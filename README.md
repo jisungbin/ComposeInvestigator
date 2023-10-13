@@ -61,3 +61,5 @@ plugins {
   id("land.sungbin.composeinvalidator") version "0.1.0-SNAPSHOT"
 }
 ```
+
+Currently, only androidx compose is supported.
