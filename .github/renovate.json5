@@ -1,0 +1,39 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    ":timezone(Asia/Seoul)",
+    "config:base",
+    "schedule:daily",
+  ],
+  "packageRules": [
+    {
+      "groupName": "Kotlin and Compose Compiler",
+      "groupSlug": "kotlin",
+      "matchPackagePrefixes": [
+        "androidx.compose.compiler",
+      ],
+      "matchPackagePatterns": [
+        "org.jetbrains.kotlin.*",
+      ],
+    },
+    {
+      "groupName": "AGP unstable updates",
+      "groupSlug": "android-gradle-plugin",
+      "ignoreUnstable": false,
+      "matchPackagePrefixes": [
+        "com.android.tools.build",
+      ],
+    },
+    {
+      "description": "Automatically merge minor and patch-level updates",
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "digest",
+      ],
+      "automerge": true,
+      "automergeStrategy": "rebase",
+      "platformAutomerge": true,
+    },
+  ],
+}
