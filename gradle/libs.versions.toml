@@ -1,5 +1,5 @@
 [versions]
-gradle-android = "8.3.0-alpha03"
+gradle-android = "8.3.0-alpha07"
 gradle-publish-maven = "0.25.3"
 gradle-dependency-handler-extensions = "1.1.0"
 
