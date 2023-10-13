@@ -18,7 +18,22 @@ The first and second features can be useful for people who want to control the C
 
 ### Usage
 
-TBD
+```kotlin
+@[Composable Invalidable(tag = [String?, default = null], disposable = [Boolean, default = true]) RecompositionRecord(child = [Boolean, default = true])]
+fun HelloWorld() = Unit
+
+// without Invalidable.tag
+
+ComposeInvalidator.invalidHelloWorld() // auto-generated function
+ComposeInvalidator.disposeHelloWorld() // auto-generated function
+
+// with Invalidable.tag
+
+ComposeInvalidator.invalidHelloWorld{Tag}() // auto-generated function
+ComposeInvalidator.disposeHelloWorld{Tag}() // auto-generated function
+
+// with @RecompositionRecord, each time a Composable is recomposed, its name is printed.
+```
 
 ### Under the hood
 
