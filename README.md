@@ -1,65 +1,53 @@
-## ComposeInvalidator
+# ComposeInvalidator 🚀
 
-Composable's forced invalidation[^1] request and invalidation tree building tools.
+**Composable's Forced Invalidation Request and Invalidation Tree Building Tools.**
 
-[^1]: Commonly known as "recomposition".
+ComposeInvalidator is a tool designed to help you control the Composable lifecycle without relying on State or the Compose Runtime. It offers a range of features, including:
 
-This tool was started for personal learning and is not proven to be necessary in production, but it can do the following things:
+1. Request to Force Invalidate a Composable: This forces the Composable to be invalidated without handling State.
 
-- **Request to force invalidate a Composable:** Forces the Composable to be invalidated without handling `State`.
-- **Request to force dispose a Composable:** Disposing of a Composable will initialize any items cached by `key`, such as `remember`, `LaunchedEffect`, and `DisposableEffect`. That is, it initializes the Composable and requests an initial-composition.
-- **Record "real" re-composed Composable:** Simply adding logs to a Composable function and seeing them printed doesn't mean that recomposition has occurred; this feature only logs when it's actually recomposed. ("fake" and "real" recompositions will be discussed in more detail later.)
+2. Request to Force Dispose a Composable: Disposing of a Composable will initialize any items cached by key, such as remember, LaunchedEffect, and DisposableEffect. Essentially, it reinitializes the Composable and requests an initial composition.
 
-- **When the root Composable is recomposed, record the child Composables that are recomposed with it:** Help easily identify tangled Composables.
+3. Record "Real" Recomposed Composables: ComposeInvalidator logs when a Composable function is actually recomposed, helping you distinguish between "fake" and "real" recompositions.
 
-The first and second features can be useful for people who want to control the Composable lifecycle without being tied to a `State` or Compose Runtime.
+4. When the root Composable is recomposed, it records the child Composables that are recomposed with it, making it easier to identify tangled Composables.
 
----
+While this tool was initially created for personal learning, it can be a valuable addition to your toolkit.
 
-### Usage
+## Usage 🧰
 
 ```kotlin
 @[Composable Invalidable(tag = [String?, default = null], disposable = [Boolean, default = true]) RecompositionRecord(child = [Boolean, default = true])]
 fun HelloWorld() = Unit
+Without Invalidable.tag:
 
-// without Invalidable.tag
+ComposeInvalidator.invalidHelloWorld() (auto-generated function)
+ComposeInvalidator.disposeHelloWorld() (auto-generated function)
+With Invalidable.tag:
 
-ComposeInvalidator.invalidHelloWorld() // auto-generated function
-ComposeInvalidator.disposeHelloWorld() // auto-generated function
+ComposeInvalidator.invalidHelloWorld{Tag}() (auto-generated function)
+ComposeInvalidator.disposeHelloWorld{Tag}() (auto-generated function)
+With @RecompositionRecord, each time a Composable is recomposed, its name is printed.
 
-// with Invalidable.tag
+Under the Hood 🛠️
+ComposeInvalidator relies on the Kotlin Compiler Plugin (K2) and works in two main steps:
 
-ComposeInvalidator.invalidHelloWorld{Tag}() // auto-generated function
-ComposeInvalidator.disposeHelloWorld{Tag}() // auto-generated function
+IR modulation of the Composable function (before the Compose Compiler).
+Re-modulating the IR modulated by the Compose Compiler to intercept changes and make them compatible with this tool.
+"Fake" and "Real" Recompositions 🔄
+(To Be Discussed)
 
-// with @RecompositionRecord, each time a Composable is recomposed, its name is printed.
-```
-
-### Under the hood
-
-The core principle behind this tool is the Kotlin Compiler Plugin (K2).
-
-The tool works in two steps.
-
-1. IR modulation of the Composable function. However, this step is performed before the Compose Compiler.
-2. Re-modulating the IR that the Compose Compiler has modulated. It intercepts the IRs that Compose Compiler changes and re-morphs them for this tool.
-
-... TBD
-
-#### "fake" and "real" recompositions
-
-TBD
-
----
-
-### Download
-
-This tool is currently in the early stages of development and **is not yet released**.
-
-```kotlin
+Download ⬇️
+This tool is currently in the early stages of development and is not yet officially released.
 plugins {
   id("land.sungbin.composeinvalidator") version "0.1.0-SNAPSHOT"
 }
-```
-
 Currently, only androidx compose is supported.
+
+Footnotes 📝
+Commonly known as "recomposition." ↩
+
+Explore the power of ComposeInvalidator and gain better control over your Composables! 🎉
+
+This updated README incorporates emojis to add visual appeal and uses concise language to make the information more accessible and engaging for readers.
+
