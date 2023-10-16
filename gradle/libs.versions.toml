@@ -10,7 +10,7 @@ kotlin-coroutines = "1.7.3"
 kotlin-kotlinpoet = "1.14.2"
 kotlin-detekt = "1.23.1"
 kotlin-ktlint-gradle = "11.5.1"
-kotlin-ktlint-source = "0.48.2"
+kotlin-ktlint-source = "0.51.0-FINAL"
 
 compose-compiler = "1.5.3"
 compose-runtime = "1.6.0-alpha07"
