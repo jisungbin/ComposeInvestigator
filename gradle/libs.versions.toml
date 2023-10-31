@@ -8,7 +8,7 @@ jetbrains-annotation = "24.0.1"
 kotlin-core = "1.9.10"
 kotlin-coroutines = "1.7.3"
 kotlin-kotlinpoet = "1.14.2"
-kotlin-detekt = "1.23.1"
+kotlin-detekt = "1.23.3"
 kotlin-ktlint-gradle = "11.5.1"
 kotlin-ktlint-source = "0.48.2"
 
