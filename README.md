@@ -39,7 +39,7 @@ ComposeInvalidator.disposeHelloWorld{Tag}() // auto-generated function
 
 ### Under the hood
 
-The core principle behind this tool is the Kotlin Compiler Plugin (K2).
+The core principle behind this tool is the Kotlin Compiler Plugin.
 
 The tool works in two steps.
 
