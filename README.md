@@ -1,3 +1,5 @@
+# WIP 👻👻👻
+
 ## ComposeInvalidator
 
 Composable's forced invalidation[^1] request and invalidation tree building tools.
@@ -61,5 +63,3 @@ plugins {
   id("land.sungbin.composeinvalidator") version "0.1.0-SNAPSHOT"
 }
 ```
-
-Currently, only androidx compose is supported.
