@@ -25,3 +25,5 @@ buildCache {
     removeUnusedEntriesAfterDays = 7
   }
 }
+
+include(":compiler")

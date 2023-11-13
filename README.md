@@ -34,7 +34,7 @@ ComposeInvalidator.disposeHelloWorld() // auto-generated function
 ComposeInvalidator.invalidHelloWorld{Tag}() // auto-generated function
 ComposeInvalidator.disposeHelloWorld{Tag}() // auto-generated function
 
-// with @RecompositionRecord, each time a Composable is recomposed, its name is printed.
+// with @InvalidationTrack, each time a Composable is recomposed, its name is printed.
 ```
 
 ### Under the hood

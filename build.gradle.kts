@@ -5,14 +5,11 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
-import io.gitlab.arturbosch.detekt.extensions.DetektExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 plugins {
-  alias(libs.plugins.kotlin.detekt)
-  alias(libs.plugins.kotlin.ktlint)
-  alias(libs.plugins.gradle.dependency.handler.extensions)
+  alias(libs.plugins.kotlin.ktlint) apply false
 }
 
 buildscript {
@@ -27,30 +24,26 @@ buildscript {
   }
 }
 
-allprojects {
+subprojects {
   repositories {
     google()
     mavenCentral()
   }
 
   apply {
-    plugin(rootProject.libs.plugins.gradle.dependency.handler.extensions.get().pluginId)
-    plugin(rootProject.libs.plugins.kotlin.detekt.get().pluginId)
     plugin(rootProject.libs.plugins.kotlin.ktlint.get().pluginId)
   }
 
   afterEvaluate {
-    extensions.configure<DetektExtension> {
-      parallel = true
-      buildUponDefaultConfig = true
-      toolVersion = libs.versions.kotlin.detekt.get()
-      config.setFrom(files("$rootDir/detekt-config.yml"))
-    }
-
     extensions.configure<KtlintExtension> {
       version.set(rootProject.libs.versions.kotlin.ktlint.source.get())
       android.set(true)
       verbose.set(true)
+    }
+
+    extensions.configure<SourceSetContainer> {
+      getByName("main").java.srcDir("src/main/kotlin")
+      getByName("test").java.srcDir("src/main/kotlin")
     }
 
     tasks.withType<KotlinCompile> {
