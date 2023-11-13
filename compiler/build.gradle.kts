@@ -4,7 +4,14 @@ plugins {
   alias(libs.plugins.kotlin.ksp)
 }
 
+sourceSets {
+  getByName("main").java.srcDir("src/main/kotlin")
+}
 
+kotlin {
+  jvmToolchain(17)
+  explicitApi()
+}
 
 dependencies {
   compileOnly(libs.kotlin.compiler.embedded)
@@ -12,9 +19,4 @@ dependencies {
 
   implementation(libs.autoservice.annotation)
   ksp(libs.autoservice.ksp)
-
-  testImplementation(libs.test.kotest)
-  testImplementation(libs.test.kotlin.compilation)
-  testImplementation(libs.test.junit.core)
-  testRuntimeOnly(libs.test.junit.enigne)
 }

@@ -20,12 +20,12 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
 @VisibleForTesting
-internal const val PLUGIN_ID = "land.sungbin.composeinvalidator.compiler"
+public const val COMPOSE_INVALIDATOR_PLUGIN_ID: String = "land.sungbin.composeinvalidator.compiler"
 
 internal val KEY_VERBOSE = CompilerConfigurationKey<String>("Whether to enable verbose log")
 
 @VisibleForTesting
-internal val OPTION_VERBOSE =
+public val OPTION_VERBOSE: CliOption =
   CliOption(
     optionName = "verbose",
     valueDescription = "<true | false>",
@@ -33,11 +33,12 @@ internal val OPTION_VERBOSE =
     required = false,
   )
 
+@VisibleForTesting
 @AutoService(CommandLineProcessor::class)
-internal class TrackerCliRegistrar : CommandLineProcessor {
-  override val pluginId = PLUGIN_ID
+public class ComposeInvalidatorCommandLineProcessor : CommandLineProcessor {
+  override val pluginId: String = COMPOSE_INVALIDATOR_PLUGIN_ID
 
-  override val pluginOptions = listOf(OPTION_VERBOSE)
+  override val pluginOptions: List<CliOption> = listOf(OPTION_VERBOSE)
 
   override fun processOption(
     option: AbstractCliOption,

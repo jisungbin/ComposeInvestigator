@@ -41,11 +41,6 @@ subprojects {
       verbose.set(true)
     }
 
-    extensions.configure<SourceSetContainer> {
-      getByName("main").java.srcDir("src/main/kotlin")
-      getByName("test").java.srcDir("src/main/kotlin")
-    }
-
     tasks.withType<KotlinCompile> {
       kotlinOptions {
         freeCompilerArgs = freeCompilerArgs + listOf(

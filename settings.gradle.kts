@@ -26,4 +26,7 @@ buildCache {
   }
 }
 
-include(":compiler")
+include(
+  ":compiler",
+  ":compiler-integration-test",
+)

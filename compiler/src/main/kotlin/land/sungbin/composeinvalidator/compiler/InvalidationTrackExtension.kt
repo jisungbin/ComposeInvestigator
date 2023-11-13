@@ -7,13 +7,16 @@
 
 package land.sungbin.composeinvalidator.compiler
 
+import land.sungbin.composeinvalidator.compiler.internal.transformer.InvalidationTrackableTransformer
 import land.sungbin.composeinvalidator.compiler.util.VerboseLogger
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
-internal class InvalidationTrackExtension(private val logger: VerboseLogger) : IrGenerationExtension {
+internal class InvalidationTrackExtension(private val logger: VerboseLogger) :
+  IrGenerationExtension {
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-    // TODO!
+    moduleFragment.transformChildrenVoid(InvalidationTrackableTransformer(logger))
   }
 }

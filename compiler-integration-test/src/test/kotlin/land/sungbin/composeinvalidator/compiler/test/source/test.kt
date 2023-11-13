@@ -5,8 +5,13 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvalidator.compiler.source
+@file:Suppress("unused")
 
+package land.sungbin.composeinvalidator.compiler.test.source
+
+import androidx.compose.runtime.Composable
+
+@Composable
 fun entry() {
   println("Hello, world!")
 }

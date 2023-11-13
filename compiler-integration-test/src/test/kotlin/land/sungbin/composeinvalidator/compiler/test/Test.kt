@@ -8,12 +8,18 @@
 @file:OptIn(ExperimentalCompilerApi::class)
 @file:Suppress("unused")
 
-package land.sungbin.composeinvalidator.compiler
+package land.sungbin.composeinvalidator.compiler.test
 
+import androidx.compose.compiler.plugins.kotlin.ComposeCommandLineProcessor
+import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.PluginOption
 import com.tschuchort.compiletesting.SourceFile
-import land.sungbin.composeinvalidator.compiler.utils.source
+import land.sungbin.composeinvalidator.compiler.COMPOSE_INVALIDATOR_PLUGIN_ID
+import land.sungbin.composeinvalidator.compiler.ComposeInvalidatorCommandLineProcessor
+import land.sungbin.composeinvalidator.compiler.ComposeInvalidatorPluginRegistrar
+import land.sungbin.composeinvalidator.compiler.OPTION_VERBOSE
+import land.sungbin.composeinvalidator.compiler.test.utils.source
 import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.JvmTarget
 import org.junit.Rule
@@ -39,15 +45,15 @@ class Test {
       jvmTarget = JvmTarget.JVM_17.toString()
       inheritClassPath = true
       supportsK2 = false
-      useK2 = false
       pluginOptions = listOf(
         PluginOption(
-          pluginId = PLUGIN_ID,
+          pluginId = COMPOSE_INVALIDATOR_PLUGIN_ID,
           optionName = OPTION_VERBOSE.optionName,
           optionValue = "true",
         ),
       )
-      compilerPluginRegistrars = listOf(TrackerPluginRegistrar())
-      commandLineProcessors = listOf(TrackerCliRegistrar())
+      @Suppress("DEPRECATION")
+      componentRegistrars = listOf(ComposePluginRegistrar(), ComposeInvalidatorPluginRegistrar())
+      commandLineProcessors = listOf(ComposeCommandLineProcessor(), ComposeInvalidatorCommandLineProcessor())
     }
 }
