@@ -8,5 +8,10 @@
 package land.sungbin.composeinvalidator.compiler.internal
 
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.Name
+
+internal val SKIP_TO_GROUP_END = Name.identifier("skipToGroupEnd")
+internal val TRACE_EVENT_START = Name.identifier("traceEventStart")
 
 internal val COMPOSABLE_FQN = FqName("androidx.compose.runtime.Composable")
+internal val COMPOSER_FQN = FqName("androidx.compose.runtime.Composer")

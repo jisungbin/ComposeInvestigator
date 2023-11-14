@@ -15,3 +15,15 @@ import androidx.compose.runtime.Composable
 fun entry() {
   println("Hello, world!")
 }
+
+// fun entry() {
+//   if (Random.nextBoolean()) {
+//     println("true world!")
+//     println("true world!")
+//     println("true world!")
+//   } else {
+//     println("false world!")
+//     println("false world!")
+//     println("false world!")
+//   }
+// }

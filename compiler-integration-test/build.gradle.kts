@@ -23,6 +23,7 @@ kotlin {
 
 dependencies {
   testImplementation(projects.compiler)
+
   testImplementation(libs.compose.compiler)
   testImplementation(libs.compose.foundation)
 
