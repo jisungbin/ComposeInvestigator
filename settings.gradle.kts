@@ -10,13 +10,24 @@
 rootProject.name = "ComposeInvalidator"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
-enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
+// enableFeaturePreview("STABLE_CONFIGURATION_CACHE")
 
 pluginManagement {
   repositories {
     gradlePluginPortal()
     google()
     mavenCentral()
+    maven("https://jitpack.io") {
+      content {
+        includeGroup("com.github.takahirom")
+      }
+    }
+  }
+
+  resolutionStrategy.eachPlugin {
+    if (requested.id.id == "com.github.takahirom.decomposer") {
+      useModule("com.github.takahirom:decomposer:main-SNAPSHOT")
+    }
   }
 }
 
@@ -29,4 +40,5 @@ buildCache {
 include(
   ":compiler",
   ":compiler-integration-test",
+  ":sample",
 )

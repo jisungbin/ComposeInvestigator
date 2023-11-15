@@ -10,7 +10,10 @@ kotlin-kotlinpoet = "1.14.2"
 kotlin-ktlint-gradle = "11.5.1"
 kotlin-ktlint-source = "0.48.2"
 
+androidx-activity = "1.8.0"
+
 compose-core = "1.5.4"
+compose-activity = "1.8.0"
 
 autoservice-annotation = "1.1.1"
 autoservice-ksp = "1.1.0"
@@ -35,10 +38,13 @@ kotlin-gradle = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.
 kotlin-compiler-embedded = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin-core" }
 kotlin-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-kotlinpoet" }
 
-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-core" }
-compose-foundation = { module = "androidx.compose.foundation:foundation", version.ref = "compose-core" }
+androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
 
-autoservice-annotation = { module = "com.google.auto.service:auto-service-annotations"  , version.ref = "autoservice-annotation" }
+compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-core" }
+compose-material = { module = "androidx.compose.material:material", version.ref = "compose-core" }
+compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
+
+autoservice-annotation = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoservice-annotation" }
 autoservice-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", version.ref = "autoservice-ksp" }
 
 test-kotest = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "test-kotest" }

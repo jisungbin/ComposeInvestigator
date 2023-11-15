@@ -9,4 +9,4 @@ package land.sungbin.composeinvalidator.compiler.internal.origin
 
 import org.jetbrains.kotlin.ir.expressions.IrStatementOriginImpl
 
-internal data object InvalidationTrackableOrigin : IrStatementOriginImpl("INVALIDATION_TRACKABLE_ORIGIN")
+internal data object InvalidationTrackableOrigin : IrStatementOriginImpl("TRANSFORMED_BY_INVALIDATION_TRACKABLE")

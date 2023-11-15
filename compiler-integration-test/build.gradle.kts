@@ -25,7 +25,7 @@ dependencies {
   testImplementation(projects.compiler)
 
   testImplementation(libs.compose.compiler)
-  testImplementation(libs.compose.foundation)
+  testImplementation(libs.compose.material)
 
   testImplementation(libs.test.kotest)
   testImplementation(libs.test.kotlin.compilation)
