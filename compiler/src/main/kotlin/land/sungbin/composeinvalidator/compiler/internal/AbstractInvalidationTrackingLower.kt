@@ -34,7 +34,6 @@ import org.jetbrains.kotlin.utils.addToStdlib.cast
 internal abstract class AbstractInvalidationTrackingLower(
   private val context: IrPluginContext,
 ) : IrElementTransformerVoidWithContext() {
-
   private val printlnSymbol: IrSimpleFunctionSymbol =
     context
       .referenceFunctions(
