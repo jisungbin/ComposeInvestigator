@@ -18,6 +18,7 @@ import land.sungbin.composeinvalidator.compiler.internal.TRACE_EVENT_END
 import land.sungbin.composeinvalidator.compiler.internal.TRACE_EVENT_START
 import land.sungbin.composeinvalidator.compiler.internal.origin.InvalidationTrackableOrigin
 import land.sungbin.composeinvalidator.compiler.util.VerboseLogger
+import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -32,13 +33,13 @@ import org.jetbrains.kotlin.ir.expressions.IrWhen
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
+import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.isNullableAny
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.isTopLevel
 import org.jetbrains.kotlin.ir.util.kotlinFqName
-import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.load.kotlin.FacadeClassSource
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
@@ -49,7 +50,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.cast
 internal class InvalidationTrackableTransformer(
   private val context: IrPluginContext,
   private val logger: VerboseLogger,
-) : IrElementTransformerVoid() {
+) : IrElementTransformerVoidWithContext() {
   private val printlnSymbol: IrSimpleFunctionSymbol =
     context
       .referenceFunctions(
@@ -63,10 +64,10 @@ internal class InvalidationTrackableTransformer(
           symbol.owner.valueParameters.single().type.isNullableAny()
       }
 
-  override fun visitFunction(declaration: IrFunction): IrStatement {
-    if (!declaration.hasAnnotation(COMPOSABLE_FQN)) return super.visitFunction(declaration)
+  override fun visitFunctionNew(declaration: IrFunction): IrStatement {
+    if (!declaration.hasAnnotation(COMPOSABLE_FQN)) return super.visitFunctionNew(declaration)
     declaration.body?.transformChildrenVoid()
-    return super.visitFunction(declaration)
+    return super.visitFunctionNew(declaration)
   }
 
   // <BLOCK> {
@@ -89,7 +90,7 @@ internal class InvalidationTrackableTransformer(
 
     val isComposerIrBlock = firstStatement.isComposerTrackBranch() && lastStatement.isComposerTrackBranch()
     if (isComposerIrBlock) {
-      val printerCall = irPrintlnCall(irString("[INVALIDATION_TRACKER] invalidation processed"))
+      val printerCall = irPrintlnCall(irString("[INVALIDATION_TRACKER] <$currentFunctionName> invalidation processed"))
       val log = buildString {
         for ((index, statement) in expression.statements.withIndex()) {
           val dump = run {
@@ -124,7 +125,7 @@ internal class InvalidationTrackableTransformer(
 
     // SKIP_TO_GROUP_END is declared in 'androidx.compose.runtime.Composer'
     if (fnName == SKIP_TO_GROUP_END && fnParentFqn == COMPOSER_FQN) {
-      val printerCall = irPrintlnCall(irString("[INVALIDATION_TRACKER] invalidation skipped"))
+      val printerCall = irPrintlnCall(irString("[INVALIDATION_TRACKER] <$currentFunctionName> invalidation skipped"))
       val block =
         IrBlockImpl(
           startOffset = UNDEFINED_OFFSET,
@@ -174,6 +175,11 @@ internal class InvalidationTrackableTransformer(
       type = context.irBuiltIns.stringType,
       value = value,
     )
+
+  private val currentFunctionName: String
+    get() {
+      return (currentFunction ?: return "unknown").scope.scopeOwnerSymbol.cast<IrFunctionSymbol>().owner.name.asString()
+    }
 }
 
 // TODO(multiplatform): this is jvm specific implementation
