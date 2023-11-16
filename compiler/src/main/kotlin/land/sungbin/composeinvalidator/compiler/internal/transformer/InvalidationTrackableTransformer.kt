@@ -22,17 +22,21 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrValueDeclaration
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrWhen
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
+import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isNullableAny
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.hasAnnotation
@@ -59,6 +63,22 @@ internal class InvalidationTrackableTransformer(
       .single { symbol ->
         symbol.owner.valueParameters.size == 1 &&
           symbol.owner.valueParameters.single().type.isNullableAny()
+      }
+  private val hashCodeSymbol: IrSimpleFunctionSymbol =
+    context
+      .referenceFunctions(
+        CallableId(
+          packageName = FqName("kotlin"),
+          callableName = Name.identifier("hashCode"),
+        ),
+      )
+      .single { symbol ->
+        val extensionReceiver = symbol.owner.extensionReceiverParameter
+
+        val isValidExtensionReceiver = extensionReceiver != null && extensionReceiver.type.isNullableAny()
+        val isValidReturnType = symbol.owner.returnType.isInt()
+
+        isValidExtensionReceiver && isValidReturnType
       }
 
   override fun visitFunctionNew(declaration: IrFunction): IrStatement {
@@ -97,11 +117,18 @@ internal class InvalidationTrackableTransformer(
           if (index == 1) appendLine(">>>>>>>>>> Add: ${printerCall.dump()}")
           appendLine(dump)
           if (index == 3) {
-            appendLine("..")
+            appendLine("...")
             break
           }
         }
       }
+
+      for (valueParameter in currentFunctionOrNull?.owner?.valueParameters.orEmpty()) {
+        val valueImpl = irGetValue(valueParameter)
+        val hashCodeCall = irHashCode(valueImpl)
+
+      }
+
       logger("[invalidation processed] transformed: $log")
       expression.statements.add(1, printerCall)
       expression.origin = InvalidationTrackableOrigin
@@ -155,15 +182,12 @@ internal class InvalidationTrackableTransformer(
     return validIf && validThen
   }
 
-  private fun irPrintlnCall(value: IrExpression): IrCall =
-    IrCallImpl.fromSymbolOwner(
+  private fun <V : IrValueDeclaration> irGetValue(value: V): IrGetValue =
+    IrGetValueImpl(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,
-      symbol = printlnSymbol,
-    ).apply {
-      origin = InvalidationTrackableOrigin
-      putValueArgument(0, value)
-    }
+      symbol = value.symbol,
+    )
 
   private fun irString(value: String): IrConst<String> =
     IrConstImpl.string(
@@ -173,9 +197,33 @@ internal class InvalidationTrackableTransformer(
       value = value,
     )
 
+  private fun irPrintlnCall(value: IrExpression?): IrCall =
+    IrCallImpl.fromSymbolOwner(
+      startOffset = UNDEFINED_OFFSET,
+      endOffset = UNDEFINED_OFFSET,
+      symbol = printlnSymbol,
+    ).apply {
+      origin = InvalidationTrackableOrigin
+      putValueArgument(0, value)
+    }
+
+  private fun irHashCode(value: IrExpression?): IrCall =
+    IrCallImpl.fromSymbolOwner(
+      startOffset = UNDEFINED_OFFSET,
+      endOffset = UNDEFINED_OFFSET,
+      symbol = hashCodeSymbol,
+    ).apply {
+      extensionReceiver = value
+    }
+
+  private val currentFunctionOrNull: IrFunctionSymbol?
+    get() {
+      return (currentFunction ?: return null).scope.scopeOwnerSymbol.cast<IrFunctionSymbol>()
+    }
+
   private val currentFunctionName: String
     get() {
-      return (currentFunction ?: return "unknown").scope.scopeOwnerSymbol.cast<IrFunctionSymbol>().owner.name.asString()
+      return (currentFunctionOrNull ?: return "unknown").owner.name.asString()
     }
 }
 

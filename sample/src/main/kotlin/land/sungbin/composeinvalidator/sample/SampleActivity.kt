@@ -28,14 +28,15 @@ class SampleActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {
-      Entry()
+      Entry("Test Log Message!")
     }
   }
 }
 
 @Composable
-private fun Entry() {
+private fun Entry(log: String) {
   val recomposeScope = currentRecomposeScope
+  println(log)
 
   Column(
     modifier = Modifier.fillMaxSize(),
