@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   id("com.android.library")
   kotlin("android")
@@ -17,8 +19,10 @@ android {
   }
 }
 
-kotlin {
-  jvmToolchain(17)
+tasks.withType<KotlinCompile> {
+  kotlinOptions {
+    jvmTarget = "17"
+  }
 }
 
 dependencies {

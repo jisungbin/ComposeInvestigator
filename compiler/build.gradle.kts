@@ -1,3 +1,5 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
   kotlin("jvm")
   alias(libs.plugins.gradle.publish.maven)
@@ -9,8 +11,13 @@ sourceSets {
 }
 
 kotlin {
-  jvmToolchain(17)
   explicitApi()
+}
+
+tasks.withType<KotlinCompile> {
+  kotlinOptions {
+    jvmTarget = "17"
+  }
 }
 
 dependencies {
