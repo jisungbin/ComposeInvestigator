@@ -11,13 +11,8 @@ package land.sungbin.composeinvalidator.compiler.test.source
 
 import androidx.compose.runtime.Composable
 
-//@Composable
-//fun fake_main() {
-//  entry("hello world!")
-//}
-
 @Composable
 fun entry(log: String?) {
   println(log)
-  // log.hashCode()
+  println("Log Message!")
 }

@@ -10,6 +10,8 @@
 
 package land.sungbin.composeinvalidator.compiler.test
 
+import androidx.compose.compiler.plugins.kotlin.ComposeCommandLineProcessor
+import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.PluginOption
 import com.tschuchort.compiletesting.SourceFile
@@ -49,9 +51,14 @@ class Test {
           optionName = OPTION_VERBOSE.optionName,
           optionValue = "true",
         ),
+        PluginOption(
+          pluginId = ComposeCommandLineProcessor.PLUGIN_ID,
+          optionName = ComposeCommandLineProcessor.LIVE_LITERALS_V2_ENABLED_OPTION.optionName,
+          optionValue = "true",
+        ),
       )
       @Suppress("DEPRECATION")
-      componentRegistrars = listOf(/*ComposePluginRegistrar(), */ComposeInvalidatorPluginRegistrar())
-      commandLineProcessors = listOf(/*ComposeCommandLineProcessor(), */ComposeInvalidatorCommandLineProcessor())
+      componentRegistrars = listOf(ComposePluginRegistrar(), ComposeInvalidatorPluginRegistrar())
+      commandLineProcessors = listOf(ComposeCommandLineProcessor(), ComposeInvalidatorCommandLineProcessor())
     }
 }

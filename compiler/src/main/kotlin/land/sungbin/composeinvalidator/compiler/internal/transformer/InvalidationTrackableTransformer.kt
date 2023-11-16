@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvalidator.compiler.internal.transformer
 
+import land.sungbin.composeinvalidator.compiler.internal.AbstractInvalidationTrackingLower
 import land.sungbin.composeinvalidator.compiler.internal.COMPOSABLE_FQN
 import land.sungbin.composeinvalidator.compiler.internal.COMPOSER_FQN
 import land.sungbin.composeinvalidator.compiler.internal.COMPOSER_KT_FQN
@@ -16,71 +17,30 @@ import land.sungbin.composeinvalidator.compiler.internal.TRACE_EVENT_END
 import land.sungbin.composeinvalidator.compiler.internal.TRACE_EVENT_START
 import land.sungbin.composeinvalidator.compiler.internal.origin.InvalidationTrackableOrigin
 import land.sungbin.composeinvalidator.compiler.util.VerboseLogger
-import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrValueDeclaration
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
-import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrWhen
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
-import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
-import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
-import org.jetbrains.kotlin.ir.types.isInt
-import org.jetbrains.kotlin.ir.types.isNullableAny
 import org.jetbrains.kotlin.ir.util.dump
+import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.isTopLevel
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.load.kotlin.FacadeClassSource
-import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 internal class InvalidationTrackableTransformer(
   private val context: IrPluginContext,
   private val logger: VerboseLogger,
-) : IrElementTransformerVoidWithContext() {
-  private val printlnSymbol: IrSimpleFunctionSymbol =
-    context
-      .referenceFunctions(
-        CallableId(
-          packageName = FqName("kotlin.io"),
-          callableName = Name.identifier("println"),
-        ),
-      )
-      .single { symbol ->
-        symbol.owner.valueParameters.size == 1 &&
-          symbol.owner.valueParameters.single().type.isNullableAny()
-      }
-  private val hashCodeSymbol: IrSimpleFunctionSymbol =
-    context
-      .referenceFunctions(
-        CallableId(
-          packageName = FqName("kotlin"),
-          callableName = Name.identifier("hashCode"),
-        ),
-      )
-      .single { symbol ->
-        val extensionReceiver = symbol.owner.extensionReceiverParameter
-
-        val isValidExtensionReceiver = extensionReceiver != null && extensionReceiver.type.isNullableAny()
-        val isValidReturnType = symbol.owner.returnType.isInt()
-
-        isValidExtensionReceiver && isValidReturnType
-      }
-
+) : AbstractInvalidationTrackingLower(context) {
   override fun visitFunctionNew(declaration: IrFunction): IrStatement {
     if (!declaration.hasAnnotation(COMPOSABLE_FQN)) return super.visitFunctionNew(declaration)
     declaration.body?.transformChildrenVoid()
@@ -107,14 +67,14 @@ internal class InvalidationTrackableTransformer(
 
     val isComposerIrBlock = firstStatement.isComposerTrackBranch() && lastStatement.isComposerTrackBranch()
     if (isComposerIrBlock) {
-      val printerCall = irPrintlnCall(irString("[INVALIDATION_TRACKER] <$currentFunctionName> invalidation processed"))
+      val println = irPrintln(irString("[INVALIDATION_TRACKER] <$currentFunctionName> invalidation processed"))
       val log = buildString {
         for ((index, statement) in expression.statements.withIndex()) {
           val dump = run {
             val dump = statement.dump().trimIndent()
             if (dump.length > 500) dump.substring(0, 500) + "..." else dump
           }
-          if (index == 1) appendLine(">>>>>>>>>> Add: ${printerCall.dump()}")
+          if (index == 1) appendLine(">>>>>>>>>> ADD: ${println.dump()}")
           appendLine(dump)
           if (index == 3) {
             appendLine("...")
@@ -123,15 +83,25 @@ internal class InvalidationTrackableTransformer(
         }
       }
 
-      for (valueParameter in currentFunctionOrNull?.owner?.valueParameters.orEmpty()) {
-        val valueImpl = irGetValue(valueParameter)
-        val hashCodeCall = irHashCode(valueImpl)
+      // The last two arguments are generated by the Compose compiler ($composer, $changed)
+      val validValueParamters = currentFunctionOrNull?.valueParameters?.dropLast(2).orEmpty()
+      for ((index, valueParameter) in validValueParamters.withIndex()) {
+        val hashCode = irHashCode(irGetValue(valueParameter))
+        val irTempatory =
+          currentFunction!!.scope
+            .createTemporaryVariable(
+              irExpression = hashCode,
+              nameHint = valueParameter.name.asString() + "\$hashCode",
+            )
 
+        expression.statements.add(index + 1, irTempatory)
       }
 
-      logger("[invalidation processed] transformed: $log")
-      expression.statements.add(1, printerCall)
+      expression.statements.add(1, println)
       expression.origin = InvalidationTrackableOrigin
+
+      logger("[invalidation processed] transformed: $log")
+      logger("[invalidation processed] dumpKotlinLike: ${expression.dumpKotlinLike()}")
     }
 
     return super.visitBlock(expression)
@@ -149,14 +119,14 @@ internal class InvalidationTrackableTransformer(
 
     // SKIP_TO_GROUP_END is declared in 'androidx.compose.runtime.Composer'
     if (fnName == SKIP_TO_GROUP_END && fnParentFqn == COMPOSER_FQN) {
-      val printerCall = irPrintlnCall(irString("[INVALIDATION_TRACKER] <$currentFunctionName> invalidation skipped"))
+      val println = irPrintln(irString("[INVALIDATION_TRACKER] <$currentFunctionName> invalidation skipped"))
       val block =
         IrBlockImpl(
           startOffset = UNDEFINED_OFFSET,
           endOffset = UNDEFINED_OFFSET,
           type = context.irBuiltIns.unitType,
           origin = InvalidationTrackableOrigin,
-          statements = listOf(printerCall, call),
+          statements = listOf(println, call),
         )
       branch.result = block
       logger("[invalidation skipped] transformed: ${call.dump()} -> ${block.dump()}")
@@ -181,50 +151,6 @@ internal class InvalidationTrackableTransformer(
 
     return validIf && validThen
   }
-
-  private fun <V : IrValueDeclaration> irGetValue(value: V): IrGetValue =
-    IrGetValueImpl(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      symbol = value.symbol,
-    )
-
-  private fun irString(value: String): IrConst<String> =
-    IrConstImpl.string(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      type = context.irBuiltIns.stringType,
-      value = value,
-    )
-
-  private fun irPrintlnCall(value: IrExpression?): IrCall =
-    IrCallImpl.fromSymbolOwner(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      symbol = printlnSymbol,
-    ).apply {
-      origin = InvalidationTrackableOrigin
-      putValueArgument(0, value)
-    }
-
-  private fun irHashCode(value: IrExpression?): IrCall =
-    IrCallImpl.fromSymbolOwner(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      symbol = hashCodeSymbol,
-    ).apply {
-      extensionReceiver = value
-    }
-
-  private val currentFunctionOrNull: IrFunctionSymbol?
-    get() {
-      return (currentFunction ?: return null).scope.scopeOwnerSymbol.cast<IrFunctionSymbol>()
-    }
-
-  private val currentFunctionName: String
-    get() {
-      return (currentFunctionOrNull ?: return "unknown").owner.name.asString()
-    }
 }
 
 // TODO(multiplatform): this is jvm specific implementation
