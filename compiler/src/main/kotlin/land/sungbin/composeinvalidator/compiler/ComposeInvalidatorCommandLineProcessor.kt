@@ -5,7 +5,6 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
-@file:OptIn(ExperimentalCompilerApi::class)
 @file:Suppress("unused")
 
 package land.sungbin.composeinvalidator.compiler
@@ -15,7 +14,6 @@ import org.jetbrains.annotations.VisibleForTesting
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
-import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 

@@ -12,6 +12,10 @@ sourceSets {
 
 kotlin {
   explicitApi()
+  compilerOptions {
+    optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
+    optIn.add("org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction")
+  }
 }
 
 tasks.withType<KotlinCompile> {

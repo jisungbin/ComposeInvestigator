@@ -5,8 +5,6 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
-@file:OptIn(UnsafeCastFunction::class)
-
 package land.sungbin.composeinvalidator.compiler.internal.transformer
 
 import land.sungbin.composeinvalidator.compiler.internal.COMPOSABLE_FQN
@@ -44,7 +42,6 @@ import org.jetbrains.kotlin.load.kotlin.FacadeClassSource
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 internal class InvalidationTrackableTransformer(
