@@ -51,6 +51,7 @@ dependencies {
   implementation(libs.compose.activity)
   implementation(libs.compose.material)
 
+  implementation(projects.runtime)
   kotlinCompilerPluginClasspath(projects.compiler)
   // kotlinCompilerPluginClasspath("land.sungbin.composeinvalidator:composeinvalidator-compiler:0.1.0-SNAPSHOT")
 }

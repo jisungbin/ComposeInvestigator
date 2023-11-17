@@ -15,22 +15,22 @@ public sealed class DeclarationStability {
   }
 
   @ComposeInvalidatorCompilerApi
-  public class Runtime(private val declarationName: String) : DeclarationStability() {
-    override fun toString(): String = "Runtime($declarationName)"
+  public class Runtime(private val name: String) : DeclarationStability() {
+    override fun toString(): String = "Runtime($name)"
   }
 
   @ComposeInvalidatorCompilerApi
-  public class Unknown(private val declarationName: String) : DeclarationStability() {
-    override fun toString(): String = "Uncertain($declarationName)"
+  public class Unknown(private val name: String) : DeclarationStability() {
+    override fun toString(): String = "Uncertain($name)"
   }
 
   @ComposeInvalidatorCompilerApi
-  public class Parameter(private val parameterName: String) : DeclarationStability() {
-    override fun toString(): String = "Parameter($parameterName)"
+  public class Parameter(private val name: String) : DeclarationStability() {
+    override fun toString(): String = "Parameter($name)"
   }
 
   @ComposeInvalidatorCompilerApi
-  public class Combined(private val elements: List<DeclarationStability>) : DeclarationStability() {
-    override fun toString(): String = elements.joinToString(",")
+  public class Combined(private vararg val elements: DeclarationStability) : DeclarationStability() {
+    override fun toString(): String = elements.asList().joinToString(",")
   }
 }

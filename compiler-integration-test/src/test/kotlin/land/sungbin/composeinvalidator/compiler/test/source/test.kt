@@ -12,13 +12,7 @@ package land.sungbin.composeinvalidator.compiler.test.source
 import androidx.compose.runtime.Composable
 
 @Composable
-fun entry(log: String?) {
-  println(log)
-  println("Log Message!")
-}
-
-@Composable
-fun entry(log: String?, log2: String, log3: Int?) {
-  println(log)
-  println("Log Message!")
+fun entry(one: Int, two: String) {
+  println(one)
+  println(two)
 }

@@ -1,4 +1,11 @@
-package land.sungbin.composeinvalidator.compiler.internal.key
+/*
+ * Designed and developed by Ji Sungbin 2023.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
+ */
+
+package land.sungbin.composeinvalidator.compiler.internal.transformer.key
 
 import land.sungbin.composeinvalidator.compiler.internal.ModuleLoweringPass
 import org.jetbrains.kotlin.ir.IrStatement
@@ -49,8 +56,8 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
 
-internal open class DurableKeyTransformer(private val keyVisitor: DurableKeyVisitor)
-  : IrElementTransformerVoid(), ModuleLoweringPass {
+internal open class DurableKeyTransformer(private val keyVisitor: DurableKeyVisitor) :
+  IrElementTransformerVoid(), ModuleLoweringPass {
 
   override fun lower(module: IrModuleFragment) {
     module.transformChildrenVoid(this)

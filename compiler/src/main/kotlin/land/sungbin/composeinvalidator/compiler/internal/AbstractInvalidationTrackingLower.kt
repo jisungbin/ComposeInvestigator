@@ -10,30 +10,28 @@
 package land.sungbin.composeinvalidator.compiler.internal
 
 import land.sungbin.composeinvalidator.compiler.internal.origin.InvalidationTrackableOrigin
-import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
+import land.sungbin.composeinvalidator.compiler.internal.transformer.IrInvalidationTrackTableClass
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrValueDeclaration
 import org.jetbrains.kotlin.ir.expressions.IrCall
-import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isNullableAny
+import org.jetbrains.kotlin.ir.types.isString
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
-internal abstract class AbstractInvalidationTrackingLower(
-  private val context: IrPluginContext,
-) : IrElementTransformerVoidWithContext() {
+internal abstract class AbstractInvalidationTrackingLower(context: IrPluginContext) :
+  IrElementTransformerWithContext<IrInvalidationTrackTableClass>() {
   private val printlnSymbol: IrSimpleFunctionSymbol =
     context
       .referenceFunctions(
@@ -62,6 +60,23 @@ internal abstract class AbstractInvalidationTrackingLower(
 
         isValidExtensionReceiver && isValidReturnType
       }
+  private val toStringSymbol: IrSimpleFunctionSymbol =
+    context
+      .referenceFunctions(
+        CallableId(
+          packageName = FqName("kotlin"),
+          callableName = Name.identifier("toString"),
+        ),
+      )
+      // has two elements... but why?
+      .first { symbol ->
+        val extensionReceiver = symbol.owner.extensionReceiverParameter
+
+        val isValidExtensionReceiver = extensionReceiver != null && extensionReceiver.type.isNullableAny()
+        val isValidReturnType = symbol.owner.returnType.isString()
+
+        isValidExtensionReceiver && isValidReturnType
+      }
 
   protected val currentFunctionOrNull: IrFunction?
     get() {
@@ -80,14 +95,6 @@ internal abstract class AbstractInvalidationTrackingLower(
       symbol = value.symbol,
     )
 
-  protected fun irString(value: String): IrConst<String> =
-    IrConstImpl.string(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      type = context.irBuiltIns.stringType,
-      value = value,
-    )
-
   protected fun irPrintln(value: IrExpression): IrCall =
     IrCallImpl.fromSymbolOwner(
       startOffset = UNDEFINED_OFFSET,
@@ -103,6 +110,15 @@ internal abstract class AbstractInvalidationTrackingLower(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,
       symbol = hashCodeSymbol,
+    ).apply {
+      extensionReceiver = value
+    }
+
+  protected fun irToString(value: IrExpression): IrCall =
+    IrCallImpl.fromSymbolOwner(
+      startOffset = UNDEFINED_OFFSET,
+      endOffset = UNDEFINED_OFFSET,
+      symbol = toStringSymbol,
     ).apply {
       extensionReceiver = value
     }

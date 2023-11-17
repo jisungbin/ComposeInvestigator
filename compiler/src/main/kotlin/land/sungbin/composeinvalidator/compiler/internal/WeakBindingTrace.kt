@@ -5,14 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
-/*
- * Designed and developed by Ji Sungbin 2023.
- *
- * Licensed under the MIT.
- * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
- */
-
-package land.sungbin.composeinvalidator.compiler.util
+package land.sungbin.composeinvalidator.compiler.internal
 
 import java.util.WeakHashMap
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext

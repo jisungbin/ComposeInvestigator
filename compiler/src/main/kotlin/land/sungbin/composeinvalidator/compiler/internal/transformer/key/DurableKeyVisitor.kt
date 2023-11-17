@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvalidator.compiler.internal.key
+package land.sungbin.composeinvalidator.compiler.internal.transformer.key
 
 internal class PathPartInfo(val key: String) {
   var parent: PathPartInfo? = null

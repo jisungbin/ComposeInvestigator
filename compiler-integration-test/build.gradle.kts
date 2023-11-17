@@ -26,6 +26,7 @@ tasks.withType<KotlinCompile> {
 }
 
 dependencies {
+  testImplementation(projects.runtime)
   testImplementation(projects.compiler)
 
   testImplementation(libs.compose.compiler)
