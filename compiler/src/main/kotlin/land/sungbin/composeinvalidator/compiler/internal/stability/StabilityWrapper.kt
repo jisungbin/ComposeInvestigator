@@ -37,8 +37,6 @@ private var declarationStabilityUnknownSymbol: IrClassSymbol? = null
 private var declarationStabilityParameterSymbol: IrClassSymbol? = null
 private var declarationStabilityCombinedSymbol: IrClassSymbol? = null
 
-private var declarationStabilityArraySymbol: IrClassSymbol? = null
-
 internal fun Stability.toIrDeclarationStability(context: IrPluginContext): IrConstructorCall =
   when (this) {
     is Stability.Certain -> context.irDeclarationStabilityCertain(context.irBoolean(stable))
@@ -53,14 +51,12 @@ private fun IrPluginContext.irDeclarationStabilityCertain(stable: IrConst<Boolea
     declarationStabilityCertainSymbol ?: (referenceClass(ClassId.topLevel(DECLARATION_STABILITY_CERTAIN_FQN))!!
       .also { symbol -> declarationStabilityCertainSymbol = symbol })
 
-  return IrConstructorCallImpl
-    .fromSymbolOwner(
-      type = symbol.owner.defaultType,
-      constructorSymbol = symbol.constructors.single(),
-    )
-    .apply {
-      putValueArgument(0, stable)
-    }
+  return IrConstructorCallImpl.fromSymbolOwner(
+    type = symbol.owner.defaultType,
+    constructorSymbol = symbol.constructors.single(),
+  ).apply {
+    putValueArgument(0, stable)
+  }
 }
 
 private fun IrPluginContext.irDeclarationStabilityRuntime(declarationName: IrConst<String>): IrConstructorCall {
@@ -68,14 +64,12 @@ private fun IrPluginContext.irDeclarationStabilityRuntime(declarationName: IrCon
     declarationStabilityRuntimeSymbol ?: (referenceClass(ClassId.topLevel(DECLARATION_STABILITY_RUNTIME_FQN))!!
       .also { symbol -> declarationStabilityRuntimeSymbol = symbol })
 
-  return IrConstructorCallImpl
-    .fromSymbolOwner(
-      type = symbol.owner.defaultType,
-      constructorSymbol = symbol.constructors.single(),
-    )
-    .apply {
-      putValueArgument(0, declarationName)
-    }
+  return IrConstructorCallImpl.fromSymbolOwner(
+    type = symbol.owner.defaultType,
+    constructorSymbol = symbol.constructors.single(),
+  ).apply {
+    putValueArgument(0, declarationName)
+  }
 }
 
 private fun IrPluginContext.irDeclarationStabilityUnknown(declarationName: IrConst<String>): IrConstructorCall {
@@ -83,14 +77,12 @@ private fun IrPluginContext.irDeclarationStabilityUnknown(declarationName: IrCon
     declarationStabilityUnknownSymbol ?: (referenceClass(ClassId.topLevel(DECLARATION_STABILITY_UNKNOWN_FQN))!!
       .also { symbol -> declarationStabilityUnknownSymbol = symbol })
 
-  return IrConstructorCallImpl
-    .fromSymbolOwner(
-      type = symbol.owner.defaultType,
-      constructorSymbol = symbol.constructors.single(),
-    )
-    .apply {
-      putValueArgument(0, declarationName)
-    }
+  return IrConstructorCallImpl.fromSymbolOwner(
+    type = symbol.owner.defaultType,
+    constructorSymbol = symbol.constructors.single(),
+  ).apply {
+    putValueArgument(0, declarationName)
+  }
 }
 
 private fun IrPluginContext.irDeclarationStabilityParameter(parameterName: IrConst<String>): IrConstructorCall {
@@ -98,14 +90,12 @@ private fun IrPluginContext.irDeclarationStabilityParameter(parameterName: IrCon
     declarationStabilityParameterSymbol ?: (referenceClass(ClassId.topLevel(DECLARATION_STABILITY_PARAMETER_FQN))!!
       .also { symbol -> declarationStabilityParameterSymbol = symbol })
 
-  return IrConstructorCallImpl
-    .fromSymbolOwner(
-      type = symbol.owner.defaultType,
-      constructorSymbol = symbol.constructors.single(),
-    )
-    .apply {
-      putValueArgument(0, parameterName)
-    }
+  return IrConstructorCallImpl.fromSymbolOwner(
+    type = symbol.owner.defaultType,
+    constructorSymbol = symbol.constructors.single(),
+  ).apply {
+    putValueArgument(0, parameterName)
+  }
 }
 
 private fun IrPluginContext.irDeclarationStabilityCombined(elements: List<IrConstructorCall>): IrConstructorCall {
@@ -115,33 +105,25 @@ private fun IrPluginContext.irDeclarationStabilityCombined(elements: List<IrCons
   val parentSymbol =
     declarationStabilitySymbol ?: (referenceClass(ClassId.topLevel(DECLARATION_STABILITY_FQN))!!
       .also { parentSymbol -> declarationStabilitySymbol = parentSymbol })
-  // val varargSymbol =
-  //   declarationStabilityArraySymbol ?: (irBuiltIns.arrayClass
-  //     .also { varargSymbol ->
-  //       varargSymbol.owner.
-  //       declarationStabilityArraySymbol = varargSymbol
-  //     })
 
-  return IrConstructorCallImpl
-    .fromSymbolOwner(
-      type = symbol.owner.defaultType,
-      constructorSymbol = symbol.constructors.single(),
+  return IrConstructorCallImpl.fromSymbolOwner(
+    type = symbol.owner.defaultType,
+    constructorSymbol = symbol.constructors.single(),
+  ).apply {
+    val varargElementType = parentSymbol.owner.defaultType
+    val genericType =
+      irBuiltIns.arrayClass.owner.defaultType.buildSimpleType {
+        val typeProjection = makeTypeProjection(type = varargElementType, variance = Variance.OUT_VARIANCE)
+        arguments = listOf(typeProjection)
+      }
+    val vararg = IrVarargImpl(
+      startOffset = UNDEFINED_OFFSET,
+      endOffset = UNDEFINED_OFFSET,
+      type = genericType,
+      varargElementType = varargElementType,
+      elements = elements,
     )
-    .apply {
-      val varargElementType = parentSymbol.owner.defaultType
-      val genericType =
-        irBuiltIns.arrayClass.owner.defaultType.buildSimpleType {
-          val typeProjection = makeTypeProjection(type = varargElementType, variance = Variance.OUT_VARIANCE)
-          arguments = listOf(typeProjection)
-        }
-      val vararg = IrVarargImpl(
-        startOffset = UNDEFINED_OFFSET,
-        endOffset = UNDEFINED_OFFSET,
-        type = genericType,
-        varargElementType = varargElementType,
-        elements = elements,
-      )
 
-      putValueArgument(0, vararg)
-    }
+    putValueArgument(0, vararg)
+  }
 }

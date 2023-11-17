@@ -22,14 +22,15 @@ import org.jetbrains.kotlin.ir.builders.irReturn
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrProperty
+import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
-import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrVararg
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
@@ -47,22 +48,27 @@ internal class IrInvalidationTrackTable private constructor(val prop: IrProperty
   private var putParamsIfAbsentSymbol: IrSimpleFunctionSymbol? = null
 
   fun obtainParameterInfo(
-    name: IrConst<String>,
-    stability: IrExpression,
-    valueString: IrExpression,
-    hashCode: IrExpression,
+    name: IrVariable,
+    stability: IrVariable,
+    valueString: IrVariable,
+    hashCode: IrVariable,
   ): IrConstructorCall =
-    IrConstructorCallImpl
-      .fromSymbolOwner(
-        type = paramInfoSymbol.owner.defaultType,
-        constructorSymbol = paramInfoSymbol.constructors.single(),
-      )
-      .apply {
-        putValueArgument(0, name)
-        putValueArgument(1, stability)
-        putValueArgument(2, valueString)
-        putValueArgument(3, hashCode)
-      }
+    IrConstructorCallImpl.fromSymbolOwner(
+      type = paramInfoSymbol.owner.defaultType,
+      constructorSymbol = paramInfoSymbol.constructors.single(),
+    ).apply {
+      fun IrVariable.valueGetter() =
+        IrGetValueImpl(
+          startOffset = UNDEFINED_OFFSET,
+          endOffset = UNDEFINED_OFFSET,
+          symbol = symbol,
+        )
+
+      putValueArgument(0, name.valueGetter())
+      putValueArgument(1, stability.valueGetter())
+      putValueArgument(2, valueString.valueGetter())
+      putValueArgument(3, hashCode.valueGetter())
+    }
 
   fun irPutParamsIfAbsent(name: IrConst<String>, paramInfos: IrVararg): IrCall {
     val propGetter = IrCallImpl.fromSymbolOwner(
@@ -95,7 +101,8 @@ internal class IrInvalidationTrackTable private constructor(val prop: IrProperty
                   packageName = COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN,
                   callableName = Name.identifier("putParamsIfAbsent"),
                 ),
-              ).single()
+              )
+              .single()
         }
   }
 }
@@ -127,8 +134,8 @@ private fun irInvalidationTrackTableProp(
       type = superSymbol.owner.defaultType
       visibility = DescriptorVisibilities.PRIVATE
     }.also { field ->
-      field.correspondingPropertySymbol = prop.symbol
       field.parent = currentFile
+      field.correspondingPropertySymbol = prop.symbol
       field.initializer = IrExpressionBodyImpl(
         startOffset = SYNTHETIC_OFFSET,
         endOffset = SYNTHETIC_OFFSET,
