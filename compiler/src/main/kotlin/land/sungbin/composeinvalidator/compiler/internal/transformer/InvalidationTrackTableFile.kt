@@ -7,11 +7,4 @@
 
 package land.sungbin.composeinvalidator.compiler.internal.transformer
 
-//internal fun IrModuleFragment.irInvalidationTrackTableFile(
-//  packageFqName: FqName,
-//): IrFile {
-//  val file =
-//    IrFileImpl(
-//
-//    )
-//}
+

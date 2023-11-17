@@ -31,7 +31,6 @@ dependencies {
   testImplementation(libs.compose.compiler)
   testImplementation(libs.compose.material)
 
-  testImplementation(libs.test.kotest)
   testImplementation(libs.test.kotlin.compilation)
 
   testImplementation(libs.test.junit.core)

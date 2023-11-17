@@ -1,18 +1,22 @@
-package land.sungbin.composeinvalidator.compiler.test.source
+/*
+ * Designed and developed by Ji Sungbin 2023.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
+ */
 
-import androidx.compose.compiler.plugins.kotlin.analysis.Stability
-import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
+package land.sungbin.composeinvalidator.runtime
 
-internal class ParameterInfo(
-  val name: String,
-  val stability: Stability,
-  val value: String,
-  val hashCode: Int,
+public class ParameterInfo(
+  public val name: String,
+  public val stability: Stability,
+  public val value: String,
+  public val hashCode: Int,
 )
 
-internal class DiffParams(
-  private val composableName: String,
-  private val params: List<Pair<ParameterInfo, ParameterInfo>>,
+public class DiffParams(
+  public val composableName: String,
+  public val params: List<Pair<ParameterInfo, ParameterInfo>>,
 ) {
   override fun toString(): String =
     buildString(capacity = params.size + 2) {
@@ -29,20 +33,17 @@ internal class DiffParams(
     }
 }
 
-// TODO: ship to runtime artifact
-internal class ComposableInvalidationTrackTable(
-  private val stabilityInferencer: StabilityInferencer,
-) {
+public class ComposableInvalidationTrackTable {
   private val parameterMap = mutableMapOf<String, Array<ParameterInfo>>()
 
-  fun putParamsIfAbsent(name: String, vararg parameterInfo: ParameterInfo) {
+  public fun putParamsIfAbsent(name: String, vararg parameterInfo: ParameterInfo) {
     if (parameterMap[name] == null) {
       @Suppress("UNCHECKED_CAST")
       parameterMap[name] = parameterInfo as Array<ParameterInfo>
     }
   }
 
-  fun getDiffParamsAndPutNewParams(
+  public fun getDiffParamsAndPutNewParams(
     composableName: String,
     vararg newParameterInfo: ParameterInfo,
   ): DiffParams {

@@ -28,7 +28,8 @@ dependencies {
   compileOnly(libs.kotlin.compiler.embedded)
   implementation(libs.jetbrains.annotation)
 
-  implementation("land.sungbin.fastlist:fastlist:0.1.0")
+  implementation(libs.fastlist)
+  implementation(projects.runtime)
 
   implementation(libs.autoservice.annotation)
   ksp(libs.autoservice.ksp)

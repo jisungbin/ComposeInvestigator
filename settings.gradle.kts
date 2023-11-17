@@ -38,6 +38,7 @@ buildCache {
 }
 
 include(
+  ":runtime",
   ":compiler",
   ":compiler-integration-test",
   ":sample",

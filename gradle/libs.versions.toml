@@ -18,7 +18,9 @@ compose-activity = "1.8.0"
 autoservice-annotation = "1.1.1"
 autoservice-ksp = "1.1.0"
 
-test-kotest = "5.7.2"
+fastlist = "0.1.0"
+
+test-kotest = "5.8.0"
 test-junit-core = "4.13.2"
 test-junit-engine = "5.10.0"
 test-kotlin-compilation = "0.4.0"
@@ -46,6 +48,8 @@ compose-activity = { module = "androidx.activity:activity-compose", version.ref 
 
 autoservice-annotation = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoservice-annotation" }
 autoservice-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", version.ref = "autoservice-ksp" }
+
+fastlist = { module = "land.sungbin.fastlist:fastlist", version.ref = "fastlist" }
 
 test-kotest = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "test-kotest" }
 test-junit-core = { module = "junit:junit", version.ref = "test-junit-core" }
