@@ -119,8 +119,7 @@ private fun irInvalidationTrackTableProp(
 
   val superSymbol = invalidationTrackTableClassSymbol ?: (
     context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN))!!
-      .also { symbol -> invalidationTrackTableClassSymbol = symbol }
-    )
+      .also { symbol -> invalidationTrackTableClassSymbol = symbol })
 
   return context.irFactory.buildProperty {
     visibility = DescriptorVisibilities.PRIVATE
