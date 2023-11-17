@@ -7,13 +7,15 @@
 
 package land.sungbin.composeinvalidator.runtime
 
+@ComposeInvalidatorCompilerApi
 public class ParameterInfo(
   public val name: String,
-  public val stability: Stability,
+  public val declarationStability: DeclarationStability,
   public val value: String,
   public val hashCode: Int,
 )
 
+@ComposeInvalidatorCompilerApi
 public class DiffParams(
   public val composableName: String,
   public val params: List<Pair<ParameterInfo, ParameterInfo>>,
@@ -25,7 +27,7 @@ public class DiffParams(
         val (prevParam, newParam) = diffParam
         val message =
           "$index. [${prevParam.name} " +
-            "<${prevParam.stability}>] ${prevParam.value}$${prevParam.hashCode} " +
+            "<${prevParam.declarationStability}>] ${prevParam.value}$${prevParam.hashCode} " +
             "-> ${newParam.value}$${newParam.hashCode}"
         appendLine("  $message")
       }
@@ -33,9 +35,11 @@ public class DiffParams(
     }
 }
 
-public class ComposableInvalidationTrackTable {
+@ComposeInvalidatorCompilerApi
+public open class ComposableInvalidationTrackTable {
   private val parameterMap = mutableMapOf<String, Array<ParameterInfo>>()
 
+  @ComposeInvalidatorCompilerApi
   public fun putParamsIfAbsent(name: String, vararg parameterInfo: ParameterInfo) {
     if (parameterMap[name] == null) {
       @Suppress("UNCHECKED_CAST")
@@ -43,6 +47,7 @@ public class ComposableInvalidationTrackTable {
     }
   }
 
+  @ComposeInvalidatorCompilerApi
   public fun getDiffParamsAndPutNewParams(
     composableName: String,
     vararg newParameterInfo: ParameterInfo,

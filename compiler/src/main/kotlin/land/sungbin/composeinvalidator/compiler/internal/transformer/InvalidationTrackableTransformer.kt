@@ -15,13 +15,16 @@ import land.sungbin.composeinvalidator.compiler.internal.IS_TRACE_IN_PROGRESS
 import land.sungbin.composeinvalidator.compiler.internal.SKIP_TO_GROUP_END
 import land.sungbin.composeinvalidator.compiler.internal.TRACE_EVENT_END
 import land.sungbin.composeinvalidator.compiler.internal.TRACE_EVENT_START
+import land.sungbin.composeinvalidator.compiler.internal.key.DurableWritableSlices
 import land.sungbin.composeinvalidator.compiler.internal.origin.InvalidationTrackableOrigin
 import land.sungbin.composeinvalidator.compiler.util.VerboseLogger
+import land.sungbin.composeinvalidator.compiler.util.irTrace
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
@@ -45,6 +48,12 @@ internal class InvalidationTrackableTransformer(
     if (!declaration.hasAnnotation(COMPOSABLE_FQN)) return super.visitFunctionNew(declaration)
     declaration.body?.transformChildrenVoid()
     return super.visitFunctionNew(declaration)
+  }
+
+  override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
+    logger("visit: ${declaration.name.asString()}")
+    logger("Key: ${context.irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, declaration]}")
+    return super.visitSimpleFunction(declaration)
   }
 
   // <BLOCK> {
