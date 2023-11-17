@@ -10,7 +10,7 @@
 package land.sungbin.composeinvalidator.compiler.internal
 
 import land.sungbin.composeinvalidator.compiler.internal.origin.InvalidationTrackableOrigin
-import land.sungbin.composeinvalidator.compiler.internal.transformer.IrInvalidationTrackTableClass
+import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrFunction
@@ -31,7 +31,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 internal abstract class AbstractInvalidationTrackingLower(context: IrPluginContext) :
-  IrElementTransformerWithContext<IrInvalidationTrackTableClass>() {
+  IrElementTransformerVoidWithContext() {
   private val printlnSymbol: IrSimpleFunctionSymbol =
     context
       .referenceFunctions(
@@ -68,7 +68,7 @@ internal abstract class AbstractInvalidationTrackingLower(context: IrPluginConte
           callableName = Name.identifier("toString"),
         ),
       )
-      // has two elements... but why?
+      // [KT-44684] Duplicate results from IrPluginContext.referenceFunctions for kotlin.toString()
       .first { symbol ->
         val extensionReceiver = symbol.owner.extensionReceiverParameter
 

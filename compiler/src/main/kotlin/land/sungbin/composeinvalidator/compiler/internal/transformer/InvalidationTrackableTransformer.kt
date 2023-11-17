@@ -27,9 +27,9 @@ import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrSymbolOwner
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
-import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrWhen
@@ -43,7 +43,6 @@ import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.isTopLevel
 import org.jetbrains.kotlin.ir.util.kotlinFqName
-import org.jetbrains.kotlin.ir.util.toIrConst
 import org.jetbrains.kotlin.load.kotlin.FacadeClassSource
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.utils.addToStdlib.cast
@@ -53,18 +52,33 @@ internal class InvalidationTrackableTransformer(
   private val logger: VerboseLogger,
   private val stabilityInferencer: StabilityInferencer,
 ) : AbstractInvalidationTrackingLower(context) {
-  override fun visitFileNew(declaration: IrFile, data: IrInvalidationTrackTableClass): IrFile {
-    val invalidationTrackTable = IrInvalidationTrackTableClass.create(context, declaration)
-    declaration.addChild(invalidationTrackTable.get())
-//    logger(declaration.dump())
-//    logger(declaration.dumpKotlinLike())
-    return super.visitFileNew(declaration, data)
+  private class IrSymbolOwnerWithData<D>(private val owner: IrSymbolOwner, val data: D) : IrSymbolOwner by owner
+
+  private val currentInvalidationTrackTable: IrInvalidationTrackTable?
+    get() =
+      allScopes
+        .lastOrNull { scope ->
+          val element = scope.irElement
+          element is IrSymbolOwnerWithData<*> && element.data is IrInvalidationTrackTable
+        }
+        ?.irElement
+        ?.cast<IrSymbolOwnerWithData<IrInvalidationTrackTable>>()
+        ?.data
+
+  override fun visitFileNew(declaration: IrFile): IrFile {
+    val invalidationTrackTable = IrInvalidationTrackTable.create(context, declaration)
+    declaration.addChild(invalidationTrackTable.irClass)
+    logger("visitNewFile dump: ${declaration.dump()}")
+    logger("visitNewFile dumpKotlinLike: ${declaration.dumpKotlinLike()}")
+    return withinScope(IrSymbolOwnerWithData(declaration, invalidationTrackTable)) {
+      super.visitFileNew(declaration)
+    }
   }
 
-  override fun visitFunctionNew(declaration: IrFunction, data: IrInvalidationTrackTableClass): IrStatement {
-    if (!declaration.hasAnnotation(COMPOSABLE_FQN)) return super.visitFunctionNew(declaration, data)
-    declaration.body?.transformChildren(this, data)
-    return super.visitFunctionNew(declaration, data)
+  override fun visitFunctionNew(declaration: IrFunction): IrStatement {
+    if (!declaration.hasAnnotation(COMPOSABLE_FQN)) return super.visitFunctionNew(declaration)
+    declaration.body?.transformChildrenVoid()
+    return super.visitFunctionNew(declaration)
   }
 
   // <BLOCK> {
@@ -72,85 +86,89 @@ internal class InvalidationTrackableTransformer(
   //   composable()
   //   <WHEN> when { <CALL> isTraceInProgress() -> <CALL> traceEventEnd() }
   // }
-  override fun visitBlock(expression: IrBlock, data: IrInvalidationTrackTableClass): IrExpression {
+  override fun visitBlock(expression: IrBlock): IrExpression {
     // skip if it is already transformed
-    if (expression.origin == InvalidationTrackableOrigin) return super.visitBlock(expression, data)
+    if (expression.origin == InvalidationTrackableOrigin) return super.visitBlock(expression)
 
     // composable ir block is always has more than 3 statements
-    if (expression.statements.size < 3) return super.visitBlock(expression, data)
+    if (expression.statements.size < 3) return super.visitBlock(expression)
 
     val firstStatement = expression.statements.first()
     val lastStatement = expression.statements.last()
 
     // composable ir block's first and last statement must be IrWhen
-    if (firstStatement !is IrWhen || lastStatement !is IrWhen) return super.visitBlock(expression, data)
+    if (firstStatement !is IrWhen || lastStatement !is IrWhen) return super.visitBlock(expression)
 
     val isComposerIrBlock = firstStatement.isComposerTrackBranch() && lastStatement.isComposerTrackBranch()
-    if (isComposerIrBlock) {
-      val println = irPrintln(context.irString("[INVALIDATION_TRACKER] <$currentFunctionName> invalidation processed"))
-      val log = buildString {
-        for ((index, statement) in expression.statements.withIndex()) {
-          val dump = run {
-            val dump = statement.dump().trimIndent()
-            if (dump.length > 500) dump.substring(0, 500) + "..." else dump
-          }
-          if (index == 1) appendLine(">>>>>>>>>> ADD: ${println.dump()}")
-          appendLine(dump)
-          if (index == 3) {
-            appendLine("...")
-            break
-          }
+    if (!isComposerIrBlock) return super.visitBlock(expression)
+
+    val currentInvalidationTrackTable = currentInvalidationTrackTable!!
+
+    val println = irPrintln(context.irString("[INVALIDATION_TRACKER] <$currentFunctionName> invalidation processed"))
+    val log = buildString {
+      for ((index, statement) in expression.statements.withIndex()) {
+        val dump = run {
+          val dump = statement.dump().trimIndent()
+          if (dump.length > 500) dump.substring(0, 500) + "..." else dump
+        }
+        if (index == 1) appendLine(">>>>>>>>>> ADD: ${println.dump()}")
+        appendLine(dump)
+        if (index == 3) {
+          appendLine("...")
+          break
         }
       }
+    }
 
-      // The last two arguments are generated by the Compose compiler ($composer, $changed)
-      val validValueParamters = currentFunctionOrNull?.valueParameters?.dropLast(2).orEmpty()
-      val paramInfos = IrVarargImpl(
-        startOffset = UNDEFINED_OFFSET,
-        endOffset = UNDEFINED_OFFSET,
-        type = context.irBuiltIns.arrayClass.owner.defaultType,
-        varargElementType = data.paramInfoSymbol!!.owner.defaultType,
+    // The last two arguments are generated by the Compose compiler ($composer, $changed)
+    val validValueParamters = currentFunctionOrNull?.valueParameters?.dropLast(2).orEmpty()
+    val paramInfos = IrVarargImpl(
+      startOffset = UNDEFINED_OFFSET,
+      endOffset = UNDEFINED_OFFSET,
+      type = context.irBuiltIns.arrayClass.owner.defaultType,
+      varargElementType = currentInvalidationTrackTable.paramInfoSymbol.owner.defaultType,
+    )
+
+    for (param in validValueParamters) {
+      val name = context.irString(param.name.asString())
+      val value = irGetValue(param)
+      val valueString = irToString(value)
+      val hashCode = irHashCode(value)
+      val stability = stabilityInferencer.stabilityOf(value).normalize()
+
+      paramInfos.addElement(
+        currentInvalidationTrackTable.obtainParameterInfo(
+          name = name,
+          valueString = valueString,
+          hashCode = hashCode,
+          stability = stability.toIrDeclarationStability(context),
+        ),
       )
-      for (param in validValueParamters) {
-        val name = context.irString(param.name.asString())
-        val value = irGetValue(param)
-        val valueString =
-          irToString(value).toIrConst(context.irBuiltIns.stringType).cast<IrConst<String>>()
-        val hashCode = irHashCode(value)
-        val stability = stabilityInferencer.stabilityOf(value).normalize()
+    }
 
-        paramInfos.addElement(
-          data.obtainParameterInfo(
-            name = name,
-            valueString = valueString,
-            hashCode = hashCode,
-            stability = stability.toIrDeclarationStability(context),
-          ),
-        )
-      }
-      val putParamsIfAbsent = data.irPutParamsIfAbsent(
+    val putParamsIfAbsent =
+      currentInvalidationTrackTable.irPutParamsIfAbsent(
         name = context.irString(currentFunctionName),
         paramInfos = paramInfos,
       )
 
-      expression.statements.add(1, println)
-      expression.statements.add(2, putParamsIfAbsent)
-      expression.origin = InvalidationTrackableOrigin
+    expression.statements.add(1, println)
+    expression.statements.add(2, putParamsIfAbsent)
+    expression.origin = InvalidationTrackableOrigin
 
-      logger("[invalidation processed] transformed: $log")
-      logger("[invalidation processed] dump: ${expression.dump()}")
-      logger("[invalidation processed] dumpKotlinLike: ${expression.dumpKotlinLike()}")
-    }
+    logger("[invalidation processed] transformed: $log")
+    logger("[invalidation processed] dump: ${expression.dump()}")
+    logger("[invalidation processed] dumpKotlinLike: ${expression.dumpKotlinLike()}")
 
-    return super.visitBlock(expression, data)
+    return super.visitBlock(expression)
   }
 
   // <WHEN> when {
   //   ...
   //   else -> <CALL> $composer.skipToGroupEnd()
   // }
-  override fun visitElseBranch(branch: IrElseBranch, data: IrInvalidationTrackTableClass): IrElseBranch {
-    val call = branch.result as? IrCall ?: return super.visitElseBranch(branch, data)
+  override fun visitElseBranch(branch: IrElseBranch): IrElseBranch {
+    val call = branch.result as? IrCall ?: return super.visitElseBranch(branch)
 
     val fnName = call.symbol.owner.name
     val fnParentFqn = call.symbol.owner.parent.kotlinFqName
@@ -170,7 +188,7 @@ internal class InvalidationTrackableTransformer(
       logger("[invalidation skipped] transformed: ${call.dump()} -> ${block.dump()}")
     }
 
-    return super.visitElseBranch(branch, data)
+    return super.visitElseBranch(branch)
   }
 
   private fun IrWhen.isComposerTrackBranch(): Boolean {

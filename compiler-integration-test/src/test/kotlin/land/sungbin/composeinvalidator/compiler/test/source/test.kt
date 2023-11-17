@@ -6,13 +6,26 @@
  */
 
 @file:Suppress("unused")
+@file:OptIn(ComposeInvalidatorCompilerApi::class)
 
 package land.sungbin.composeinvalidator.compiler.test.source
 
-import androidx.compose.runtime.Composable
+import land.sungbin.composeinvalidator.runtime.ComposableInvalidationTrackTable
+import land.sungbin.composeinvalidator.runtime.ComposeInvalidatorCompilerApi
+import land.sungbin.composeinvalidator.runtime.DeclarationStability
+import land.sungbin.composeinvalidator.runtime.ParameterInfo
 
-@Composable
 fun entry(one: Int, two: String) {
-  println(one)
-  println(two)
+  ComposableInvalidationTrackTableScope
+    .putParamsIfAbsent(
+      name = "name",
+      ParameterInfo(
+        name = "Tracie Travis",
+        declarationStability = DeclarationStability.Runtime(""),
+        value = "lorem",
+        hashCode = 6733
+      ),
+    )
 }
+
+private val ComposableInvalidationTrackTableScope = ComposableInvalidationTrackTable()
