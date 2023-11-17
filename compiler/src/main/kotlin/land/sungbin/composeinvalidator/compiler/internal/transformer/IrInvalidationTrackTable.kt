@@ -119,6 +119,7 @@ private fun irInvalidationTrackTableProp(
     visibility = DescriptorVisibilities.PRIVATE
     name = propName
   }.also { prop ->
+    prop.parent = currentFile
     prop.backingField = context.irFactory.buildField {
       name = propName
       isStatic = true

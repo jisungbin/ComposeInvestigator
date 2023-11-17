@@ -18,12 +18,15 @@ import land.sungbin.composeinvalidator.compiler.internal.SKIP_TO_GROUP_END
 import land.sungbin.composeinvalidator.compiler.internal.TRACE_EVENT_END
 import land.sungbin.composeinvalidator.compiler.internal.TRACE_EVENT_START
 import land.sungbin.composeinvalidator.compiler.internal.irString
+import land.sungbin.composeinvalidator.compiler.internal.irTrace
 import land.sungbin.composeinvalidator.compiler.internal.origin.InvalidationTrackableOrigin
 import land.sungbin.composeinvalidator.compiler.internal.stability.toIrDeclarationStability
+import land.sungbin.composeinvalidator.compiler.internal.transformer.key.DurableWritableSlices
 import land.sungbin.composeinvalidator.compiler.util.VerboseLogger
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
+import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrFunction
@@ -123,6 +126,8 @@ internal class InvalidationTrackableTransformer(
       }
     }
 
+    val currentFunctionNameKey =
+      context.irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, currentFunctionOrNull!! as IrAttributeContainer]!!.name
     val paramInfoType = currentInvalidationTrackTable.paramInfoSymbol.owner.defaultType
     val paramInfoGenericType =
       context.irBuiltIns.arrayClass.owner.defaultType.buildSimpleType {
@@ -157,7 +162,7 @@ internal class InvalidationTrackableTransformer(
 
     val putParamsIfAbsent =
       currentInvalidationTrackTable.irPutParamsIfAbsent(
-        name = context.irString(currentFunctionName),
+        name = context.irString(currentFunctionNameKey),
         paramInfos = paramInfos,
       )
 
