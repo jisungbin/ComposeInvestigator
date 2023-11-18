@@ -31,6 +31,6 @@ public sealed class DeclarationStability {
 
   @ComposeInvalidatorCompilerApi
   public class Combined(private vararg val elements: DeclarationStability) : DeclarationStability() {
-    override fun toString(): String = elements.asList().joinToString(",")
+    override fun toString(): String = elements.joinToString(",")
   }
 }

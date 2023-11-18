@@ -5,7 +5,31 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package land.sungbin.composeinvalidator.runtime
+
+@ComposeInvalidatorCompilerApi
+@JvmInline
+public value class DiffParams(public val params: List<Pair<ParameterInfo, ParameterInfo>>) {
+  override fun toString(): String =
+    buildString(capacity = params.size + 2) {
+      appendLine("DiffParams(")
+      if (params.isNotEmpty()) {
+        for ((index, diffParam) in params.withIndex()) {
+          val (prevParam, newParam) = diffParam
+          val message =
+            "${index + 1}. [${prevParam.name} <${prevParam.declarationStability}>] " +
+              "${prevParam.value}$${prevParam.hashCode} -> ${newParam.value}$${newParam.hashCode}"
+          appendLine("  $message")
+        }
+      } else {
+        appendLine("  No diff params.")
+        appendLine("  Some argument may be unstable, or there may have been an invalidation request on the current RecomposeScope.")
+      }
+      appendLine(")")
+    }
+}
 
 @ComposeInvalidatorCompilerApi
 public class ParameterInfo(
@@ -16,45 +40,24 @@ public class ParameterInfo(
 )
 
 @ComposeInvalidatorCompilerApi
-public class DiffParams(
-  public val composableName: String,
-  public val params: List<Pair<ParameterInfo, ParameterInfo>>,
-) {
-  override fun toString(): String =
-    buildString(capacity = params.size + 2) {
-      appendLine("[$composableName] DiffParams(")
-      for ((index, diffParam) in params.withIndex()) {
-        val (prevParam, newParam) = diffParam
-        val message =
-          "$index. [${prevParam.name} " +
-            "<${prevParam.declarationStability}>] ${prevParam.value}$${prevParam.hashCode} " +
-            "-> ${newParam.value}$${newParam.hashCode}"
-        appendLine("  $message")
-      }
-      appendLine(")")
-    }
-}
-
-@ComposeInvalidatorCompilerApi
-public open class ComposableInvalidationTrackTable {
+public class ComposableInvalidationTrackTable {
   private val parameterMap = mutableMapOf<String, Array<ParameterInfo>>()
 
   @ComposeInvalidatorCompilerApi
-  public fun putParamsIfAbsent(name: String, vararg parameterInfo: ParameterInfo) {
-    if (parameterMap[name] == null) {
-      @Suppress("UNCHECKED_CAST")
-      parameterMap[name] = parameterInfo as Array<ParameterInfo>
-    }
-  }
-
-  @ComposeInvalidatorCompilerApi
-  public fun getDiffParamsAndPutNewParams(
+  public fun computeDiffParamsIfPresent(
     composableName: String,
     vararg newParameterInfo: ParameterInfo,
-  ): DiffParams {
-    val diffs = mutableListOf<Pair<ParameterInfo, ParameterInfo>>()
+  ): DiffParams? {
+    val prevParams = parameterMap[composableName]
 
-    for ((index, prevParam) in parameterMap[composableName]!!.withIndex()) {
+    if (prevParams == null) {
+      @Suppress("UNCHECKED_CAST")
+      parameterMap[composableName] = newParameterInfo as Array<ParameterInfo>
+      return null
+    }
+
+    val diffs = mutableListOf<Pair<ParameterInfo, ParameterInfo>>()
+    for ((index, prevParam) in prevParams.withIndex()) {
       if (prevParam.hashCode != newParameterInfo[index].hashCode) {
         diffs.add(prevParam to newParameterInfo[index])
       }
@@ -63,9 +66,6 @@ public open class ComposableInvalidationTrackTable {
     @Suppress("UNCHECKED_CAST")
     parameterMap[composableName] = newParameterInfo as Array<ParameterInfo>
 
-    return DiffParams(
-      composableName = composableName,
-      params = diffs,
-    )
+    return DiffParams(diffs)
   }
 }

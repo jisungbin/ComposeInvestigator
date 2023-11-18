@@ -45,7 +45,7 @@ internal class IrInvalidationTrackTable private constructor(val prop: IrProperty
   private var _paramInfoSymbol: IrClassSymbol? = null
   val paramInfoSymbol: IrClassSymbol get() = _paramInfoSymbol!!
 
-  private var putParamsIfAbsentSymbol: IrSimpleFunctionSymbol? = null
+  private var computeDiffParamsIfPresentSymbol: IrSimpleFunctionSymbol? = null
 
   fun obtainParameterInfo(
     name: IrVariable,
@@ -70,7 +70,7 @@ internal class IrInvalidationTrackTable private constructor(val prop: IrProperty
       putValueArgument(3, hashCode.valueGetter())
     }
 
-  fun irPutParamsIfAbsent(name: IrConst<String>, paramInfos: IrVararg): IrCall {
+  fun irComputeDiffParamsIfPresent(name: IrConst<String>, paramInfos: IrVararg): IrCall {
     val propGetter = IrCallImpl.fromSymbolOwner(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,
@@ -80,7 +80,7 @@ internal class IrInvalidationTrackTable private constructor(val prop: IrProperty
     return IrCallImpl.fromSymbolOwner(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,
-      symbol = putParamsIfAbsentSymbol!!,
+      symbol = computeDiffParamsIfPresentSymbol!!,
     ).also { fn ->
       fn.dispatchReceiver = propGetter
     }.apply {
@@ -94,12 +94,12 @@ internal class IrInvalidationTrackTable private constructor(val prop: IrProperty
       IrInvalidationTrackTable(irInvalidationTrackTableProp(context, currentFile))
         .also { clz ->
           clz._paramInfoSymbol = context.referenceClass(ClassId.topLevel(PARAMETER_INFO_FQN))!!
-          clz.putParamsIfAbsentSymbol =
+          clz.computeDiffParamsIfPresentSymbol =
             context
               .referenceFunctions(
                 CallableId(
                   packageName = COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN,
-                  callableName = Name.identifier("putParamsIfAbsent"),
+                  callableName = Name.identifier("computeDiffParamsIfPresent"),
                 ),
               )
               .single()

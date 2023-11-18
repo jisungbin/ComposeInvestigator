@@ -23,8 +23,8 @@ import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
-import org.jetbrains.kotlin.ir.types.impl.buildSimpleType
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
+import org.jetbrains.kotlin.ir.types.typeWithArguments
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.name.ClassId
@@ -111,11 +111,8 @@ private fun IrPluginContext.irDeclarationStabilityCombined(elements: List<IrCons
     constructorSymbol = symbol.constructors.single(),
   ).apply {
     val varargElementType = parentSymbol.owner.defaultType
-    val genericType =
-      irBuiltIns.arrayClass.owner.defaultType.buildSimpleType {
-        val typeProjection = makeTypeProjection(type = varargElementType, variance = Variance.OUT_VARIANCE)
-        arguments = listOf(typeProjection)
-      }
+    val genericTypeProjection = makeTypeProjection(type = varargElementType, variance = Variance.OUT_VARIANCE)
+    val genericType = irBuiltIns.arrayClass.typeWithArguments(listOf(genericTypeProjection))
     val vararg = IrVarargImpl(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,

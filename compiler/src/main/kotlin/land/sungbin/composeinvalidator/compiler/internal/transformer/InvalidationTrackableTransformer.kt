@@ -35,12 +35,18 @@ import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.IrWhen
 import org.jetbrains.kotlin.ir.expressions.addElement
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrBranchImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrElseBranchImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
-import org.jetbrains.kotlin.ir.types.impl.buildSimpleType
+import org.jetbrains.kotlin.ir.expressions.impl.IrWhenImpl
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
+import org.jetbrains.kotlin.ir.types.typeWithArguments
 import org.jetbrains.kotlin.ir.util.addChild
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.dump
@@ -129,14 +135,9 @@ internal class InvalidationTrackableTransformer(
       }
     }
 
-    val currentFunctionNameKey =
-      irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, currentFunctionOrNull!! as IrAttributeContainer]!!.name
-
     val paramInfoType = currentInvalidationTrackTable.paramInfoSymbol.owner.defaultType
-    val paramInfoGenericType = irBuiltIns.arrayClass.owner.defaultType.buildSimpleType {
-      val typeProjection = makeTypeProjection(type = paramInfoType, variance = Variance.OUT_VARIANCE)
-      arguments = listOf(typeProjection)
-    }
+    val paramInfoGenericTypeProjection = makeTypeProjection(type = paramInfoType, variance = Variance.OUT_VARIANCE)
+    val paramInfoGenericType = irBuiltIns.arrayClass.typeWithArguments(listOf(paramInfoGenericTypeProjection))
     val paramInfos = IrVarargImpl(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,
@@ -168,12 +169,66 @@ internal class InvalidationTrackableTransformer(
       )
     }
 
-    val putParamsIfAbsent =
-      currentInvalidationTrackTable.irPutParamsIfAbsent(
+    val currentFunctionNameKey =
+      irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, currentFunctionOrNull!! as IrAttributeContainer]!!.name
+    val computeDiffParamsIfPresent =
+      currentInvalidationTrackTable.irComputeDiffParamsIfPresent(
         name = irString(currentFunctionNameKey),
         paramInfos = paramInfos,
       )
-    newStatements += putParamsIfAbsent
+    val computeDiffParamsIfPresentVariable = irTmpVariableInCurrentFun(
+      computeDiffParamsIfPresent,
+      nameHint = "$currentFunctionName\$diffParams",
+    )
+    newStatements += computeDiffParamsIfPresentVariable
+
+    val computeDiffParamsIfPresentPrintln =
+      IrWhenImpl(
+        startOffset = UNDEFINED_OFFSET,
+        endOffset = UNDEFINED_OFFSET,
+        type = irBuiltIns.unitType,
+        origin = IrStatementOrigin.IF,
+        branches = listOf(
+          IrBranchImpl(
+            startOffset = UNDEFINED_OFFSET,
+            endOffset = UNDEFINED_OFFSET,
+            condition = IrCallImpl.fromSymbolOwner(
+              startOffset = UNDEFINED_OFFSET,
+              endOffset = UNDEFINED_OFFSET,
+              symbol = irBuiltIns.eqeqSymbol,
+            ).apply {
+              putValueArgument(
+                0,
+                irGetValue(computeDiffParamsIfPresentVariable),
+              )
+              putValueArgument(
+                1,
+                IrConstImpl.constNull(
+                  startOffset = UNDEFINED_OFFSET,
+                  endOffset = UNDEFINED_OFFSET,
+                  type = computeDiffParamsIfPresent.type,
+                ),
+              )
+            },
+            result = IrConstImpl.constFalse(
+              startOffset = UNDEFINED_OFFSET,
+              endOffset = UNDEFINED_OFFSET,
+              type = irBuiltIns.booleanType,
+            ),
+          ),
+          IrElseBranchImpl(
+            startOffset = UNDEFINED_OFFSET,
+            endOffset = UNDEFINED_OFFSET,
+            condition = IrConstImpl.constTrue(
+              startOffset = UNDEFINED_OFFSET,
+              endOffset = UNDEFINED_OFFSET,
+              type = irBuiltIns.booleanType,
+            ),
+            result = irPrintln(irToString(irGetValue(computeDiffParamsIfPresentVariable))),
+          ),
+        ),
+      )
+    newStatements += computeDiffParamsIfPresentPrintln
 
     expression.statements.addAll(1, newStatements)
     expression.origin = InvalidationTrackableOrigin

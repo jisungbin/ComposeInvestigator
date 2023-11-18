@@ -9,7 +9,6 @@
 
 package land.sungbin.composeinvalidator.compiler.internal
 
-import land.sungbin.composeinvalidator.compiler.internal.origin.InvalidationTrackableOrigin
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -102,7 +101,6 @@ internal abstract class AbstractInvalidationTrackingLower(context: IrPluginConte
       endOffset = UNDEFINED_OFFSET,
       symbol = printlnSymbol,
     ).apply {
-      origin = InvalidationTrackableOrigin
       putValueArgument(0, value)
     }
 
