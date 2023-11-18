@@ -22,7 +22,7 @@ fastlist = "0.1.0"
 
 test-kotest = "5.8.0"
 test-junit-core = "4.13.2"
-test-junit-engine = "5.10.0"
+test-junit-engine = "5.10.1"
 test-kotlin-compilation = "0.4.0"
 
 [plugins]
