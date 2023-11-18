@@ -2,7 +2,7 @@
 gradle-android = "8.1.3"
 gradle-publish-maven = "0.25.3"
 
-jetbrains-annotation = "24.0.1"
+jetbrains-annotation = "24.1.0"
 
 kotlin-core = "1.9.20"
 kotlin-ksp = "1.9.20-1.0.14"
