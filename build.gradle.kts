@@ -5,10 +5,13 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
+import com.adarshr.gradle.testlogger.TestLoggerExtension
+import com.adarshr.gradle.testlogger.theme.ThemeType
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 plugins {
+  alias(libs.plugins.test.gradle.logging) apply false
   alias(libs.plugins.kotlin.ktlint) apply false
 }
 
@@ -31,10 +34,16 @@ subprojects {
   }
 
   apply {
+    plugin(rootProject.libs.plugins.test.gradle.logging.get().pluginId)
     plugin(rootProject.libs.plugins.kotlin.ktlint.get().pluginId)
   }
 
   afterEvaluate {
+    extensions.configure<TestLoggerExtension> {
+      theme = ThemeType.MOCHA_PARALLEL
+      slowThreshold = 5000
+    }
+
     extensions.configure<KtlintExtension> {
       version.set(rootProject.libs.versions.kotlin.ktlint.source.get())
       android.set(true)
@@ -43,11 +52,17 @@ subprojects {
 
     tasks.withType<KotlinCompile> {
       kotlinOptions {
+        jvmTarget = "17"
         freeCompilerArgs = freeCompilerArgs + listOf(
           "-opt-in=kotlin.OptIn",
           "-opt-in=kotlin.RequiresOptIn",
         )
       }
+    }
+
+    tasks.withType<Test>().configureEach {
+      useJUnitPlatform()
+      outputs.upToDateWhen { false }
     }
   }
 }
