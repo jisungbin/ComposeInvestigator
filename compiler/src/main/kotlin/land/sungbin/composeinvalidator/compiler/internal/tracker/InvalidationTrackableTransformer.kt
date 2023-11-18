@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvalidator.compiler.internal.transformer
+package land.sungbin.composeinvalidator.compiler.internal.tracker
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.normalize
@@ -21,7 +21,7 @@ import land.sungbin.composeinvalidator.compiler.internal.irString
 import land.sungbin.composeinvalidator.compiler.internal.irTrace
 import land.sungbin.composeinvalidator.compiler.internal.origin.InvalidationTrackableOrigin
 import land.sungbin.composeinvalidator.compiler.internal.stability.toIrDeclarationStability
-import land.sungbin.composeinvalidator.compiler.internal.transformer.key.DurableWritableSlices
+import land.sungbin.composeinvalidator.compiler.internal.tracker.key.DurableWritableSlices
 import land.sungbin.composeinvalidator.compiler.util.VerboseLogger
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement

@@ -5,8 +5,6 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package land.sungbin.composeinvalidator.compiler.internal
 
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext

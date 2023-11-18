@@ -28,7 +28,6 @@ internal val COMPOSER_FQN = FqName("$AndroidxComposeRuntime.Composer")
 internal val COMPOSER_KT_FQN = FqName("$AndroidxComposeRuntime.ComposerKt")
 
 internal val PARAMETER_INFO_FQN = FqName("$ComposeInvalidatorRuntime.ParameterInfo")
-internal val DIFF_PARAMS_FQN = FqName("$ComposeInvalidatorRuntime.DiffParams")
 internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN =
   FqName("$ComposeInvalidatorRuntime.ComposableInvalidationTrackTable")
 

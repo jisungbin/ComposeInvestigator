@@ -5,7 +5,9 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvalidator.compiler.internal.transformer.key
+@file:Suppress("MemberVisibilityCanBePrivate")
+
+package land.sungbin.composeinvalidator.compiler.internal.tracker.key
 
 import land.sungbin.composeinvalidator.compiler.internal.ModuleLoweringPass
 import org.jetbrains.kotlin.ir.IrStatement

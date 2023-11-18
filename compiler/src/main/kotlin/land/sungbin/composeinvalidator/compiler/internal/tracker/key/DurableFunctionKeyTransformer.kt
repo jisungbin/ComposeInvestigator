@@ -5,7 +5,9 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvalidator.compiler.internal.transformer.key
+@file:Suppress("unused")
+
+package land.sungbin.composeinvalidator.compiler.internal.tracker.key
 
 import land.sungbin.composeinvalidator.compiler.internal.irTrace
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -46,10 +48,10 @@ internal class DurableFunctionKeyTransformer(private val context: IrPluginContex
     val signature = declaration.signatureString()
     val (fullName, success) = buildKey("fun-$signature")
     val info = KeyInfo(
-      fullName,
-      declaration.startOffset,
-      declaration.endOffset,
-      !success,
+      name = fullName,
+      startOffset = declaration.startOffset,
+      endOffset = declaration.endOffset,
+      hasDuplicates = !success,
     )
     currentKeys.add(info)
     context.irTrace.record(DurableWritableSlices.DURABLE_FUNCTION_KEY, declaration, info)

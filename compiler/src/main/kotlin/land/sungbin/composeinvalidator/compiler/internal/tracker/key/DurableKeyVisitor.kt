@@ -5,7 +5,9 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvalidator.compiler.internal.transformer.key
+@file:Suppress("MemberVisibilityCanBePrivate")
+
+package land.sungbin.composeinvalidator.compiler.internal.tracker.key
 
 internal class PathPartInfo(val key: String) {
   var parent: PathPartInfo? = null
@@ -50,7 +52,7 @@ internal class PathPartInfo(val key: String) {
  * This data structure is used to build unique but durable "key paths" for tree structures using a
  * DSL.
  *
- * This is primarily used by the [LiveLiteralTransformer] to create unique and durable keys for
+ * This is primarily used by the `LiveLiteralTransformer` to create unique and durable keys for
  * all of the constant literals in an IR source tree.
  */
 internal class DurableKeyVisitor(private var keys: MutableSet<String> = mutableSetOf()) {

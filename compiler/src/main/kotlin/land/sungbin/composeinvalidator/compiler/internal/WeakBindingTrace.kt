@@ -5,14 +5,16 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
+// Copied from AOSP, Modified by Ji Sungbin
+
 package land.sungbin.composeinvalidator.compiler.internal
 
-import java.util.WeakHashMap
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.com.intellij.util.keyFMap.KeyFMap
 import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.util.slicedMap.ReadOnlySlice
 import org.jetbrains.kotlin.util.slicedMap.WritableSlice
+import java.util.WeakHashMap
 
 /**
  * This class is meant to have the shape of a BindingTrace object that could exist and flow

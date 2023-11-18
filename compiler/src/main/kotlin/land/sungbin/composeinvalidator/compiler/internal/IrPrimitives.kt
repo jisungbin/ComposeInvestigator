@@ -20,14 +20,6 @@ internal fun IrPluginContext.irString(value: String): IrConst<String> =
     value = value,
   )
 
-internal fun IrPluginContext.irInt(value: Int): IrConst<Int> =
-  IrConstImpl.int(
-    startOffset = UNDEFINED_OFFSET,
-    endOffset = UNDEFINED_OFFSET,
-    type = irBuiltIns.intType,
-    value = value,
-  )
-
 internal fun IrPluginContext.irBoolean(value: Boolean): IrConst<Boolean> =
   IrConstImpl.boolean(
     startOffset = UNDEFINED_OFFSET,

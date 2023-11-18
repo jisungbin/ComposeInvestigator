@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvalidator.compiler.internal.transformer
+package land.sungbin.composeinvalidator.compiler.internal.tracker
 
 import land.sungbin.composeinvalidator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN
 import land.sungbin.composeinvalidator.compiler.internal.PARAMETER_INFO_FQN
