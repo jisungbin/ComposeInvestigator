@@ -2,7 +2,7 @@
  * Designed and developed by Ji Sungbin 2023.
  *
  * Licensed under the MIT.
- * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile

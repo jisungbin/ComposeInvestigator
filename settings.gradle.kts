@@ -2,12 +2,12 @@
  * Designed and developed by Ji Sungbin 2023.
  *
  * Licensed under the MIT.
- * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
 @file:Suppress("UnstableApiUsage")
 
-rootProject.name = "ComposeInvalidator"
+rootProject.name = "ComposeInvestigator"
 
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 // enableFeaturePreview("STABLE_CONFIGURATION_CACHE")

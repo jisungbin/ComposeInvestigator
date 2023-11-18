@@ -1,6 +1,6 @@
 # WIP 👻👻👻
 
-## ComposeInvalidator
+## ComposeInvestigator
 
 Composable's forced invalidation[^1] request and invalidation tree building tools.
 
@@ -26,13 +26,13 @@ fun HelloWorld() = Unit
 
 // without Invalidable.tag
 
-ComposeInvalidator.invalidHelloWorld() // auto-generated function
-ComposeInvalidator.disposeHelloWorld() // auto-generated function
+ComposeInvestigator.invalidHelloWorld() // auto-generated function
+ComposeInvestigator.disposeHelloWorld() // auto-generated function
 
 // with Invalidable.tag
 
-ComposeInvalidator.invalidHelloWorld{Tag}() // auto-generated function
-ComposeInvalidator.disposeHelloWorld{Tag}() // auto-generated function
+ComposeInvestigator.invalidHelloWorld{Tag}() // auto-generated function
+ComposeInvestigator.disposeHelloWorld{Tag}() // auto-generated function
 
 // with @InvalidationTrack, each time a Composable is recomposed, its name is printed.
 ```
@@ -60,6 +60,6 @@ This tool is currently in the early stages of development and **is not yet relea
 
 ```kotlin
 plugins {
-  id("land.sungbin.composeinvalidator") version "0.1.0-SNAPSHOT"
+  id("land.sungbin.composeinvestigator") version "0.1.0-SNAPSHOT"
 }
 ```
