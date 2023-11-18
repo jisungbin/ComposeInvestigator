@@ -5,32 +5,36 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvalidator/blob/main/LICENSE
  */
 
+@file:Suppress("MemberVisibilityCanBePrivate")
+
 package land.sungbin.composeinvalidator.runtime
+
+// Get from https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/compiler/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/analysis/Stability.kt;l=74;drc=7d3e127599f8ce142445c944c703cf3c3e6d2b3a.
 
 @ComposeInvalidatorCompilerApi
 public sealed class DeclarationStability {
   @ComposeInvalidatorCompilerApi
-  public class Certain(private val stable: Boolean) : DeclarationStability() {
+  public class Certain(public val stable: Boolean) : DeclarationStability() {
     override fun toString(): String = if (stable) "Stable" else "Unstable"
   }
 
   @ComposeInvalidatorCompilerApi
-  public class Runtime(private val name: String) : DeclarationStability() {
+  public class Runtime(public val name: String) : DeclarationStability() {
     override fun toString(): String = "Runtime($name)"
   }
 
   @ComposeInvalidatorCompilerApi
-  public class Unknown(private val name: String) : DeclarationStability() {
+  public class Unknown(public val name: String) : DeclarationStability() {
     override fun toString(): String = "Uncertain($name)"
   }
 
   @ComposeInvalidatorCompilerApi
-  public class Parameter(private val name: String) : DeclarationStability() {
+  public class Parameter(public val name: String) : DeclarationStability() {
     override fun toString(): String = "Parameter($name)"
   }
 
   @ComposeInvalidatorCompilerApi
-  public class Combined(private vararg val elements: DeclarationStability) : DeclarationStability() {
+  public class Combined(public vararg val elements: DeclarationStability) : DeclarationStability() {
     override fun toString(): String = elements.joinToString(",")
   }
 }
