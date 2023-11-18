@@ -70,7 +70,11 @@ internal class IrInvalidationTrackTable private constructor(val prop: IrProperty
       putValueArgument(3, hashCode.valueGetter())
     }
 
-  fun irComputeDiffParamsIfPresent(name: IrConst<String>, paramInfos: IrVararg): IrCall {
+  fun irComputeDiffParamsIfPresent(
+    keyName: IrConst<String>,
+    originalName: IrConst<String>,
+    paramInfos: IrVararg,
+  ): IrCall {
     val propGetter = IrCallImpl.fromSymbolOwner(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,
@@ -84,8 +88,9 @@ internal class IrInvalidationTrackTable private constructor(val prop: IrProperty
     ).also { fn ->
       fn.dispatchReceiver = propGetter
     }.apply {
-      putValueArgument(0, name)
-      putValueArgument(1, paramInfos)
+      putValueArgument(0, keyName)
+      putValueArgument(1, originalName)
+      putValueArgument(2, paramInfos)
     }
   }
 

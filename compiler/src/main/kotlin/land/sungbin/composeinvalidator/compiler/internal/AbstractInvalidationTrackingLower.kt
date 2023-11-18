@@ -85,7 +85,7 @@ internal abstract class AbstractInvalidationTrackingLower(context: IrPluginConte
 
   protected val currentFunctionName: String
     get() {
-      return (currentFunctionOrNull ?: return "unknown").name.asString()
+      return (currentFunctionOrNull ?: return "<unknown>").name.asString()
     }
 
   protected fun irGetValue(value: IrValueDeclaration): IrGetValue =

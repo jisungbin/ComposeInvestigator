@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrSymbolOwner
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
@@ -56,6 +57,7 @@ import org.jetbrains.kotlin.ir.util.isTopLevel
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.load.kotlin.FacadeClassSource
 import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
@@ -117,7 +119,7 @@ internal class InvalidationTrackableTransformer(
     val newStatements = mutableListOf<IrStatement>()
     val currentInvalidationTrackTable = currentInvalidationTrackTable!!
 
-    val println = irPrintln(irString("[INVALIDATION_TRACKER] <$currentFunctionName> invalidation processed"))
+    val println = irPrintln(irString("[INVALIDATION_TRACKER] <${getCurrentFunctionNameIntercepttedAnonymous()}> invalidation processed"))
     newStatements += println
 
     val log = buildString {
@@ -169,11 +171,12 @@ internal class InvalidationTrackableTransformer(
       )
     }
 
-    val currentFunctionNameKey =
+    val currentFunctionKeyName =
       irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, currentFunctionOrNull!! as IrAttributeContainer]!!.name
     val computeDiffParamsIfPresent =
       currentInvalidationTrackTable.irComputeDiffParamsIfPresent(
-        name = irString(currentFunctionNameKey),
+        keyName = irString(currentFunctionKeyName),
+        originalName = irString(currentFunctionName),
         paramInfos = paramInfos,
       )
     val computeDiffParamsIfPresentVariable = irTmpVariableInCurrentFun(
@@ -252,7 +255,7 @@ internal class InvalidationTrackableTransformer(
 
     // SKIP_TO_GROUP_END is declared in 'androidx.compose.runtime.Composer'
     if (fnName == SKIP_TO_GROUP_END && fnParentFqn == COMPOSER_FQN) {
-      val println = irPrintln(irString("[INVALIDATION_TRACKER] <$currentFunctionName> invalidation skipped"))
+      val println = irPrintln(irString("[INVALIDATION_TRACKER] <${getCurrentFunctionNameIntercepttedAnonymous()}> invalidation skipped"))
       val block = IrBlockImpl(
         startOffset = UNDEFINED_OFFSET,
         endOffset = UNDEFINED_OFFSET,
@@ -265,6 +268,18 @@ internal class InvalidationTrackableTransformer(
     }
 
     return super.visitElseBranch(branch)
+  }
+
+  private fun getCurrentFunctionNameIntercepttedAnonymous(): String {
+    val currentFunctionName = currentFunctionOrNull?.name
+    return if (currentFunctionName == SpecialNames.ANONYMOUS) {
+      try {
+        val parent = currentFunction!!.irElement.cast<IrSimpleFunction>().parent
+        "${SpecialNames.ANONYMOUS_STRING} in ${parent.kotlinFqName.asString()}"
+      } catch (_: Exception) {
+        SpecialNames.ANONYMOUS_STRING
+      }
+    } else currentFunctionName?.asString() ?: "<unknown>"
   }
 
   private fun IrWhen.isComposerTrackBranch(): Boolean {

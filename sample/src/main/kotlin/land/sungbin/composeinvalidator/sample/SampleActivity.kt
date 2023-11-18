@@ -16,7 +16,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -32,7 +35,7 @@ class SampleActivity : ComponentActivity() {
 
 @Composable
 private fun Entry() {
-  val recomposeScope = currentRecomposeScope
+  var currentMillis by remember { mutableLongStateOf(System.currentTimeMillis()) }
 
   Column(
     modifier = Modifier.fillMaxSize(),
@@ -43,8 +46,14 @@ private fun Entry() {
     ),
   ) {
     Text(text = System.currentTimeMillis().toString())
-    Button(onClick = { recomposeScope.invalidate() }) {
-      Text(text = "Recompose")
+    Button(onClick = { currentMillis = System.currentTimeMillis() }) {
+      Text(text = "Update current time")
     }
+    TimeDisplay(currentMillis)
   }
+}
+
+@Composable
+fun TimeDisplay(milliseconds: Long) {
+  Text(text = "Current time: $milliseconds")
 }

@@ -10,17 +10,19 @@
 package land.sungbin.composeinvalidator.runtime
 
 @ComposeInvalidatorCompilerApi
-@JvmInline
-public value class DiffParams(public val params: List<Pair<ParameterInfo, ParameterInfo>>) {
+public class DiffParams(
+  public val name: String,
+  public val params: List<Pair<ParameterInfo, ParameterInfo>>,
+) {
   override fun toString(): String =
     buildString(capacity = params.size + 2) {
-      appendLine("DiffParams(")
+      appendLine("<$name> DiffParams(")
       if (params.isNotEmpty()) {
         for ((index, diffParam) in params.withIndex()) {
           val (prevParam, newParam) = diffParam
           val message =
             "${index + 1}. [${prevParam.name} <${prevParam.declarationStability}>] " +
-              "${prevParam.value}$${prevParam.hashCode} -> ${newParam.value}$${newParam.hashCode}"
+              "${prevParam.value} (${prevParam.hashCode}) -> ${newParam.value} (${newParam.hashCode})"
           appendLine("  $message")
         }
       } else {
@@ -45,27 +47,28 @@ public class ComposableInvalidationTrackTable {
 
   @ComposeInvalidatorCompilerApi
   public fun computeDiffParamsIfPresent(
-    composableName: String,
-    vararg newParameterInfo: ParameterInfo,
+    composableKeyName: String,
+    composableOriginalName: String,
+    vararg parameterInfos: ParameterInfo,
   ): DiffParams? {
-    val prevParams = parameterMap[composableName]
+    val prevParams = parameterMap[composableKeyName]
 
     if (prevParams == null) {
       @Suppress("UNCHECKED_CAST")
-      parameterMap[composableName] = newParameterInfo as Array<ParameterInfo>
+      parameterMap[composableKeyName] = parameterInfos as Array<ParameterInfo>
       return null
     }
 
     val diffs = mutableListOf<Pair<ParameterInfo, ParameterInfo>>()
     for ((index, prevParam) in prevParams.withIndex()) {
-      if (prevParam.hashCode != newParameterInfo[index].hashCode) {
-        diffs.add(prevParam to newParameterInfo[index])
+      if (prevParam.hashCode != parameterInfos[index].hashCode) {
+        diffs.add(prevParam to parameterInfos[index])
       }
     }
 
     @Suppress("UNCHECKED_CAST")
-    parameterMap[composableName] = newParameterInfo as Array<ParameterInfo>
+    parameterMap[composableKeyName] = parameterInfos as Array<ParameterInfo>
 
-    return DiffParams(diffs)
+    return DiffParams(name = composableOriginalName, params = diffs)
   }
 }
