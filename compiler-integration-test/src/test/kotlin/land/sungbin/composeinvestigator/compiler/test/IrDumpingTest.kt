@@ -5,9 +5,6 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-@file:OptIn(ExperimentalCompilerApi::class)
-@file:Suppress("unused")
-
 package land.sungbin.composeinvestigator.compiler.test
 
 import androidx.compose.compiler.plugins.kotlin.ComposeCommandLineProcessor
@@ -20,19 +17,18 @@ import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorCommandLineP
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorPluginRegistrar
 import land.sungbin.composeinvestigator.compiler.OPTION_VERBOSE
 import land.sungbin.composeinvestigator.compiler.test.utils.source
-import org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi
 import org.jetbrains.kotlin.config.JvmTarget
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TemporaryFolder
 
-class Test {
+class IrDumpingTest {
   @get:Rule
   val tempDir: TemporaryFolder = TemporaryFolder.builder().assureDeletion().build()
 
   @Test
   fun debug() {
-    compile(source("test.kt"))
+    compile(source("SourceForIrDump.kt"))
   }
 
   private fun compile(vararg sourceFiles: SourceFile) =
