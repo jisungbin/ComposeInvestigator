@@ -17,14 +17,6 @@
       ],
     },
     {
-      "groupName": "AGP unstable updates",
-      "groupSlug": "android-gradle-plugin",
-      "ignoreUnstable": false,
-      "matchPackagePrefixes": [
-        "com.android.tools.build",
-      ],
-    },
-    {
       "description": "Automatically merge minor and patch-level updates",
       "matchUpdateTypes": [
         "minor",
