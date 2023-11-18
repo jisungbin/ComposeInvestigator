@@ -10,6 +10,9 @@ sourceSets {
 
 kotlin {
   explicitApi()
+  compilerOptions {
+    optIn.add("land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi")
+  }
 }
 
 dependencies {
