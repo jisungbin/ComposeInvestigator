@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
-        android:label="ComposeInvalidatorSample"
+        android:label="ComposeInvestigatorSample"
         tools:ignore="MissingApplicationIcon">
 
         <activity

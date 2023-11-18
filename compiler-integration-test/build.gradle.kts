@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-  namespace = "land.sungbin.composeinvalidator.compiler.test"
+  namespace = "land.sungbin.composeinvestigator.compiler.test"
   compileSdk = 34
 
   sourceSets {

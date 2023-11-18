@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-  namespace = "land.sungbin.composeinvalidator.sample"
+  namespace = "land.sungbin.composeinvestigator.sample"
   compileSdk = 34
 
   defaultConfig {
@@ -37,7 +37,7 @@ tasks.withType<KotlinCompile> {
     jvmTarget = "17"
     freeCompilerArgs = freeCompilerArgs + listOf(
       "-P",
-      "plugin:land.sungbin.composeinvalidator.compiler:verbose=true",
+      "plugin:land.sungbin.composeinvestigator.compiler:verbose=true",
     )
   }
 }
@@ -53,5 +53,5 @@ dependencies {
 
   implementation(projects.runtime)
   kotlinCompilerPluginClasspath(projects.compiler)
-  // kotlinCompilerPluginClasspath("land.sungbin.composeinvalidator:composeinvalidator-compiler:0.1.0-SNAPSHOT")
+  // kotlinCompilerPluginClasspath("land.sungbin.composeinvestigator:composeinvestigator-compiler:0.1.0-SNAPSHOT")
 }
