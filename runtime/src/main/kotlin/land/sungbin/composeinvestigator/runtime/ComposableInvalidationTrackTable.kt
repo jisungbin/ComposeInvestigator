@@ -9,8 +9,10 @@
 
 package land.sungbin.composeinvestigator.runtime
 
+import org.jetbrains.annotations.VisibleForTesting
+
 @ComposeInvestigatorCompilerApi
-public class DiffParams(
+public data class DiffParams(
   public val name: String,
   public val params: List<Pair<ParameterInfo, ParameterInfo>>,
 ) {
@@ -21,7 +23,7 @@ public class DiffParams(
         for ((index, diffParam) in params.withIndex()) {
           val (prevParam, newParam) = diffParam
           val message =
-            "${index + 1}. [${prevParam.name} <${prevParam.declarationStability}>] " +
+            "${index + 1}. [${prevParam.name} <${prevParam.stability}>] " +
               "${prevParam.value} (${prevParam.hashCode}) -> ${newParam.value} (${newParam.hashCode})"
           appendLine("  $message")
         }
@@ -34,16 +36,17 @@ public class DiffParams(
 }
 
 @ComposeInvestigatorCompilerApi
-public class ParameterInfo(
+public data class ParameterInfo(
   public val name: String,
-  public val declarationStability: DeclarationStability,
+  public val stability: DeclarationStability,
   public val value: String,
   public val hashCode: Int,
 )
 
 @ComposeInvestigatorCompilerApi
 public class ComposableInvalidationTrackTable {
-  private val parameterMap = mutableMapOf<String, Array<ParameterInfo>>()
+  @VisibleForTesting
+  internal val parameterMap = mutableMapOf<String, Array<ParameterInfo>>()
 
   @ComposeInvestigatorCompilerApi
   public fun computeDiffParamsIfPresent(
