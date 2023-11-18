@@ -10,7 +10,7 @@ kotlin-kotlinpoet = "1.14.2"
 kotlin-ktlint-gradle = "11.6.1"
 kotlin-ktlint-source = "0.48.2"
 
-androidx-activity = "1.8.0"
+androidx-activity = "1.8.1"
 
 compose-core = "1.5.4"
 compose-activity = "1.8.1"
