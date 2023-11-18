@@ -1,5 +1,5 @@
 [versions]
-gradle-android = "8.1.3"
+gradle-android = "8.1.4"
 gradle-publish-maven = "0.25.3"
 
 jetbrains-annotation = "24.1.0"
