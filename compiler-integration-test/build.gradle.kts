@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
   id("com.android.library")
   kotlin("android")
@@ -19,9 +17,10 @@ android {
   }
 }
 
-tasks.withType<KotlinCompile> {
-  kotlinOptions {
-    jvmTarget = "17"
+kotlin {
+  compilerOptions {
+    optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
+    optIn.add("org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction")
   }
 }
 
@@ -32,8 +31,11 @@ dependencies {
   testImplementation(libs.compose.compiler)
   testImplementation(libs.compose.material)
 
+  testImplementation(libs.kotlin.compiler.embedded)
   testImplementation(libs.test.kotlin.compilation)
 
+  testImplementation(libs.test.mockk)
+  testImplementation(libs.test.kotest)
   testImplementation(libs.test.junit.core)
   testRuntimeOnly(libs.test.junit.enigne)
 }
