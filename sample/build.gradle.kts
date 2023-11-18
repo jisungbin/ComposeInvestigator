@@ -34,7 +34,6 @@ android {
 
 tasks.withType<KotlinCompile> {
   kotlinOptions {
-    jvmTarget = "17"
     freeCompilerArgs = freeCompilerArgs + listOf(
       "-P",
       "plugin:land.sungbin.composeinvestigator.compiler:verbose=true",
