@@ -12,7 +12,7 @@ import org.jetbrains.kotlin.util.slicedMap.BasicWritableSlice
 import org.jetbrains.kotlin.util.slicedMap.RewritePolicy
 import org.jetbrains.kotlin.util.slicedMap.WritableSlice
 
-internal object DurableWritableSlices {
-  val DURABLE_FUNCTION_KEY: WritableSlice<IrAttributeContainer, KeyInfo> =
+public object DurableWritableSlices {
+  public val DURABLE_FUNCTION_KEY: WritableSlice<IrAttributeContainer, KeyInfo> =
     BasicWritableSlice(RewritePolicy.DO_NOTHING)
 }
