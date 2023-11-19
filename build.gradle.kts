@@ -41,7 +41,7 @@ subprojects {
   afterEvaluate {
     extensions.configure<TestLoggerExtension> {
       theme = ThemeType.MOCHA_PARALLEL
-      slowThreshold = 5000
+      slowThreshold = 10_000
     }
 
     extensions.configure<KtlintExtension> {
