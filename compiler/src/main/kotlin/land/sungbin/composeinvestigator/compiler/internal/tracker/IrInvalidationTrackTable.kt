@@ -26,6 +26,7 @@ import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
+import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrVararg
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
@@ -41,23 +42,23 @@ import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 
-internal class IrInvalidationTrackTable private constructor(val prop: IrProperty) {
+public class IrInvalidationTrackTable private constructor(public val prop: IrProperty) {
   private var _paramInfoSymbol: IrClassSymbol? = null
-  val paramInfoSymbol: IrClassSymbol get() = _paramInfoSymbol!!
+  public val paramInfoSymbol: IrClassSymbol get() = _paramInfoSymbol!!
 
   private var computeDiffParamsIfPresentSymbol: IrSimpleFunctionSymbol? = null
 
-  fun obtainParameterInfo(
+  public fun obtainParameterInfo(
     name: IrVariable,
     stability: IrVariable,
     valueString: IrVariable,
-    hashCode: IrVariable,
+    valueHashCode: IrVariable,
   ): IrConstructorCall =
     IrConstructorCallImpl.fromSymbolOwner(
       type = paramInfoSymbol.owner.defaultType,
       constructorSymbol = paramInfoSymbol.constructors.single(),
     ).apply {
-      fun IrVariable.valueGetter() =
+      fun IrVariable.valueGetter(): IrGetValue =
         IrGetValueImpl(
           startOffset = UNDEFINED_OFFSET,
           endOffset = UNDEFINED_OFFSET,
@@ -67,10 +68,10 @@ internal class IrInvalidationTrackTable private constructor(val prop: IrProperty
       putValueArgument(0, name.valueGetter())
       putValueArgument(1, stability.valueGetter())
       putValueArgument(2, valueString.valueGetter())
-      putValueArgument(3, hashCode.valueGetter())
+      putValueArgument(3, valueHashCode.valueGetter())
     }
 
-  fun irComputeDiffParamsIfPresent(
+  public fun irComputeDiffParamsIfPresent(
     keyName: IrConst<String>,
     originalName: IrConst<String>,
     paramInfos: IrVararg,
@@ -94,8 +95,8 @@ internal class IrInvalidationTrackTable private constructor(val prop: IrProperty
     }
   }
 
-  internal companion object {
-    fun create(context: IrPluginContext, currentFile: IrFile): IrInvalidationTrackTable =
+  public companion object {
+    public fun create(context: IrPluginContext, currentFile: IrFile): IrInvalidationTrackTable =
       IrInvalidationTrackTable(irInvalidationTrackTableProp(context, currentFile))
         .also { clz ->
           clz._paramInfoSymbol = context.referenceClass(ClassId.topLevel(PARAMETER_INFO_FQN))!!
