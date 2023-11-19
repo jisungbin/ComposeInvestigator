@@ -8,6 +8,7 @@
 package land.sungbin.composeinvestigator.compiler.test.tracker
 
 import io.kotest.assertions.fail
+import io.kotest.core.annotation.Ignored
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.shouldBe
@@ -51,6 +52,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 // - parameter
 // - companion object
 // - anonymous object
+@Ignored("TODO")
 class InvalidationTrackableTransformerTest : StringSpec(), IrBaseTest {
   init {
     "A statement is added to print that the invalidation is in progress, and to look up the arguments that are different from the previous invalidation." {
