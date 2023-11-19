@@ -8,6 +8,8 @@
 package land.sungbin.composeinvestigator.compiler
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
+import land.sungbin.composeinvestigator.compiler.internal.logger.InvestigateLogger
+import land.sungbin.composeinvestigator.compiler.internal.logger.InvestigateLoggerVisitor
 import land.sungbin.composeinvestigator.compiler.internal.tracker.InvalidationTrackableTransformer
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.DurableFunctionKeyTransformer
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
@@ -22,8 +24,14 @@ internal class InvalidationTrackExtension(private val logger: VerboseLogger) : I
     val stabilityInferencer = StabilityInferencer(moduleFragment.descriptor, emptySet())
 
     DurableFunctionKeyTransformer(pluginContext).lower(moduleFragment)
+    moduleFragment.transformChildrenVoid(InvestigateLoggerVisitor(pluginContext, logger))
+
+    if (!InvestigateLogger.checkLoggerIsInstalled()) {
+      InvestigateLogger.useDefaultLogger(pluginContext)
+    }
+
     moduleFragment.transformChildrenVoid(
-      transformer = InvalidationTrackableTransformer(
+      InvalidationTrackableTransformer(
         context = pluginContext,
         logger = logger,
         stabilityInferencer = stabilityInferencer,

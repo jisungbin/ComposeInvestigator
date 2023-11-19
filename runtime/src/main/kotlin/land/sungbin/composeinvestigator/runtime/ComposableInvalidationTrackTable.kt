@@ -11,7 +11,6 @@ package land.sungbin.composeinvestigator.runtime
 
 import org.jetbrains.annotations.VisibleForTesting
 
-@ComposeInvestigatorCompilerApi
 public data class DiffParams(
   public val name: String,
   public val params: List<Pair<ParameterInfo, ParameterInfo>>,
@@ -35,7 +34,6 @@ public data class DiffParams(
     }
 }
 
-@ComposeInvestigatorCompilerApi
 public data class ParameterInfo(
   public val name: String,
   public val stability: DeclarationStability,

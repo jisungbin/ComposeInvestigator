@@ -19,6 +19,7 @@ import land.sungbin.composeinvestigator.compiler.internal.TRACE_EVENT_END
 import land.sungbin.composeinvestigator.compiler.internal.TRACE_EVENT_START
 import land.sungbin.composeinvestigator.compiler.internal.irString
 import land.sungbin.composeinvestigator.compiler.internal.irTracee
+import land.sungbin.composeinvestigator.compiler.internal.logger.InvestigateLogger
 import land.sungbin.composeinvestigator.compiler.internal.origin.InvalidationTrackerOrigin
 import land.sungbin.composeinvestigator.compiler.internal.stability.toIrDeclarationStability
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.DurableWritableSlices
@@ -36,19 +37,16 @@ import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.IrWhen
 import org.jetbrains.kotlin.ir.expressions.addElement
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrBranchImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrElseBranchImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrWhenImpl
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.types.typeWithArguments
 import org.jetbrains.kotlin.ir.util.addChild
+import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
@@ -119,24 +117,6 @@ internal class InvalidationTrackableTransformer(
     val newStatements = mutableListOf<IrStatement>()
     val currentInvalidationTrackTable = currentInvalidationTrackTable!!
 
-    val println = irPrintln(irString("[INVALIDATION_TRACKER] <${getCurrentFunctionNameIntercepttedAnonymous()}> invalidation processed"))
-    newStatements += println
-
-    val log = buildString {
-      for ((index, statement) in expression.statements.withIndex()) {
-        val dump = run {
-          val dump = statement.dump().trimIndent()
-          if (dump.length > 500) dump.substring(0, 500) + "..." else dump
-        }
-        if (index == 1) appendLine(">>>>>>>>>> ADD: ${println.dump()}")
-        appendLine(dump)
-        if (index == 3) {
-          appendLine("...")
-          break
-        }
-      }
-    }
-
     val paramInfoType = currentInvalidationTrackTable.paramInfoSymbol.owner.defaultType
     val paramInfoGenericTypeProjection = makeTypeProjection(type = paramInfoType, variance = Variance.OUT_VARIANCE)
     val paramInfoGenericType = irBuiltIns.arrayClass.typeWithArguments(listOf(paramInfoGenericTypeProjection))
@@ -185,58 +165,41 @@ internal class InvalidationTrackableTransformer(
     )
     newStatements += computeDiffParamsIfPresentVariable
 
-    val computeDiffParamsIfPresentPrintln =
-      IrWhenImpl(
-        startOffset = UNDEFINED_OFFSET,
-        endOffset = UNDEFINED_OFFSET,
-        type = irBuiltIns.unitType,
-        origin = IrStatementOrigin.SAFE_CALL,
-        branches = listOf(
-          IrBranchImpl(
-            startOffset = UNDEFINED_OFFSET,
-            endOffset = UNDEFINED_OFFSET,
-            condition = IrCallImpl.fromSymbolOwner(
-              startOffset = UNDEFINED_OFFSET,
-              endOffset = UNDEFINED_OFFSET,
-              symbol = irBuiltIns.eqeqSymbol,
-            ).apply {
-              putValueArgument(
-                0,
-                irGetValue(computeDiffParamsIfPresentVariable),
-              )
-              putValueArgument(
-                1,
-                IrConstImpl.constNull(
-                  startOffset = UNDEFINED_OFFSET,
-                  endOffset = UNDEFINED_OFFSET,
-                  type = computeDiffParamsIfPresent.type,
-                ),
-              )
-            },
-            result = IrConstImpl.constFalse(
-              startOffset = UNDEFINED_OFFSET,
-              endOffset = UNDEFINED_OFFSET,
-              type = irBuiltIns.booleanType,
-            ),
-          ),
-          IrElseBranchImpl(
-            startOffset = UNDEFINED_OFFSET,
-            endOffset = UNDEFINED_OFFSET,
-            condition = IrConstImpl.constTrue(
-              startOffset = UNDEFINED_OFFSET,
-              endOffset = UNDEFINED_OFFSET,
-              type = irBuiltIns.booleanType,
-            ),
-            result = irPrintln(irToString(irGetValue(computeDiffParamsIfPresentVariable))),
-          ),
-        ),
-      )
-    newStatements += computeDiffParamsIfPresentPrintln
+    val originalLogMessage = irString("[INVALIDATION_TRACKER] <${getCurrentFunctionNameIntercepttedAnonymous()}> invalidation processed")
+    val logTypeSymbol = InvestigateLogger.obtainLogTypeSymbol(context)
+    val logTypeInvalidationProcessedSymbol = InvestigateLogger.obtainLogTypeInvalidationProcessedSymbol(context)
+    val logTypeCall = IrConstructorCallImpl.fromSymbolOwner(
+      type = logTypeSymbol.owner.defaultType,
+      constructorSymbol = logTypeInvalidationProcessedSymbol.constructors.single(),
+    ).apply {
+      putValueArgument(0, irGetValue(computeDiffParamsIfPresentVariable))
+    }
+    val loggerCall = InvestigateLogger.makeIrCall(
+      composableName = irString(currentFunctionName),
+      logType = logTypeCall,
+      originalMessage = originalLogMessage,
+    )
+    newStatements += loggerCall
 
     expression.statements.addAll(1, newStatements)
     expression.origin = InvalidationTrackerOrigin
 
-    logger("[invalidation processed] transformed: $log")
+    val log = buildString {
+      for ((index, statement) in expression.statements.withIndex()) {
+        val dump = run {
+          val dump = statement.dump().trimIndent()
+          if (dump.length > 500) dump.substring(0, 500) + "..." else dump
+        }
+        if (index == 1) appendLine(">>>>>>>>>> ADD: ${loggerCall.dump()}")
+        appendLine(dump)
+        if (index == 3) {
+          appendLine("...")
+          break
+        }
+      }
+    }
+
+    logger("[invalidation processed] $log")
     logger("[invalidation processed] dump: ${expression.dump()}")
     logger("[invalidation processed] dumpKotlinLike: ${expression.dumpKotlinLike()}")
 
@@ -255,16 +218,31 @@ internal class InvalidationTrackableTransformer(
 
     // SKIP_TO_GROUP_END is declared in 'androidx.compose.runtime.Composer'
     if (fnName == SKIP_TO_GROUP_END && fnParentFqn == COMPOSER_FQN) {
-      val println = irPrintln(irString("[INVALIDATION_TRACKER] <${getCurrentFunctionNameIntercepttedAnonymous()}> invalidation skipped"))
+      val originalLogMessage = irString("[INVALIDATION_TRACKER] <${getCurrentFunctionNameIntercepttedAnonymous()}> invalidation skipped")
+      val logTypeSymbol = InvestigateLogger.obtainLogTypeSymbol(context)
+      val logTypeInvalidationSkippedSymbol = InvestigateLogger.obtainLogTypeInvalidationSkippedSymbol(context)
+      val logTypeCall = IrGetObjectValueImpl(
+        startOffset = UNDEFINED_OFFSET,
+        endOffset = UNDEFINED_OFFSET,
+        type = logTypeSymbol.owner.defaultType,
+        symbol = logTypeInvalidationSkippedSymbol,
+      )
+      val loggerCall = InvestigateLogger.makeIrCall(
+        composableName = irString(currentFunctionName),
+        logType = logTypeCall,
+        originalMessage = originalLogMessage,
+      )
+
       val block = IrBlockImpl(
         startOffset = UNDEFINED_OFFSET,
         endOffset = UNDEFINED_OFFSET,
         type = irBuiltIns.unitType,
         origin = InvalidationTrackerOrigin,
-        statements = listOf(println, call),
+        statements = listOf(loggerCall, call),
       )
+
       branch.result = block
-      logger("[invalidation skipped] transformed: ${call.dump()} -> ${block.dump()}")
+      logger("[invalidation skipped] transformed: ${call.dumpKotlinLike()} -> ${block.dumpKotlinLike()}")
     }
 
     return super.visitElseBranch(branch)

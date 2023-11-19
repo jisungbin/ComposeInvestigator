@@ -93,15 +93,6 @@ internal abstract class AbstractInvalidationTrackingLower(context: IrPluginConte
       symbol = value.symbol,
     )
 
-  protected fun irPrintln(value: IrExpression): IrCall =
-    IrCallImpl.fromSymbolOwner(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      symbol = printlnSymbol,
-    ).apply {
-      putValueArgument(0, value)
-    }
-
   protected fun irHashCode(value: IrExpression): IrCall =
     IrCallImpl.fromSymbolOwner(
       startOffset = UNDEFINED_OFFSET,
