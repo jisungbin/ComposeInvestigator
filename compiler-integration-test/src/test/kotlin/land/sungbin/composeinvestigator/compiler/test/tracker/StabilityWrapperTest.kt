@@ -8,6 +8,7 @@
 package land.sungbin.composeinvestigator.compiler.test.tracker
 
 import androidx.compose.compiler.plugins.kotlin.analysis.Stability
+import io.kotest.assertions.fail
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.collections.shouldHaveSize
@@ -209,6 +210,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
             is IrConst<*> -> element.value shouldBe matchValues[index]
             is IrClass -> element.name.asString() shouldBe matchValues[index]
             is IrTypeParameter -> element.name.asString() shouldBe matchValues[index]
+            else -> fail("Unexpected element type: ${element::class.simpleName}")
           }
         }
       }
