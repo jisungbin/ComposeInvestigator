@@ -8,13 +8,10 @@
 package land.sungbin.composeinvestigator.compiler.test.tracker
 
 import androidx.compose.compiler.plugins.kotlin.analysis.Stability
-import io.kotest.assertions.fail
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.should
 import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.beInstanceOf
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.every
 import io.mockk.mockk
@@ -59,12 +56,10 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
       unstableStability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Certain"
 
       with(stableStability!!.valueArguments.single()) {
-        this should beInstanceOf<IrConst<Boolean>>()
-        cast<IrConst<Boolean>>().value shouldBe true
+        shouldBeInstanceOf<IrConst<Boolean>>().value shouldBe true
       }
       with(unstableStability!!.valueArguments.single()) {
-        this should beInstanceOf<IrConst<Boolean>>()
-        cast<IrConst<Boolean>>().value shouldBe false
+        shouldBeInstanceOf<IrConst<Boolean>>().value shouldBe false
       }
     }
     test("Stability.Runtime to IrDeclarationStability") {
@@ -90,8 +85,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
       stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Runtime"
 
       with(stability!!.valueArguments.single()) {
-        this should beInstanceOf<IrConst<String>>()
-        cast<IrConst<String>>().value shouldBe "RuntimeDeclaration"
+        shouldBeInstanceOf<IrConst<String>>().value shouldBe "RuntimeDeclaration"
       }
     }
     test("Stability.Unknown to IrDeclarationStability") {
@@ -117,8 +111,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
       stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Unknown"
 
       with(stability!!.valueArguments.single()) {
-        this should beInstanceOf<IrConst<String>>()
-        cast<IrConst<String>>().value shouldBe "UnknownDeclaration"
+        shouldBeInstanceOf<IrConst<String>>().value shouldBe "UnknownDeclaration"
       }
     }
     test("Stability.Parameter to IrDeclarationStability") {
@@ -144,8 +137,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
       stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Parameter"
 
       with(stability!!.valueArguments.single()) {
-        this should beInstanceOf<IrConst<String>>()
-        cast<IrConst<String>>().value shouldBe "ParameterDeclaration"
+        shouldBeInstanceOf<IrConst<String>>().value shouldBe "ParameterDeclaration"
       }
     }
     test("Stability.Combined to IrDeclarationStability") {
@@ -185,8 +177,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
       stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Combined"
 
       with(stability!!.valueArguments.single()) {
-        this should beInstanceOf<IrVararg>()
-        cast<IrVararg>().elements shouldHaveSize 5
+        shouldBeInstanceOf<IrVararg>().elements shouldHaveSize 5
 
         val matchFqNames = listOf(
           "land.sungbin.composeinvestigator.runtime.DeclarationStability.Certain", // Certain(true)
@@ -204,13 +195,9 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
         )
 
         cast<IrVararg>().elements.forEachIndexed { index, element ->
-          element.shouldBeInstanceOf<IrConstructorCall>()
-          element.type.classFqName?.asString() shouldBe matchFqNames[index]
-          when (element) {
-            is IrConst<*> -> element.value shouldBe matchValues[index]
-            is IrClass -> element.name.asString() shouldBe matchValues[index]
-            is IrTypeParameter -> element.name.asString() shouldBe matchValues[index]
-            else -> fail("Unexpected element type: ${element::class.simpleName}")
+          with(element) {
+            shouldBeInstanceOf<IrConstructorCall>().type.classFqName?.asString() shouldBe matchFqNames[index]
+            valueArguments.single().shouldBeInstanceOf<IrConst<*>>().value shouldBe matchValues[index]
           }
         }
       }
