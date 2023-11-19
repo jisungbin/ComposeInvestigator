@@ -79,7 +79,7 @@ fun IrBaseTest.kotlinCompilation(
   @Suppress("DEPRECATION")
   componentRegistrars = mutableListOf<ComponentRegistrar>(ComposeInvestigatorPluginRegistrar()).also { registrars ->
     if (enableComposeCompiler) registrars.add(0, ComposePluginRegistrar())
-    if (additionalVisitor != null) registrars.add(2, additionalVisitor)
+    if (additionalVisitor != null) registrars.add(additionalVisitor)
   }
   commandLineProcessors = mutableListOf<CommandLineProcessor>(ComposeInvestigatorCommandLineProcessor()).also { processors ->
     if (enableComposeCompiler) processors.add(0, ComposeCommandLineProcessor())
