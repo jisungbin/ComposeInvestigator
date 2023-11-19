@@ -18,7 +18,7 @@ import land.sungbin.composeinvestigator.compiler.internal.SKIP_TO_GROUP_END
 import land.sungbin.composeinvestigator.compiler.internal.TRACE_EVENT_END
 import land.sungbin.composeinvestigator.compiler.internal.TRACE_EVENT_START
 import land.sungbin.composeinvestigator.compiler.internal.irString
-import land.sungbin.composeinvestigator.compiler.internal.irTrace
+import land.sungbin.composeinvestigator.compiler.internal.irTracee
 import land.sungbin.composeinvestigator.compiler.internal.origin.InvalidationTrackerOrigin
 import land.sungbin.composeinvestigator.compiler.internal.stability.toIrDeclarationStability
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.DurableWritableSlices
@@ -165,14 +165,14 @@ internal class InvalidationTrackableTransformer(
         currentInvalidationTrackTable.obtainParameterInfo(
           name = name,
           valueString = valueString,
-          hashCode = hashCode,
+          valueHashCode = hashCode,
           stability = stability,
         ),
       )
     }
 
     val currentFunctionKeyName =
-      irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, currentFunctionOrNull!! as IrAttributeContainer]!!.name
+      irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, currentFunctionOrNull!! as IrAttributeContainer]!!.name
     val computeDiffParamsIfPresent =
       currentInvalidationTrackTable.irComputeDiffParamsIfPresent(
         keyName = irString(currentFunctionKeyName),
@@ -190,7 +190,7 @@ internal class InvalidationTrackableTransformer(
         startOffset = UNDEFINED_OFFSET,
         endOffset = UNDEFINED_OFFSET,
         type = irBuiltIns.unitType,
-        origin = IrStatementOrigin.IF,
+        origin = IrStatementOrigin.SAFE_CALL,
         branches = listOf(
           IrBranchImpl(
             startOffset = UNDEFINED_OFFSET,

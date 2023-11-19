@@ -30,6 +30,12 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
 
     project.extensionArea
       .getExtensionPoint(IrGenerationExtension.extensionPointName)
-      .registerExtension(InvalidationTrackExtension(logger = logger), LoadingOrder.LAST, project)
+      .registerExtension(
+        InvalidationTrackExtension(logger = logger),
+        // TODO: LoadingOrder("after ${ComposeCommandLineProcessor.PLUGIN_ID}"),
+        // https://github.com/JetBrains/intellij-community/blob/17ca1d0afb43f824cda948fc3ea4467ebe55b346/platform/extensions/src/com/intellij/openapi/extensions/LoadingOrder.kt#L24
+        LoadingOrder.LAST,
+        project,
+      )
   }
 }

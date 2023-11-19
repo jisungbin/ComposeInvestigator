@@ -37,7 +37,7 @@ private var declarationStabilityUnknownSymbol: IrClassSymbol? = null
 private var declarationStabilityParameterSymbol: IrClassSymbol? = null
 private var declarationStabilityCombinedSymbol: IrClassSymbol? = null
 
-internal fun Stability.toIrDeclarationStability(context: IrPluginContext): IrConstructorCall =
+public fun Stability.toIrDeclarationStability(context: IrPluginContext): IrConstructorCall =
   when (this) {
     is Stability.Certain -> context.irDeclarationStabilityCertain(context.irBoolean(stable))
     is Stability.Runtime -> context.irDeclarationStabilityRuntime(context.irString(declaration.name.asString()))

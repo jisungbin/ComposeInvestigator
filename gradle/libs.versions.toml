@@ -20,16 +20,21 @@ autoservice-ksp = "1.1.0"
 
 fastlist = "0.1.0"
 
+test-mockk = "1.13.8"
 test-kotest = "5.8.0"
 test-junit-core = "4.13.2"
 test-junit-engine = "5.10.1"
 test-kotlin-compilation = "0.4.0"
+
+test-gradle-logging = "4.0.0"
 
 [plugins]
 gradle-publish-maven = { id = "com.vanniktech.maven.publish", version.ref = "gradle-publish-maven" }
 
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
 kotlin-ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "kotlin-ktlint-gradle" }
+
+test-gradle-logging = { id = "com.adarshr.test-logger", version.ref = "test-gradle-logging" }
 
 [libraries]
 gradle-android = { module = "com.android.tools.build:gradle", version.ref = "gradle-android" }
@@ -51,7 +56,8 @@ autoservice-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", versi
 
 fastlist = { module = "land.sungbin.fastlist:fastlist", version.ref = "fastlist" }
 
-test-kotest = { module = "io.kotest:kotest-runner-junit5-jvm", version.ref = "test-kotest" }
+test-mockk = { module = "io.mockk:mockk", version.ref = "test-mockk" }
+test-kotest = { module = "io.kotest:kotest-runner-junit5", version.ref = "test-kotest" }
 test-junit-core = { module = "junit:junit", version.ref = "test-junit-core" }
 test-junit-enigne = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "test-junit-engine" }
 test-kotlin-compilation = { module = "dev.zacsweers.kctfork:core", version.ref = "test-kotlin-compilation" }

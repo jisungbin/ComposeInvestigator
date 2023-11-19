@@ -6,6 +6,7 @@
  */
 
 // Copied from AOSP, Modified by Ji Sungbin
+// Since this is code copied from the Compose Compiler (AOSP), we use an extra e in the copy to distinguish it.
 
 package land.sungbin.composeinvestigator.compiler.internal
 
@@ -22,10 +23,10 @@ import java.util.WeakHashMap
  * the future by a trace that handles this use case in upstream. For now, we are okay with this
  * because the combination of IrAttributeContainer and WeakHashMap makes this relatively safe.
  */
-internal class WeakBindingTrace {
+public class WeakBindingTracee {
   private val map = WeakHashMap<Any, KeyFMap>()
 
-  fun <K : IrAttributeContainer, V> record(slice: WritableSlice<K, V>, key: K, value: V) {
+  internal fun <K : IrAttributeContainer, V> record(slice: WritableSlice<K, V>, key: K, value: V) {
     var holder = map[key.attributeOwnerId] ?: KeyFMap.EMPTY_MAP
     val prev = holder.get(slice.key)
     if (prev != null) {
@@ -35,12 +36,12 @@ internal class WeakBindingTrace {
     map[key.attributeOwnerId] = holder
   }
 
-  operator fun <K : IrAttributeContainer, V> get(slice: ReadOnlySlice<K, V>, key: K): V? {
+  public operator fun <K : IrAttributeContainer, V> get(slice: ReadOnlySlice<K, V>, key: K): V? {
     return map[key.attributeOwnerId]?.get(slice.key)
   }
 }
 
-private val ComposeTemporaryGlobalBindingTrace = WeakBindingTrace()
+private val ComposeTemporaryGlobalBindingTracee = WeakBindingTracee()
 
 @Suppress("UnusedReceiverParameter")
-internal val IrPluginContext.irTrace: WeakBindingTrace get() = ComposeTemporaryGlobalBindingTrace
+public val IrPluginContext.irTracee: WeakBindingTracee get() = ComposeTemporaryGlobalBindingTracee

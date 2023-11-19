@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
   kotlin("jvm")
   alias(libs.plugins.gradle.publish.maven)
@@ -15,12 +13,6 @@ kotlin {
   compilerOptions {
     optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
     optIn.add("org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction")
-  }
-}
-
-tasks.withType<KotlinCompile> {
-  kotlinOptions {
-    jvmTarget = "17"
   }
 }
 

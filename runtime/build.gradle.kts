@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
   kotlin("jvm")
   alias(libs.plugins.gradle.publish.maven)
@@ -7,18 +5,17 @@ plugins {
 
 sourceSets {
   getByName("main").java.srcDir("src/main/kotlin")
+  getByName("test").java.srcDir("src/main/kotlin")
 }
 
 kotlin {
   explicitApi()
-}
-
-tasks.withType<KotlinCompile> {
-  kotlinOptions {
-    jvmTarget = "17"
+  compilerOptions {
+    optIn.add("land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi")
   }
 }
 
 dependencies {
+  implementation(libs.jetbrains.annotation)
   testImplementation(libs.test.kotest)
 }
