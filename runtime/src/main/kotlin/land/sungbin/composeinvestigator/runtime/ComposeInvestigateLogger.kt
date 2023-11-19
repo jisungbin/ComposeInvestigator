@@ -10,7 +10,7 @@ package land.sungbin.composeinvestigator.runtime
 /**
  * ```
  * @ComposeInvestigateLogger
- * public fun composeInvestigateLogger(composableName: String, logType: LogType) {
+ * public fun composeInvestigateLogger(composableName: String, logType: ComposeInvestigateLogType) {
  *   // Your logger code here
  * }
  * ```
@@ -20,7 +20,7 @@ package land.sungbin.composeinvestigator.runtime
 @Target(AnnotationTarget.FUNCTION)
 public annotation class ComposeInvestigateLogger
 
-public sealed class LogType {
-  public class InvalidationProcessed(public val diffParams: DiffParams?) : LogType()
-  public data object InvalidationSkipped : LogType()
+public sealed class ComposeInvestigateLogType {
+  public class InvalidationProcessed(public val diffParams: DiffParams?) : ComposeInvestigateLogType()
+  public data object InvalidationSkipped : ComposeInvestigateLogType()
 }
