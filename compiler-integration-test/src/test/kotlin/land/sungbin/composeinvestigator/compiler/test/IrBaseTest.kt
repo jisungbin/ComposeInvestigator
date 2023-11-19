@@ -49,6 +49,8 @@ fun IrBaseTest.buildIrVisiterRegistrar(builder: (context: IrPluginContext) -> Ir
               moduleFragment.acceptVoid(builder(pluginContext))
             }
           },
+          // TODO: LoadingOrder("after $COMPOSE_INVESTIGATOR_PLUGIN_ID"),
+          // https://github.com/JetBrains/intellij-community/blob/17ca1d0afb43f824cda948fc3ea4467ebe55b346/platform/extensions/src/com/intellij/openapi/extensions/LoadingOrder.kt#L24
           LoadingOrder.LAST,
           project,
         )
@@ -77,7 +79,7 @@ fun IrBaseTest.kotlinCompilation(
   @Suppress("DEPRECATION")
   componentRegistrars = mutableListOf<ComponentRegistrar>(ComposeInvestigatorPluginRegistrar()).also { registrars ->
     if (enableComposeCompiler) registrars.add(0, ComposePluginRegistrar())
-    additionalVisitor?.let(registrars::add)
+    if (additionalVisitor != null) registrars.add(2, additionalVisitor)
   }
   commandLineProcessors = mutableListOf<CommandLineProcessor>(ComposeInvestigatorCommandLineProcessor()).also { processors ->
     if (enableComposeCompiler) processors.add(0, ComposeCommandLineProcessor())
