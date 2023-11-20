@@ -5,6 +5,7 @@ gradle-publish-maven = "0.25.3"
 jetbrains-annotation = "24.1.0"
 
 kotlin-core = "1.9.20"
+kotlin-coroutines = "1.7.2"
 kotlin-ksp = "1.9.20-1.0.14"
 kotlin-kotlinpoet = "1.15.1"
 kotlin-ktlint-gradle = "11.6.1"
@@ -24,6 +25,7 @@ test-mockk = "1.13.8"
 test-kotest = "5.8.0"
 test-junit-core = "4.13.2"
 test-junit-engine = "5.10.1"
+test-robolectric = "4.11.1"
 test-kotlin-compilation = "0.4.0"
 
 test-gradle-logging = "4.0.0"
@@ -60,4 +62,7 @@ test-mockk = { module = "io.mockk:mockk", version.ref = "test-mockk" }
 test-kotest = { module = "io.kotest:kotest-runner-junit5", version.ref = "test-kotest" }
 test-junit-core = { module = "junit:junit", version.ref = "test-junit-core" }
 test-junit-enigne = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "test-junit-engine" }
+test-junit-compose = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-core" }
+test-robolectric = { module = "org.robolectric:robolectric", version.ref = "test-robolectric" }
+test-kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
 test-kotlin-compilation = { module = "dev.zacsweers.kctfork:core", version.ref = "test-kotlin-compilation" }
