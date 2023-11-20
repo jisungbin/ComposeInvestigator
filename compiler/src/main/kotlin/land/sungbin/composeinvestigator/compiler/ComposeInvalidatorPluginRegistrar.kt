@@ -10,15 +10,14 @@
 package land.sungbin.composeinvestigator.compiler
 
 import com.google.auto.service.AutoService
+import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorConfiguration.KEY_VERBOSE
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
-import org.jetbrains.annotations.VisibleForTesting
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.com.intellij.openapi.extensions.LoadingOrder
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
-@VisibleForTesting
 @AutoService(ComponentRegistrar::class)
 public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
   override fun registerProjectComponents(

@@ -10,32 +10,20 @@
 package land.sungbin.composeinvestigator.compiler
 
 import com.google.auto.service.AutoService
-import org.jetbrains.annotations.VisibleForTesting
+import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorConfiguration.KEY_VERBOSE
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
-@VisibleForTesting
-public const val COMPOSE_INVESTIGATOR_PLUGIN_ID: String = "land.sungbin.composeinvestigator.compiler"
+public object ComposeInvestigatorConfiguration {
+  public val KEY_VERBOSE: CompilerConfigurationKey<String> = CompilerConfigurationKey<String>("Whether to enable verbose log")
+}
 
-internal val KEY_VERBOSE = CompilerConfigurationKey<String>("Whether to enable verbose log")
-
-@VisibleForTesting
-public val OPTION_VERBOSE: CliOption =
-  CliOption(
-    optionName = "verbose",
-    valueDescription = "<true | false>",
-    description = KEY_VERBOSE.toString(),
-    required = false,
-  )
-
-@VisibleForTesting
 @AutoService(CommandLineProcessor::class)
 public class ComposeInvestigatorCommandLineProcessor : CommandLineProcessor {
-  override val pluginId: String = COMPOSE_INVESTIGATOR_PLUGIN_ID
-
+  override val pluginId: String = PLUGIN_ID
   override val pluginOptions: List<CliOption> = listOf(OPTION_VERBOSE)
 
   override fun processOption(
@@ -47,5 +35,16 @@ public class ComposeInvestigatorCommandLineProcessor : CommandLineProcessor {
       OPTION_VERBOSE.optionName -> configuration.put(KEY_VERBOSE, value)
       else -> error("Unknown plugin option: $optionName")
     }
+  }
+
+  public companion object {
+    public const val PLUGIN_ID: String = "land.sungbin.composeinvestigator.compiler"
+
+    public val OPTION_VERBOSE: CliOption = CliOption(
+      optionName = "verbose",
+      valueDescription = "<true | false>",
+      description = KEY_VERBOSE.toString(),
+      required = false,
+    )
   }
 }

@@ -9,7 +9,6 @@ package land.sungbin.composeinvestigator.compiler.internal.tracker
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.normalize
-import land.sungbin.composeinvestigator.compiler.internal.AbstractInvalidationTrackingLower
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSER_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSER_KT_FQN

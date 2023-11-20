@@ -12,10 +12,8 @@ import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.PluginOption
 import com.tschuchort.compiletesting.SourceFile
-import land.sungbin.composeinvestigator.compiler.COMPOSE_INVESTIGATOR_PLUGIN_ID
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorCommandLineProcessor
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorPluginRegistrar
-import land.sungbin.composeinvestigator.compiler.OPTION_VERBOSE
 import land.sungbin.composeinvestigator.compiler.test.utils.source
 import org.jetbrains.kotlin.config.JvmTarget
 import org.junit.Rule
@@ -43,8 +41,8 @@ class IrDumpingTest {
       supportsK2 = false
       pluginOptions = listOf(
         PluginOption(
-          pluginId = COMPOSE_INVESTIGATOR_PLUGIN_ID,
-          optionName = OPTION_VERBOSE.optionName,
+          pluginId = ComposeInvestigatorCommandLineProcessor.PLUGIN_ID,
+          optionName = ComposeInvestigatorCommandLineProcessor.OPTION_VERBOSE.optionName,
           optionValue = "true",
         ),
         PluginOption(
