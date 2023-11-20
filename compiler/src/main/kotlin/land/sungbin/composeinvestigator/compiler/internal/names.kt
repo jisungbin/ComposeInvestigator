@@ -28,6 +28,7 @@ internal val COMPOSER_FQN = FqName("$AndroidxComposeRuntime.Composer")
 internal val COMPOSER_KT_FQN = FqName("$AndroidxComposeRuntime.ComposerKt")
 
 internal val COMPOSE_INVESTIGATE_LOGGER_FQN = FqName("$ComposeInvestigatorRuntime.ComposeInvestigateLogger")
+internal val COMPOSE_INVESTIGATE_AFFECTED_COMPOSABLE_FQN = FqName("$ComposeInvestigatorRuntime.AffectedComposable")
 internal val COMPOSE_INVESTIGATE_LOG_TYPE_FQN = FqName("$ComposeInvestigatorRuntime.ComposeInvestigateLogType")
 internal val COMPOSE_INVESTIGATE_LOG_TYPE_INVALIDATION_PROCESSED_FQN = COMPOSE_INVESTIGATE_LOG_TYPE_FQN.child(Name.identifier("InvalidationProcessed"))
 internal val COMPOSE_INVESTIGATE_LOG_TYPE_INVALIDATION_SKIPPED_FQN = COMPOSE_INVESTIGATE_LOG_TYPE_FQN.child(Name.identifier("InvalidationSkipped"))

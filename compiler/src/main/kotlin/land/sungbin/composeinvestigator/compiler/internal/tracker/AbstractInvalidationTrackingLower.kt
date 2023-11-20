@@ -11,6 +11,7 @@ import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrValueDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.IrCall
@@ -23,9 +24,11 @@ import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isNullableAny
 import org.jetbrains.kotlin.ir.types.isString
+import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 internal abstract class AbstractInvalidationTrackingLower(context: IrPluginContext) :
@@ -73,6 +76,20 @@ internal abstract class AbstractInvalidationTrackingLower(context: IrPluginConte
     get() {
       return (currentFunctionOrNull ?: return "<unknown>").name.asString()
     }
+
+  protected fun getCurrentFunctionPackage() = currentFunctionOrNull?.kotlinFqName?.asString() ?: "<unknown>"
+
+  protected fun getCurrentFunctionNameIntercepttedAnonymous(): String {
+    val currentFunctionName = currentFunctionOrNull?.name
+    return if (currentFunctionName == SpecialNames.ANONYMOUS) {
+      try {
+        val parent = currentFunction!!.irElement.cast<IrSimpleFunction>().parent
+        "${SpecialNames.ANONYMOUS_STRING} in ${parent.kotlinFqName.asString()}"
+      } catch (_: Exception) {
+        SpecialNames.ANONYMOUS_STRING
+      }
+    } else currentFunctionName?.asString() ?: "<unknown>"
+  }
 
   protected fun irGetValue(value: IrValueDeclaration): IrGetValue =
     IrGetValueImpl(

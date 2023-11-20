@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler.internal.logger
 
+import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATE_AFFECTED_COMPOSABLE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATE_LOG_TYPE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATE_LOG_TYPE_INVALIDATION_PROCESSED_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATE_LOG_TYPE_INVALIDATION_SKIPPED_FQN
@@ -27,6 +28,8 @@ import org.jetbrains.kotlin.name.Name
 internal object InvestigateLogger {
   private var loggerSymbol: IrSimpleFunctionSymbol? = null
   private var loggerType: LoggerType? = null
+
+  private var affectedComposableSymbol: IrClassSymbol? = null
 
   private var logTypeSymbol: IrClassSymbol? = null
   private var logTypeInvalidationProcessedSymbol: IrClassSymbol? = null
@@ -58,7 +61,7 @@ internal object InvestigateLogger {
   }
 
   internal fun makeIrCall(
-    composableName: IrConst<String>,
+    composable: IrDeclarationReference,
     logType: IrDeclarationReference,
     originalMessage: IrConst<String>,
   ): IrCall =
@@ -72,11 +75,19 @@ internal object InvestigateLogger {
           putValueArgument(0, originalMessage)
         }
         LoggerType.Custom -> {
-          putValueArgument(0, composableName)
+          putValueArgument(0, composable)
           putValueArgument(1, logType)
         }
       }
     }
+
+  internal fun obtainAffectedComposableSymbol(context: IrPluginContext): IrClassSymbol {
+    if (affectedComposableSymbol == null) {
+      affectedComposableSymbol =
+        context.referenceClass(ClassId.topLevel(COMPOSE_INVESTIGATE_AFFECTED_COMPOSABLE_FQN))
+    }
+    return affectedComposableSymbol!!
+  }
 
   internal fun obtainLogTypeSymbol(context: IrPluginContext): IrClassSymbol {
     if (logTypeSymbol == null) {
