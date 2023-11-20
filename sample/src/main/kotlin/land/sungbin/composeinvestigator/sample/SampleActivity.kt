@@ -23,6 +23,22 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import land.sungbin.composeinvestigator.runtime.AffectedComposable
+import land.sungbin.composeinvestigator.runtime.ComposeInvestigateLogType
+import land.sungbin.composeinvestigator.runtime.ComposeInvestigateLogger
+
+@Suppress("unused")
+@ComposeInvestigateLogger
+fun composeInvestigateLogger(composable: AffectedComposable, logType: ComposeInvestigateLogType) {
+  when (logType) {
+    is ComposeInvestigateLogType.InvalidationProcessed -> {
+      println("<${composable.name} in ${composable.pkg}> InvalidationProcessed. DiffParams: ${logType.diffParams}")
+    }
+    is ComposeInvestigateLogType.InvalidationSkipped -> {
+      println("<${composable.name} in ${composable.pkg}> InvalidationSkipped")
+    }
+  }
+}
 
 class SampleActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {

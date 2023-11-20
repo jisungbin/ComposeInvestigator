@@ -30,7 +30,6 @@ import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrFunction
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrSymbolOwner
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
@@ -54,7 +53,6 @@ import org.jetbrains.kotlin.ir.util.isTopLevel
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.load.kotlin.FacadeClassSource
 import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
@@ -165,6 +163,14 @@ internal class InvalidationTrackableTransformer(
     newStatements += computeDiffParamsIfPresentVariable
 
     val originalLogMessage = irString("[INVALIDATION_TRACKER] <${getCurrentFunctionNameIntercepttedAnonymous()}> invalidation processed")
+    val affectedComposableSymbol = InvestigateLogger.obtainAffectedComposableSymbol(context)
+    val affectedComposableCall = IrConstructorCallImpl.fromSymbolOwner(
+      type = affectedComposableSymbol.owner.defaultType,
+      constructorSymbol = affectedComposableSymbol.constructors.single(),
+    ).apply {
+      putValueArgument(0, irString(currentFunctionName))
+      putValueArgument(1, irString(getCurrentFunctionPackage()))
+    }
     val logTypeSymbol = InvestigateLogger.obtainLogTypeSymbol(context)
     val logTypeInvalidationProcessedSymbol = InvestigateLogger.obtainLogTypeInvalidationProcessedSymbol(context)
     val logTypeCall = IrConstructorCallImpl.fromSymbolOwner(
@@ -174,7 +180,7 @@ internal class InvalidationTrackableTransformer(
       putValueArgument(0, irGetValue(computeDiffParamsIfPresentVariable))
     }
     val loggerCall = InvestigateLogger.makeIrCall(
-      composableName = irString(currentFunctionName),
+      composable = affectedComposableCall,
       logType = logTypeCall,
       originalMessage = originalLogMessage,
     )
@@ -218,6 +224,14 @@ internal class InvalidationTrackableTransformer(
     // SKIP_TO_GROUP_END is declared in 'androidx.compose.runtime.Composer'
     if (fnName == SKIP_TO_GROUP_END && fnParentFqn == COMPOSER_FQN) {
       val originalLogMessage = irString("[INVALIDATION_TRACKER] <${getCurrentFunctionNameIntercepttedAnonymous()}> invalidation skipped")
+      val affectedComposableSymbol = InvestigateLogger.obtainAffectedComposableSymbol(context)
+      val affectedComposableCall = IrConstructorCallImpl.fromSymbolOwner(
+        type = affectedComposableSymbol.owner.defaultType,
+        constructorSymbol = affectedComposableSymbol.constructors.single(),
+      ).apply {
+        putValueArgument(0, irString(currentFunctionName))
+        putValueArgument(1, irString(getCurrentFunctionPackage()))
+      }
       val logTypeSymbol = InvestigateLogger.obtainLogTypeSymbol(context)
       val logTypeInvalidationSkippedSymbol = InvestigateLogger.obtainLogTypeInvalidationSkippedSymbol(context)
       val logTypeCall = IrGetObjectValueImpl(
@@ -227,7 +241,7 @@ internal class InvalidationTrackableTransformer(
         symbol = logTypeInvalidationSkippedSymbol,
       )
       val loggerCall = InvestigateLogger.makeIrCall(
-        composableName = irString(currentFunctionName),
+        composable = affectedComposableCall,
         logType = logTypeCall,
         originalMessage = originalLogMessage,
       )
@@ -245,18 +259,6 @@ internal class InvalidationTrackableTransformer(
     }
 
     return super.visitElseBranch(branch)
-  }
-
-  private fun getCurrentFunctionNameIntercepttedAnonymous(): String {
-    val currentFunctionName = currentFunctionOrNull?.name
-    return if (currentFunctionName == SpecialNames.ANONYMOUS) {
-      try {
-        val parent = currentFunction!!.irElement.cast<IrSimpleFunction>().parent
-        "${SpecialNames.ANONYMOUS_STRING} in ${parent.kotlinFqName.asString()}"
-      } catch (_: Exception) {
-        SpecialNames.ANONYMOUS_STRING
-      }
-    } else currentFunctionName?.asString() ?: "<unknown>"
   }
 
   private fun IrWhen.isComposerTrackBranch(): Boolean {

@@ -8,6 +8,7 @@
 package land.sungbin.composeinvestigator.compiler.internal.logger
 
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_FQN
+import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATE_AFFECTED_COMPOSABLE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATE_LOGGER_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATE_LOG_TYPE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.origin.InvestigateLoggerUsedFuntionOrigin
@@ -17,7 +18,6 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.types.classFqName
-import org.jetbrains.kotlin.ir.types.isString
 import org.jetbrains.kotlin.ir.types.isUnit
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.hasAnnotation
@@ -51,7 +51,7 @@ internal class InvestigateLoggerVisitor(
   // 4. no extension receiver and no context receiver
   // 5. not suspend
   // 6. unit type
-  // 7. has only two parameters: <String, LogType>
+  // 7. has only two parameters: <AffectedComposable, ComposeInvestigateLogType>
   private fun IrFunction.isValidComposeInvestigateLoggerFunction(): Boolean =
     hasAnnotation(COMPOSE_INVESTIGATE_LOGGER_FQN) &&
       !hasAnnotation(COMPOSABLE_FQN) &&
@@ -62,6 +62,6 @@ internal class InvestigateLoggerVisitor(
       !isSuspend &&
       returnType.isUnit() &&
       valueParameters.size == 2 &&
-      valueParameters[0].type.isString() &&
+      valueParameters[0].type.classFqName == COMPOSE_INVESTIGATE_AFFECTED_COMPOSABLE_FQN &&
       valueParameters[1].type.classFqName == COMPOSE_INVESTIGATE_LOG_TYPE_FQN
 }

@@ -8,17 +8,18 @@
 package land.sungbin.composeinvestigator.compiler.test.source
 
 import androidx.compose.runtime.Composable
+import land.sungbin.composeinvestigator.runtime.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.ComposeInvestigateLogType
 import land.sungbin.composeinvestigator.runtime.ComposeInvestigateLogger
 
 @ComposeInvestigateLogger
-fun composeInvestigateLogger(composableName: String, logType: ComposeInvestigateLogType) {
+fun composeInvestigateLogger(composable: AffectedComposable, logType: ComposeInvestigateLogType) {
   when (logType) {
     is ComposeInvestigateLogType.InvalidationProcessed -> {
-      println("<$composableName> InvalidationProcessed. DiffParams: ${logType.diffParams}")
+      println("<${composable.name} in ${composable.pkg}> InvalidationProcessed. DiffParams: ${logType.diffParams}")
     }
     is ComposeInvestigateLogType.InvalidationSkipped -> {
-      println("<$composableName> InvalidationSkipped")
+      println("<${composable.name} in ${composable.pkg}> InvalidationSkipped")
     }
   }
 }
