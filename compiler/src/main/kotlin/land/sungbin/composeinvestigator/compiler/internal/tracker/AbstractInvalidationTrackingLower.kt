@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.internal
+package land.sungbin.composeinvestigator.compiler.internal.tracker
 
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -30,18 +30,6 @@ import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 internal abstract class AbstractInvalidationTrackingLower(context: IrPluginContext) :
   IrElementTransformerVoidWithContext() {
-  private val printlnSymbol: IrSimpleFunctionSymbol =
-    context
-      .referenceFunctions(
-        CallableId(
-          packageName = FqName("kotlin.io"),
-          callableName = Name.identifier("println"),
-        ),
-      )
-      .single { symbol ->
-        symbol.owner.valueParameters.size == 1 &&
-          symbol.owner.valueParameters.single().type.isNullableAny()
-      }
   private val hashCodeSymbol: IrSimpleFunctionSymbol =
     context
       .referenceFunctions(
