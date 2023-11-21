@@ -5,12 +5,15 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
+@file:Suppress("TestFunctionName")
+
 package land.sungbin.composeinvestigator.compiler.test.tracker
 
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
@@ -25,9 +28,32 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import land.sungbin.composeinvestigator.runtime.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.ComposeInvestigateLogType
 import land.sungbin.composeinvestigator.runtime.ComposeInvestigateLogger
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
+import org.junit.jupiter.api.DisplayName
+import org.junit.rules.TestWatcher
+import org.junit.runner.Description
 import org.junit.runner.RunWith
+
+private var currentComposableName: String? = null
+private val composeInvestigateLogMap =
+  mutableMapOf<String?, MutableList<Pair<AffectedComposable, ComposeInvestigateLogType>>>()
+
+class ComposeInvestigateLogTestRule : TestWatcher() {
+  override fun starting(description: Description?) {
+    currentComposableName = description?.methodName
+  }
+
+  fun getCurrentLog(): List<Pair<AffectedComposable, ComposeInvestigateLogType>>? =
+    composeInvestigateLogMap[currentComposableName]
+}
+
+@Suppress("unused")
+@ComposeInvestigateLogger
+fun composeInvestigateLogger(composable: AffectedComposable, logType: ComposeInvestigateLogType) {
+  composeInvestigateLogMap.getOrPut(currentComposableName, ::mutableListOf).add(composable to logType)
+}
 
 // [transformation scenarios]
 // - invalidation processed
@@ -48,31 +74,62 @@ class InvalidationTrackableTransformerTest {
   @get:Rule
   val compose = createAndroidComposeRule<ComponentActivity>()
 
+  @get:Rule
+  val investigateLogRule = ComposeInvestigateLogTestRule()
+
+  @Before
+  fun cleanup() {
+    composeInvestigateLogMap.clear()
+  }
+
+  @DisplayName("Most basic logging tests")
   @Test
-  fun test() {
-    compose.setContent {
-      var a by remember { mutableIntStateOf(1) }
-      BasicText(modifier = Modifier.testTag("a"), text = "$a")
+  fun basic() {
+    @Composable
+    fun BasicTextContent() {
+      var number by remember { mutableIntStateOf(1) }
+
+      BasicText(
+        modifier = Modifier.testTag("display"),
+        text = "$number",
+      )
       Box(
         Modifier
-          .testTag("b")
-          .clickable { a++ },
+          .testTag("increaseNumber")
+          .clickable { number++ },
       )
     }
 
-    val button = compose.onNodeWithTag("b")
+    compose.setContent {
+      BasicTextContent()
+    }
+
+    val button = compose.onNodeWithTag("increaseNumber")
     button.performClick()
 
-    val text = compose.onNodeWithTag("a")
+    val text = compose.onNodeWithTag("display")
 
     compose.runOnIdle {
       text.assertTextEquals("2")
+
+      // [
+      // (AffectedComposable(
+      //   name= <anonymous>,
+      //   pkg=land.sungbin.composeinvestigator.compiler.test.tracker.ComposableSingletons$InvalidationTrackableTransformerTestKt.lambda-1.<anonymous>
+      // ),
+      // InvalidationProcessed(diffParams=null)
+      // ),
+      // (AffectedComposable(
+      //   name= <anonymous>,
+      //   pkg=land.sungbin.composeinvestigator.compiler.test.tracker.ComposableSingletons$InvalidationTrackableTransformerTestKt.lambda-1.<anonymous>
+      // ),
+      // InvalidationProcessed(
+      //   diffParams= <<anonymous>> DiffParams(
+      //     No diff params.
+      //     Some argument may be unstable, or there may have been an invalidation request on the current RecomposeScope.
+      // )
+      // ))]
+      println(investigateLogRule.getCurrentLog())
     }
   }
-}
-
-@Suppress("unused")
-@ComposeInvestigateLogger
-fun composeInvestigateLogger(composable: AffectedComposable, logType: ComposeInvestigateLogType) {
-  println("composeInvestigateLogger: $composable, $logType")
 }
