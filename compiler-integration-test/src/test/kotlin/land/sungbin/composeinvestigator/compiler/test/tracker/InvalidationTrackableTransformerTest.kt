@@ -5,38 +5,54 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
+@file:Suppress("TestFunctionName")
+
 package land.sungbin.composeinvestigator.compiler.test.tracker
 
-import io.kotest.assertions.fail
-import io.kotest.core.annotation.Ignored
-import io.kotest.core.spec.style.StringSpec
-import io.kotest.engine.spec.tempdir
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.string.shouldEndWith
-import io.kotest.matchers.string.shouldStartWith
-import io.kotest.matchers.types.shouldBeTypeOf
-import land.sungbin.composeinvestigator.compiler.internal.origin.InvalidationTrackerOrigin
-import land.sungbin.composeinvestigator.compiler.test.IrBaseTest
-import land.sungbin.composeinvestigator.compiler.test.buildIrVisiterRegistrar
-import land.sungbin.composeinvestigator.compiler.test.kotlinCompilation
-import land.sungbin.composeinvestigator.compiler.test.utils.source
-import org.jetbrains.kotlin.backend.jvm.JvmLoweredDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.IrClass
-import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.expressions.IrBlock
-import org.jetbrains.kotlin.ir.expressions.IrBlockBody
-import org.jetbrains.kotlin.ir.expressions.IrCall
-import org.jetbrains.kotlin.ir.expressions.IrConst
-import org.jetbrains.kotlin.ir.expressions.IrElseBranch
-import org.jetbrains.kotlin.ir.expressions.IrGetValue
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
-import org.jetbrains.kotlin.ir.expressions.impl.IrWhenImpl
-import org.jetbrains.kotlin.ir.symbols.IrVariableSymbol
-import org.jetbrains.kotlin.ir.util.dump
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitorVoid
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
+import androidx.activity.ComponentActivity
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.test.assertTextEquals
+import androidx.compose.ui.test.junit4.createAndroidComposeRule
+import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.test.ext.junit.runners.AndroidJUnit4
+import land.sungbin.composeinvestigator.runtime.AffectedComposable
+import land.sungbin.composeinvestigator.runtime.ComposeInvestigateLogType
+import org.junit.Before
+import org.junit.Rule
+import org.junit.Test
+import org.junit.jupiter.api.DisplayName
+import org.junit.rules.TestWatcher
+import org.junit.runner.Description
+import org.junit.runner.RunWith
+
+private var currentComposableName: String? = null
+private val composeInvestigateLogMap =
+  mutableMapOf<String?, MutableList<Pair<AffectedComposable, ComposeInvestigateLogType>>>()
+
+class ComposeInvestigateLogTestRule : TestWatcher() {
+  override fun starting(description: Description?) {
+    currentComposableName = description?.methodName
+  }
+
+  fun getCurrentLog(): List<Pair<AffectedComposable, ComposeInvestigateLogType>>? =
+    composeInvestigateLogMap[currentComposableName]
+}
+
+// @Suppress("unused")
+// @ComposeInvestigateLogger
+// fun composeInvestigateLogger(composable: AffectedComposable, logType: ComposeInvestigateLogType) {
+//   composeInvestigateLogMap.getOrPut(currentComposableName, ::mutableListOf).add(composable to logType)
+// }
 
 // [transformation scenarios]
 // - invalidation processed
@@ -52,120 +68,67 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 // - parameter
 // - companion object
 // - anonymous object
-@Ignored("TODO")
-class InvalidationTrackableTransformerTest : StringSpec(), IrBaseTest {
-  init {
-    "A statement is added to print that the invalidation is in progress, and to look up the arguments that are different from the previous invalidation." {
-      var file: IrFile? = null
+@RunWith(AndroidJUnit4::class)
+class InvalidationTrackableTransformerTest {
+  @get:Rule
+  val compose = createAndroidComposeRule<ComponentActivity>()
 
-      val irVisitor = buildIrVisiterRegistrar {
-        object : IrElementVisitorVoid {
-          override fun visitModuleFragment(declaration: IrModuleFragment) {
-            file = declaration.files.single()
-            return super.visitModuleFragment(declaration)
-          }
-        }
-      }
+  @get:Rule
+  val investigateLogRule = ComposeInvestigateLogTestRule()
 
-      kotlinCompilation(
-        workingDir = tempdir(),
-        enableComposeCompiler = true,
-        enableVerboseLogging = true,
-        additionalVisitor = irVisitor,
-        sourceFiles = arrayOf(source("tracker/InvalidationTrackableTransformerTestSource.kt")),
-      ).compile()
-
-      val classes = file!!.declarations.filterIsInstance<IrClass>()
-
-      val jvmClz = classes.single { clz -> clz.name.asString() == "InvalidationTrackableTransformerTestSourceKt" }
-      val classClz = classes.single { clz -> clz.name.asString() == "Class" }
-      val objClz = classes.single { clz -> clz.name.asString() == "Object" }
-      val companionObjClz = classes.single { clz -> clz.name.asString() == "CompanionObject" }
-
-      jvmClz.irCheckForJvmClz()
-      classClz.irCheckForClassClz()
-      objClz.irCheckForObjClz()
-      companionObjClz.irCheckForCompanionObjClz()
-    }
+  @Before
+  fun cleanup() {
+    composeInvestigateLogMap.clear()
   }
 
-  private fun IrClass.irCheckForJvmClz() {
-    val fns = declarations
-      .filterIsInstance<IrSimpleFunction>()
-      .filterNot { fn -> fn.origin == JvmLoweredDeclarationOrigin.CLASS_STATIC_INITIALIZER }
+  @DisplayName("Most basic logging tests")
+  @Test
+  fun basic() {
+    @Composable
+    fun BasicTextContent() {
+      var number by remember { mutableIntStateOf(1) }
 
-    for (fn in fns) {
-      var valid = false
-      fn.body.safeAs<IrBlockBody>()?.statements?.forEach { statement ->
-        if (valid) return@forEach
-        valid = statement.safeAs<IrBlock>()?.validateTransformed() ?: false
-      }
-      if (!valid) fail(
-        "The transformation did not proceed as expected. " +
-          "DUMP: ${fn.dump()}",
+      BasicText(
+        modifier = Modifier.testTag("display"),
+        text = "$number",
+      )
+      Box(
+        Modifier
+          .testTag("increaseNumber")
+          .clickable { number++ },
       )
     }
-  }
 
-  private fun IrClass.irCheckForClassClz() {
-
-  }
-
-  private fun IrClass.irCheckForObjClz() {
-
-  }
-
-  private fun IrClass.irCheckForCompanionObjClz() {
-
-  }
-
-  private fun IrBlock.validateTransformed(): Boolean {
-    val expression = this
-    if (expression.origin == InvalidationTrackerOrigin) {
-      val printlnStatement = expression.statements[1]
-
-      printlnStatement.shouldBeTypeOf<IrCall>()
-      printlnStatement.valueArgumentsCount shouldBe 1
-
-      with(printlnStatement.getValueArgument(0)) {
-        shouldBeTypeOf<IrConst<String>>()
-        value shouldStartWith "[INVALIDATION_TRACKER]"
-        value shouldEndWith "invalidation processed"
-      }
-
-      for (statement in expression.statements.drop(2)) {
-        if (statement is IrWhenImpl && statement.origin == IrStatementOrigin.SAFE_CALL) {
-          if (statement.branches.size == 2) {
-            val elseBranch = statement.branches.last().safeAs<IrElseBranch>() ?: continue
-            val elseCondition = elseBranch.condition.safeAs<IrConst<Boolean>>() ?: continue
-            val elseResult = elseBranch.result.safeAs<IrCall>() ?: continue
-
-            if (elseCondition.value) {
-              if (elseResult.valueArgumentsCount == 1) {
-                val maybePrintlnCallArg = elseResult.getValueArgument(0)
-                if (maybePrintlnCallArg is IrCall) { // irToString
-                  if (maybePrintlnCallArg.valueArgumentsCount == 1) {
-                    val maybeGetValueCall = maybePrintlnCallArg.getValueArgument(0)
-                    if (maybeGetValueCall is IrGetValue) { // irGetValue
-                      val getValueCallSymbol = maybeGetValueCall.symbol
-                      if (getValueCallSymbol is IrVariableSymbol) { // irVariable
-                        println(getValueCallSymbol.owner.name.asString())
-                        if (getValueCallSymbol.owner.name.asString().endsWith("\$diffParams")) return true
-                      }
-                    }
-                  }
-                }
-              }
-            }
-            return true
-          }
-        }
-      }
+    compose.setContent {
+      BasicTextContent()
     }
-    return false
-  }
 
-  private fun IrElseBranch.validateTransformed() {
+    val button = compose.onNodeWithTag("increaseNumber")
+    button.performClick()
 
+    val text = compose.onNodeWithTag("display")
+
+    compose.runOnIdle {
+      text.assertTextEquals("2")
+
+      // [
+      // (AffectedComposable(
+      //   name= <anonymous>,
+      //   pkg=land.sungbin.composeinvestigator.compiler.test.tracker.ComposableSingletons$InvalidationTrackableTransformerTestKt.lambda-1.<anonymous>
+      // ),
+      // InvalidationProcessed(diffParams=null)
+      // ),
+      // (AffectedComposable(
+      //   name= <anonymous>,
+      //   pkg=land.sungbin.composeinvestigator.compiler.test.tracker.ComposableSingletons$InvalidationTrackableTransformerTestKt.lambda-1.<anonymous>
+      // ),
+      // InvalidationProcessed(
+      //   diffParams= <<anonymous>> DiffParams(
+      //     No diff params.
+      //     Some argument may be unstable, or there may have been an invalidation request on the current RecomposeScope.
+      // )
+      // ))]
+      println(investigateLogRule.getCurrentLog())
+    }
   }
 }

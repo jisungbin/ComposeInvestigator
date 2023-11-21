@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+  ~ Designed and developed by Duckie Team 2023.
+  ~
+  ~ Licensed under the MIT.
+  ~ Please see full license: https://github.com/duckie-team/quack-quack-android/blob/main/LICENSE
+  -->
+
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- https://stackoverflow.com/a/67354577/14299073 -->
+    <application>
+        <activity
+            android:name="androidx.activity.ComponentActivity"
+            android:theme="@android:style/Theme.Material.NoActionBar.Fullscreen" />
+    </application>
+</manifest>

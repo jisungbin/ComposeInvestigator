@@ -23,6 +23,9 @@ public annotation class ComposeInvestigateLogger
 public data class AffectedComposable(public val name: String, public val pkg: String)
 
 public sealed class ComposeInvestigateLogType {
-  public class InvalidationProcessed(public val diffParams: DiffParams?) : ComposeInvestigateLogType()
+  public class InvalidationProcessed(public val diffParams: DiffParams?) : ComposeInvestigateLogType() {
+    override fun toString(): String = "InvalidationProcessed(diffParams=$diffParams)"
+  }
+
   public data object InvalidationSkipped : ComposeInvestigateLogType()
 }
