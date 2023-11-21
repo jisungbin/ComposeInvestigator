@@ -13,6 +13,7 @@ import com.google.auto.service.AutoService
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorConfiguration.KEY_VERBOSE
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
 import org.jetbrains.kotlin.compiler.plugin.CliOption
+import org.jetbrains.kotlin.compiler.plugin.CliOptionProcessingException
 import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.CompilerConfigurationKey
@@ -33,7 +34,7 @@ public class ComposeInvestigatorCommandLineProcessor : CommandLineProcessor {
   ) {
     when (val optionName = option.optionName) {
       OPTION_VERBOSE.optionName -> configuration.put(KEY_VERBOSE, value)
-      else -> error("Unknown plugin option: $optionName")
+      else -> throw CliOptionProcessingException("Unknown plugin option: $optionName")
     }
   }
 
