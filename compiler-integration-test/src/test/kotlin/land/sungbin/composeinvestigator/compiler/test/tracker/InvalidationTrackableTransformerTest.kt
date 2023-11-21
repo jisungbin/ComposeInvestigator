@@ -27,6 +27,7 @@ import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import land.sungbin.composeinvestigator.runtime.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.ComposeInvestigateLogType
+import land.sungbin.composeinvestigator.runtime.ComposeInvestigateLogger
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -48,11 +49,11 @@ class ComposeInvestigateLogTestRule : TestWatcher() {
     composeInvestigateLogMap[currentComposableName]
 }
 
-// @Suppress("unused")
-// @ComposeInvestigateLogger
-// fun composeInvestigateLogger(composable: AffectedComposable, logType: ComposeInvestigateLogType) {
-//   composeInvestigateLogMap.getOrPut(currentComposableName, ::mutableListOf).add(composable to logType)
-// }
+@Suppress("unused")
+@ComposeInvestigateLogger
+fun composeInvestigateLogger(composable: AffectedComposable, logType: ComposeInvestigateLogType) {
+  composeInvestigateLogMap.getOrPut(currentComposableName, ::mutableListOf).add(composable to logType)
+}
 
 // [transformation scenarios]
 // - invalidation processed
