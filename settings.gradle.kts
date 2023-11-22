@@ -15,7 +15,12 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 pluginManagement {
   repositories {
     gradlePluginPortal()
-    google()
+    google {
+      content {
+        includeGroupByRegex(".*google.*")
+        includeGroupByRegex(".*android.*")
+      }
+    }
     mavenCentral()
     maven("https://jitpack.io") {
       content {

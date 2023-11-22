@@ -17,7 +17,12 @@ plugins {
 
 buildscript {
   repositories {
-    google()
+    google {
+      content {
+        includeGroupByRegex(".*google.*")
+        includeGroupByRegex(".*android.*")
+      }
+    }
     mavenCentral()
   }
 
@@ -29,7 +34,12 @@ buildscript {
 
 subprojects {
   repositories {
-    google()
+    google {
+      content {
+        includeGroupByRegex(".*google.*")
+        includeGroupByRegex(".*android.*")
+      }
+    }
     mavenCentral()
   }
 
