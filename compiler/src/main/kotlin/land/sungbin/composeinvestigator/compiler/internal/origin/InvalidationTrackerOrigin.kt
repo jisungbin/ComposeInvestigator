@@ -9,4 +9,4 @@ package land.sungbin.composeinvestigator.compiler.internal.origin
 
 import org.jetbrains.kotlin.ir.expressions.IrStatementOriginImpl
 
-public data object InvalidationTrackerOrigin : IrStatementOriginImpl("TRANSFORMED_BY_INVALIDATION_TRACKER")
+public data object InvalidationTrackerOrigin : IrStatementOriginImpl("GENERATED_INVALIDATION_TRACKER_MEMBER")
