@@ -35,9 +35,9 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
+import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
 import org.jetbrains.kotlin.ir.util.constructors
-import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
@@ -56,7 +56,7 @@ public class IrInvalidationTrackTable private constructor(public val prop: IrPro
     valueHashCode: IrVariable,
   ): IrConstructorCall =
     IrConstructorCallImpl.fromSymbolOwner(
-      type = paramInfoSymbol.owner.defaultType,
+      type = paramInfoSymbol.defaultType,
       constructorSymbol = paramInfoSymbol.constructors.single(),
     ).apply {
       fun IrVariable.valueGetter(): IrGetValue =
@@ -137,7 +137,7 @@ private fun irInvalidationTrackTableProp(
       name = propName
       isStatic = true
       isFinal = true
-      type = superSymbol.owner.defaultType
+      type = superSymbol.defaultType
       visibility = DescriptorVisibilities.PRIVATE
     }.also { field ->
       field.parent = currentFile
@@ -146,13 +146,13 @@ private fun irInvalidationTrackTableProp(
         startOffset = SYNTHETIC_OFFSET,
         endOffset = SYNTHETIC_OFFSET,
         expression = IrConstructorCallImpl.fromSymbolOwner(
-          type = superSymbol.owner.defaultType,
+          type = superSymbol.defaultType,
           constructorSymbol = superSymbol.constructors.single(),
         ),
       )
     }
     prop.addGetter {
-      returnType = superSymbol.owner.defaultType
+      returnType = superSymbol.defaultType
       visibility = DescriptorVisibilities.PRIVATE
       origin = IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
     }.also { getter ->

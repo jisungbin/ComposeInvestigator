@@ -23,10 +23,10 @@ import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.types.typeWithArguments
 import org.jetbrains.kotlin.ir.util.constructors
-import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.types.Variance
 
@@ -52,7 +52,7 @@ private fun IrPluginContext.irDeclarationStabilityCertain(stable: IrConst<Boolea
       .also { symbol -> declarationStabilityCertainSymbol = symbol })
 
   return IrConstructorCallImpl.fromSymbolOwner(
-    type = symbol.owner.defaultType,
+    type = symbol.defaultType,
     constructorSymbol = symbol.constructors.single(),
   ).apply {
     putValueArgument(0, stable)
@@ -65,7 +65,7 @@ private fun IrPluginContext.irDeclarationStabilityRuntime(declarationName: IrCon
       .also { symbol -> declarationStabilityRuntimeSymbol = symbol })
 
   return IrConstructorCallImpl.fromSymbolOwner(
-    type = symbol.owner.defaultType,
+    type = symbol.defaultType,
     constructorSymbol = symbol.constructors.single(),
   ).apply {
     putValueArgument(0, declarationName)
@@ -78,7 +78,7 @@ private fun IrPluginContext.irDeclarationStabilityUnknown(declarationName: IrCon
       .also { symbol -> declarationStabilityUnknownSymbol = symbol })
 
   return IrConstructorCallImpl.fromSymbolOwner(
-    type = symbol.owner.defaultType,
+    type = symbol.defaultType,
     constructorSymbol = symbol.constructors.single(),
   ).apply {
     putValueArgument(0, declarationName)
@@ -91,7 +91,7 @@ private fun IrPluginContext.irDeclarationStabilityParameter(parameterName: IrCon
       .also { symbol -> declarationStabilityParameterSymbol = symbol })
 
   return IrConstructorCallImpl.fromSymbolOwner(
-    type = symbol.owner.defaultType,
+    type = symbol.defaultType,
     constructorSymbol = symbol.constructors.single(),
   ).apply {
     putValueArgument(0, parameterName)
@@ -107,10 +107,10 @@ private fun IrPluginContext.irDeclarationStabilityCombined(elements: List<IrCons
       .also { parentSymbol -> declarationStabilitySymbol = parentSymbol })
 
   return IrConstructorCallImpl.fromSymbolOwner(
-    type = symbol.owner.defaultType,
+    type = symbol.defaultType,
     constructorSymbol = symbol.constructors.single(),
   ).apply {
-    val varargElementType = parentSymbol.owner.defaultType
+    val varargElementType = parentSymbol.defaultType
     val genericTypeProjection = makeTypeProjection(type = varargElementType, variance = Variance.OUT_VARIANCE)
     val genericType = irBuiltIns.arrayClass.typeWithArguments(listOf(genericTypeProjection))
     val vararg = IrVarargImpl(

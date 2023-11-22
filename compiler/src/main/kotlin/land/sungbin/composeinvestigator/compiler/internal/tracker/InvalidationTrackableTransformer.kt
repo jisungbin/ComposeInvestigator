@@ -29,7 +29,6 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.types.typeWithArguments
-import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.types.Variance
@@ -46,7 +45,7 @@ internal class InvalidationTrackableTransformer(
     val currentFunctionLocation = function.getSafelyLocation()
     val currentInvalidationTrackTable = currentInvalidationTrackTable!!
 
-    val paramInfoType = currentInvalidationTrackTable.paramInfoSymbol.owner.defaultType
+    val paramInfoType = currentInvalidationTrackTable.paramInfoSymbol.defaultType
     val paramInfoGenericTypeProjection = makeTypeProjection(type = paramInfoType, variance = Variance.OUT_VARIANCE)
     val paramInfoGenericType = irBuiltIns.arrayClass.typeWithArguments(listOf(paramInfoGenericTypeProjection))
     val paramInfos = IrVarargImpl(
