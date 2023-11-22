@@ -23,10 +23,10 @@ internal class InvalidationTrackExtension(private val logger: VerboseLogger) : I
     // TODO: Supports externalStableTypeMatchers.
     val stabilityInferencer = StabilityInferencer(moduleFragment.descriptor, emptySet())
 
-    DurableFunctionKeyTransformer(pluginContext).lower(moduleFragment)
+    moduleFragment.transformChildrenVoid(DurableFunctionKeyTransformer(pluginContext))
     moduleFragment.transformChildrenVoid(InvestigateLoggerVisitor(pluginContext, logger))
 
-    if (!InvestigateLogger.checkLoggerIsInstalled()) {
+    if (InvestigateLogger.getCurrentLoggerSymbolOrNull() == null) {
       InvestigateLogger.useDefaultLogger(pluginContext)
     }
 

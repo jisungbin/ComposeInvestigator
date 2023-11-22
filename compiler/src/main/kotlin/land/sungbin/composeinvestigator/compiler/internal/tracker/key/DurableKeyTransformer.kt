@@ -9,7 +9,6 @@
 
 package land.sungbin.composeinvestigator.compiler.internal.tracker.key
 
-import land.sungbin.composeinvestigator.compiler.internal.ModuleLoweringPass
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrClass
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
@@ -17,7 +16,6 @@ import org.jetbrains.kotlin.ir.declarations.IrDeclarationWithName
 import org.jetbrains.kotlin.ir.declarations.IrEnumEntry
 import org.jetbrains.kotlin.ir.declarations.IrField
 import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.declarations.IrPackageFragment
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
@@ -55,15 +53,10 @@ import org.jetbrains.kotlin.ir.util.fqNameForIrSerialization
 import org.jetbrains.kotlin.ir.util.isAnnotationClass
 import org.jetbrains.kotlin.ir.util.parentAsClass
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
-import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.Name
 
 internal open class DurableKeyTransformer(private val keyVisitor: DurableKeyVisitor) :
-  IrElementTransformerVoid(), ModuleLoweringPass {
-
-  override fun lower(module: IrModuleFragment) {
-    module.transformChildrenVoid(this)
-  }
+  IrElementTransformerVoid() {
 
   protected fun buildKey(
     prefix: String,
