@@ -10,6 +10,7 @@
 package land.sungbin.composeinvestigator.runtime
 
 // Get from https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/compiler/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/analysis/Stability.kt;l=74;drc=7d3e127599f8ce142445c944c703cf3c3e6d2b3a.
+// The name is prefixed with "Declaration" to distinguish it from AOSP's Stability.
 
 public sealed class DeclarationStability {
   public class Certain(public val stable: Boolean) : DeclarationStability() {
