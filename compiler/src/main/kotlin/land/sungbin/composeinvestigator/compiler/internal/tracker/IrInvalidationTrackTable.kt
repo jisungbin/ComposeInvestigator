@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler.internal.tracker
 
+import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_COMPUTE_DIFF_PARAMS_IF_PRESENT_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.PARAMETER_INFO_FQN
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -104,8 +105,8 @@ public class IrInvalidationTrackTable private constructor(public val prop: IrPro
             context
               .referenceFunctions(
                 CallableId(
-                  packageName = COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN,
-                  callableName = Name.identifier("computeDiffParamsIfPresent"),
+                  packageName = COMPOSABLE_INVALIDATION_TRACK_TABLE_COMPUTE_DIFF_PARAMS_IF_PRESENT_FQN.parent(),
+                  callableName = COMPOSABLE_INVALIDATION_TRACK_TABLE_COMPUTE_DIFF_PARAMS_IF_PRESENT_FQN.shortName(),
                 ),
               )
               .single()

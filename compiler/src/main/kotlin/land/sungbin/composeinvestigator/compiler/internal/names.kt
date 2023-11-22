@@ -28,13 +28,21 @@ internal val COMPOSER_FQN = FqName("$AndroidxComposeRuntime.Composer")
 internal val COMPOSER_KT_FQN = FqName("$AndroidxComposeRuntime.ComposerKt")
 
 internal val COMPOSE_INVESTIGATE_LOGGER_FQN = FqName("$ComposeInvestigatorRuntime.ComposeInvestigateLogger")
-internal val COMPOSE_INVESTIGATE_AFFECTED_COMPOSABLE_FQN = FqName("$ComposeInvestigatorRuntime.AffectedComposable")
-internal val COMPOSE_INVESTIGATE_LOG_TYPE_FQN = FqName("$ComposeInvestigatorRuntime.ComposeInvestigateLogType")
-internal val COMPOSE_INVESTIGATE_LOG_TYPE_INVALIDATION_PROCESSED_FQN = COMPOSE_INVESTIGATE_LOG_TYPE_FQN.child(Name.identifier("InvalidationProcessed"))
-internal val COMPOSE_INVESTIGATE_LOG_TYPE_INVALIDATION_SKIPPED_FQN = COMPOSE_INVESTIGATE_LOG_TYPE_FQN.child(Name.identifier("InvalidationSkipped"))
+internal val AFFECTED_COMPOSABLE_FQN = FqName("$ComposeInvestigatorRuntime.AffectedComposable")
+
+internal val COMPOSABLE_INVALIDATE_TYPE_FQN = FqName("$ComposeInvestigatorRuntime.ComposableInvalidateType")
+internal val COMPOSABLE_INVALIDATE_TYPE_PROCESSED_FQN = COMPOSABLE_INVALIDATE_TYPE_FQN.child(Name.identifier("Processed"))
+internal val COMPOSABLE_INVALIDATE_TYPE_SKIPPED_FQN = COMPOSABLE_INVALIDATE_TYPE_FQN.child(Name.identifier("Skipped"))
 
 internal val PARAMETER_INFO_FQN = FqName("$ComposeInvestigatorRuntime.ParameterInfo")
+
+internal val CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN = FqName("$ComposeInvestigatorRuntime.currentComposableInvalidationTracker")
+
 internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationTrackTable")
+internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_NAME_FQN = COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN.child(Name.identifier("currentComposableName"))
+internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_KEY_NAME_FQN = COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN.child(Name.identifier("currentComposableKeyName"))
+internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_CALL_LISTENERS_FQN = COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN.child(Name.identifier("callListeners"))
+internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_COMPUTE_DIFF_PARAMS_IF_PRESENT_FQN = COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN.child(Name.identifier("computeDiffParamsIfPresent"))
 
 internal val DECLARATION_STABILITY_FQN = FqName("$ComposeInvestigatorRuntime.DeclarationStability")
 internal val DECLARATION_STABILITY_CERTAIN_FQN = DECLARATION_STABILITY_FQN.child(Name.identifier("Certain"))
