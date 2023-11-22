@@ -9,7 +9,6 @@ package land.sungbin.composeinvestigator.compiler.internal.tracker
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.normalize
-import land.sungbin.composeinvestigator.compiler.internal.irInt
 import land.sungbin.composeinvestigator.compiler.internal.irString
 import land.sungbin.composeinvestigator.compiler.internal.irTracee
 import land.sungbin.composeinvestigator.compiler.internal.logger.InvestigateLogger
@@ -26,12 +25,10 @@ import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.addElement
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
+import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.types.typeWithArguments
-import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
@@ -97,31 +94,24 @@ internal class InvalidationTrackableTransformer(
     newStatements += computeDiffParamsIfPresentVariable
 
     val originalLogMessage = irString("[INVALIDATION_TRACKER] <${getCurrentFunctionNameIntercepttedAnonymous()}> invalidation processed")
-    val affectedComposableSymbol = InvestigateLogger.obtainAffectedComposableSymbol(context)
-    val affectedComposableCall = IrConstructorCallImpl.fromSymbolOwner(
-      type = affectedComposableSymbol.owner.defaultType,
-      constructorSymbol = affectedComposableSymbol.constructors.single(),
-    ).apply {
-      putValueArgument(0, irString(currentFunctionName))
-      putValueArgument(1, irString(getCurrentFunctionPackage()))
-      putValueArgument(2, irString(currentFunctionLocation.file))
-      putValueArgument(3, irInt(currentFunctionLocation.line))
-      putValueArgument(4, irInt(currentFunctionLocation.column))
-    }
-    val invalidateTypeSymbol = InvestigateLogger.obtainInvalidateTypeSymbol(context)
-    val invalidateTypeProcessedSymbol = InvestigateLogger.obtainInvalidateTypeProcessedSymbol(context)
-    val invalidateTypeCall = IrConstructorCallImpl.fromSymbolOwner(
-      type = invalidateTypeSymbol.owner.defaultType,
-      constructorSymbol = invalidateTypeProcessedSymbol.constructors.single(),
-    ).apply {
-      putValueArgument(0, irGetValue(computeDiffParamsIfPresentVariable))
-    }
-    val loggerCall = InvestigateLogger.makeIrCall(
-      composable = affectedComposableCall,
-      type = invalidateTypeCall,
+    val affectedComposable = InvestigateLogger.irAffectedComposable(
+      context = context,
+      functionName = currentFunctionName,
+      packageName = getCurrentFunctionPackage(),
+      location = currentFunctionLocation,
+    )
+    val invalidateTypeSymbol = InvestigateLogger.irInvalidateTypeSymbol(context)
+    val invalidateTypeProcessed = InvestigateLogger.irInvalidateTypeProcessed(
+      context = context,
+      diffParams = irGetValue(computeDiffParamsIfPresentVariable),
+    ).apply { type = invalidateTypeSymbol.defaultType }
+
+    val logger = InvestigateLogger.irLog(
+      affectedComposable = affectedComposable,
+      invalidateType = invalidateTypeProcessed,
       originalMessage = originalLogMessage,
     )
-    newStatements += loggerCall
+    newStatements += logger
 
     expression.statements.addAll(1, newStatements)
     expression.origin = InvalidationTrackerOrigin
@@ -132,7 +122,7 @@ internal class InvalidationTrackableTransformer(
           val dump = statement.dump().trimIndent()
           if (dump.length > 500) dump.substring(0, 500) + "..." else dump
         }
-        if (index == 1) appendLine(">>>>>>>>>> ADD: ${loggerCall.dump()}")
+        if (index == 1) appendLine(">>>>>>>>>> ADD: ${logger.dump()}")
         appendLine(dump)
         if (index == 3) {
           appendLine("...")
@@ -153,37 +143,27 @@ internal class InvalidationTrackableTransformer(
     val currentFunctionName = function.name.asString()
 
     val originalLogMessage = irString("[INVALIDATION_TRACKER] <${getCurrentFunctionNameIntercepttedAnonymous()}> invalidation skipped")
-    val affectedComposableSymbol = InvestigateLogger.obtainAffectedComposableSymbol(context)
-    val affectedComposableCall = IrConstructorCallImpl.fromSymbolOwner(
-      type = affectedComposableSymbol.owner.defaultType,
-      constructorSymbol = affectedComposableSymbol.constructors.single(),
-    ).apply {
-      putValueArgument(0, irString(currentFunctionName))
-      putValueArgument(1, irString(getCurrentFunctionPackage()))
-      putValueArgument(2, irString(currentFunctionLocation.file))
-      putValueArgument(3, irInt(currentFunctionLocation.line))
-      putValueArgument(4, irInt(currentFunctionLocation.column))
-    }
-    val invalidateTypeSymbol = InvestigateLogger.obtainInvalidateTypeSymbol(context)
-    val invalidateTypeSkippedSymbol = InvestigateLogger.obtainInvalidateTypeSkippedSymbol(context)
-    val invalidateTypeCall = IrGetObjectValueImpl(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      type = invalidateTypeSymbol.owner.defaultType,
-      symbol = invalidateTypeSkippedSymbol,
+    val affectedComposable = InvestigateLogger.irAffectedComposable(
+      context = context,
+      functionName = currentFunctionName,
+      packageName = getCurrentFunctionPackage(),
+      location = currentFunctionLocation,
     )
-    val loggerCall = InvestigateLogger.makeIrCall(
-      composable = affectedComposableCall,
-      type = invalidateTypeCall,
+    val invalidateTypeSymbol = InvestigateLogger.irInvalidateTypeSymbol(context)
+    val invalidateTypeSkipped = InvestigateLogger.irInvalidateTypeSkipped(context)
+      .apply { type = invalidateTypeSymbol.defaultType }
+
+    val logger = InvestigateLogger.irLog(
+      affectedComposable = affectedComposable,
+      invalidateType = invalidateTypeSkipped,
       originalMessage = originalLogMessage,
     )
-
     val block = IrBlockImpl(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,
       type = irBuiltIns.unitType,
       origin = InvalidationTrackerOrigin,
-      statements = listOf(loggerCall, expression),
+      statements = listOf(logger, expression),
     )
 
     logger("[invalidation skipped] transformed: ${expression.dumpKotlinLike()} -> ${block.dumpKotlinLike()}")
