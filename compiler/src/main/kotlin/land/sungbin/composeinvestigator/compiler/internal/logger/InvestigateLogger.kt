@@ -7,10 +7,10 @@
 
 package land.sungbin.composeinvestigator.compiler.internal.logger
 
-import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATE_AFFECTED_COMPOSABLE_FQN
-import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATE_LOG_TYPE_FQN
-import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATE_LOG_TYPE_INVALIDATION_PROCESSED_FQN
-import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATE_LOG_TYPE_INVALIDATION_SKIPPED_FQN
+import land.sungbin.composeinvestigator.compiler.internal.AFFECTED_COMPOSABLE_FQN
+import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATE_TYPE_FQN
+import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATE_TYPE_PROCESSED_FQN
+import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATE_TYPE_SKIPPED_FQN
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.expressions.IrCall
@@ -31,11 +31,11 @@ internal object InvestigateLogger {
 
   private var affectedComposableSymbol: IrClassSymbol? = null
 
-  private var logTypeSymbol: IrClassSymbol? = null
-  private var logTypeInvalidationProcessedSymbol: IrClassSymbol? = null
-  private var logTypeInvalidationSkippedSymbol: IrClassSymbol? = null
+  private var invalidateTypeSymbol: IrClassSymbol? = null
+  private var invalidateTypeProcessedSymbol: IrClassSymbol? = null
+  private var invalidateTypeSkippedSymbol: IrClassSymbol? = null
 
-  internal fun checkLoggerIsInstalled(): Boolean = loggerSymbol != null && loggerType != null
+  internal fun getCurrentLoggerSymbolOrNull(): IrSimpleFunctionSymbol? = loggerSymbol
 
   internal fun useDefaultLogger(context: IrPluginContext) {
     val printlnSymbol: IrSimpleFunctionSymbol =
@@ -62,54 +62,53 @@ internal object InvestigateLogger {
 
   internal fun makeIrCall(
     composable: IrDeclarationReference,
-    logType: IrDeclarationReference,
+    type: IrDeclarationReference,
     originalMessage: IrConst<String>,
-  ): IrCall =
-    IrCallImpl.fromSymbolOwner(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      symbol = loggerSymbol!!,
-    ).apply {
-      when (loggerType!!) {
-        LoggerType.Println -> {
-          putValueArgument(0, originalMessage)
-        }
-        LoggerType.Custom -> {
-          putValueArgument(0, composable)
-          putValueArgument(1, logType)
-        }
+  ): IrCall = IrCallImpl.fromSymbolOwner(
+    startOffset = UNDEFINED_OFFSET,
+    endOffset = UNDEFINED_OFFSET,
+    symbol = loggerSymbol!!,
+  ).apply {
+    when (loggerType!!) {
+      LoggerType.Println -> {
+        putValueArgument(0, originalMessage)
+      }
+      LoggerType.Custom -> {
+        putValueArgument(0, composable)
+        putValueArgument(1, type)
       }
     }
+  }
 
   internal fun obtainAffectedComposableSymbol(context: IrPluginContext): IrClassSymbol {
     if (affectedComposableSymbol == null) {
       affectedComposableSymbol =
-        context.referenceClass(ClassId.topLevel(COMPOSE_INVESTIGATE_AFFECTED_COMPOSABLE_FQN))
+        context.referenceClass(ClassId.topLevel(AFFECTED_COMPOSABLE_FQN))
     }
     return affectedComposableSymbol!!
   }
 
-  internal fun obtainLogTypeSymbol(context: IrPluginContext): IrClassSymbol {
-    if (logTypeSymbol == null) {
-      logTypeSymbol = context.referenceClass(ClassId.topLevel(COMPOSE_INVESTIGATE_LOG_TYPE_FQN))
+  internal fun obtainInvalidateTypeSymbol(context: IrPluginContext): IrClassSymbol {
+    if (invalidateTypeSymbol == null) {
+      invalidateTypeSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATE_TYPE_FQN))
     }
-    return logTypeSymbol!!
+    return invalidateTypeSymbol!!
   }
 
-  internal fun obtainLogTypeInvalidationProcessedSymbol(context: IrPluginContext): IrClassSymbol {
-    if (logTypeInvalidationProcessedSymbol == null) {
-      logTypeInvalidationProcessedSymbol =
-        context.referenceClass(ClassId.topLevel(COMPOSE_INVESTIGATE_LOG_TYPE_INVALIDATION_PROCESSED_FQN))
+  internal fun obtainInvalidateTypeProcessedSymbol(context: IrPluginContext): IrClassSymbol {
+    if (invalidateTypeProcessedSymbol == null) {
+      invalidateTypeProcessedSymbol =
+        context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATE_TYPE_PROCESSED_FQN))
     }
-    return logTypeInvalidationProcessedSymbol!!
+    return invalidateTypeProcessedSymbol!!
   }
 
-  internal fun obtainLogTypeInvalidationSkippedSymbol(context: IrPluginContext): IrClassSymbol {
-    if (logTypeInvalidationSkippedSymbol == null) {
-      logTypeInvalidationSkippedSymbol =
-        context.referenceClass(ClassId.topLevel(COMPOSE_INVESTIGATE_LOG_TYPE_INVALIDATION_SKIPPED_FQN))
+  internal fun obtainInvalidateTypeSkippedSymbol(context: IrPluginContext): IrClassSymbol {
+    if (invalidateTypeSkippedSymbol == null) {
+      invalidateTypeSkippedSymbol =
+        context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATE_TYPE_SKIPPED_FQN))
     }
-    return logTypeInvalidationSkippedSymbol!!
+    return invalidateTypeSkippedSymbol!!
   }
 
   private enum class LoggerType {
