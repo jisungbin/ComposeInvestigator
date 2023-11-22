@@ -11,5 +11,5 @@ package land.sungbin.composeinvestigator.runtime
   "This API is designed for use with the ComposeInvestigator compiler only; " +
     "manual use may cause undesired results.",
 )
-@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
 public annotation class ComposeInvestigatorCompilerApi

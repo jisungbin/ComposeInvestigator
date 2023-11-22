@@ -5,11 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package land.sungbin.composeinvestigator.runtime
-
-import org.jetbrains.annotations.VisibleForTesting
 
 public data class DiffParams(
   public val name: String,
@@ -41,10 +37,43 @@ public data class ParameterInfo(
   public val hashCode: Int,
 )
 
-@ComposeInvestigatorCompilerApi
-public class ComposableInvalidationTrackTable {
-  @VisibleForTesting
-  internal val parameterMap = mutableMapOf<String, Array<ParameterInfo>>()
+public fun interface ComposableInvalidationListener {
+  public fun onInvalidate(composable: AffectedComposable, type: ComposableInvalidateType)
+}
+
+public val currentComposableInvalidationTracker: ComposableInvalidationTrackTable
+  get() {
+    throw NotImplementedError("Implemented as an intrinsic")
+  }
+
+public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi constructor() {
+  private val listeners = mutableListOf<ComposableInvalidationListener>()
+
+  public val parameterMap: MutableMap<String, Array<ParameterInfo>> = mutableMapOf()
+
+  public var currentComposableName: String
+    get() = throw NotImplementedError("Implemented as an intrinsic")
+    set(_) { /* Implemented as an intrinsic */ }
+
+  public val currentComposableKeyName: String
+    get() {
+      throw NotImplementedError("Implemented as an intrinsic")
+    }
+
+  public fun registerListener(listener: ComposableInvalidationListener) {
+    listeners.add(listener)
+  }
+
+  public fun unregisterListener(listener: ComposableInvalidationListener) {
+    listeners.remove(listener)
+  }
+
+  @ComposeInvestigatorCompilerApi
+  public fun callListeners(composable: AffectedComposable, type: ComposableInvalidateType) {
+    for (listener in listeners) {
+      listener.onInvalidate(composable, type)
+    }
+  }
 
   @ComposeInvestigatorCompilerApi
   public fun computeDiffParamsIfPresent(

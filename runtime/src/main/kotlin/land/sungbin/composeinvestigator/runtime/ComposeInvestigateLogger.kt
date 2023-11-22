@@ -10,7 +10,7 @@ package land.sungbin.composeinvestigator.runtime
 /**
  * ```
  * @ComposeInvestigateLogger
- * public fun composeInvestigateLogger(composable: AffectedComposable, logType: ComposeInvestigateLogType) {
+ * public fun composeInvestigateLogger(composable: AffectedComposable, type: ComposableInvalidateType) {
  *   // Your logger code here
  * }
  * ```
@@ -20,12 +20,18 @@ package land.sungbin.composeinvestigator.runtime
 @Target(AnnotationTarget.FUNCTION)
 public annotation class ComposeInvestigateLogger
 
-public data class AffectedComposable(public val name: String, public val pkg: String)
+public data class AffectedComposable(
+  public val name: String,
+  public val pkg: String,
+  public val filePath: String,
+  public val startLine: Int,
+  public val startColumn: Int,
+)
 
-public sealed class ComposeInvestigateLogType {
-  public class InvalidationProcessed(public val diffParams: DiffParams?) : ComposeInvestigateLogType() {
+public sealed class ComposableInvalidateType {
+  public class Processed(public val diffParams: DiffParams?) : ComposableInvalidateType() {
     override fun toString(): String = "InvalidationProcessed(diffParams=$diffParams)"
   }
 
-  public data object InvalidationSkipped : ComposeInvestigateLogType()
+  public data object Skipped : ComposableInvalidateType()
 }
