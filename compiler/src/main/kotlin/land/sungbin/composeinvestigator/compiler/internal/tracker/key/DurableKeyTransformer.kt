@@ -71,13 +71,8 @@ internal open class DurableKeyTransformer(private val keyVisitor: DurableKeyVisi
   protected fun <T> siblings(key: String, block: () -> T) = keyVisitor.siblings(key, block)
   protected fun <T> siblings(block: () -> T) = keyVisitor.siblings(block)
 
-  protected fun Name.asJvmFriendlyString(): String {
-    return if (!isSpecial) identifier
-    else asString()
-      .replace('<', '$')
-      .replace('>', '$')
-      .replace(' ', '-')
-  }
+  protected fun Name.asJvmFriendlyString(): String =
+    if (!isSpecial) identifier else asString().replace('<', '$').replace('>', '$').replace(' ', '-')
 
   override fun visitClass(declaration: IrClass): IrStatement {
     // constants in annotations need to be compile-time values, so we can never transform them
