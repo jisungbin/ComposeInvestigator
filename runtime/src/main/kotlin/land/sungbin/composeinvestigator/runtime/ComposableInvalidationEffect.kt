@@ -28,7 +28,9 @@ import kotlin.coroutines.CoroutineContext
 @NonRestartableComposable
 public fun ComposableInvalidationEffect(
   key1: Any?,
-  block: suspend CoroutineScope.(invalidationTrackTable: ComposableInvalidationTrackTable) -> ComposableInvalidationListener,
+  block: suspend CoroutineScope.(
+    invalidationTrackTable: ComposableInvalidationTrackTable,
+  ) -> ComposableInvalidationListener,
 ) {
   val applyContext = currentComposer.applyCoroutineContext
   val invalidationTrackTable = currentComposableInvalidationTracker
@@ -41,7 +43,9 @@ public fun ComposableInvalidationEffect(
 public fun ComposableInvalidationEffect(
   key1: Any?,
   key2: Any?,
-  block: suspend CoroutineScope.(invalidationTrackTable: ComposableInvalidationTrackTable) -> ComposableInvalidationListener,
+  block: suspend CoroutineScope.(
+    invalidationTrackTable: ComposableInvalidationTrackTable,
+  ) -> ComposableInvalidationListener,
 ) {
   val applyContext = currentComposer.applyCoroutineContext
   val invalidationTrackTable = currentComposableInvalidationTracker
@@ -55,7 +59,9 @@ public fun ComposableInvalidationEffect(
   key1: Any?,
   key2: Any?,
   key3: Any?,
-  block: suspend CoroutineScope.(invalidationTrackTable: ComposableInvalidationTrackTable) -> ComposableInvalidationListener,
+  block: suspend CoroutineScope.(
+    invalidationTrackTable: ComposableInvalidationTrackTable,
+  ) -> ComposableInvalidationListener,
 ) {
   val applyContext = currentComposer.applyCoroutineContext
   val invalidationTrackTable = currentComposableInvalidationTracker
@@ -67,7 +73,9 @@ public fun ComposableInvalidationEffect(
 @NonRestartableComposable
 public fun ComposableInvalidationEffect(
   vararg keys: Any?,
-  block: suspend CoroutineScope.(invalidationTrackTable: ComposableInvalidationTrackTable) -> ComposableInvalidationListener,
+  block: suspend CoroutineScope.(
+    invalidationTrackTable: ComposableInvalidationTrackTable,
+  ) -> ComposableInvalidationListener,
 ) {
   val applyContext = currentComposer.applyCoroutineContext
   val invalidationTrackTable = currentComposableInvalidationTracker
@@ -79,7 +87,9 @@ private class InvalidationEffectScope(
   parentCoroutineContext: CoroutineContext,
   private val composableKey: String,
   private val invalidationTrackTable: ComposableInvalidationTrackTable,
-  private val task: suspend CoroutineScope.(invalidationTrackTable: ComposableInvalidationTrackTable) -> ComposableInvalidationListener,
+  private val task: suspend CoroutineScope.(
+    invalidationTrackTable: ComposableInvalidationTrackTable,
+  ) -> ComposableInvalidationListener,
 ) : RememberObserver {
   private val scope = CoroutineScope(parentCoroutineContext)
   private var job: Job? = null

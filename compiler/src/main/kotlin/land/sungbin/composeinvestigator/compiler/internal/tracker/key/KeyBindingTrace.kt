@@ -19,7 +19,11 @@ import java.util.WeakHashMap
 public class KeyBindingTrace {
   private val map = WeakHashMap<Any, KeyFMap>()
 
-  internal operator fun <K : IrAttributeContainer, V> set(slice: WritableSlice<K, V>, key: K, value: V) {
+  internal operator fun <K : IrAttributeContainer, V> set(
+    slice: WritableSlice<K, V>,
+    key: K,
+    value: V,
+  ) {
     var holder = map[key.attributeOwnerId] ?: KeyFMap.EMPTY_MAP
     val prev = holder.get(slice.key)
     if (prev != null) {
