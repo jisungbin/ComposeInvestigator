@@ -15,7 +15,10 @@ import land.sungbin.composeinvestigator.compiler.internal.SKIP_TO_GROUP_END
 import land.sungbin.composeinvestigator.compiler.internal.TRACE_EVENT_END
 import land.sungbin.composeinvestigator.compiler.internal.TRACE_EVENT_START
 import land.sungbin.composeinvestigator.compiler.internal.origin.InvalidationTrackerOrigin
+import land.sungbin.composeinvestigator.compiler.internal.tracker.table.InvalidationTrackTableCallTransformer
+import land.sungbin.composeinvestigator.compiler.internal.tracker.table.IrInvalidationTrackTable
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
+import land.sungbin.fastlist.fastLastOrNull
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.wasm.ir2wasm.getSourceLocation
@@ -36,17 +39,15 @@ import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrWhen
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
-import org.jetbrains.kotlin.ir.symbols.IrFunctionSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isNullableAny
 import org.jetbrains.kotlin.ir.types.isString
 import org.jetbrains.kotlin.ir.util.addChild
-import org.jetbrains.kotlin.ir.util.dump
-import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.isTopLevel
 import org.jetbrains.kotlin.ir.util.kotlinFqName
+import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.load.kotlin.FacadeClassSource
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
@@ -57,7 +58,7 @@ import org.jetbrains.kotlin.wasm.ir.source.location.SourceLocation
 
 internal abstract class AbstractInvalidationTrackingLower(
   private val context: IrPluginContext,
-  private val logger: VerboseLogger,
+  @Suppress("unused") private val logger: VerboseLogger,
 ) : IrElementTransformerVoidWithContext() {
   private class IrSymbolOwnerWithData<D>(private val owner: IrSymbolOwner, val data: D) : IrSymbolOwner by owner
 
@@ -96,14 +97,17 @@ internal abstract class AbstractInvalidationTrackingLower(
         isValidExtensionReceiver && isValidReturnType
       }
 
-  private val unsafeCurrentFunction: IrFunction
-    get() {
-      return currentFunction!!.scope.scopeOwnerSymbol.cast<IrFunctionSymbol>().owner
-    }
+  private val unsafeCurrentFunction: IrSimpleFunction
+    get() = allScopes
+      .fastLastOrNull { scope -> scope.irElement is IrSimpleFunction }
+      ?.irElement
+      ?.cast()
+      ?: error("Cannot find current function")
 
   protected fun getCurrentFunctionPackage() = unsafeCurrentFunction.kotlinFqName.asString()
 
-  protected fun getCurrentFunctionNameIntercepttedAnonymous(): String {
+  protected fun getCurrentFunctionNameIntercepttedAnonymous(userProvideName: String?): String {
+    if (userProvideName != null) return userProvideName
     val currentFunctionName = unsafeCurrentFunction.name
     return if (currentFunctionName == SpecialNames.ANONYMOUS) {
       try {
@@ -114,31 +118,6 @@ internal abstract class AbstractInvalidationTrackingLower(
       }
     } else currentFunctionName.asString()
   }
-
-  protected fun irGetValue(value: IrValueDeclaration): IrGetValue =
-    IrGetValueImpl(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      symbol = value.symbol,
-    )
-
-  protected fun irHashCode(value: IrExpression): IrCall =
-    IrCallImpl.fromSymbolOwner(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      symbol = hashCodeSymbol,
-    ).apply {
-      extensionReceiver = value
-    }
-
-  protected fun irToString(value: IrExpression): IrCall =
-    IrCallImpl.fromSymbolOwner(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      symbol = toStringSymbol,
-    ).apply {
-      extensionReceiver = value
-    }
 
   protected val currentInvalidationTrackTable: IrInvalidationTrackTable?
     get() =
@@ -151,15 +130,11 @@ internal abstract class AbstractInvalidationTrackingLower(
         ?.cast<IrSymbolOwnerWithData<IrInvalidationTrackTable>>()
         ?.data
 
-  protected fun irTmpVariableInCurrentFun(expression: IrExpression, nameHint: String? = null): IrVariable =
-    currentFunction!!.scope.createTemporaryVariable(irExpression = expression, nameHint = nameHint)
-
   override fun visitFileNew(declaration: IrFile): IrFile {
-    val invalidationTrackTable = IrInvalidationTrackTable.create(context, declaration)
-    declaration.addChild(invalidationTrackTable.prop)
-    logger("visitNewFile dump: ${declaration.dump()}")
-    logger("visitNewFile dumpKotlinLike: ${declaration.dumpKotlinLike()}")
-    return withinScope(IrSymbolOwnerWithData(declaration, invalidationTrackTable)) {
+    val trackTable = IrInvalidationTrackTable.create(context, declaration)
+    declaration.addChild(trackTable.prop)
+    declaration.transformChildrenVoid(InvalidationTrackTableCallTransformer(context, trackTable))
+    return withinScope(IrSymbolOwnerWithData(declaration, trackTable)) {
       super.visitFileNew(declaration)
     }
   }
@@ -191,7 +166,7 @@ internal abstract class AbstractInvalidationTrackingLower(
     val isComposableIrBlock = firstStatement.isComposableTraceBranch() && lastStatement.isComposableTraceBranch()
     if (!isComposableIrBlock) return super.visitBlock(expression)
 
-    return super.visitBlock(visitComposableIrBlock(unsafeCurrentFunction, expression))
+    return super.visitBlock(visitComposableBlock(unsafeCurrentFunction, expression))
   }
 
   // <WHEN> when {
@@ -218,8 +193,8 @@ internal abstract class AbstractInvalidationTrackingLower(
       else SourceLocation.Location(file = "<unknown>", line = -1, column = -1)
     }
 
-  protected abstract fun visitComposableIrBlock(function: IrFunction, expression: IrBlock): IrBlock
-  protected abstract fun visitSkipToGroupEndCall(function: IrFunction, expression: IrCall): IrBlock
+  protected abstract fun visitComposableBlock(function: IrSimpleFunction, expression: IrBlock): IrBlock
+  protected abstract fun visitSkipToGroupEndCall(function: IrSimpleFunction, expression: IrCall): IrBlock
 
   private fun IrWhen.isComposableTraceBranch(): Boolean {
     val branch = branches.singleOrNull() ?: return false
@@ -237,6 +212,34 @@ internal abstract class AbstractInvalidationTrackingLower(
 
     return validIf && validThen
   }
+
+  protected fun irGetValue(value: IrValueDeclaration): IrGetValue =
+    IrGetValueImpl(
+      startOffset = UNDEFINED_OFFSET,
+      endOffset = UNDEFINED_OFFSET,
+      symbol = value.symbol,
+    )
+
+  protected fun irHashCode(value: IrExpression): IrCall =
+    IrCallImpl.fromSymbolOwner(
+      startOffset = UNDEFINED_OFFSET,
+      endOffset = UNDEFINED_OFFSET,
+      symbol = hashCodeSymbol,
+    ).apply {
+      extensionReceiver = value
+    }
+
+  protected fun irToString(value: IrExpression): IrCall =
+    IrCallImpl.fromSymbolOwner(
+      startOffset = UNDEFINED_OFFSET,
+      endOffset = UNDEFINED_OFFSET,
+      symbol = toStringSymbol,
+    ).apply {
+      extensionReceiver = value
+    }
+
+  protected fun irTmpVariableInCurrentFun(expression: IrExpression, nameHint: String? = null): IrVariable =
+    currentFunction!!.scope.createTemporaryVariable(irExpression = expression, nameHint = nameHint)
 }
 
 // TODO(multiplatform): this is jvm specific implementation
