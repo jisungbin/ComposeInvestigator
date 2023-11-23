@@ -1,11 +1,34 @@
 plugins {
-  kotlin("jvm")
-  alias(libs.plugins.gradle.publish.maven)
+  id("com.android.library")
+  kotlin("android")
+  // alias(libs.plugins.gradle.publish.maven)
 }
 
-sourceSets {
-  getByName("main").java.srcDir("src/main/kotlin")
-  getByName("test").java.srcDir("src/main/kotlin")
+android {
+  namespace = "land.sungbin.composeinvestigator.runtime"
+  compileSdk = 34
+
+  defaultConfig {
+    minSdk = 21
+  }
+
+  sourceSets {
+    getByName("main").java.srcDir("src/main/kotlin")
+    getByName("test").java.srcDir("src/main/kotlin")
+  }
+
+  compileOptions {
+    sourceCompatibility = JavaVersion.VERSION_17
+    targetCompatibility = JavaVersion.VERSION_17
+  }
+
+  buildFeatures {
+    compose = true
+  }
+
+  composeOptions {
+    kotlinCompilerExtensionVersion = libs.versions.compose.core.get()
+  }
 }
 
 kotlin {
@@ -16,6 +39,6 @@ kotlin {
 }
 
 dependencies {
-  implementation(libs.jetbrains.annotation)
+  implementation(libs.compose.runtime)
   testImplementation(libs.test.kotest)
 }
