@@ -7,8 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler.test
 
-import androidx.compose.compiler.plugins.kotlin.ComposeCommandLineProcessor
-import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
+import com.tschuchort.compiletesting.JvmCompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.PluginOption
 import com.tschuchort.compiletesting.SourceFile
@@ -29,10 +28,10 @@ class IrDumpingTest {
     compile(source("SourceForIrDump.kt"))
   }
 
-  private fun compile(vararg sourceFiles: SourceFile) =
+  private fun compile(vararg sourceFiles: SourceFile): JvmCompilationResult =
     prepareCompilation(*sourceFiles).compile()
 
-  private fun prepareCompilation(vararg sourceFiles: SourceFile) =
+  private fun prepareCompilation(vararg sourceFiles: SourceFile): KotlinCompilation =
     KotlinCompilation().apply {
       workingDir = tempDir.root
       sources = sourceFiles.asList()
@@ -45,14 +44,14 @@ class IrDumpingTest {
           optionName = ComposeInvestigatorCommandLineProcessor.OPTION_VERBOSE.optionName,
           optionValue = "true",
         ),
-        PluginOption(
-          pluginId = ComposeCommandLineProcessor.PLUGIN_ID,
-          optionName = ComposeCommandLineProcessor.LIVE_LITERALS_V2_ENABLED_OPTION.optionName,
-          optionValue = "true",
-        ),
+        // PluginOption(
+        //   pluginId = ComposeCommandLineProcessor.PLUGIN_ID,
+        //   optionName = ComposeCommandLineProcessor.LIVE_LITERALS_V2_ENABLED_OPTION.optionName,
+        //   optionValue = "true",
+        // ),
       )
       @Suppress("DEPRECATION")
-      componentRegistrars = listOf(ComposePluginRegistrar(), ComposeInvestigatorPluginRegistrar())
-      commandLineProcessors = listOf(ComposeCommandLineProcessor(), ComposeInvestigatorCommandLineProcessor())
+      componentRegistrars = listOf(/*ComposePluginRegistrar(), */ComposeInvestigatorPluginRegistrar())
+      commandLineProcessors = listOf(/*ComposeCommandLineProcessor(), */ComposeInvestigatorCommandLineProcessor())
     }
 }

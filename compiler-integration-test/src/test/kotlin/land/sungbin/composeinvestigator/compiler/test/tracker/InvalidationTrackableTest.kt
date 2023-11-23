@@ -26,7 +26,7 @@ import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import land.sungbin.composeinvestigator.runtime.AffectedComposable
-import land.sungbin.composeinvestigator.runtime.ComposableInvalidateType
+import land.sungbin.composeinvestigator.runtime.ComposableInvalidationType
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -37,14 +37,14 @@ import org.junit.runner.RunWith
 
 private var currentComposableName: String? = null
 private val composeInvestigateLogMap =
-  mutableMapOf<String?, MutableList<Pair<AffectedComposable, ComposableInvalidateType>>>()
+  mutableMapOf<String?, MutableList<Pair<AffectedComposable, ComposableInvalidationType>>>()
 
 class ComposeInvestigateLogTestRule : TestWatcher() {
   override fun starting(description: Description?) {
     currentComposableName = description?.methodName
   }
 
-  fun getCurrentLog(): List<Pair<AffectedComposable, ComposableInvalidateType>>? =
+  fun getCurrentLog(): List<Pair<AffectedComposable, ComposableInvalidationType>>? =
     composeInvestigateLogMap[currentComposableName]
 }
 
