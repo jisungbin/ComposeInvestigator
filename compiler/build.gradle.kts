@@ -1,6 +1,6 @@
 plugins {
   kotlin("jvm")
-  alias(libs.plugins.gradle.publish.maven)
+  // alias(libs.plugins.gradle.publish.maven)
   alias(libs.plugins.kotlin.ksp)
 }
 
