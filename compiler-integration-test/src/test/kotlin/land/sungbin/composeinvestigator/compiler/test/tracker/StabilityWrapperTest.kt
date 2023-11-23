@@ -50,7 +50,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
         enableVerboseLogging = false,
         additionalVisitor = irVisitor,
         sourceFiles = arrayOf(source("hello.kt")),
-      ).compile()
+      )
 
       stableStability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Certain"
       unstableStability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Certain"
@@ -80,7 +80,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
         enableVerboseLogging = false,
         additionalVisitor = irVisitor,
         sourceFiles = arrayOf(source("hello.kt")),
-      ).compile()
+      )
 
       stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Runtime"
 
@@ -106,7 +106,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
         enableVerboseLogging = false,
         additionalVisitor = irVisitor,
         sourceFiles = arrayOf(source("hello.kt")),
-      ).compile()
+      )
 
       stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Unknown"
 
@@ -132,7 +132,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
         enableVerboseLogging = false,
         additionalVisitor = irVisitor,
         sourceFiles = arrayOf(source("hello.kt")),
-      ).compile()
+      )
 
       stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Parameter"
 
@@ -172,7 +172,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
         enableVerboseLogging = false,
         additionalVisitor = irVisitor,
         sourceFiles = arrayOf(source("hello.kt")),
-      ).compile()
+      )
 
       stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Combined"
 

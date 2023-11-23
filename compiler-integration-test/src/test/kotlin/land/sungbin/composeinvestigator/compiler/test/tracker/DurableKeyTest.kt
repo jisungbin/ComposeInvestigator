@@ -10,9 +10,9 @@ package land.sungbin.composeinvestigator.compiler.test.tracker
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.shouldBe
-import land.sungbin.composeinvestigator.compiler.internal.WeakBindingTracee
-import land.sungbin.composeinvestigator.compiler.internal.irTracee
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.DurableWritableSlices
+import land.sungbin.composeinvestigator.compiler.internal.tracker.key.KeyBindingTrace
+import land.sungbin.composeinvestigator.compiler.internal.tracker.key.irTracee
 import land.sungbin.composeinvestigator.compiler.test.IrBaseTest
 import land.sungbin.composeinvestigator.compiler.test.buildIrVisiterRegistrar
 import land.sungbin.composeinvestigator.compiler.test.kotlinCompilation
@@ -25,7 +25,7 @@ class DurableKeyTest : ShouldSpec(), IrBaseTest {
   init {
     should("Generates a unique key for the same function name") {
       val irFunctions = mutableListOf<IrSimpleFunction>()
-      var irTrace: WeakBindingTracee? = null
+      var irTrace: KeyBindingTrace? = null
 
       val irVisitor = buildIrVisiterRegistrar { context ->
         object : IrElementVisitorVoid {
@@ -43,7 +43,7 @@ class DurableKeyTest : ShouldSpec(), IrBaseTest {
         enableVerboseLogging = false,
         additionalVisitor = irVisitor,
         sourceFiles = arrayOf(source("tracker/DurableKeyTestSource.kt")),
-      ).compile()
+      )
 
       val zeroArgFn = irFunctions.single { fn -> fn.valueParameters.isEmpty() }
       val oneArgFn = irFunctions.single { fn -> fn.valueParameters.size == 1 }
@@ -55,10 +55,10 @@ class DurableKeyTest : ShouldSpec(), IrBaseTest {
       val twoArgFnKey = irTrace!![DurableWritableSlices.DURABLE_FUNCTION_KEY, twoArgFn]!!
       val threeArgFnKey = irTrace!![DurableWritableSlices.DURABLE_FUNCTION_KEY, threeArgFn]!!
 
-      zeroArgFnKey.name shouldBe "fun-one()Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker/file-DurableKeyTestSource.kt"
-      oneArgFnKey.name shouldBe "fun-one(Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker/file-DurableKeyTestSource.kt"
-      twoArgFnKey.name shouldBe "fun-one(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker/file-DurableKeyTestSource.kt"
-      threeArgFnKey.name shouldBe "fun-one(Any,Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker/file-DurableKeyTestSource.kt"
+      zeroArgFnKey.keyName shouldBe "fun-one()Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker/file-DurableKeyTestSource.kt"
+      oneArgFnKey.keyName shouldBe "fun-one(Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker/file-DurableKeyTestSource.kt"
+      twoArgFnKey.keyName shouldBe "fun-one(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker/file-DurableKeyTestSource.kt"
+      threeArgFnKey.keyName shouldBe "fun-one(Any,Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker/file-DurableKeyTestSource.kt"
     }
   }
 }
