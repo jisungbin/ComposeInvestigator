@@ -1,6 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-
 plugins {
   id("com.android.library")
   kotlin("android")

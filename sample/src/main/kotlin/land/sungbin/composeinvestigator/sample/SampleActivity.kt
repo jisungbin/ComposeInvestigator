@@ -24,12 +24,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import land.sungbin.composeinvestigator.runtime.AffectedComposable
-import land.sungbin.composeinvestigator.runtime.ComposableInvalidateType
-import land.sungbin.composeinvestigator.runtime.ComposeInvestigateLogger
+import land.sungbin.composeinvestigator.runtime.ComposableInvalidationType
+import land.sungbin.composeinvestigator.runtime.ComposableInvalidationLogger
 
 @Suppress("unused")
-@ComposeInvestigateLogger
-fun composeInvestigateLogger(composable: AffectedComposable, type: ComposableInvalidateType) {
+@ComposableInvalidationLogger
+fun composeInvestigateLogger(composable: AffectedComposable, type: ComposableInvalidationType) {
   println("<$composable> $type")
 }
 
