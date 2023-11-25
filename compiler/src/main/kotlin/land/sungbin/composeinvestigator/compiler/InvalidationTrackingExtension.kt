@@ -22,23 +22,20 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
 internal class InvalidationTrackingExtension(private val logger: VerboseLogger) : IrGenerationExtension {
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-    // TODO: Supports externalStableTypeMatchers.
-    val stabilityInferencer = StabilityInferencer(moduleFragment.descriptor, emptySet())
-
     InvalidationLogger.init(pluginContext)
-
-    moduleFragment.transformChildrenVoid(DurableFunctionKeyTransformer(pluginContext))
     moduleFragment.transformChildrenVoid(InvalidationLoggerVisitor(pluginContext, logger))
 
     if (InvalidationLogger.getCurrentLoggerSymbolOrNull() == null) {
       InvalidationLogger.useDefaultLogger(pluginContext)
     }
 
+    moduleFragment.transformChildrenVoid(DurableFunctionKeyTransformer(pluginContext))
     moduleFragment.transformChildrenVoid(
       InvalidationTrackableTransformer(
         context = pluginContext,
         logger = logger,
-        stabilityInferencer = stabilityInferencer,
+        // TODO: Supports externalStableTypeMatchers (StabilityInferencer)
+        stabilityInferencer = StabilityInferencer(moduleFragment.descriptor, emptySet()),
       ),
     )
 
