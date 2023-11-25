@@ -31,9 +31,11 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.constructors
+import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.utils.addToStdlib.cast
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 private var composableNameSymbol: IrClassSymbol? = null
 
@@ -83,9 +85,11 @@ internal class InvalidationTrackTableCallTransformer(
           val userProvideName =
             expression
               .getValueArgument(0).cast<IrConstructorCall>()
-              .getValueArgument(0).cast<IrConst<String>>().value
+              .getValueArgument(0).safeAs<IrConst<String>>()?.value
+              ?: error("Currently, only string hardcodes are supported as arguments to ComposableName. (${expression.dumpKotlinLike()})")
           val prevKey = irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function]!!
           val newKey = prevKey.copy(userProvideName = userProvideName)
+
           irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function] = newKey
           result = true
         }
