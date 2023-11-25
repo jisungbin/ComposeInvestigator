@@ -43,10 +43,10 @@ import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isNullableAny
 import org.jetbrains.kotlin.ir.types.isString
-import org.jetbrains.kotlin.ir.util.addChild
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.isTopLevel
 import org.jetbrains.kotlin.ir.util.kotlinFqName
+import org.jetbrains.kotlin.ir.util.setDeclarationsParent
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.load.kotlin.FacadeClassSource
 import org.jetbrains.kotlin.name.CallableId
@@ -58,7 +58,7 @@ import org.jetbrains.kotlin.wasm.ir.source.location.SourceLocation
 
 internal abstract class AbstractInvalidationTrackingLower(
   private val context: IrPluginContext,
-  @Suppress("unused") private val logger: VerboseLogger,
+  private val logger: VerboseLogger,
 ) : IrElementTransformerVoidWithContext() {
   private class IrSymbolOwnerWithData<D>(private val owner: IrSymbolOwner, val data: D) : IrSymbolOwner by owner
 
@@ -132,8 +132,6 @@ internal abstract class AbstractInvalidationTrackingLower(
 
   override fun visitFileNew(declaration: IrFile): IrFile {
     val trackTable = IrInvalidationTrackTable.create(context, declaration)
-    declaration.addChild(trackTable.prop)
-    declaration.transformChildrenVoid(InvalidationTrackTableCallTransformer(context, trackTable))
     declaration.declarations.add(0, trackTable.prop.also { it.setDeclarationsParent(declaration) })
     declaration.transformChildrenVoid(
       InvalidationTrackTableCallTransformer(
