@@ -40,7 +40,7 @@ internal class InvalidationLoggerVisitor(
         InvalidationLogger.useDefaultLogger(context)
       } else if (currentLoggerSymbol == null) {
         InvalidationLogger.useCustomLogger(declaration.symbol)
-        logger("Found ComposeInvestigateLogger function: ${declaration.dump()}")
+        logger("Found ComposableInvalidationLogger function: ${declaration.dump()}")
       }
     }
     return super.visitSimpleFunction(declaration)
