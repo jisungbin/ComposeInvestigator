@@ -7,22 +7,19 @@
 
 // This code is based on https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/runtime/runtime/src/commonMain/kotlin/androidx/compose/runtime/Effects.kt;l=281;drc=8fa982f966a52c0b72cdf4756461354914a178be.
 
-@file:OptIn(InternalComposeApi::class)
+@file:Suppress("UNUSED_PARAMETER")
 
 package land.sungbin.composeinvestigator.runtime
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.RememberObserver
-import androidx.compose.runtime.currentComposer
-import androidx.compose.runtime.remember
+import java.util.concurrent.CancellationException
+import kotlin.coroutines.CoroutineContext
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import java.util.concurrent.CancellationException
-import kotlin.coroutines.CoroutineContext
 
 @Composable
 @NonRestartableComposable
@@ -30,10 +27,7 @@ public fun ComposableInvalidationEffect(
   key1: Any?,
   block: suspend CoroutineScope.(invalidationTrackTable: ComposableInvalidationTrackTable) -> ComposableInvalidationListener,
 ) {
-  val applyContext = currentComposer.applyCoroutineContext
-  val invalidationTrackTable = currentComposableInvalidationTracker
-  val composableKey = invalidationTrackTable.currentComposableKeyName
-  remember(key1) { InvalidationEffectScope(applyContext, composableKey, invalidationTrackTable, block) }
+  throw NotImplementedError("Implemented as an intrinsic")
 }
 
 @Composable
@@ -43,10 +37,7 @@ public fun ComposableInvalidationEffect(
   key2: Any?,
   block: suspend CoroutineScope.(invalidationTrackTable: ComposableInvalidationTrackTable) -> ComposableInvalidationListener,
 ) {
-  val applyContext = currentComposer.applyCoroutineContext
-  val invalidationTrackTable = currentComposableInvalidationTracker
-  val composableKey = invalidationTrackTable.currentComposableKeyName
-  remember(key1, key2) { InvalidationEffectScope(applyContext, composableKey, invalidationTrackTable, block) }
+  throw NotImplementedError("Implemented as an intrinsic")
 }
 
 @Composable
@@ -57,10 +48,7 @@ public fun ComposableInvalidationEffect(
   key3: Any?,
   block: suspend CoroutineScope.(invalidationTrackTable: ComposableInvalidationTrackTable) -> ComposableInvalidationListener,
 ) {
-  val applyContext = currentComposer.applyCoroutineContext
-  val invalidationTrackTable = currentComposableInvalidationTracker
-  val composableKey = invalidationTrackTable.currentComposableKeyName
-  remember(key1, key2, key3) { InvalidationEffectScope(applyContext, composableKey, invalidationTrackTable, block) }
+  throw NotImplementedError("Implemented as an intrinsic")
 }
 
 @Composable
@@ -69,13 +57,11 @@ public fun ComposableInvalidationEffect(
   vararg keys: Any?,
   block: suspend CoroutineScope.(invalidationTrackTable: ComposableInvalidationTrackTable) -> ComposableInvalidationListener,
 ) {
-  val applyContext = currentComposer.applyCoroutineContext
-  val invalidationTrackTable = currentComposableInvalidationTracker
-  val composableKey = invalidationTrackTable.currentComposableKeyName
-  remember(*keys) { InvalidationEffectScope(applyContext, composableKey, invalidationTrackTable, block) }
+  throw NotImplementedError("Implemented as an intrinsic")
 }
 
-private class InvalidationEffectScope(
+@ComposeInvestigatorCompilerApi
+public class InvalidationEffectScope(
   parentCoroutineContext: CoroutineContext,
   private val composableKey: String,
   private val invalidationTrackTable: ComposableInvalidationTrackTable,
