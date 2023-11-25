@@ -9,6 +9,19 @@
 
 package land.sungbin.composeinvestigator.compiler.test.source
 
-import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracker
+fun getString() = "1"
+val hi = getString()
 
-val currentInvalidationTable = currentComposableInvalidationTracker
+//val table1 = currentComposableInvalidationTracker
+//
+//fun table1() {
+//  table1 shouldBeSameInstanceAs currentComposableInvalidationTracker
+//}
+//
+//fun currentComposableName1() {
+//  val prevComposableName = table1.currentComposableName
+//  prevComposableName shouldBe "currentComposableName1"
+//
+//  table1.currentComposableName = "ChangedComposableName"
+//  table1.currentComposableName shouldBe "ChangedComposableName"
+//}

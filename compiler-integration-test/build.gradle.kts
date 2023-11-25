@@ -14,7 +14,8 @@ android {
   }
 
   sourceSets {
-    getByName("test").java.srcDir("src/main/kotlin")
+    getByName("main").java.srcDir("src/main/kotlin")
+    getByName("test").java.srcDir("src/test/kotlin")
   }
 
   compileOptions {
@@ -39,6 +40,7 @@ android {
 
   composeOptions {
     kotlinCompilerExtensionVersion = libs.versions.compose.core.get()
+    useLiveLiterals = true
   }
 }
 
@@ -54,11 +56,12 @@ kotlin {
 }
 
 dependencies {
-  testImplementation(projects.runtime)
-  testImplementation(projects.compiler)
+  implementation(projects.runtime)
+  implementation(libs.compose.material)
+  implementation(libs.test.kotest.assertion)
 
+  testImplementation(projects.compiler)
   testImplementation(libs.compose.compiler)
-  testImplementation(libs.compose.material)
 
   testImplementation(libs.kotlin.compiler.embedded)
   testImplementation(libs.test.kotlin.compilation)
@@ -67,7 +70,7 @@ dependencies {
   }
 
   testImplementation(libs.test.mockk)
-  testImplementation(libs.test.kotest)
+  testImplementation(libs.test.kotest.junit5)
   testImplementation(libs.test.robolectric) {
     because("https://stackoverflow.com/a/64287388/14299073")
   }

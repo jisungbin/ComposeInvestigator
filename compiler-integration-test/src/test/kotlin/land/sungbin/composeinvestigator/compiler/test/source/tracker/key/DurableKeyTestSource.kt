@@ -5,7 +5,9 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.test.source.tracker
+@file:Suppress("unused", "UNUSED_PARAMETER")
+
+package land.sungbin.composeinvestigator.compiler.test.source.tracker.key
 
 fun one() {}
 fun one(a: Any) {}

@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.test.tracker
+package land.sungbin.composeinvestigator.compiler.test.tracker.key
 
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.engine.spec.tempdir
@@ -42,7 +42,7 @@ class DurableKeyTest : ShouldSpec(), IrBaseTest {
         enableComposeCompiler = false,
         enableVerboseLogging = false,
         additionalVisitor = irVisitor,
-        sourceFiles = arrayOf(source("tracker/DurableKeyTestSource.kt")),
+        sourceFiles = arrayOf(source("tracker/key/DurableKeyTestSource.kt")),
       )
 
       val zeroArgFn = irFunctions.single { fn -> fn.valueParameters.isEmpty() }
@@ -55,10 +55,10 @@ class DurableKeyTest : ShouldSpec(), IrBaseTest {
       val twoArgFnKey = irTrace!![DurableWritableSlices.DURABLE_FUNCTION_KEY, twoArgFn]!!
       val threeArgFnKey = irTrace!![DurableWritableSlices.DURABLE_FUNCTION_KEY, threeArgFn]!!
 
-      zeroArgFnKey.keyName shouldBe "fun-one()Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker/file-DurableKeyTestSource.kt"
-      oneArgFnKey.keyName shouldBe "fun-one(Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker/file-DurableKeyTestSource.kt"
-      twoArgFnKey.keyName shouldBe "fun-one(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker/file-DurableKeyTestSource.kt"
-      threeArgFnKey.keyName shouldBe "fun-one(Any,Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker/file-DurableKeyTestSource.kt"
+      zeroArgFnKey.keyName shouldBe "fun-one()Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker.key/file-DurableKeyTestSource.kt"
+      oneArgFnKey.keyName shouldBe "fun-one(Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker.key/file-DurableKeyTestSource.kt"
+      twoArgFnKey.keyName shouldBe "fun-one(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker.key/file-DurableKeyTestSource.kt"
+      threeArgFnKey.keyName shouldBe "fun-one(Any,Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker.key/file-DurableKeyTestSource.kt"
     }
   }
 }

@@ -14,13 +14,11 @@ import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATIO
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.isUnit
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.hasAnnotation
-import org.jetbrains.kotlin.ir.util.isSuspend
 import org.jetbrains.kotlin.ir.util.isTopLevel
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
@@ -55,7 +53,7 @@ internal class InvalidationLoggerVisitor(
   // 5. not suspend
   // 6. unit type
   // 7. has only two parameters: <AffectedComposable, ComposableInvalidationType>
-  private fun IrFunction.isValidComposableInvalidationLoggerFunction(): Boolean =
+  private fun IrSimpleFunction.isValidComposableInvalidationLoggerFunction(): Boolean =
     hasAnnotation(COMPOSABLE_INVALIDATION_LOGGER_FQN) &&
       !hasAnnotation(COMPOSABLE_FQN) &&
       isTopLevel &&
