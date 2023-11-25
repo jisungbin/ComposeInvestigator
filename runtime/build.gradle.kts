@@ -40,5 +40,5 @@ kotlin {
 
 dependencies {
   implementation(libs.compose.runtime)
-  testImplementation(libs.test.kotest)
+  testImplementation(libs.test.kotest.junit5)
 }
