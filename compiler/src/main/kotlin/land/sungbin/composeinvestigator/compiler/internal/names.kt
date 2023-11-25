@@ -52,6 +52,8 @@ internal val CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN_GETTER_INTRINSIC = FqNa
 internal val COMPOSABLE_INVALIDATION_LISTENER_FQN = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationListener")
 internal val COMPOSABLE_INVALIDATION_LISTENER_ON_INVALIDATE_FQN = COMPOSABLE_INVALIDATION_LISTENER_FQN.child(Name.identifier("onInvalidate"))
 
+internal val COMPOSABLE_NAME_FQN = FqName("$ComposeInvestigatorRuntime.ComposableName")
+
 internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationTrackTable")
 internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_NAME_FQN = COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN.child(Name.identifier("currentComposableName"))
 internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_NAME_FQN_GETTER_INTRINSIC = COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN.child(Name.identifier("<get-currentComposableName>"))

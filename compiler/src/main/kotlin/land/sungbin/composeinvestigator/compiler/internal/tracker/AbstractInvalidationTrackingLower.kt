@@ -135,6 +135,13 @@ internal abstract class AbstractInvalidationTrackingLower(
     declaration.addChild(trackTable.prop)
     declaration.transformChildrenVoid(InvalidationTrackTableCallTransformer(context, trackTable))
     declaration.declarations.add(0, trackTable.prop.also { it.setDeclarationsParent(declaration) })
+    declaration.transformChildrenVoid(
+      InvalidationTrackTableCallTransformer(
+        context = context,
+        table = trackTable,
+        logger = logger,
+      ),
+    )
     return withinScope(IrSymbolOwnerWithData(declaration, trackTable)) {
       super.visitFileNew(declaration)
     }

@@ -16,12 +16,19 @@ public fun interface ComposableInvalidationListener {
   public fun onInvalidate(composable: AffectedComposable, type: ComposableInvalidationType)
 }
 
+// We use an annotation class to prevent LiveLiteral from the Compose compiler.
+@Target()
+@Retention(AnnotationRetention.SOURCE)
+public annotation class ComposableName(public val name: String)
+
+public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): String = name
+
 public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi public constructor() {
   private val listeners = mutableMapOf<String, MutableList<ComposableInvalidationListener>>()
 
   public val parameterMap: MutableMap<String, Array<ParameterInfo>> = mutableMapOf()
 
-  public var currentComposableName: String
+  public var currentComposableName: ComposableName
     get() {
       throw NotImplementedError("Implemented as an intrinsic")
     }

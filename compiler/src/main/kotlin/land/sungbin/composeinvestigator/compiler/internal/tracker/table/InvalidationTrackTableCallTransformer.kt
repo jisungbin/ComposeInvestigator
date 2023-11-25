@@ -11,11 +11,13 @@ import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATIO
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_NAME_FQN_GETTER_INTRINSIC
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_NAME_FQN_SETTER_INTRINSIC
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN
+import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_NAME_FQN
 import land.sungbin.composeinvestigator.compiler.internal.CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN_GETTER_INTRINSIC
 import land.sungbin.composeinvestigator.compiler.internal.irBoolean
 import land.sungbin.composeinvestigator.compiler.internal.irString
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.DurableWritableSlices
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.irTracee
+import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
 import land.sungbin.fastlist.fastLastOrNull
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -23,14 +25,29 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
+import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.types.defaultType
+import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.kotlinFqName
+import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.utils.addToStdlib.cast
+
+private var composableNameSymbol: IrClassSymbol? = null
 
 internal class InvalidationTrackTableCallTransformer(
   private val context: IrPluginContext,
   private val table: IrInvalidationTrackTable,
+  @Suppress("unused") private val logger: VerboseLogger,
 ) : IrElementTransformerVoidWithContext(), IrPluginContext by context {
+  init {
+    if (composableNameSymbol == null) {
+      composableNameSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_NAME_FQN))
+    }
+  }
+
   override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
     withinScope(declaration) { declaration.body?.transformChildrenVoid() }
     return super.visitSimpleFunction(declaration)
@@ -45,31 +62,41 @@ internal class InvalidationTrackTableCallTransformer(
       }
       callFqName == COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_NAME_FQN_GETTER_INTRINSIC &&
         callParentFqName == COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN -> {
-        val lastFoundComposable = lastFoundComposable()
-        if (lastFoundComposable != null) {
-          irString(lastFoundComposable.name.asString())
-        } else {
-          irString("<unknown>")
+        val name = when (val function = lastReachedFunction()) {
+          null -> "<unknown>"
+          else -> irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function]?.userProvideName ?: function.name.asString()
+        }
+
+        IrConstructorCallImpl.fromSymbolOwner(
+          type = composableNameSymbol!!.defaultType,
+          constructorSymbol = composableNameSymbol!!.constructors.single(),
+        ).apply {
+          putValueArgument(0, irString(name))
         }
       }
       callFqName == COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_NAME_FQN_SETTER_INTRINSIC &&
         callParentFqName == COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN -> {
-        val lastFoundComposable = lastFoundComposable()
+        val function = lastReachedFunction()
         var result = false
-        if (lastFoundComposable != null) {
-          val userProvideName = expression.getValueArgument(0).cast<IrConst<String>>().value
-          val prevKey = irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, lastFoundComposable]!!
+
+        if (function != null) {
+          val userProvideName =
+            expression
+              .getValueArgument(0).cast<IrConstructorCall>()
+              .getValueArgument(0).cast<IrConst<String>>().value
+          val prevKey = irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function]!!
           val newKey = prevKey.copy(userProvideName = userProvideName)
-          irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, lastFoundComposable] = newKey
+          irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function] = newKey
           result = true
         }
+
         irBoolean(result)
       }
       callFqName == COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_KEY_NAME_FQN_GETTER_INTRINSIC &&
         callParentFqName == COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN -> {
-        val lastFoundComposable = lastFoundComposable()
-        if (lastFoundComposable != null) {
-          val key = irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, lastFoundComposable]!!
+        val function = lastReachedFunction()
+        if (function != null) {
+          val key = irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function]!!
           irString(key.keyName)
         } else {
           irString("<unknown>")
@@ -79,7 +106,7 @@ internal class InvalidationTrackTableCallTransformer(
     }
   }
 
-  private fun lastFoundComposable(): IrSimpleFunction? =
+  private fun lastReachedFunction(): IrSimpleFunction? =
     allScopes
       .fastLastOrNull { scope -> scope.irElement is IrSimpleFunction }
       ?.irElement
