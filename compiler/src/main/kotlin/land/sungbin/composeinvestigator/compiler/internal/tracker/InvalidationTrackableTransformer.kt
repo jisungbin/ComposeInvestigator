@@ -104,12 +104,17 @@ internal class InvalidationTrackableTransformer(
       InvalidationLogger.irInvalidationTypeProcessed(reason = irGetValue(computeInvalidationReasonVariable))
         .apply { type = invalidationTypeSymbol.defaultType }
 
+    val callListeners = currentInvalidationTrackTable.irCallListeners(
+      key = irString(currentKey.keyName),
+      composable = affectedComposable,
+      type = invalidationTypeProcessed,
+    )
     val logger = InvalidationLogger.irLog(
       affectedComposable = affectedComposable,
       invalidationType = invalidationTypeProcessed,
       defaultMessage = defaultMessage,
     )
-    newStatements += logger
+    newStatements += listOf(callListeners, logger)
 
     expression.statements.addAll(1, newStatements)
     expression.origin = InvalidationTrackerOrigin
@@ -140,8 +145,9 @@ internal class InvalidationTrackableTransformer(
     val currentKey = irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function]!!
     val currentUserProvideName = currentKey.userProvideName
 
-    val currentFunctionLocation = function.getSafelyLocation()
     val currentFunctionName = currentUserProvideName ?: function.name.asString()
+    val currentFunctionLocation = function.getSafelyLocation()
+    val currentInvalidationTrackTable = currentInvalidationTrackTable!!
 
     // TODO: Improve default log message
     val defaultMessage = irString("[INVALIDATION_TRACKER] <${getCurrentFunctionNameIntercepttedAnonymous(currentUserProvideName)}> invalidation skipped")
@@ -156,17 +162,23 @@ internal class InvalidationTrackableTransformer(
     val invalidationTypeSkipped = InvalidationLogger.irInvalidationTypeSkipped()
       .apply { type = invalidationTypeSymbol.defaultType }
 
+    val callListeners = currentInvalidationTrackTable.irCallListeners(
+      key = irString(currentKey.keyName),
+      composable = affectedComposable,
+      type = invalidationTypeSkipped,
+    )
     val logger = InvalidationLogger.irLog(
       affectedComposable = affectedComposable,
       invalidationType = invalidationTypeSkipped,
       defaultMessage = defaultMessage,
     )
+
     val block = IrBlockImpl(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,
       type = irBuiltIns.unitType,
       origin = InvalidationTrackerOrigin,
-      statements = listOf(logger, expression),
+      statements = listOf(callListeners, logger, expression),
     )
 
     logger("[invalidation skipped] transformed: ${expression.dumpKotlinLike()} -> ${block.dumpKotlinLike()}")
