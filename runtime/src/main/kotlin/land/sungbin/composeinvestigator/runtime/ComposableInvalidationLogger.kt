@@ -5,8 +5,6 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package land.sungbin.composeinvestigator.runtime
 
 /**
@@ -75,7 +73,7 @@ public sealed class InvalidationReason {
   public data class Unknown(public val params: List<Parameter>) : InvalidationReason() {
     override fun toString(): String = """
       No diff params. Some parameter may be unstable.
-      ParameterInfos: ${params.joinToString()}
+      ParameterInfos: ${params.joinToString().ifEmpty { "(no parameter)" }}
     """.trimIndent()
   }
 }
