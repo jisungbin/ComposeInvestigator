@@ -47,9 +47,7 @@ public sealed class InvalidationReason {
     override fun toString(): String = "Initial composition for building data inside Compose."
   }
 
-  public data class ParameterChanged(
-    public val changedParams: List<Pair<ParameterInfo, ParameterInfo>>,
-  ) : InvalidationReason() {
+  public data class ParameterChanged(public val changedParams: List<Pair<ParameterInfo, ParameterInfo>>) : InvalidationReason() {
     override fun toString(): String = buildString {
       appendLine("ChangedParams(")
       for ((index, changedParam) in changedParams.withIndex()) {
