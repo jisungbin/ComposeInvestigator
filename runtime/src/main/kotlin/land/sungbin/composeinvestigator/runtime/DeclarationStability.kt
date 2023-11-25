@@ -13,24 +13,40 @@ package land.sungbin.composeinvestigator.runtime
 
 // The name is prefixed with "Declaration" to distinguish it from AOSP's Stability.
 public sealed class DeclarationStability {
-  public class Certain(public val stable: Boolean) : DeclarationStability() {
+  public data class Certain(public val stable: Boolean) : DeclarationStability() {
     override fun toString(): String = if (stable) "Stable" else "Unstable"
   }
 
-  public class Runtime(public val name: String) : DeclarationStability() {
+  public data class Runtime(public val name: String) : DeclarationStability() {
     override fun toString(): String = "Runtime($name)"
   }
 
-  public class Unknown(public val name: String) : DeclarationStability() {
+  public data class Unknown(public val name: String) : DeclarationStability() {
     override fun toString(): String = "Uncertain($name)"
   }
 
-  public class Parameter(public val name: String) : DeclarationStability() {
+  public data class Parameter(public val name: String) : DeclarationStability() {
     override fun toString(): String = "Parameter($name)"
   }
 
   public class Combined(public vararg val elements: DeclarationStability) : DeclarationStability() {
+    override fun equals(other: Any?): Boolean {
+      if (this === other) return true
+      if (javaClass != other?.javaClass) return false
+
+      other as Combined
+
+      return elements.contentEquals(other.elements)
+    }
+
+    override fun hashCode(): Int = elements.contentHashCode()
+
     override fun toString(): String = elements.joinToString(",")
+  }
+
+  public companion object {
+    public val Stable: Certain = Certain(stable = true)
+    public val Unstable: Certain = Certain(stable = false)
   }
 }
 
