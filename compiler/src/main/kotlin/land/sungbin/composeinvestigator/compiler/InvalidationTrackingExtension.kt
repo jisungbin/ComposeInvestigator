@@ -16,36 +16,27 @@ import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
-import org.jetbrains.kotlin.ir.util.dump
-import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
 internal class InvalidationTrackingExtension(private val logger: VerboseLogger) : IrGenerationExtension {
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-    InvalidationLogger.init(pluginContext)
-    moduleFragment.transformChildrenVoid(InvalidationLoggerVisitor(pluginContext, logger))
+    try {
+      InvalidationLogger.init(pluginContext)
+      moduleFragment.transformChildrenVoid(InvalidationLoggerVisitor(pluginContext, logger))
 
-    if (InvalidationLogger.getCurrentLoggerSymbolOrNull() == null) {
-      InvalidationLogger.useDefaultLogger(pluginContext)
-    }
-
-    moduleFragment.transformChildrenVoid(DurableFunctionKeyTransformer(pluginContext))
-    moduleFragment.transformChildrenVoid(
-      InvalidationTrackableTransformer(
-        context = pluginContext,
-        logger = logger,
-        // TODO: Supports externalStableTypeMatchers (StabilityInferencer)
-        stabilityInferencer = StabilityInferencer(moduleFragment.descriptor, emptySet()),
-      ),
-    )
-
-    for (file in moduleFragment.files) {
-      logger(file.dump())
-      println()
-      logger(file.dumpKotlinLike())
-      println()
-      println()
-      println()
+      if (InvalidationLogger.getCurrentLoggerSymbolOrNull() == null) {
+        InvalidationLogger.useDefaultLogger(pluginContext)
+      }
+    } finally {
+      moduleFragment.transformChildrenVoid(DurableFunctionKeyTransformer(pluginContext))
+      moduleFragment.transformChildrenVoid(
+        InvalidationTrackableTransformer(
+          context = pluginContext,
+          logger = logger,
+          // TODO: Supports externalStableTypeMatchers (StabilityInferencer)
+          stabilityInferencer = StabilityInferencer(moduleFragment.descriptor, emptySet()),
+        ),
+      )
     }
   }
 }
