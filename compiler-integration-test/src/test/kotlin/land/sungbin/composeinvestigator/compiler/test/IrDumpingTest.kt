@@ -7,6 +7,8 @@
 
 package land.sungbin.composeinvestigator.compiler.test
 
+import androidx.compose.compiler.plugins.kotlin.ComposeCommandLineProcessor
+import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
 import com.tschuchort.compiletesting.JvmCompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.PluginOption
@@ -51,7 +53,7 @@ class IrDumpingTest {
         // ),
       )
       @Suppress("DEPRECATION")
-      componentRegistrars = listOf(/*ComposePluginRegistrar(), */ComposeInvestigatorPluginRegistrar())
-      commandLineProcessors = listOf(/*ComposeCommandLineProcessor(), */ComposeInvestigatorCommandLineProcessor())
+      componentRegistrars = listOf(ComposePluginRegistrar(), ComposeInvestigatorPluginRegistrar())
+      commandLineProcessors = listOf(ComposeCommandLineProcessor(), ComposeInvestigatorCommandLineProcessor())
     }
 }
