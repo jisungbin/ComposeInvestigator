@@ -7,12 +7,11 @@
 
 @file:OptIn(ComposeInvestigatorCompilerApi::class)
 
-package land.sungbin.composeinvestigator.compiler.test.source.table.callback
+package land.sungbin.composeinvestigator.compiler.test.source.table.listener
 
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.currentRecomposeScope
 import land.sungbin.composeinvestigator.runtime.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.ComposableInvalidationType
@@ -25,28 +24,24 @@ fun findInvalidationListens(composableName: String): List<ComposableInvalidation
   invalidationListens.filterKeys { composable -> composable.name == composableName }.values.flatten()
 
 @Composable
-fun SetListener_InvalidationSkippedRoot() {
+fun RegisterListener_InvalidationSkippedRoot() {
   val recomposeScope = currentRecomposeScope
   val tracker = currentComposableInvalidationTracker
 
-  LaunchedEffect(Unit) {
-    tracker.registerListener(keyName = tracker.currentComposableKeyName) { composable, type ->
-      invalidationListens.getOrPut(composable, ::mutableListOf).add(type)
-    }
+  tracker.registerListener(keyName = tracker.currentComposableKeyName) { composable, type ->
+    invalidationListens.getOrPut(composable, ::mutableListOf).add(type)
   }
 
   Button(onClick = { recomposeScope.invalidate() }) {}
-  SetListener_InvalidationSkippedChild()
+  RegisterListener_InvalidationSkippedChild()
 }
 
 @Composable
-private fun SetListener_InvalidationSkippedChild() {
+private fun RegisterListener_InvalidationSkippedChild() {
   val tracker = currentComposableInvalidationTracker
 
-  LaunchedEffect(Unit) {
-    tracker.registerListener(keyName = tracker.currentComposableKeyName) { composable, type ->
-      invalidationListens.getOrPut(composable, ::mutableListOf).add(type)
-    }
+  tracker.registerListener(keyName = tracker.currentComposableKeyName) { composable, type ->
+    invalidationListens.getOrPut(composable, ::mutableListOf).add(type)
   }
 
   Text(text = "Child")
