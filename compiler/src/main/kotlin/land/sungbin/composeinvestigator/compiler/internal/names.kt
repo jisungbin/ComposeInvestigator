@@ -73,5 +73,4 @@ internal val DECLARATION_STABILITY_COMBINED_FQN = DECLARATION_STABILITY_FQN.chil
 
 // START ComposableInvalidationEffect.kt
 internal val COMPOSABLE_INVALIDATION_EFFECT_FQN = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationEffect")
-internal val COMPOSABLE_INVALIDATION_EFFECT_IMPL_FQN = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationEffectImpl")
 // END ComposableInvalidationEffect.kt

@@ -41,12 +41,10 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
       throw NotImplementedError("Implemented as an intrinsic")
     }
 
-  @ComposeInvestigatorCompilerApi
   public fun registerListener(keyName: String, listener: ComposableInvalidationListener) {
     listeners.getOrPut(keyName, ::mutableListOf).add(listener)
   }
 
-  @ComposeInvestigatorCompilerApi
   public fun unregisterListener(keyName: String, listener: ComposableInvalidationListener) {
     listeners.getOrDefault(keyName, mutableListOf()).remove(listener)
   }

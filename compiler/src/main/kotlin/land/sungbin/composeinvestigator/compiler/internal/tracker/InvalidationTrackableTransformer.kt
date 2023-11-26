@@ -9,8 +9,6 @@ package land.sungbin.composeinvestigator.compiler.internal.tracker
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.normalize
-import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_EFFECT_FQN
-import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_EFFECT_IMPL_FQN
 import land.sungbin.composeinvestigator.compiler.internal.irInt
 import land.sungbin.composeinvestigator.compiler.internal.irString
 import land.sungbin.composeinvestigator.compiler.internal.origin.InvalidationTrackerOrigin
@@ -18,7 +16,6 @@ import land.sungbin.composeinvestigator.compiler.internal.stability.toIrDeclarat
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.DurableWritableSlices
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.irTracee
 import land.sungbin.composeinvestigator.compiler.internal.tracker.logger.InvalidationLogger
-import land.sungbin.composeinvestigator.compiler.internal.tracker.table.propGetter
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
@@ -26,19 +23,14 @@ import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
-import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.addElement
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
-import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.types.typeWithArguments
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
-import org.jetbrains.kotlin.ir.util.kotlinFqName
-import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.types.Variance
 
 internal class InvalidationTrackableTransformer(
@@ -46,8 +38,6 @@ internal class InvalidationTrackableTransformer(
   private val logger: VerboseLogger,
   private val stabilityInferencer: StabilityInferencer,
 ) : AbstractInvalidationTrackingLower(context, logger), IrPluginContext by context {
-  private var composableInvalidationEffectImplSymbol: IrSimpleFunctionSymbol? = null
-
   override fun visitComposableBlock(function: IrSimpleFunction, expression: IrBlock): IrBlock {
     val newStatements = mutableListOf<IrStatement>()
 
@@ -57,12 +47,6 @@ internal class InvalidationTrackableTransformer(
     val currentFunctionName = currentUserProvideName ?: function.name.asString()
     val currentFunctionLocation = function.getSafelyLocation()
     val currentInvalidationTrackTable = currentInvalidationTrackTable!!
-
-    val composableInvalidationEffectCallToImplTransformResult =
-      expression.transformComposableInvalidationEffectCallToImpl(
-        composableKey = irString(currentKey.keyName),
-        tableGetter = currentInvalidationTrackTable.propGetter(),
-      )
 
     val paramInfoType = InvalidationLogger.paramInfoSymbol!!.defaultType
     val paramInfoGenericTypeProjection = makeTypeProjection(type = paramInfoType, variance = Variance.OUT_VARIANCE)
@@ -132,12 +116,6 @@ internal class InvalidationTrackableTransformer(
     )
     newStatements += listOf(callListeners, logger)
 
-    if (composableInvalidationEffectCallToImplTransformResult != null) {
-      val (index, newCall) = composableInvalidationEffectCallToImplTransformResult
-      expression.statements.removeAt(index)
-      expression.statements.add(index, newCall)
-    }
-
     expression.statements.addAll(1, newStatements)
     expression.origin = InvalidationTrackerOrigin
 
@@ -190,57 +168,5 @@ internal class InvalidationTrackableTransformer(
     logger("[invalidation skipped] transformed: ${expression.dumpKotlinLike()} -> ${block.dumpKotlinLike()}")
 
     return block
-  }
-
-  private fun IrBlock.transformComposableInvalidationEffectCallToImpl(
-    composableKey: IrConst<String>,
-    tableGetter: IrCall,
-  ): Pair<Int, IrCall>? {
-    var foundIndex: Int? = null
-    var foundStatement: IrCall? = null
-
-    for ((index, statement) in statements.withIndex()) {
-      if (statement is IrCall) {
-        if (statement.symbol.owner.kotlinFqName == COMPOSABLE_INVALIDATION_EFFECT_FQN) {
-          foundIndex = index
-          foundStatement = statement
-          break
-        }
-      }
-    }
-
-    if (foundIndex != null && foundStatement != null) {
-      val givenKeys = foundStatement.getValueArgument(0)
-      val givenBlock = foundStatement.getValueArgument(1)
-      val givenComposer = foundStatement.getValueArgument(2)
-      val givenChanged = foundStatement.getValueArgument(3)
-
-      if (composableInvalidationEffectImplSymbol == null) {
-        composableInvalidationEffectImplSymbol =
-          context
-            .referenceFunctions(
-              CallableId(
-                packageName = COMPOSABLE_INVALIDATION_EFFECT_IMPL_FQN.parent(),
-                callableName = COMPOSABLE_INVALIDATION_EFFECT_IMPL_FQN.shortName(),
-              ),
-            )
-            .single()
-      }
-
-      return foundIndex to IrCallImpl.fromSymbolOwner(
-        startOffset = UNDEFINED_OFFSET,
-        endOffset = UNDEFINED_OFFSET,
-        symbol = composableInvalidationEffectImplSymbol!!,
-      ).apply {
-        putValueArgument(0, composableKey)
-        putValueArgument(1, tableGetter)
-        putValueArgument(2, givenKeys)
-        putValueArgument(3, givenBlock)
-        putValueArgument(4, givenComposer)
-        putValueArgument(5, givenChanged)
-      }
-    }
-
-    return null
   }
 }
