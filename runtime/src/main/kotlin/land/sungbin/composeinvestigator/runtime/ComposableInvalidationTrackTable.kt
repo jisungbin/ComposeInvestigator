@@ -46,7 +46,9 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
   }
 
   public fun unregisterListener(keyName: String, listener: ComposableInvalidationListener) {
-    listeners.getOrDefault(keyName, mutableListOf()).remove(listener)
+    if (listeners.containsKey(keyName)) {
+      listeners[keyName]!!.remove(listener)
+    }
   }
 
   @ComposeInvestigatorCompilerApi
@@ -55,7 +57,7 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
     composable: AffectedComposable,
     type: ComposableInvalidationType,
   ) {
-    for (listener in listeners.getOrDefault(keyName, emptyList())) {
+    for (listener in listeners[keyName].orEmpty()) {
       listener.onInvalidate(composable, type)
     }
   }
