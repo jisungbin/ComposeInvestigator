@@ -10,4 +10,3 @@ inline fun source(filename: String): SourceFile =
 
 inline fun sourceString(filename: String): String =
   File("src/test/kotlin/land/sungbin/composeinvestigator/compiler/test/source/$filename").readText()
-
