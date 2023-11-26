@@ -22,24 +22,34 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
-// TODO: `invalidationTrackTable.currentComposableKeyName`의 값이 ComposableInvalidationEffect 함수 자체의 키로
-//  적용되어서 예상하지 않은 결과로 이어짐. 이를 해결하기 위해선 ComposableInvalidationEffect 함수도 intrinsic으로
-//  만들어야 할 거 같음.
-@OptIn(InternalComposeApi::class)
+@Suppress("UNUSED_PARAMETER")
 @Composable
 @NonRestartableComposable
 public fun ComposableInvalidationEffect(
   vararg keys: Any?,
   block: suspend CoroutineScope.(invalidationTrackTable: ComposableInvalidationTrackTable) -> ComposableInvalidationListener,
 ) {
+  throw NotImplementedError("Implemented as an intrinsic")
+}
+
+@OptIn(InternalComposeApi::class)
+@ComposeInvestigatorCompilerApi
+@Composable
+@NonRestartableComposable
+public fun ComposableInvalidationEffectImpl(
+  composableKey: String,
+  table: ComposableInvalidationTrackTable,
+  vararg keys: Any?,
+  block: suspend CoroutineScope.(invalidationTrackTable: ComposableInvalidationTrackTable) -> ComposableInvalidationListener,
+) {
   val applyContext = currentComposer.applyCoroutineContext
-  val invalidationTrackTable = currentComposableInvalidationTracker
-  val composableKey = invalidationTrackTable.currentComposableKeyName
-  remember(*keys) {
+  val finalKeys = keys.ifEmpty { arrayOf(Unit) }
+
+  remember(keys = finalKeys) {
     InvalidationEffectScope(
       parentCoroutineContext = applyContext,
       composableKey = composableKey,
-      invalidationTrackTable = invalidationTrackTable,
+      invalidationTrackTable = table,
       task = block,
     )
   }
