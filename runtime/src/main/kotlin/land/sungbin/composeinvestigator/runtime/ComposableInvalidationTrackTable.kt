@@ -24,7 +24,7 @@ public annotation class ComposableName(public val name: String)
 public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): String = name
 
 public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi public constructor() {
-  private val listeners = mutableMapOf<String, MutableList<ComposableInvalidationListener>>()
+  private val listeners: MutableMap<String, MutableList<ComposableInvalidationListener>> = mutableMapOf()
 
   public val parameterMap: MutableMap<String, Array<ParameterInfo>> = mutableMapOf()
 

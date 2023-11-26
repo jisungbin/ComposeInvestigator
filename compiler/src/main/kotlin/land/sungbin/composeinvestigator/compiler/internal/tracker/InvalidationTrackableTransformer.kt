@@ -119,22 +119,6 @@ internal class InvalidationTrackableTransformer(
     expression.statements.addAll(1, newStatements)
     expression.origin = InvalidationTrackerOrigin
 
-    val log = buildString {
-      for ((index, statement) in expression.statements.withIndex()) {
-        val dump = run {
-          val dump = statement.dump().trimIndent()
-          if (dump.length > 500) dump.substring(0, 500) + "..." else dump
-        }
-        if (index == 1) appendLine(">>>>>>>>>> ADD: ${logger.dump()}")
-        appendLine(dump)
-        if (index == 3) {
-          appendLine("...")
-          break
-        }
-      }
-    }
-
-    logger("[invalidation processed] $log")
     logger("[invalidation processed] dump: ${expression.dump()}")
     logger("[invalidation processed] dumpKotlinLike: ${expression.dumpKotlinLike()}")
 

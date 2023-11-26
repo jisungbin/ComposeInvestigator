@@ -39,12 +39,13 @@ internal class InvalidationTrackingExtension(private val logger: VerboseLogger) 
       ),
     )
 
-    logger("[TRANSFORM RESULT]")
     for (file in moduleFragment.files) {
-      logger("\n\n")
       logger(file.dump())
-      logger("\n")
+      println()
       logger(file.dumpKotlinLike())
+      println()
+      println()
+      println()
     }
   }
 }
