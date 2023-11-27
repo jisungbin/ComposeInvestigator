@@ -5,71 +5,97 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package land.sungbin.composeinvestigator.runtime
 
-import org.jetbrains.annotations.VisibleForTesting
+public val currentComposableInvalidationTracker: ComposableInvalidationTrackTable
+  get() {
+    throw NotImplementedError("Implemented as an intrinsic")
+  }
 
-public data class DiffParams(
-  public val name: String,
-  public val params: List<Pair<ParameterInfo, ParameterInfo>>,
-) {
-  override fun toString(): String =
-    buildString(capacity = params.size + 2) {
-      appendLine("<$name> DiffParams(")
-      if (params.isNotEmpty()) {
-        for ((index, diffParam) in params.withIndex()) {
-          val (prevParam, newParam) = diffParam
-          val message =
-            "${index + 1}. [${prevParam.name} <${prevParam.stability}>] " +
-              "${prevParam.value} (${prevParam.hashCode}) -> ${newParam.value} (${newParam.hashCode})"
-          appendLine("  $message")
-        }
-      } else {
-        appendLine("  No diff params.")
-        appendLine("  Some argument may be unstable, or there may have been an invalidation request on the current RecomposeScope.")
-      }
-      appendLine(")")
-    }
+public fun interface ComposableInvalidationListener {
+  public fun onInvalidate(composable: AffectedComposable, type: ComposableInvalidationType)
 }
 
-public data class ParameterInfo(
-  public val name: String,
-  public val stability: DeclarationStability,
-  public val value: String,
-  public val hashCode: Int,
-)
+// We use an annotation class to prevent LiveLiteral from the Compose compiler.
+@Target()
+@Retention(AnnotationRetention.SOURCE)
+public annotation class ComposableName(public val name: String)
 
-@ComposeInvestigatorCompilerApi
-public class ComposableInvalidationTrackTable {
-  @VisibleForTesting
-  internal val parameterMap = mutableMapOf<String, Array<ParameterInfo>>()
+public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): String = name
+
+public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi public constructor() {
+  private val listeners: MutableMap<String, MutableList<ComposableInvalidationListener>> = mutableMapOf()
+
+  public val parameterMap: MutableMap<String, Array<ParameterInfo>> = mutableMapOf()
+
+  public var currentComposableName: ComposableName
+    get() {
+      throw NotImplementedError("Implemented as an intrinsic")
+    }
+    set(@Suppress("UNUSED_PARAMETER") name) {
+      throw NotImplementedError("Implemented as an intrinsic")
+    }
+
+  public val currentComposableKeyName: String
+    get() {
+      throw NotImplementedError("Implemented as an intrinsic")
+    }
+
+  public fun registerListener(keyName: String, listener: ComposableInvalidationListener) {
+    listeners.getOrPut(keyName, ::mutableListOf).add(listener)
+  }
+
+  public fun unregisterListener(keyName: String, listener: ComposableInvalidationListener) {
+    if (listeners.containsKey(keyName)) {
+      listeners[keyName]!!.remove(listener)
+    }
+  }
 
   @ComposeInvestigatorCompilerApi
-  public fun computeDiffParamsIfPresent(
-    composableKeyName: String,
-    composableOriginalName: String,
+  public fun callListeners(
+    keyName: String,
+    composable: AffectedComposable,
+    type: ComposableInvalidationType,
+  ) {
+    for (listener in listeners[keyName].orEmpty()) {
+      listener.onInvalidate(composable, type)
+    }
+  }
+
+  @ComposeInvestigatorCompilerApi
+  public fun computeInvalidationReason(
+    keyName: String,
     vararg parameterInfos: ParameterInfo,
-  ): DiffParams? {
-    val prevParams = parameterMap[composableKeyName]
+  ): InvalidationReason {
+    val prevParams = parameterMap[keyName]
 
     if (prevParams == null) {
       @Suppress("UNCHECKED_CAST")
-      parameterMap[composableKeyName] = parameterInfos as Array<ParameterInfo>
-      return null
+      parameterMap[keyName] = parameterInfos as Array<ParameterInfo>
+      return InvalidationReason.Initial
     }
 
     val diffs = mutableListOf<Pair<ParameterInfo, ParameterInfo>>()
     for ((index, prevParam) in prevParams.withIndex()) {
-      if (prevParam.hashCode != parameterInfos[index].hashCode) {
-        diffs.add(prevParam to parameterInfos[index])
+      val newParam = parameterInfos[index]
+      require(prevParam.name == newParam.name) {
+        "Parameter name must be same. prevParam.name=${prevParam.name}, newParam.name=${newParam.name}"
+      }
+      if (prevParam.valueHashCode != newParam.valueHashCode) {
+        diffs.add(prevParam to newParam)
       }
     }
 
     @Suppress("UNCHECKED_CAST")
-    parameterMap[composableKeyName] = parameterInfos as Array<ParameterInfo>
+    parameterMap[keyName] = parameterInfos as Array<ParameterInfo>
 
-    return DiffParams(name = composableOriginalName, params = diffs)
+    return if (diffs.isEmpty()) {
+      InvalidationReason.Unknown(params = parameterInfos.map(ParameterInfo::toSimpleParameter))
+    } else {
+      InvalidationReason.ParameterChanged(changedParams = diffs)
+    }
   }
 }
+
+private fun ParameterInfo.toSimpleParameter(): Parameter =
+  Parameter(name = name, stability = stability)

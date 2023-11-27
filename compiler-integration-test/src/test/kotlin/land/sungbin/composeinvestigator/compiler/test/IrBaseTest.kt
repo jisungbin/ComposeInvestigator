@@ -11,6 +11,7 @@ package land.sungbin.composeinvestigator.compiler.test
 
 import androidx.compose.compiler.plugins.kotlin.ComposeCommandLineProcessor
 import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
+import com.tschuchort.compiletesting.JvmCompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.PluginOption
 import com.tschuchort.compiletesting.SourceFile
@@ -61,7 +62,7 @@ fun IrBaseTest.kotlinCompilation(
   enableVerboseLogging: Boolean = true,
   @Suppress("DEPRECATION") additionalVisitor: ComponentRegistrar? = null,
   vararg sourceFiles: SourceFile,
-) = KotlinCompilation().apply {
+): JvmCompilationResult = KotlinCompilation().apply {
   this.workingDir = workingDir
   sources = sourceFiles.asList()
   jvmTarget = JvmTarget.JVM_17.toString()
@@ -82,4 +83,4 @@ fun IrBaseTest.kotlinCompilation(
   commandLineProcessors = mutableListOf<CommandLineProcessor>(ComposeInvestigatorCommandLineProcessor()).also { processors ->
     if (enableComposeCompiler) processors.add(0, ComposeCommandLineProcessor())
   }
-}
+}.compile()

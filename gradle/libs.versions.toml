@@ -50,6 +50,7 @@ kotlin-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
 
 compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-core" }
+compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose-core" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose-core" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
 
@@ -59,7 +60,8 @@ autoservice-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", versi
 fastlist = { module = "land.sungbin.fastlist:fastlist", version.ref = "fastlist" }
 
 test-mockk = { module = "io.mockk:mockk", version.ref = "test-mockk" }
-test-kotest = { module = "io.kotest:kotest-runner-junit5", version.ref = "test-kotest" }
+test-kotest-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "test-kotest" }
+test-kotest-assertion = { module = "io.kotest:kotest-assertions-core", version.ref = "test-kotest" }
 test-junit-core = { module = "junit:junit", version.ref = "test-junit-core" }
 test-junit-enigne = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "test-junit-engine" }
 test-junit-compose = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-core" }

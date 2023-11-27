@@ -5,24 +5,18 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-@file:Suppress("unused")
-
 package land.sungbin.composeinvestigator.compiler.internal.tracker.key
 
-import land.sungbin.composeinvestigator.compiler.internal.irTracee
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 
-public class KeyInfo(
-  public val name: String,
-  public val startOffset: Int,
-  public val endOffset: Int,
-  public val hasDuplicates: Boolean,
-) {
-  public var used: Boolean = false
-  public val key: Int get() = name.hashCode()
+public class KeyInfo(public val keyName: String, public val userProvideName: String?) {
+  public fun copy(
+    keyName: String = this.keyName,
+    userProvideName: String? = this.userProvideName,
+  ): KeyInfo = KeyInfo(keyName = keyName, userProvideName = userProvideName)
 }
 
 internal class DurableFunctionKeyTransformer(private val context: IrPluginContext) :
@@ -46,15 +40,10 @@ internal class DurableFunctionKeyTransformer(private val context: IrPluginContex
 
   override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
     val signature = declaration.signatureString()
-    val (fullName, success) = buildKey("fun-$signature")
-    val info = KeyInfo(
-      name = fullName,
-      startOffset = declaration.startOffset,
-      endOffset = declaration.endOffset,
-      hasDuplicates = !success,
-    )
-    currentKeys.add(info)
-    context.irTracee.record(DurableWritableSlices.DURABLE_FUNCTION_KEY, declaration, info)
+    val (keyName) = buildKey("fun-$signature")
+    val keyInfo = KeyInfo(keyName = keyName, userProvideName = null)
+    currentKeys += keyInfo
+    context.irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, declaration] = keyInfo
     return super.visitSimpleFunction(declaration)
   }
 }
