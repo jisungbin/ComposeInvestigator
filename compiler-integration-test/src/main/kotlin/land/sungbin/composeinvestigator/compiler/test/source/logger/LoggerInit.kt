@@ -7,11 +7,15 @@
 
 package land.sungbin.composeinvestigator.compiler.test.source.logger
 
-import land.sungbin.composeinvestigator.runtime.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.ComposableInvalidationLogger
 import land.sungbin.composeinvestigator.runtime.ComposableInvalidationType
+import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 
 val invalidationLog = mutableMapOf<AffectedComposable, MutableList<ComposableInvalidationType>>()
+
+fun clearInvalidationLog() {
+  invalidationLog.clear()
+}
 
 fun findInvalidationLog(composableName: String): List<ComposableInvalidationType> =
   invalidationLog.filterKeys { composable -> composable.name == composableName }.values.flatten()

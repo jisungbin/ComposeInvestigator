@@ -28,7 +28,7 @@ internal class InvalidationLoggerVisitor(
   private val logger: VerboseLogger,
 ) : IrElementTransformerVoid(), IrPluginContext by context {
   override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
-    val currentLoggerSymbol = InvalidationLogger.getCurrentLoggerSymbolOrNull()
+    val currentLoggerSymbol = IrInvalidationLogger.getCurrentLoggerSymbolOrNull()
     if (declaration.isValidComposableInvalidationLoggerFunction()) {
       if (currentLoggerSymbol != null && currentLoggerSymbol.owner.kotlinFqName != declaration.kotlinFqName) {
         val message = """
@@ -37,9 +37,9 @@ internal class InvalidationLoggerVisitor(
         """.trimIndent()
         // TODO: print message with warning level
         logger(message)
-        InvalidationLogger.useDefaultLogger(context)
+        IrInvalidationLogger.useDefaultLogger(context)
       } else if (currentLoggerSymbol == null) {
-        InvalidationLogger.useCustomLogger(declaration.symbol)
+        IrInvalidationLogger.useCustomLogger(declaration.symbol)
         logger("Found ComposableInvalidationLogger function: ${declaration.dump()}")
       }
     }

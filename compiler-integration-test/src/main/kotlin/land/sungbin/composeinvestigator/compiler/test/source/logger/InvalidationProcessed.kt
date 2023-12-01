@@ -16,13 +16,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
 @Composable
-fun InvalidationProcessedParameterChangedRoot() {
+fun InvalidationProcessedRoot_StateDelegateReference() {
   var count by remember { mutableIntStateOf(0) }
   Button(onClick = { count = 1 }) {}
-  InvalidationProcessedParameterChangedChild(count)
+  InvalidationProcessedChild_StateDelegateReference(count)
 }
 
 @Composable
-private fun InvalidationProcessedParameterChangedChild(count: Int) {
+private fun InvalidationProcessedChild_StateDelegateReference(count: Int) {
+  Text(text = "$count")
+}
+
+@Composable
+fun InvalidationProcessedRoot_StateDirectReference() {
+  val count = remember { mutableIntStateOf(0) }
+  Button(onClick = { count.intValue = 1 }) {}
+  InvalidationProcessedChild_StateDirectReference(count.intValue)
+}
+
+@Composable
+private fun InvalidationProcessedChild_StateDirectReference(count: Int) {
   Text(text = "$count")
 }

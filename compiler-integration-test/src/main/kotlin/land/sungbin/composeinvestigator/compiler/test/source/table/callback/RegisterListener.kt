@@ -11,8 +11,8 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
-import land.sungbin.composeinvestigator.runtime.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.ComposableInvalidationType
+import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracker
 
 val invalidationListensViaManualRegister = mutableMapOf<AffectedComposable, MutableList<ComposableInvalidationType>>()
