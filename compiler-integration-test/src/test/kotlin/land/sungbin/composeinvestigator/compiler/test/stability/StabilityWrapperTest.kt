@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.test.tracker
+package land.sungbin.composeinvestigator.compiler.test.stability
 
 import androidx.compose.compiler.plugins.kotlin.analysis.Stability
 import io.kotest.core.spec.style.FunSpec

@@ -13,8 +13,8 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.kotest.matchers.collections.shouldBeSameSizeAs
+import io.kotest.matchers.collections.shouldContainExactly
 import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.shouldBe
 import land.sungbin.composeinvestigator.compiler.test.source.table.callback.RegisterListener_InvalidationSkippedRoot
 import land.sungbin.composeinvestigator.compiler.test.source.table.callback.findInvalidationListensViaManualRegister
 import land.sungbin.composeinvestigator.runtime.ComposableInvalidationType
@@ -37,12 +37,17 @@ class InvalidationCallbackTest {
       val rootListens = findInvalidationListensViaManualRegister("RegisterListener_InvalidationSkippedRoot")
       val childListens = findInvalidationListensViaManualRegister("RegisterListener_InvalidationSkippedChild")
 
-      rootListens shouldHaveSize 1
+      rootListens shouldHaveSize 2
       rootListens shouldBeSameSizeAs childListens
 
-      // The initial composition is not callbacked because the listener is registered after the initial composition (the first run of the composable).
-      rootListens[0] shouldBe ComposableInvalidationType.Processed(InvalidationReason.Unknown(params = emptyList()))
-      childListens[0] shouldBe ComposableInvalidationType.Skipped
+      rootListens shouldContainExactly listOf(
+        ComposableInvalidationType.Processed(InvalidationReason.Initial),
+        ComposableInvalidationType.Processed(InvalidationReason.Unknown()),
+      )
+      childListens shouldContainExactly listOf(
+        ComposableInvalidationType.Processed(InvalidationReason.Initial),
+        ComposableInvalidationType.Skipped,
+      )
     }
   }
 }
