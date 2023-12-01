@@ -13,7 +13,8 @@ kotlin-ktlint-source = "0.48.2"
 
 androidx-activity = "1.8.1"
 
-compose-core = "1.5.4"
+compose-compiler = "1.5.4"
+compose-runtime = "1.5.4"
 compose-activity = "1.8.1"
 
 autoservice-annotation = "1.1.1"
@@ -49,9 +50,9 @@ kotlin-kotlinpoet = { module = "com.squareup:kotlinpoet", version.ref = "kotlin-
 
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
 
-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-core" }
-compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose-core" }
-compose-material = { module = "androidx.compose.material:material", version.ref = "compose-core" }
+compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-compiler" }
+compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose-runtime" }
+compose-material = { module = "androidx.compose.material:material", version.ref = "compose-runtime" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
 
 autoservice-annotation = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoservice-annotation" }
@@ -64,7 +65,7 @@ test-kotest-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = 
 test-kotest-assertion = { module = "io.kotest:kotest-assertions-core", version.ref = "test-kotest" }
 test-junit-core = { module = "junit:junit", version.ref = "test-junit-core" }
 test-junit-enigne = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "test-junit-engine" }
-test-junit-compose = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-core" }
+test-junit-compose = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-runtime" }
 test-robolectric = { module = "org.robolectric:robolectric", version.ref = "test-robolectric" }
 test-kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
 test-kotlin-compilation = { module = "dev.zacsweers.kctfork:core", version.ref = "test-kotlin-compilation" }
