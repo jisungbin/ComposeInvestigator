@@ -199,8 +199,8 @@ internal abstract class AbstractInvalidationTrackingLower(
       else SourceLocation.Location(file = "<unknown>", line = -1, column = -1)
     }
 
-  protected abstract fun visitComposableBlock(function: IrSimpleFunction, expression: IrBlock): IrBlock
-  protected abstract fun visitSkipToGroupEndCall(function: IrSimpleFunction, expression: IrCall): IrBlock
+  protected abstract fun visitComposableBlock(function: IrSimpleFunction, block: IrBlock): IrBlock
+  protected abstract fun visitSkipToGroupEndCall(function: IrSimpleFunction, call: IrCall): IrBlock
 
   private fun IrWhen.isComposableTraceBranch(): Boolean {
     val branch = branches.singleOrNull() ?: return false
