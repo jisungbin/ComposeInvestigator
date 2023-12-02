@@ -80,7 +80,7 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
     for ((index, old) in oldFields.withIndex()) {
       val new = fields[index]
       check(old.name == new.name) { "Field name must be same. old.name=${old.name}, new.name=${new.name}" }
-      if (old.valueHashCode != new.valueHashCode) changed.add(ChangedFieldPair(old = old, new = new))
+      if (old.valueHashCode != new.valueHashCode) changed.add(old changedTo new)
     }
 
     @Suppress("UNCHECKED_CAST")
