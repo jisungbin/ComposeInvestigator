@@ -12,6 +12,7 @@ import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
 plugins {
   alias(libs.plugins.test.gradle.logging) apply false
+  alias(libs.plugins.gradle.publish.maven) apply false
   alias(libs.plugins.kotlin.ktlint) apply false
 }
 

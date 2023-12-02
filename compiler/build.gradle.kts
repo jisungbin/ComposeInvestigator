@@ -1,7 +1,7 @@
 plugins {
   kotlin("jvm")
-  // alias(libs.plugins.gradle.publish.maven)
   alias(libs.plugins.kotlin.ksp)
+  id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 
 sourceSets {
