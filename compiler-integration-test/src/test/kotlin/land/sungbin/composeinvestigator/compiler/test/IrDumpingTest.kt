@@ -44,7 +44,7 @@ class IrDumpingTest {
         PluginOption(
           pluginId = ComposeInvestigatorCommandLineProcessor.PLUGIN_ID,
           optionName = ComposeInvestigatorCommandLineProcessor.OPTION_VERBOSE.optionName,
-          optionValue = "true",
+          optionValue = if (System.getenv("CI") == "true") "false" else "true",
         ),
         // PluginOption(
         //   pluginId = ComposeCommandLineProcessor.PLUGIN_ID,
