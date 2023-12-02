@@ -72,7 +72,7 @@ fun IrBaseTest.kotlinCompilation(
     PluginOption(
       pluginId = ComposeInvestigatorCommandLineProcessor.PLUGIN_ID,
       optionName = ComposeInvestigatorCommandLineProcessor.OPTION_VERBOSE.optionName,
-      optionValue = enableVerboseLogging.toString(),
+      optionValue = if (System.getenv("CI") == "true") "false" else enableVerboseLogging.toString(),
     ),
   )
   @Suppress("DEPRECATION")

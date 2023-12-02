@@ -10,10 +10,13 @@ package land.sungbin.composeinvestigator.compiler.internal.tracker.logger
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TYPE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TYPE_PROCESSED_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TYPE_SKIPPED_FQN
+import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATOR_CONFIG_FQN
+import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATOR_CONFIG_INVALIDATION_LOGGER_FQN
+import land.sungbin.composeinvestigator.compiler.internal.FUNCTION_2_FQN
+import land.sungbin.composeinvestigator.compiler.internal.FUNCTION_2_INVOKE_FQN
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.expressions.IrCall
-import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -24,16 +27,16 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.defaultType
-import org.jetbrains.kotlin.ir.types.isNullableAny
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.name.FqName
-import org.jetbrains.kotlin.name.Name
 
 public object IrInvalidationLogger {
-  private var loggerSymbol: IrSimpleFunctionSymbol? = null
-  private var loggerType: LoggerType? = null
+  private var loggerContainerSymbol: IrClassSymbol? = null
+  private var loggerGetterSymbol: IrSimpleFunctionSymbol? = null
+
+  private var function2Symbol: IrClassSymbol? = null
+  private var function2InvokeSymbol: IrSimpleFunctionSymbol? = null
 
   private var invalidationTypeSymbol: IrClassSymbol? = null
   private var invalidationTypeProcessedSymbol: IrClassSymbol? = null
@@ -42,54 +45,61 @@ public object IrInvalidationLogger {
   public val irInvalidationTypeSymbol: IrClassSymbol get() = invalidationTypeSymbol!!
 
   public fun init(context: IrPluginContext) {
+    loggerContainerSymbol = context.referenceClass(ClassId.topLevel(COMPOSE_INVESTIGATOR_CONFIG_FQN))!!
+    loggerGetterSymbol =
+      context
+        .referenceProperties(
+          CallableId(
+            packageName = COMPOSE_INVESTIGATOR_CONFIG_INVALIDATION_LOGGER_FQN.parent(),
+            callableName = COMPOSE_INVESTIGATOR_CONFIG_INVALIDATION_LOGGER_FQN.shortName(),
+          ),
+        )
+        .single()
+        .owner
+        .getter!!
+        .symbol
+
+    function2Symbol = context.referenceClass(ClassId.topLevel(FUNCTION_2_FQN))!!
+    function2InvokeSymbol =
+      context
+        .referenceFunctions(
+          CallableId(
+            packageName = FUNCTION_2_INVOKE_FQN.parent(),
+            callableName = FUNCTION_2_INVOKE_FQN.shortName(),
+          )
+        )
+        .single()
+
     invalidationTypeSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TYPE_FQN))!!
     invalidationTypeProcessedSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TYPE_PROCESSED_FQN))!!
     invalidationTypeSkippedSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TYPE_SKIPPED_FQN))!!
   }
 
-  internal fun getCurrentLoggerSymbolOrNull(): IrSimpleFunctionSymbol? = loggerSymbol
-
-  public fun useDefaultLogger(context: IrPluginContext) {
-    val printlnSymbol: IrSimpleFunctionSymbol =
-      context
-        .referenceFunctions(
-          CallableId(
-            packageName = FqName("kotlin.io"),
-            callableName = Name.identifier("println"),
-          ),
-        )
-        .single { symbol ->
-          symbol.owner.valueParameters.size == 1 &&
-            symbol.owner.valueParameters.single().type.isNullableAny()
-        }
-
-    loggerSymbol = printlnSymbol
-    loggerType = LoggerType.Println
-  }
-
-  public fun useCustomLogger(symbol: IrSimpleFunctionSymbol) {
-    loggerSymbol = symbol
-    loggerType = LoggerType.Custom
-  }
-
   public fun irLog(
     affectedComposable: IrDeclarationReference,
     invalidationType: IrDeclarationReference,
-    defaultMessage: IrConst<String>,
   ): IrCall = IrCallImpl.fromSymbolOwner(
     startOffset = UNDEFINED_OFFSET,
     endOffset = UNDEFINED_OFFSET,
-    symbol = loggerSymbol!!,
-  ).apply {
-    when (loggerType!!) {
-      LoggerType.Println -> {
-        putValueArgument(0, defaultMessage)
-      }
-      LoggerType.Custom -> {
-        putValueArgument(0, affectedComposable)
-        putValueArgument(1, invalidationType)
-      }
+    symbol = function2InvokeSymbol!!,
+  ).also { invokeCall ->
+    invokeCall.dispatchReceiver = IrCallImpl.fromSymbolOwner(
+      startOffset = UNDEFINED_OFFSET,
+      endOffset = UNDEFINED_OFFSET,
+      symbol = loggerGetterSymbol!!,
+    ).also { loggerGetter ->
+      loggerGetter.dispatchReceiver = IrGetObjectValueImpl(
+        startOffset = UNDEFINED_OFFSET,
+        endOffset = UNDEFINED_OFFSET,
+        type = loggerContainerSymbol!!.defaultType,
+        symbol = loggerContainerSymbol!!,
+      )
+    }.apply {
+      type = function2Symbol!!.defaultType
     }
+  }.apply {
+    putValueArgument(0, affectedComposable)
+    putValueArgument(1, invalidationType)
   }
 
   public fun irInvalidationTypeProcessed(reason: IrExpression): IrConstructorCall {
@@ -110,10 +120,5 @@ public object IrInvalidationLogger {
       type = invalidateTypeSkippedSymbol.defaultType,
       symbol = invalidateTypeSkippedSymbol,
     )
-  }
-
-  public enum class LoggerType {
-    Println,
-    Custom,
   }
 }

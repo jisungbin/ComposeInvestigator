@@ -26,6 +26,11 @@ internal val TRACE_EVENT_END = Name.identifier("traceEventEnd")
 
 // ===== FULLY-QUALIFIED NAME ===== //
 
+// START Kotlin Standard Library
+internal val FUNCTION_2_FQN = FqName("kotlin.jvm.functions.Function2")
+internal val FUNCTION_2_INVOKE_FQN = FUNCTION_2_FQN.child(Name.identifier("invoke"))
+// END Kotlin Standard Library
+
 // START Compose Runtime
 internal val COMPOSABLE_FQN = FqName("$AndroidxComposeRuntime.Composable")
 internal val COMPOSER_FQN = FqName("$AndroidxComposeRuntime.Composer")
@@ -36,9 +41,13 @@ internal val STATE_VALUE_FQN = STATE_FQN.child(Name.identifier("value"))
 internal val STATE_VALUE_FQN_GETTER_INTRINSIC = STATE_FQN.child(Name.special("<get-value>"))
 // END Compose Runtime
 
-// START ComposableInvalidationLogger.kt
-internal val COMPOSABLE_INVALIDATION_LOGGER_FQN = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationLogger")
+// START ComposeInvestigatorConfig.kt
+internal val COMPOSE_INVESTIGATOR_CONFIG_FQN = FqName("$ComposeInvestigatorRuntime.ComposeInvestigatorConfig")
+internal val COMPOSE_INVESTIGATOR_CONFIG_INVALIDATION_LOGGER_FQN = COMPOSE_INVESTIGATOR_CONFIG_FQN.child(Name.identifier("invalidationLogger"))
+internal val COMPOSE_INVESTIGATOR_CONFIG_INVALIDATION_LOGGER_FQN_GETTER_INTRINSIC = COMPOSE_INVESTIGATOR_CONFIG_FQN.child(Name.special("<get-invalidationLogger>"))
+// END ComposeInvestigatorConfig.kt
 
+// START ComposableInvalidationLogger.kt
 internal val SIMPLE_PARAMETER = FqName("$ComposeInvestigatorRuntime.SimpleParameter")
 internal val CHANGED_FIELD_PAIR = FqName("$ComposeInvestigatorRuntime.ChangedFieldPair")
 

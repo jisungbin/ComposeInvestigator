@@ -23,15 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import land.sungbin.composeinvestigator.runtime.ComposableInvalidationLogger
-import land.sungbin.composeinvestigator.runtime.ComposableInvalidationType
-import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
-
-@Suppress("unused")
-@ComposableInvalidationLogger
-fun composeInvestigateLogger(composable: AffectedComposable, type: ComposableInvalidationType) {
-  println("<$composable> $type")
-}
 
 class SampleActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
