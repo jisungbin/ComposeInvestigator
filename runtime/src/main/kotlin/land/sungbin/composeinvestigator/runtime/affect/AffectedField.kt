@@ -13,7 +13,6 @@ public sealed interface AffectedField {
   public val name: String
   public val valueString: String
   public val valueHashCode: Int
-  override fun toString(): String
 
   public data class ValueParameter(
     override val name: String,

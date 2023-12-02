@@ -28,6 +28,9 @@ public data class ChangedFieldPair(public val old: AffectedField, public val new
   }
 }
 
+public infix fun AffectedField.changedTo(new: AffectedField): ChangedFieldPair =
+  ChangedFieldPair(old = this, new = new)
+
 public sealed interface InvalidationReason {
   override fun toString(): String
 
@@ -41,28 +44,29 @@ public sealed interface InvalidationReason {
       // but we sort it one more time just in case there are any bugs.
       val typeSortedFields = changed.sortedByDescending { field -> field.old is AffectedField.ValueParameter }
       var stateTypePrinted = false
+      var index = 0
 
       appendLine("FieldChanged(")
 
-      appendLine("  Parameter:")
+      appendLine("  [Parameters]")
       if (typeSortedFields[0].old !is AffectedField.ValueParameter) {
         appendLine("    (no changed parameter)")
       }
 
-      for ((index, diff) in typeSortedFields.withIndex()) {
-        val (old, new) = diff
+      typeSortedFields.forEach { (old, new) ->
         check(old.name == new.name) { "Field name must be same. old.name=${old.name}, new.name=${new.name}" }
 
         if (old is AffectedField.StateProperty && !stateTypePrinted) {
-          appendLine("  State:")
+          appendLine("  [States]")
           stateTypePrinted = true
+          index = 0
         }
 
         appendLine(
           """
-          |    ${index + 1}. ${old.name}:
-          |      Old: $old
-          |      New: $new
+          |    ${++index}. ${old.name}${if (old is AffectedField.ValueParameter) " <${old.stability}>" else ""}
+          |      Old: ${with(old) { "$valueString ($valueHashCode)" }}
+          |      New: ${with(new) { "$valueString ($valueHashCode)" }}
           """.trimMargin(),
         )
       }
