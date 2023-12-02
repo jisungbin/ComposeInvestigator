@@ -135,8 +135,6 @@ internal class InvalidationTrackableTransformer(
     )
     newStatements += computeInvalidationReasonVariable
 
-    // TODO: Improve default log message
-    val defaultMessage = irString("[INVALIDATION_TRACKER] <${getCurrentFunctionNameIntercepttedAnonymous(currentUserProvideName)}> invalidation processed")
     val affectedComposable = IrAffectedComposable.irAffectedComposable(
       composableName = irString(currentFunctionName),
       packageName = irString(getCurrentFunctionPackage()),
@@ -157,7 +155,6 @@ internal class InvalidationTrackableTransformer(
     val logger = IrInvalidationLogger.irLog(
       affectedComposable = affectedComposable,
       invalidationType = invalidationTypeProcessed,
-      defaultMessage = defaultMessage,
     )
     newStatements += listOf(callListeners, logger)
 
@@ -178,8 +175,6 @@ internal class InvalidationTrackableTransformer(
     val currentFunctionLocation = function.getSafelyLocation()
     val currentInvalidationTrackTable = currentInvalidationTrackTable!!
 
-    // TODO: Improve default log message
-    val defaultMessage = irString("[INVALIDATION_TRACKER] <${getCurrentFunctionNameIntercepttedAnonymous(currentUserProvideName)}> invalidation skipped")
     val affectedComposable = IrAffectedComposable.irAffectedComposable(
       composableName = irString(currentFunctionName),
       packageName = irString(getCurrentFunctionPackage()),
@@ -199,7 +194,6 @@ internal class InvalidationTrackableTransformer(
     val logger = IrInvalidationLogger.irLog(
       affectedComposable = affectedComposable,
       invalidationType = invalidationTypeSkipped,
-      defaultMessage = defaultMessage,
     )
 
     val block = IrBlockImpl(

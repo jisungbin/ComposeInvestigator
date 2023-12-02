@@ -20,8 +20,6 @@ fun clearInvalidationLog() {
 fun findInvalidationLog(composableName: String): List<ComposableInvalidationType> =
   invalidationLog.filterKeys { composable -> composable.name == composableName }.values.flatten()
 
-@Suppress("unused")
-@ComposableInvalidationLogger
-fun invalidationLogger(composable: AffectedComposable, type: ComposableInvalidationType) {
+val invalidationLogger: ComposableInvalidationLogger = ComposableInvalidationLogger { composable, type ->
   invalidationLog.getOrPut(composable, ::mutableListOf).add(type)
 }

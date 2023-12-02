@@ -7,20 +7,13 @@
 
 package land.sungbin.composeinvestigator.runtime
 
+import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
 
-/**
- * ```
- * @ComposableInvalidationLogger
- * public fun invalidationLogger(composable: AffectedComposable, type: ComposableInvalidationType) {
- *   // Your logger code here
- * }
- * ```
- */
-@MustBeDocumented
-@Retention(AnnotationRetention.SOURCE)
-@Target(AnnotationTarget.FUNCTION)
-public annotation class ComposableInvalidationLogger
+@JvmInline
+public value class ComposableInvalidationLogger(
+  private val logger: (composable: AffectedComposable, type: ComposableInvalidationType) -> Unit,
+) : Function2<AffectedComposable, ComposableInvalidationType, Unit> by logger
 
 public data class SimpleParameter(
   public val name: String,
