@@ -15,16 +15,16 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-//@RunWith(AndroidJUnit4::class)
-//class IrBugCheckTest {
-//  @get:Rule
-//  val compose = createAndroidComposeRule<ComponentActivity>()
-//
-//  @get:Rule
-//  val loggerTest = InvalidationLoggerTestRule()
-//
-//  @Test
-//  fun nested_state() {
-//    compose.setContent { NestedLocalStateCapture() }
-//  }
-//}
+@RunWith(AndroidJUnit4::class)
+class IrBugCheckTest {
+  @get:Rule
+  val compose = createAndroidComposeRule<ComponentActivity>()
+
+  @get:Rule
+  val loggerTest = InvalidationLoggerTestRule()
+
+  @Test
+  fun nested_state() {
+    compose.setContent { NestedLocalStateCapture() }
+  }
+}
