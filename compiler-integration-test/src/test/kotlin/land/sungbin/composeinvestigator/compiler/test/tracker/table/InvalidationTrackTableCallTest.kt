@@ -13,10 +13,10 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import io.kotest.matchers.nulls.shouldNotBeNull
 import io.kotest.matchers.types.shouldBeTypeOf
 import io.kotest.matchers.types.shouldNotBeSameInstanceAs
-import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.currentComposableKeyName1
-import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.currentComposableKeyName2
-import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.currentComposableName1
-import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.currentComposableName2
+import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.CurrentComposableKeyName1
+import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.CurrentComposableKeyName2
+import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.CurrentComposableName1
+import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.CurrentComposableName2
 import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.table1
 import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.table2
 import land.sungbin.composeinvestigator.runtime.ComposableInvalidationTrackTable
@@ -42,13 +42,17 @@ class InvalidationTrackTableCallTest {
 
   @Test
   fun composable_name_change() {
-    currentComposableName1()
-    currentComposableName2()
+    compose.setContent {
+      CurrentComposableName1()
+      CurrentComposableName2()
+    }
   }
 
   @Test
   fun composable_key_name() {
-    currentComposableKeyName1()
-    currentComposableKeyName2()
+    compose.setContent {
+      CurrentComposableKeyName1()
+      CurrentComposableKeyName2()
+    }
   }
 }

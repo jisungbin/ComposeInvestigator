@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall
 
+import androidx.compose.runtime.Composable
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeSameInstanceAs
 import land.sungbin.composeinvestigator.runtime.ComposableName
@@ -19,14 +20,16 @@ fun table1() {
   table1 shouldBeSameInstanceAs currentComposableInvalidationTracker
 }
 
-fun currentComposableName1() {
+@Composable
+fun CurrentComposableName1() {
   val prevComposableName by table1.currentComposableName
-  prevComposableName shouldBe "currentComposableName1"
+  prevComposableName shouldBe "CurrentComposableName1"
 
   table1.currentComposableName = ComposableName("ChangedComposableName1")
   table1.currentComposableName.name shouldBe "ChangedComposableName1"
 }
 
-fun currentComposableKeyName1() {
-  table1.currentComposableKeyName shouldBe "fun-currentComposableKeyName1()Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall/file-TableCallFile1.kt"
+@Composable
+fun CurrentComposableKeyName1() {
+  table1.currentComposableKeyName shouldBe "fun-CurrentComposableKeyName1(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall/file-TableCallFile1.kt"
 }
