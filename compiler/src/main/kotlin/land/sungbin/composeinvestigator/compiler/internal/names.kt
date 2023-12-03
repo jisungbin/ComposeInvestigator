@@ -7,8 +7,10 @@
 
 package land.sungbin.composeinvestigator.compiler.internal
 
+import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.SpecialNames
 
 // ===== PACKAGE ===== //
 
@@ -27,8 +29,15 @@ internal val TRACE_EVENT_END = Name.identifier("traceEventEnd")
 // ===== FULLY-QUALIFIED NAME ===== //
 
 // START Kotlin Standard Library
+// FIXME: There is a `functionN` factory in `IrBuiltIns`, but it currently produces unbound symbols.
+//        We can switch to this and remove this function once KT-54230 is fixed.
 internal val FUNCTION_2_FQN = FqName("kotlin.jvm.functions.Function2")
 internal val FUNCTION_2_INVOKE_FQN = FUNCTION_2_FQN.child(Name.identifier("invoke"))
+
+internal val MUTABLE_LIST_OF_FQN = FqName("kotlin.collections.mutableListOf")
+internal val MUTABLE_LIST_ADD_FQN = FqName("kotlin.collections.MutableList.add")
+
+internal val HASH_CODE_FQN = FqName("kotlin.hashCode")
 // END Kotlin Standard Library
 
 // START Compose Runtime
@@ -105,3 +114,13 @@ internal val AFFECTED_FIELD_STATE_PROPERTY_FQN = AFFECTED_FIELD_FQN.child(Name.i
 // START affect/AffectedComposable.kt
 internal val AFFECTED_COMPOSABLE_FQN = FqName("$ComposeInvestigatorRuntimeAffect.AffectedComposable")
 // END affect/AffectedComposable.kt
+
+// START helper/IrHelper.kt
+internal val OBTAIN_STATE_PROPERTY_AND_ADD_FQN = FqName("$ComposeInvestigatorRuntime.helper.obtainStatePropertyAndAdd")
+// END helper/IrHelper.kt
+
+public fun CallableId.Companion.fromFqName(fqName: FqName): CallableId =
+  CallableId(packageName = fqName.parent(), callableName = fqName.shortName())
+
+@Suppress("UnusedReceiverParameter")
+public val SpecialNames.UNKNOWN_STRING: String get() = "<unknown>"

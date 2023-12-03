@@ -24,7 +24,7 @@ class ComposableInvalidationTrackTableTest : FeatureSpec() {
         )
         val invalidationReason = table.computeInvalidationReason(
           keyName = "keyName",
-          fields = arrayOf(param),
+          fields = listOf(param),
         )
 
         table.affectFields shouldBe mapOf("keyName" to listOf(param))
@@ -46,12 +46,12 @@ class ComposableInvalidationTrackTableTest : FeatureSpec() {
         val table = ComposableInvalidationTrackTable().apply {
           computeInvalidationReason(
             keyName = "keyName",
-            fields = arrayOf(oldParam),
+            fields = listOf(oldParam),
           )
         }
         val invalidationReason = table.computeInvalidationReason(
           keyName = "keyName",
-          fields = arrayOf(newParam),
+          fields = listOf(newParam),
         )
 
         table.affectFields shouldBe mapOf("keyName" to listOf(newParam))

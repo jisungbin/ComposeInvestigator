@@ -7,12 +7,14 @@
 
 package land.sungbin.composeinvestigator.compiler.internal.tracker.table
 
+import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_KEY_NAME_FQN_GETTER_INTRINSIC
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_NAME_FQN_GETTER_INTRINSIC
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_NAME_FQN_SETTER_INTRINSIC
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_NAME_FQN
 import land.sungbin.composeinvestigator.compiler.internal.CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN_GETTER_INTRINSIC
+import land.sungbin.composeinvestigator.compiler.internal.UNKNOWN_STRING
 import land.sungbin.composeinvestigator.compiler.internal.irBoolean
 import land.sungbin.composeinvestigator.compiler.internal.irString
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.DurableWritableSlices
@@ -22,6 +24,7 @@ import land.sungbin.fastlist.fastLastOrNull
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
@@ -34,6 +37,7 @@ import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
@@ -64,8 +68,8 @@ internal class InvalidationTrackTableCallTransformer(
       }
       callFqName == COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_NAME_FQN_GETTER_INTRINSIC &&
         callParentFqName == COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN -> {
-        val name = when (val function = lastReachedFunction()) {
-          null -> "<unknown>"
+        val name = when (val function = lastReachedComposable()) {
+          null -> SpecialNames.UNKNOWN_STRING
           else -> irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function]?.userProvideName ?: function.name.asString()
         }
 
@@ -78,7 +82,7 @@ internal class InvalidationTrackTableCallTransformer(
       }
       callFqName == COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_NAME_FQN_SETTER_INTRINSIC &&
         callParentFqName == COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN -> {
-        val function = lastReachedFunction()
+        val function = lastReachedComposable()
         var result = false
 
         if (function != null) {
@@ -98,21 +102,23 @@ internal class InvalidationTrackTableCallTransformer(
       }
       callFqName == COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_KEY_NAME_FQN_GETTER_INTRINSIC &&
         callParentFqName == COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN -> {
-        val function = lastReachedFunction()
+        val function = lastReachedComposable()
         if (function != null) {
           val key = irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function]!!
           irString(key.keyName)
         } else {
-          irString("<unknown>")
+          irString(SpecialNames.UNKNOWN_STRING)
         }
       }
       else -> super.visitCall(expression)
     }
   }
 
-  private fun lastReachedFunction(): IrSimpleFunction? =
+  private fun lastReachedComposable(): IrSimpleFunction? =
     allScopes
-      .fastLastOrNull { scope -> scope.irElement is IrSimpleFunction }
-      ?.irElement
-      ?.cast()
+      .fastLastOrNull { scope ->
+        val element = scope.irElement
+        if (element is IrFunction) element.hasComposableAnnotation() else false
+      }
+      ?.irElement?.safeAs<IrSimpleFunction>()
 }

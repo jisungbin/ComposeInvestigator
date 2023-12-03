@@ -10,7 +10,6 @@ package land.sungbin.composeinvestigator.runtime
 import androidx.compose.runtime.Immutable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
-import land.sungbin.composeinvestigator.runtime.affect.AffectedField.ValueParameter
 
 public val currentComposableInvalidationTracker: ComposableInvalidationTrackTable
   get() {
@@ -31,10 +30,9 @@ public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): Stri
 @Immutable
 public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi public constructor() {
   private val listeners: MutableMap<String, MutableSet<ComposableInvalidationListener>> = mutableMapOf()
-  private val affectFieldMap: MutableMap<String, Array<AffectedField>> = mutableMapOf()
+  private val affectFieldMap: MutableMap<String, List<AffectedField>> = mutableMapOf()
 
-  public val affectFields: Map<String, List<AffectedField>>
-    get() = affectFieldMap.mapValues { (_, value) -> value.asList() }
+  public val affectFields: Map<String, List<AffectedField>> get() = affectFieldMap
 
   public var currentComposableName: ComposableName
     get() {
@@ -67,13 +65,12 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
   }
 
   @ComposeInvestigatorCompilerApi
-  public fun computeInvalidationReason(keyName: String, vararg fields: AffectedField): InvalidationReason {
+  public fun computeInvalidationReason(keyName: String, fields: List<AffectedField>): InvalidationReason {
     val oldFields = affectFieldMap[keyName]
     val changed = ArrayList<ChangedFieldPair>(fields.size)
 
     if (oldFields == null) {
-      @Suppress("UNCHECKED_CAST")
-      affectFieldMap[keyName] = fields as Array<AffectedField>
+      affectFieldMap[keyName] = fields
       return InvalidationReason.Initial
     }
 
@@ -83,17 +80,16 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
       if (old.valueHashCode != new.valueHashCode) changed.add(old changedTo new)
     }
 
-    @Suppress("UNCHECKED_CAST")
-    affectFieldMap[keyName] = fields as Array<AffectedField>
+    affectFieldMap[keyName] = fields
 
     return if (changed.isEmpty()) {
-      val params = fields.filterIsInstance<ValueParameter>()
-      InvalidationReason.Unknown(params = params.map(ValueParameter::toSimpleParameter))
+      val params = fields.filterIsInstance<AffectedField.ValueParameter>()
+      InvalidationReason.Unknown(params = params.map(AffectedField.ValueParameter::toSimpleParameter))
     } else {
       InvalidationReason.FieldChanged(changed = changed)
     }
   }
 }
 
-private fun ValueParameter.toSimpleParameter(): SimpleParameter =
+private fun AffectedField.ValueParameter.toSimpleParameter(): SimpleParameter =
   SimpleParameter(name = name, stability = stability)

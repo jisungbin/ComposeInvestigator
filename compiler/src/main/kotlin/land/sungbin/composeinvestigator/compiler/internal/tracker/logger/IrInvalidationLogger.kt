@@ -14,6 +14,7 @@ import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATOR_C
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATOR_CONFIG_INVALIDATION_LOGGER_FQN
 import land.sungbin.composeinvestigator.compiler.internal.FUNCTION_2_FQN
 import land.sungbin.composeinvestigator.compiler.internal.FUNCTION_2_INVOKE_FQN
+import land.sungbin.composeinvestigator.compiler.internal.fromFqName
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.expressions.IrCall
@@ -48,27 +49,11 @@ public object IrInvalidationLogger {
     loggerContainerSymbol = context.referenceClass(ClassId.topLevel(COMPOSE_INVESTIGATOR_CONFIG_FQN))!!
     loggerGetterSymbol =
       context
-        .referenceProperties(
-          CallableId(
-            packageName = COMPOSE_INVESTIGATOR_CONFIG_INVALIDATION_LOGGER_FQN.parent(),
-            callableName = COMPOSE_INVESTIGATOR_CONFIG_INVALIDATION_LOGGER_FQN.shortName(),
-          ),
-        )
-        .single()
-        .owner
-        .getter!!
-        .symbol
+        .referenceProperties(CallableId.fromFqName(COMPOSE_INVESTIGATOR_CONFIG_INVALIDATION_LOGGER_FQN)).single()
+        .owner.getter!!.symbol
 
     function2Symbol = context.referenceClass(ClassId.topLevel(FUNCTION_2_FQN))!!
-    function2InvokeSymbol =
-      context
-        .referenceFunctions(
-          CallableId(
-            packageName = FUNCTION_2_INVOKE_FQN.parent(),
-            callableName = FUNCTION_2_INVOKE_FQN.shortName(),
-          )
-        )
-        .single()
+    function2InvokeSymbol = context.referenceFunctions(CallableId.fromFqName(FUNCTION_2_INVOKE_FQN)).single()
 
     invalidationTypeSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TYPE_FQN))!!
     invalidationTypeProcessedSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TYPE_PROCESSED_FQN))!!

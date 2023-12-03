@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-// Since this is code copied from the Compose Compiler (AOSP), we use an extra e in the copy to distinguish it.
+// Since this is code copied from the Compose Compiler (AOSP), we use an extra "e" in the copy to distinguish it.
 
 package land.sungbin.composeinvestigator.compiler.internal.tracker.key
 

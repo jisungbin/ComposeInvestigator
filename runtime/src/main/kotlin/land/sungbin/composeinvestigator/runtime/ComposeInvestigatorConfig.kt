@@ -15,6 +15,6 @@ public object ComposeInvestigatorConfig {
 
   public var invalidationLogger: ComposableInvalidationLogger =
     ComposableInvalidationLogger { composable, type ->
-      Log.d(LOGGER_DEFAULT_TAG, "The '${composable.name}' composable has been invalidated.\n\n$type")
+      Log.d(LOGGER_DEFAULT_TAG, "The '${composable.name}' composable has been invalidated.\n$type")
     }
 }

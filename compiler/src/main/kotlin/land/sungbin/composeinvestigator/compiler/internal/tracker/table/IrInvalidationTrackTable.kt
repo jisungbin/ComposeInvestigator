@@ -10,6 +10,7 @@ package land.sungbin.composeinvestigator.compiler.internal.tracker.table
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_CALL_LISTENERS_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_COMPUTE_INVALIDATION_REASON_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN
+import land.sungbin.composeinvestigator.compiler.internal.fromFqName
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
@@ -26,7 +27,7 @@ import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
-import org.jetbrains.kotlin.ir.expressions.IrVararg
+import org.jetbrains.kotlin.ir.expressions.IrValueAccessExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
@@ -62,7 +63,7 @@ public class IrInvalidationTrackTable private constructor(public val prop: IrPro
 
   public fun irComputeInvalidationReason(
     composableKeyName: IrConst<String>,
-    fields: IrVararg,
+    fields: IrValueAccessExpression,
   ): IrCall = IrCallImpl.fromSymbolOwner(
     startOffset = UNDEFINED_OFFSET,
     endOffset = UNDEFINED_OFFSET,
@@ -80,21 +81,11 @@ public class IrInvalidationTrackTable private constructor(public val prop: IrPro
         .also { clz ->
           clz.computeInvalidationReasonSymbol =
             context
-              .referenceFunctions(
-                CallableId(
-                  packageName = COMPOSABLE_INVALIDATION_TRACK_TABLE_COMPUTE_INVALIDATION_REASON_FQN.parent(),
-                  callableName = COMPOSABLE_INVALIDATION_TRACK_TABLE_COMPUTE_INVALIDATION_REASON_FQN.shortName(),
-                ),
-              )
+              .referenceFunctions(CallableId.fromFqName(COMPOSABLE_INVALIDATION_TRACK_TABLE_COMPUTE_INVALIDATION_REASON_FQN))
               .single()
           clz.callListenersSymbol =
             context
-              .referenceFunctions(
-                CallableId(
-                  packageName = COMPOSABLE_INVALIDATION_TRACK_TABLE_CALL_LISTENERS_FQN.parent(),
-                  callableName = COMPOSABLE_INVALIDATION_TRACK_TABLE_CALL_LISTENERS_FQN.shortName(),
-                ),
-              )
+              .referenceFunctions(CallableId.fromFqName(COMPOSABLE_INVALIDATION_TRACK_TABLE_CALL_LISTENERS_FQN))
               .single()
         }
   }
