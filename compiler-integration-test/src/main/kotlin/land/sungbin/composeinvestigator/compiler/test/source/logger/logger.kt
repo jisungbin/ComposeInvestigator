@@ -20,6 +20,6 @@ fun clearInvalidationLog() {
 fun findInvalidationLog(composableName: String): List<ComposableInvalidationType> =
   invalidationLog.filterKeys { composable -> composable.name == composableName }.values.flatten()
 
-val invalidationLogger: ComposableInvalidationLogger = ComposableInvalidationLogger { composable, type ->
+val invalidationLogger = ComposableInvalidationLogger { composable, type ->
   invalidationLog.getOrPut(composable, ::mutableListOf).add(type)
 }

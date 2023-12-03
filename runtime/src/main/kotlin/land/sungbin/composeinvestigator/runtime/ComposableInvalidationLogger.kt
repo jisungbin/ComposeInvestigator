@@ -86,7 +86,7 @@ public sealed interface InvalidationReason {
   public data class Unknown(public val params: List<SimpleParameter> = emptyList()) : InvalidationReason {
     override fun toString(): String = "Didn't find any fields that are changed from before. " +
       "Please refer to the project README for more information on why this happens." +
-      if (params.isNotEmpty()) "\n\ngiven parameters: ${params.joinToString()}" else ""
+      if (params.isNotEmpty()) "\ngiven parameters: ${params.joinToString()}" else ""
   }
 }
 
