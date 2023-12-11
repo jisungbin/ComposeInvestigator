@@ -7,13 +7,14 @@
 
 package land.sungbin.composeinvestigator.runtime
 
+import androidx.compose.runtime.Immutable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
 
-@JvmInline
-public value class ComposableInvalidationLogger(
-  private val logger: (composable: AffectedComposable, type: ComposableInvalidationType) -> Unit,
-) : Function2<AffectedComposable, ComposableInvalidationType, Unit> by logger
+@Immutable
+public fun interface ComposableInvalidationLogger : Function2<AffectedComposable, ComposableInvalidationType, Unit> {
+  override fun invoke(composable: AffectedComposable, type: ComposableInvalidationType)
+}
 
 public data class SimpleParameter(
   public val name: String,
