@@ -1,6 +1,6 @@
 [versions]
 gradle-android = "8.2.0"
-gradle-publish-maven = "0.25.3"
+gradle-publish-maven = "0.26.0"
 
 jetbrains-annotation = "24.1.0"
 
