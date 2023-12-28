@@ -15,7 +15,7 @@ androidx-activity = "1.8.2"
 
 compose-compiler = "1.5.4"
 compose-runtime = "1.5.4"
-compose-activity = "1.8.1"
+compose-activity = "1.8.2"
 
 autoservice-annotation = "1.1.1"
 autoservice-ksp = "1.1.0"
