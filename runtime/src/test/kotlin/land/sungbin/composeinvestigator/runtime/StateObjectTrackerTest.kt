@@ -205,20 +205,24 @@ class StateObjectTrackerTest : ShouldSpec() {
           }
         }
 
-        log shouldContainExactlyInAnyOrder listOf(
-          STATE(name = "stringState", previousValue = "string", newValue = "string string"),
-          STATE(name = "intState", previousValue = 0, newValue = 1),
-          STATE(name = "floatState", previousValue = 0f, newValue = 1f),
-        )
+        withClue("Targeted for state tracking when in Remembered state") {
+          log shouldContainExactlyInAnyOrder listOf(
+            STATE(name = "stringState", previousValue = "string", newValue = "string string"),
+            STATE(name = "intState", previousValue = 0, newValue = 1),
+            STATE(name = "floatState", previousValue = 0f, newValue = 1f),
+          )
+        }
 
         mount = false
         expectChanges()
 
-        log shouldContainExactlyInAnyOrder listOf(
-          STATE(name = "stringState", previousValue = "string", newValue = "string string"),
-          STATE(name = "intState", previousValue = 0, newValue = 1),
-          STATE(name = "floatState", previousValue = 0f, newValue = 1f),
-        )
+        withClue("When Forgotten, all registered states tracking targets in that group are cleared.") {
+          log shouldContainExactlyInAnyOrder listOf(
+            STATE(name = "stringState", previousValue = "string", newValue = "string string"),
+            STATE(name = "intState", previousValue = 0, newValue = 1),
+            STATE(name = "floatState", previousValue = 0f, newValue = 1f),
+          )
+        }
       }
     }
   }
