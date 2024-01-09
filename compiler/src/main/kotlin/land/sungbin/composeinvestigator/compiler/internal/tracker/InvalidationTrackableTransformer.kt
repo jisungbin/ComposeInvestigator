@@ -9,6 +9,7 @@ package land.sungbin.composeinvestigator.compiler.internal.tracker
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.normalize
+import androidx.compose.compiler.plugins.kotlin.irTrace
 import land.sungbin.composeinvestigator.compiler.internal.MUTABLE_LIST_ADD_FQN
 import land.sungbin.composeinvestigator.compiler.internal.MUTABLE_LIST_OF_FQN
 import land.sungbin.composeinvestigator.compiler.internal.OBTAIN_STATE_PROPERTY_AND_ADD_FQN
@@ -20,8 +21,7 @@ import land.sungbin.composeinvestigator.compiler.internal.origin.InvalidationTra
 import land.sungbin.composeinvestigator.compiler.internal.stability.toIrDeclarationStability
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedComposable
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedField
-import land.sungbin.composeinvestigator.compiler.internal.tracker.key.DurableWritableSlices
-import land.sungbin.composeinvestigator.compiler.internal.tracker.key.irTracee
+import land.sungbin.composeinvestigator.compiler.internal.tracker.key.TrackerWritableSlices
 import land.sungbin.composeinvestigator.compiler.internal.tracker.logger.IrInvalidationLogger
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -72,7 +72,7 @@ internal class InvalidationTrackableTransformer(
     val newFirstStatements = mutableListOf<IrStatement>()
     val newLastStatements = mutableListOf<IrStatement>()
 
-    val currentKey = irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function]!!
+    val currentKey = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function]!!
     val currentUserProvideName = currentKey.userProvideName
 
     val currentFunctionName = getCurrentFunctionNameIntercepttedAnonymous(currentUserProvideName)
@@ -167,7 +167,7 @@ internal class InvalidationTrackableTransformer(
   }
 
   override fun visitSkipToGroupEndCall(function: IrSimpleFunction, call: IrCall): IrBlock {
-    val currentKey = irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function]!!
+    val currentKey = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function]!!
     val currentUserProvideName = currentKey.userProvideName
 
     val currentFunctionName = getCurrentFunctionNameIntercepttedAnonymous(currentUserProvideName)

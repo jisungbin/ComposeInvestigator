@@ -7,21 +7,27 @@
 
 package land.sungbin.composeinvestigator.compiler.internal.tracker.key
 
+import androidx.compose.compiler.plugins.kotlin.EmptyModuleMetrics
+import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
+import androidx.compose.compiler.plugins.kotlin.irTrace
+import androidx.compose.compiler.plugins.kotlin.lower.ComposableSymbolRemapper
+import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyTransformer
+import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyVisitor
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 
-public class KeyInfo(public val keyName: String, public val userProvideName: String?) {
-  public fun copy(
-    keyName: String = this.keyName,
-    userProvideName: String? = this.userProvideName,
-  ): KeyInfo = KeyInfo(keyName = keyName, userProvideName = userProvideName)
-}
-
-internal class DurableFunctionKeyTransformer(private val context: IrPluginContext) :
-  DurableKeyTransformer(DurableKeyVisitor()) {
-
+internal class TrackerFunctionKeyVisitor(
+  context: IrPluginContext,
+  stabilityInferencer: StabilityInferencer,
+) : DurableKeyTransformer(
+  keyVisitor = DurableKeyVisitor(),
+  context = context,
+  symbolRemapper = ComposableSymbolRemapper(),
+  stabilityInferencer = stabilityInferencer,
+  metrics = EmptyModuleMetrics,
+), IrPluginContext by context {
   private var currentKeys = mutableListOf<KeyInfo>()
 
   override fun visitFile(declaration: IrFile): IrFile {
@@ -43,7 +49,7 @@ internal class DurableFunctionKeyTransformer(private val context: IrPluginContex
     val (keyName) = buildKey("fun-$signature")
     val keyInfo = KeyInfo(keyName = keyName, userProvideName = null)
     currentKeys += keyInfo
-    context.irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, declaration] = keyInfo
+    irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, declaration] = keyInfo
     return super.visitSimpleFunction(declaration)
   }
 }

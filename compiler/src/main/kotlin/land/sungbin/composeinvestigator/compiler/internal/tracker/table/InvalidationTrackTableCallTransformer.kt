@@ -8,6 +8,7 @@
 package land.sungbin.composeinvestigator.compiler.internal.tracker.table
 
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
+import androidx.compose.compiler.plugins.kotlin.irTrace
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_KEY_NAME_FQN_GETTER_INTRINSIC
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_NAME_FQN_GETTER_INTRINSIC
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_CURRENT_COMPOSABLE_NAME_FQN_SETTER_INTRINSIC
@@ -17,8 +18,8 @@ import land.sungbin.composeinvestigator.compiler.internal.CURRENT_COMPOSABLE_INV
 import land.sungbin.composeinvestigator.compiler.internal.UNKNOWN_STRING
 import land.sungbin.composeinvestigator.compiler.internal.irBoolean
 import land.sungbin.composeinvestigator.compiler.internal.irString
-import land.sungbin.composeinvestigator.compiler.internal.tracker.key.DurableWritableSlices
-import land.sungbin.composeinvestigator.compiler.internal.tracker.key.irTracee
+import land.sungbin.composeinvestigator.compiler.internal.tracker.key.TrackerWritableSlices
+import land.sungbin.composeinvestigator.compiler.internal.tracker.key.set
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
 import land.sungbin.fastlist.fastLastOrNull
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
@@ -70,7 +71,7 @@ internal class InvalidationTrackTableCallTransformer(
         callParentFqName == COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN -> {
         val name = when (val function = lastReachedComposable()) {
           null -> SpecialNames.UNKNOWN_STRING
-          else -> irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function]?.userProvideName ?: function.name.asString()
+          else -> irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function]?.userProvideName ?: function.name.asString()
         }
 
         IrConstructorCallImpl.fromSymbolOwner(
@@ -91,10 +92,10 @@ internal class InvalidationTrackTableCallTransformer(
               .getValueArgument(0).cast<IrConstructorCall>()
               .getValueArgument(0).safeAs<IrConst<String>>()?.value
               ?: error("Currently, only string hardcodes are supported as arguments to ComposableName. (${expression.dumpKotlinLike()})")
-          val prevKey = irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function]!!
+          val prevKey = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function]!!
           val newKey = prevKey.copy(userProvideName = userProvideName)
 
-          irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function] = newKey
+          irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function] = newKey
           result = true
         }
 
@@ -104,7 +105,7 @@ internal class InvalidationTrackTableCallTransformer(
         callParentFqName == COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN -> {
         val function = lastReachedComposable()
         if (function != null) {
-          val key = irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function]!!
+          val key = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function]!!
           irString(key.keyName)
         } else {
           irString(SpecialNames.UNKNOWN_STRING)

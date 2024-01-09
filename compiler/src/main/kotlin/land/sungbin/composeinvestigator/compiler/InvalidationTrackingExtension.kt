@@ -11,7 +11,7 @@ import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import land.sungbin.composeinvestigator.compiler.internal.tracker.InvalidationTrackableTransformer
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedComposable
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedField
-import land.sungbin.composeinvestigator.compiler.internal.tracker.key.DurableFunctionKeyTransformer
+import land.sungbin.composeinvestigator.compiler.internal.tracker.key.TrackerFunctionKeyVisitor
 import land.sungbin.composeinvestigator.compiler.internal.tracker.logger.IrInvalidationLogger
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
@@ -25,16 +25,23 @@ internal class InvalidationTrackingExtension(private val logger: VerboseLogger) 
     IrAffectedField.init(pluginContext)
     IrAffectedComposable.init(pluginContext)
 
-    moduleFragment.transformChildrenVoid(DurableFunctionKeyTransformer(pluginContext))
+    val stabilityInferencer = StabilityInferencer(
+      currentModule = moduleFragment.descriptor,
+      // TODO: support this field
+      externalStableTypeMatchers = emptySet(),
+    )
+
+    moduleFragment.transformChildrenVoid(
+      TrackerFunctionKeyVisitor(
+        context = pluginContext,
+        stabilityInferencer = stabilityInferencer,
+      ),
+    )
     moduleFragment.transformChildrenVoid(
       InvalidationTrackableTransformer(
         context = pluginContext,
         logger = logger,
-        stabilityInferencer = StabilityInferencer(
-          currentModule = moduleFragment.descriptor,
-          // TODO: support this field
-          externalStableTypeMatchers = emptySet(),
-        ),
+        stabilityInferencer = stabilityInferencer,
       ),
     )
   }
