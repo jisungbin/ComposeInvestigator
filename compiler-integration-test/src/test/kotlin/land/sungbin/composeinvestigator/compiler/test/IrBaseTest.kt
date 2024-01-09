@@ -58,8 +58,8 @@ fun IrBaseTest.buildIrVisiterRegistrar(builder: (context: IrPluginContext) -> Ir
 
 fun IrBaseTest.kotlinCompilation(
   workingDir: File,
-  enableComposeCompiler: Boolean = true,
-  enableVerboseLogging: Boolean = true,
+  composeCompiling: Boolean = true,
+  verboseLogging: Boolean = true,
   @Suppress("DEPRECATION") additionalVisitor: ComponentRegistrar? = null,
   vararg sourceFiles: SourceFile,
 ): JvmCompilationResult = KotlinCompilation().apply {
@@ -72,15 +72,15 @@ fun IrBaseTest.kotlinCompilation(
     PluginOption(
       pluginId = ComposeInvestigatorCommandLineProcessor.PLUGIN_ID,
       optionName = ComposeInvestigatorCommandLineProcessor.OPTION_VERBOSE.optionName,
-      optionValue = if (System.getenv("CI") == "true") "false" else enableVerboseLogging.toString(),
+      optionValue = if (System.getenv("CI") == "true") "false" else verboseLogging.toString(),
     ),
   )
   @Suppress("DEPRECATION")
   componentRegistrars = mutableListOf<ComponentRegistrar>(ComposeInvestigatorPluginRegistrar()).also { registrars ->
-    if (enableComposeCompiler) registrars.add(0, ComposePluginRegistrar())
+    if (composeCompiling) registrars.add(0, ComposePluginRegistrar())
     if (additionalVisitor != null) registrars.add(additionalVisitor)
   }
   commandLineProcessors = mutableListOf<CommandLineProcessor>(ComposeInvestigatorCommandLineProcessor()).also { processors ->
-    if (enableComposeCompiler) processors.add(0, ComposeCommandLineProcessor())
+    if (composeCompiling) processors.add(0, ComposeCommandLineProcessor())
   }
 }.compile()

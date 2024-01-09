@@ -46,8 +46,8 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
 
       kotlinCompilation(
         workingDir = tempdir(),
-        enableComposeCompiler = false,
-        enableVerboseLogging = false,
+        composeCompiling = false,
+        verboseLogging = false,
         additionalVisitor = irVisitor,
         sourceFiles = arrayOf(source("hello.kt")),
       )
@@ -76,8 +76,8 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
 
       kotlinCompilation(
         workingDir = tempdir(),
-        enableComposeCompiler = false,
-        enableVerboseLogging = false,
+        composeCompiling = false,
+        verboseLogging = false,
         additionalVisitor = irVisitor,
         sourceFiles = arrayOf(source("hello.kt")),
       )
@@ -102,8 +102,8 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
 
       kotlinCompilation(
         workingDir = tempdir(),
-        enableComposeCompiler = false,
-        enableVerboseLogging = false,
+        composeCompiling = false,
+        verboseLogging = false,
         additionalVisitor = irVisitor,
         sourceFiles = arrayOf(source("hello.kt")),
       )
@@ -128,8 +128,8 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
 
       kotlinCompilation(
         workingDir = tempdir(),
-        enableComposeCompiler = false,
-        enableVerboseLogging = false,
+        composeCompiling = false,
+        verboseLogging = false,
         additionalVisitor = irVisitor,
         sourceFiles = arrayOf(source("hello.kt")),
       )
@@ -168,8 +168,8 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
 
       kotlinCompilation(
         workingDir = tempdir(),
-        enableComposeCompiler = false,
-        enableVerboseLogging = false,
+        composeCompiling = false,
+        verboseLogging = false,
         additionalVisitor = irVisitor,
         sourceFiles = arrayOf(source("hello.kt")),
       )
