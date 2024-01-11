@@ -12,6 +12,9 @@ import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
 
 public val currentComposableInvalidationTracker: ComposableInvalidationTrackTable
+  // TODO: Should we make this a Composable function?
+  // @Composable
+  // @ExplicitGroupsComposable
   get() {
     throw NotImplementedError("Implemented as an intrinsic")
   }
@@ -27,6 +30,7 @@ public annotation class ComposableName(public val name: String)
 
 public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): String = name
 
+@ExperimentalComposeInvestigatorApi
 @Immutable
 public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi public constructor() {
   private val listeners: MutableMap<String, MutableSet<ComposableInvalidationListener>> = mutableMapOf()

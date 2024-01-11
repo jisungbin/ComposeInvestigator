@@ -48,10 +48,9 @@ kotlin {
   compilerOptions {
     optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
     optIn.add("org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction")
-    freeCompilerArgs.addAll(
-      "-P",
-      "plugin:land.sungbin.composeinvestigator.compiler:verbose=true",
-    )
+    optIn.add("land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi")
+    optIn.add("land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi")
+    freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=true")
   }
 }
 

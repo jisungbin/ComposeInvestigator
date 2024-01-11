@@ -41,7 +41,9 @@ android {
 kotlin {
   explicitApi()
   compilerOptions {
+    optIn.add("androidx.compose.runtime.InternalComposeApi")
     optIn.add("land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi")
+    optIn.add("land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi")
   }
 }
 

@@ -13,3 +13,10 @@ package land.sungbin.composeinvestigator.runtime
 )
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
 public annotation class ComposeInvestigatorCompilerApi
+
+@RequiresOptIn(
+  "This is an experimental API for ComposeInvestigator and is likely to change" +
+    "before becoming stable.",
+)
+@Target(AnnotationTarget.CLASS)
+public annotation class ExperimentalComposeInvestigatorApi
