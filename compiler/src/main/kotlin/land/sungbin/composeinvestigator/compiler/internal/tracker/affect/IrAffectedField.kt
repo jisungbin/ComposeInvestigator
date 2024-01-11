@@ -37,32 +37,26 @@ public object IrAffectedField {
     valueString: IrExpression,
     valueHashCode: IrExpression,
     stability: IrExpression,
-  ): IrConstructorCall {
-    val valueParameterSymbol = valueParameterSymbol!!
-    return IrConstructorCallImpl.fromSymbolOwner(
-      type = valueParameterSymbol.defaultType,
-      constructorSymbol = valueParameterSymbol.constructors.single(),
-    ).apply {
-      putValueArgument(0, name)
-      putValueArgument(1, valueString)
-      putValueArgument(2, valueHashCode)
-      putValueArgument(3, stability)
-    }
+  ): IrConstructorCall = IrConstructorCallImpl.fromSymbolOwner(
+    type = valueParameterSymbol!!.defaultType,
+    constructorSymbol = valueParameterSymbol!!.constructors.single(),
+  ).apply {
+    putValueArgument(0, name)
+    putValueArgument(1, valueString)
+    putValueArgument(2, valueHashCode)
+    putValueArgument(3, stability)
   }
 
   public fun irStateProperty(
     name: IrExpression,
     valueString: IrExpression,
     valueHashCode: IrExpression,
-  ): IrConstructorCall {
-    val statePropertySymbol = statePropertySymbol!!
-    return IrConstructorCallImpl.fromSymbolOwner(
-      type = statePropertySymbol.defaultType,
-      constructorSymbol = statePropertySymbol.constructors.single(),
-    ).apply {
-      putValueArgument(0, name)
-      putValueArgument(1, valueString)
-      putValueArgument(2, valueHashCode)
-    }
+  ): IrConstructorCall = IrConstructorCallImpl.fromSymbolOwner(
+    type = statePropertySymbol!!.defaultType,
+    constructorSymbol = statePropertySymbol!!.constructors.single(),
+  ).apply {
+    putValueArgument(0, name)
+    putValueArgument(1, valueString)
+    putValueArgument(2, valueHashCode)
   }
 }

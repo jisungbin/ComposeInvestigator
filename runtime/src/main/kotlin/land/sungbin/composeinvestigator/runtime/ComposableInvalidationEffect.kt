@@ -8,19 +8,19 @@
 package land.sungbin.composeinvestigator.runtime
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.InternalComposeApi
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.cancellation.CancellationException
 
-@OptIn(InternalComposeApi::class)
+private val DEFAULT_KEY = arrayOf(Unit)
+
 @Composable
 @NonRestartableComposable
 public fun ComposableInvalidationEffect(
@@ -30,7 +30,7 @@ public fun ComposableInvalidationEffect(
   block: suspend CoroutineScope.() -> ComposableInvalidationListener,
 ) {
   val applyContext = currentComposer.applyCoroutineContext
-  val finalKeys = keys.ifEmpty { arrayOf(Unit) }
+  val finalKeys = keys.ifEmpty { DEFAULT_KEY }
 
   remember(keys = finalKeys) {
     InvalidationEffectScope(

@@ -99,6 +99,7 @@ public fun IrInvalidationTrackTable.propGetter(): IrCall =
   )
 
 private var invalidationTrackTableClassSymbol: IrClassSymbol? = null
+
 private fun irInvalidationTrackTableProp(context: IrPluginContext, currentFile: IrFile): IrProperty {
   val fileName = currentFile.fileEntry.name.split('/').last()
   val shortName = PackagePartClassUtils.getFilePartShortName(fileName)

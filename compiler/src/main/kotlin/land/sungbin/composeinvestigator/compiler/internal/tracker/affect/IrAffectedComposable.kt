@@ -9,7 +9,6 @@ package land.sungbin.composeinvestigator.compiler.internal.tracker.affect
 
 import land.sungbin.composeinvestigator.compiler.internal.AFFECTED_COMPOSABLE_FQN
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
@@ -33,17 +32,14 @@ public object IrAffectedComposable {
     filePath: IrExpression,
     startLine: IrExpression,
     startColumn: IrExpression,
-  ): IrConstructorCall {
-    val affectedComposableSymbol = affectedComposableSymbol!!
-    return IrConstructorCallImpl.fromSymbolOwner(
-      type = affectedComposableSymbol.defaultType,
-      constructorSymbol = affectedComposableSymbol.constructors.single(),
-    ).apply {
-      putValueArgument(0, composableName)
-      putValueArgument(1, packageName)
-      putValueArgument(2, filePath)
-      putValueArgument(3, startLine)
-      putValueArgument(4, startColumn)
-    }
+  ): IrConstructorCallImpl = IrConstructorCallImpl.fromSymbolOwner(
+    type = affectedComposableSymbol!!.defaultType,
+    constructorSymbol = affectedComposableSymbol!!.constructors.single(),
+  ).apply {
+    putValueArgument(0, composableName)
+    putValueArgument(1, packageName)
+    putValueArgument(2, filePath)
+    putValueArgument(3, startLine)
+    putValueArgument(4, startColumn)
   }
 }

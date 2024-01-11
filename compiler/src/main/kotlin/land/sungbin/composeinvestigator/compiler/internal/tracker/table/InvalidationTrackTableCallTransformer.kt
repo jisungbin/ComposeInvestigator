@@ -92,8 +92,8 @@ internal class InvalidationTrackTableCallTransformer(
               .getValueArgument(0).cast<IrConstructorCall>()
               .getValueArgument(0).safeAs<IrConst<String>>()?.value
               ?: error("Currently, only string hardcodes are supported as arguments to ComposableName. (${expression.dumpKotlinLike()})")
-          val prevKey = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function]!!
-          val newKey = prevKey.copy(userProvideName = userProvideName)
+          val previousKey = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function]!!
+          val newKey = previousKey.copy(userProvideName = userProvideName)
 
           irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function] = newKey
           result = true

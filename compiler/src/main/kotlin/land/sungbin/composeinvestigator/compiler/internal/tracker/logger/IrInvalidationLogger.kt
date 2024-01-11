@@ -12,8 +12,6 @@ import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATIO
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TYPE_SKIPPED_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATOR_CONFIG_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSE_INVESTIGATOR_CONFIG_INVALIDATION_LOGGER_FQN
-import land.sungbin.composeinvestigator.compiler.internal.FUNCTION_2_FQN
-import land.sungbin.composeinvestigator.compiler.internal.FUNCTION_2_INVOKE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.fromFqName
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -52,9 +50,6 @@ public object IrInvalidationLogger {
         .referenceProperties(CallableId.fromFqName(COMPOSE_INVESTIGATOR_CONFIG_INVALIDATION_LOGGER_FQN)).single()
         .owner.getter!!.symbol
 
-    function2Symbol = context.referenceClass(ClassId.topLevel(FUNCTION_2_FQN))!!
-    function2InvokeSymbol = context.referenceFunctions(CallableId.fromFqName(FUNCTION_2_INVOKE_FQN)).single()
-
     invalidationTypeSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TYPE_FQN))!!
     invalidationTypeProcessedSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TYPE_PROCESSED_FQN))!!
     invalidationTypeSkippedSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TYPE_SKIPPED_FQN))!!
@@ -87,23 +82,19 @@ public object IrInvalidationLogger {
     putValueArgument(1, invalidationType)
   }
 
-  public fun irInvalidationTypeProcessed(reason: IrExpression): IrConstructorCall {
-    val invalidateTypeProcessedSymbol = invalidationTypeProcessedSymbol!!
-    return IrConstructorCallImpl.fromSymbolOwner(
-      type = invalidateTypeProcessedSymbol.defaultType,
-      constructorSymbol = invalidateTypeProcessedSymbol.constructors.single(),
+  public fun irInvalidationTypeProcessed(reason: IrExpression): IrConstructorCall =
+    IrConstructorCallImpl.fromSymbolOwner(
+      type = invalidationTypeProcessedSymbol!!.defaultType,
+      constructorSymbol = invalidationTypeProcessedSymbol!!.constructors.single(),
     ).apply {
       putValueArgument(0, reason)
     }
-  }
 
-  public fun irInvalidationTypeSkipped(): IrGetObjectValue {
-    val invalidateTypeSkippedSymbol = invalidationTypeSkippedSymbol!!
-    return IrGetObjectValueImpl(
+  public fun irInvalidationTypeSkipped(): IrGetObjectValue =
+    IrGetObjectValueImpl(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,
-      type = invalidateTypeSkippedSymbol.defaultType,
-      symbol = invalidateTypeSkippedSymbol,
+      type = invalidationTypeSkippedSymbol!!.defaultType,
+      symbol = invalidationTypeSkippedSymbol!!,
     )
-  }
 }
