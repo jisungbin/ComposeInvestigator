@@ -7,14 +7,11 @@
 
 package land.sungbin.composeinvestigator.compiler.internal.tracker
 
-import androidx.compose.compiler.plugins.kotlin.KtxNameConventions.IS_TRACE_IN_PROGRESS
-import androidx.compose.compiler.plugins.kotlin.KtxNameConventions.TRACE_EVENT_END
-import androidx.compose.compiler.plugins.kotlin.KtxNameConventions.TRACE_EVENT_START
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSER_FQN
-import land.sungbin.composeinvestigator.compiler.internal.COMPOSER_KT_FQN
 import land.sungbin.composeinvestigator.compiler.internal.HASH_CODE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.SKIP_TO_GROUP_END
+import land.sungbin.composeinvestigator.compiler.internal.STATE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.UNKNOWN_STRING
 import land.sungbin.composeinvestigator.compiler.internal.fromFqName
 import land.sungbin.composeinvestigator.compiler.internal.origin.InvalidationTrackerOrigin
@@ -25,36 +22,49 @@ import land.sungbin.fastlist.fastLastOrNull
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.wasm.ir2wasm.getSourceLocation
+import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.declarations.IrClass
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrFunction
+import org.jetbrains.kotlin.ir.declarations.IrLocalDelegatedProperty
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrSymbolOwner
 import org.jetbrains.kotlin.ir.declarations.IrValueDeclaration
+import org.jetbrains.kotlin.ir.declarations.IrValueParameter
 import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.IrBlock
+import org.jetbrains.kotlin.ir.expressions.IrBlockBody
+import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
-import org.jetbrains.kotlin.ir.expressions.IrWhen
+import org.jetbrains.kotlin.ir.expressions.IrReturn
+import org.jetbrains.kotlin.ir.expressions.IrStatementContainer
+import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
-import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
+import org.jetbrains.kotlin.ir.types.IrType
+import org.jetbrains.kotlin.ir.types.classOrFail
+import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isNullableAny
+import org.jetbrains.kotlin.ir.types.isSubtypeOfClass
+import org.jetbrains.kotlin.ir.types.isUnit
+import org.jetbrains.kotlin.ir.types.makeNullable
+import org.jetbrains.kotlin.ir.types.starProjectedType
 import org.jetbrains.kotlin.ir.util.hasAnnotation
-import org.jetbrains.kotlin.ir.util.isTopLevel
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.ir.util.setDeclarationsParent
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
-import org.jetbrains.kotlin.load.kotlin.FacadeClassSource
 import org.jetbrains.kotlin.name.CallableId
-import org.jetbrains.kotlin.name.FqName
+import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.utils.addToStdlib.cast
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.kotlin.wasm.ir.source.location.SourceLocation
 
 internal abstract class AbstractInvalidationTrackingLower(
@@ -63,7 +73,9 @@ internal abstract class AbstractInvalidationTrackingLower(
 ) : IrElementTransformerVoidWithContext() {
   private class IrSymbolOwnerWithData<D>(private val owner: IrSymbolOwner, val data: D) : IrSymbolOwner by owner
 
-  private val hashCodeSymbol: IrSimpleFunctionSymbol =
+  private val stateSymbol = context.referenceClass(ClassId.topLevel(STATE_FQN))!!
+  private val composerSymbol = context.referenceClass(ClassId.topLevel(COMPOSER_FQN))!!
+  private val hashCodeSymbol =
     context
       .referenceFunctions(CallableId.fromFqName(HASH_CODE_FQN))
       .single { symbol ->
@@ -104,7 +116,7 @@ internal abstract class AbstractInvalidationTrackingLower(
         }
         ?.irElement?.cast<IrSymbolOwnerWithData<IrInvalidationTrackTable>>()?.data
 
-  override fun visitFileNew(declaration: IrFile): IrFile {
+  final override fun visitFileNew(declaration: IrFile): IrFile {
     val trackTable = IrInvalidationTrackTable.create(context, declaration)
     declaration.declarations.add(0, trackTable.prop.also { prop -> prop.setDeclarationsParent(declaration) })
     declaration.transformChildrenVoid(InvalidationTrackTableCallTransformer(context = context, table = trackTable, logger = logger))
@@ -113,39 +125,72 @@ internal abstract class AbstractInvalidationTrackingLower(
     }
   }
 
-  override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
-    if (!declaration.hasAnnotation(COMPOSABLE_FQN)) return super.visitSimpleFunction(declaration)
-    withinScope(declaration) { declaration.body?.transformChildrenVoid() }
-    return super.visitSimpleFunction(declaration)
+  // State properties visitor
+  final override fun visitBlock(expression: IrBlock): IrExpression {
+    fun IrType.isState() = classOrNull?.isSubtypeOfClass(stateSymbol.starProjectedType.classOrFail) ?: false
+
+    expression.transformChildrenVoid(
+      object : IrElementTransformerVoidWithContext() {
+        // val state = remember { mutableStateOf(T) }
+        override fun visitVariable(declaration: IrVariable): IrStatement {
+          if (declaration.origin == IrDeclarationOrigin.PROPERTY_DELEGATE) return super.visitVariable(declaration)
+          if (declaration.type.isState()) visitStateProperty(declaration)
+          return super.visitVariable(declaration)
+        }
+
+        // var state by remember { mutableStateOf(T) }
+        override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty): IrStatement {
+          if (declaration.delegate.type.isState()) visitStateProperty(declaration.delegate)
+          return super.visitLocalDelegatedProperty(declaration)
+        }
+      },
+    )
+
+    return super.visitBlock(expression)
   }
 
-  // <BLOCK> {
-  //   <WHEN> when { <CALL> isTraceInProgress() -> <CALL> traceEventStart() }
-  //   composable()
-  //   <WHEN> when { <CALL> isTraceInProgress() -> <CALL> traceEventEnd() }
-  // }
-  final override fun visitBlock(expression: IrBlock): IrExpression {
-    // skip if it is already transformed
-    if (expression.origin == InvalidationTrackerOrigin) return super.visitBlock(expression)
+  // tmp0_safe_receiver.updateScope(block = local fun <anonymous>($composer: Composer?, $force: Int) {
+  //   <ENTER HERE>
+  //   return Composable($composer = $composer, $changed = updateChangedFlags(flags = $changed.or(other = 1)))
+  // })
+  final override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
+    fun List<IrValueParameter>.isUpdateScopeLambdaParameters(): Boolean {
+      if (size != 2) return false
+      val (composer, force) = this
+      if (composer.type != composerSymbol.defaultType.makeNullable()) return false
+      if (!force.type.isInt()) return false
+      return true
+    }
 
-    // composable ir block is always has more than 3 statements
-    if (expression.statements.size < 3) return super.visitBlock(expression)
+    if (
+      declaration.origin == IrDeclarationOrigin.LOCAL_FUNCTION_FOR_LAMBDA &&
+      declaration.name == SpecialNames.ANONYMOUS &&
+      declaration.visibility == DescriptorVisibilities.LOCAL &&
+      declaration.returnType.isUnit() &&
+      declaration.valueParameters.isUpdateScopeLambdaParameters()
+    ) {
+      declaration.body!!.transformChildrenVoid(
+        object : IrElementTransformerVoidWithContext() {
+          override fun visitBlockBody(body: IrBlockBody): IrBody {
+            val returnCall = body.statements.singleOrNull()?.safeAs<IrReturn>() ?: return super.visitBlockBody(body)
+            val transform = transformUpdateScopeBlock(declaration, returnCall)
+            body.statements.clear()
+            body.statements.addAll(transform.statements)
+            return super.visitBlockBody(body)
+          }
+        },
+      )
+    } else {
+      if (!declaration.hasAnnotation(COMPOSABLE_FQN)) return super.visitSimpleFunction(declaration)
+      withinScope(declaration) { declaration.body?.transformChildrenVoid() }
+    }
 
-    val firstStatement = expression.statements.first()
-    val lastStatement = expression.statements.last()
-
-    // composable ir block's first and last statement must be IrWhen
-    if (firstStatement !is IrWhen || lastStatement !is IrWhen) return super.visitBlock(expression)
-
-    val isComposableIrBlock = firstStatement.isComposableTraceBranch() && lastStatement.isComposableTraceBranch()
-    if (!isComposableIrBlock) return super.visitBlock(expression)
-
-    return super.visitBlock(visitComposableBlock(unsafeCurrentFunction, expression))
+    return super.visitSimpleFunction(declaration)
   }
 
   // <WHEN> when {
   //   ...
-  //   else -> <CALL> $composer.skipToGroupEnd()
+  //   else -> <CALL> $composer.skipToGroupEnd() <ENTER HERE>
   // }
   final override fun visitElseBranch(branch: IrElseBranch): IrElseBranch {
     val call = branch.result as? IrCall ?: return super.visitElseBranch(branch)
@@ -156,7 +201,14 @@ internal abstract class AbstractInvalidationTrackingLower(
     // SKIP_TO_GROUP_END is declared in 'androidx.compose.runtime.Composer'
     if (callName != SKIP_TO_GROUP_END || callParentFqn != COMPOSER_FQN) return super.visitElseBranch(branch)
 
-    branch.result = visitSkipToGroupEndCall(unsafeCurrentFunction, call)
+    val transform = transformSkipToGroupEndCall(unsafeCurrentFunction, call)
+    branch.result = IrBlockImpl(
+      startOffset = transform.startOffset,
+      endOffset = transform.endOffset,
+      type = context.irBuiltIns.unitType,
+      origin = InvalidationTrackerOrigin,
+      statements = transform.statements,
+    )
 
     return super.visitElseBranch(branch)
   }
@@ -167,25 +219,9 @@ internal abstract class AbstractInvalidationTrackingLower(
       else SourceLocation.Location(file = SpecialNames.UNKNOWN_STRING, line = UNDEFINED_OFFSET, column = UNDEFINED_OFFSET)
     }
 
-  protected abstract fun visitComposableBlock(function: IrSimpleFunction, block: IrBlock): IrBlock
-  protected abstract fun visitSkipToGroupEndCall(function: IrSimpleFunction, call: IrCall): IrBlock
-
-  private fun IrWhen.isComposableTraceBranch(): Boolean {
-    val branch = branches.singleOrNull() ?: return false
-    val `if` = (branch.condition as? IrCall ?: return false).symbol.owner
-    val then = (branch.result as? IrCall ?: return false).symbol.owner
-
-    // IS_TRACE_IN_PROGRESS, TRACE_EVENT_START, TRACE_EVENT_END are declared in 'androidx.compose.runtime.ComposerKt' (top-level)
-    if (!`if`.isTopLevel || !then.isTopLevel) return false
-
-    val thenName = then.name
-    val thenParentFqn = then.unsafeGetTopLevelParentFqn()
-
-    val validIf = `if`.name == IS_TRACE_IN_PROGRESS && `if`.unsafeGetTopLevelParentFqn() == COMPOSER_KT_FQN
-    val validThen = (thenName == TRACE_EVENT_START || thenName == TRACE_EVENT_END) && thenParentFqn == COMPOSER_KT_FQN
-
-    return validIf && validThen
-  }
+  protected abstract fun visitStateProperty(property: IrVariable)
+  protected abstract fun transformUpdateScopeBlock(function: IrSimpleFunction, statement: IrStatement): IrStatementContainer
+  protected abstract fun transformSkipToGroupEndCall(function: IrSimpleFunction, expression: IrExpression): IrStatementContainer
 
   protected fun irGetValue(value: IrValueDeclaration): IrGetValue =
     IrGetValueImpl(
@@ -215,8 +251,3 @@ internal abstract class AbstractInvalidationTrackingLower(
   protected fun irTmpVariableInCurrentFun(expression: IrExpression, nameHint: String? = null): IrVariable =
     currentFunction!!.scope.createTemporaryVariable(irExpression = expression, nameHint = nameHint)
 }
-
-private fun IrFunction.unsafeGetTopLevelParentFqn(): FqName =
-  parent.cast<IrClass>()
-    .source.cast<FacadeClassSource>()
-    .className.getFqNameForClassNameWithoutDollars() // JvmClassName -> FqName

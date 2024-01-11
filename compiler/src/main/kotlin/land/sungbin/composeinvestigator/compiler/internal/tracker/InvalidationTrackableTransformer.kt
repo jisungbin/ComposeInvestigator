@@ -12,8 +12,6 @@ import androidx.compose.compiler.plugins.kotlin.analysis.normalize
 import androidx.compose.compiler.plugins.kotlin.irTrace
 import land.sungbin.composeinvestigator.compiler.internal.MUTABLE_LIST_ADD_FQN
 import land.sungbin.composeinvestigator.compiler.internal.MUTABLE_LIST_OF_FQN
-import land.sungbin.composeinvestigator.compiler.internal.OBTAIN_STATE_PROPERTY_AND_ADD_FQN
-import land.sungbin.composeinvestigator.compiler.internal.STATE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.fromFqName
 import land.sungbin.composeinvestigator.compiler.internal.irInt
 import land.sungbin.composeinvestigator.compiler.internal.irString
@@ -23,39 +21,25 @@ import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffec
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedField
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.TrackerWritableSlices
 import land.sungbin.composeinvestigator.compiler.internal.tracker.logger.IrInvalidationLogger
+import land.sungbin.composeinvestigator.compiler.util.IrStatementContainerImpl
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.backend.wasm.ir2wasm.getSourceLocation
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.IrLocalDelegatedProperty
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.declarations.IrVariable
-import org.jetbrains.kotlin.ir.expressions.IrBlock
-import org.jetbrains.kotlin.ir.expressions.IrCall
-import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrStatementContainer
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.classOrFail
-import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.defaultType
-import org.jetbrains.kotlin.ir.types.isSubtypeOfClass
-import org.jetbrains.kotlin.ir.types.starProjectedType
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
-import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.name.CallableId
-import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.wasm.ir.source.location.SourceLocation
 
 internal class InvalidationTrackableTransformer(
   private val context: IrPluginContext,
   private val logger: VerboseLogger,
   private val stabilityInferencer: StabilityInferencer,
 ) : AbstractInvalidationTrackingLower(context, logger), IrPluginContext by context {
-  private val stateClassType = context.referenceClass(ClassId.topLevel(STATE_FQN))!!.starProjectedType
-
   private val mutableListOfSymbol =
     context
       .referenceFunctions(CallableId.fromFqName(MUTABLE_LIST_OF_FQN))
@@ -65,10 +49,7 @@ internal class InvalidationTrackableTransformer(
       .referenceFunctions(CallableId.fromFqName(MUTABLE_LIST_ADD_FQN))
       .single { fn -> fn.owner.valueParameters.size == 1 }
 
-  private val obtainStatePropertyAndAddSymbol =
-    context.referenceFunctions(CallableId.fromFqName(OBTAIN_STATE_PROPERTY_AND_ADD_FQN)).single()
-
-  override fun visitComposableBlock(function: IrSimpleFunction, block: IrBlock): IrBlock {
+  override fun transformUpdateScopeBlock(function: IrSimpleFunction, statement: IrStatement): IrStatementContainer {
     val newFirstStatements = mutableListOf<IrStatement>()
     val newLastStatements = mutableListOf<IrStatement>()
 
@@ -166,7 +147,7 @@ internal class InvalidationTrackableTransformer(
     return block
   }
 
-  override fun visitSkipToGroupEndCall(function: IrSimpleFunction, call: IrCall): IrBlock {
+  override fun transformSkipToGroupEndCall(function: IrSimpleFunction, expression: IrExpression): IrStatementContainer {
     val currentKey = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function]!!
     val currentUserProvideName = currentKey.userProvideName
 
@@ -195,77 +176,10 @@ internal class InvalidationTrackableTransformer(
       invalidationType = invalidationTypeSkipped,
     )
 
-    val block = IrBlockImpl(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      type = irBuiltIns.unitType,
-      origin = InvalidationTrackerOrigin,
-      statements = listOf(call, callListeners, logger),
-    )
+    val transform = IrStatementContainerImpl(statements = listOf(expression, callListeners, logger))
 
-    logger("[invalidation skipped] transformed: ${call.dumpKotlinLike()} -> ${block.dumpKotlinLike()}")
+    logger("[invalidation skipped] transformed: ${expression.dumpKotlinLike()} -> ${transform.dumpKotlinLike()}")
 
-    return block
+    return transform
   }
-
-  private fun IrBlock.obtainStateProperties(statePropListVar: IrVariable) {
-    val handledLocations = mutableMapOf<SourceLocation, Unit>()
-
-    transform(
-      object : IrElementTransformerVoid() {
-        // val state = remember { mutableStateOf(T) }
-        override fun visitVariable(declaration: IrVariable): IrStatement {
-          if (declaration.origin == IrDeclarationOrigin.PROPERTY_DELEGATE) return super.visitVariable(declaration)
-          if (declaration.type.isComposeState()) {
-            val name = irString(declaration.name.asString())
-            val location = declaration.getSourceLocation(currentFile.fileEntry)
-
-            if (!handledLocations.containsKey(location)) {
-              val statePropAddingCall = IrCallImpl.fromSymbolOwner(
-                startOffset = UNDEFINED_OFFSET,
-                endOffset = UNDEFINED_OFFSET,
-                symbol = obtainStatePropertyAndAddSymbol,
-              ).apply {
-                extensionReceiver = declaration.initializer!!
-                putValueArgument(0, name)
-                putValueArgument(1, irGetValue(statePropListVar))
-              }
-
-              declaration.initializer = statePropAddingCall
-              handledLocations[location] = Unit
-            }
-          }
-          return super.visitVariable(declaration)
-        }
-
-        // var state by remember { mutableStateOf(T) }
-        override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty): IrStatement {
-          if (declaration.delegate.type.isComposeState()) {
-            val name = irString(declaration.name.asString())
-            val location = declaration.delegate.getSourceLocation(currentFile.fileEntry)
-
-            if (!handledLocations.containsKey(location)) {
-              val statePropAddingCall = IrCallImpl.fromSymbolOwner(
-                startOffset = UNDEFINED_OFFSET,
-                endOffset = UNDEFINED_OFFSET,
-                symbol = obtainStatePropertyAndAddSymbol,
-              ).apply {
-                extensionReceiver = declaration.delegate.initializer!!
-                putValueArgument(0, name)
-                putValueArgument(1, irGetValue(statePropListVar))
-                putTypeArgument(0, declaration.type)
-              }
-
-              declaration.delegate.initializer = statePropAddingCall
-              handledLocations[location] = Unit
-            }
-          }
-          return super.visitLocalDelegatedProperty(declaration)
-        }
-      },
-      null,
-    )
-  }
-
-  private fun IrType.isComposeState(): Boolean = classOrNull?.isSubtypeOfClass(stateClassType.classOrFail) ?: false
 }

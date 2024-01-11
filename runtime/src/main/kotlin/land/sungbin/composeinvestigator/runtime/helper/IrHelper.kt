@@ -11,6 +11,7 @@ import androidx.compose.runtime.State
 import land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
 
+// TODO: Move this to IR!
 // **This function is for the ComposeInvestigator compiler only.** It should be replaced by an IR,
 // but due to the risk and complexity of writing a custom IR, we replace it with a runtime function.
 @ComposeInvestigatorCompilerApi
