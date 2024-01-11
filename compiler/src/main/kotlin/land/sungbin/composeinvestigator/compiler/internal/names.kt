@@ -22,22 +22,15 @@ private const val ComposeInvestigatorRuntimeAffect = "land.sungbin.composeinvest
 
 internal val SKIP_TO_GROUP_END = Name.identifier("skipToGroupEnd")
 
-internal val IS_TRACE_IN_PROGRESS = Name.identifier("isTraceInProgress")
-internal val TRACE_EVENT_START = Name.identifier("traceEventStart")
-internal val TRACE_EVENT_END = Name.identifier("traceEventEnd")
-
 // ===== FULLY-QUALIFIED NAME ===== //
 
 // START Kotlin Standard Library
-// FIXME: There is a `functionN` factory in `IrBuiltIns`, but it currently produces unbound symbols.
-//        We can switch to this and remove this function once KT-54230 is fixed.
-internal val FUNCTION_2_FQN = FqName("kotlin.jvm.functions.Function2")
-internal val FUNCTION_2_INVOKE_FQN = FUNCTION_2_FQN.child(Name.identifier("invoke"))
-
 internal val MUTABLE_LIST_OF_FQN = FqName("kotlin.collections.mutableListOf")
 internal val MUTABLE_LIST_ADD_FQN = FqName("kotlin.collections.MutableList.add")
 
 internal val HASH_CODE_FQN = FqName("kotlin.hashCode")
+
+internal val PAIR_FQN = FqName("kotlin.Pair")
 // END Kotlin Standard Library
 
 // START Compose Runtime
@@ -50,13 +43,16 @@ internal val STATE_VALUE_FQN = STATE_FQN.child(Name.identifier("value"))
 internal val STATE_VALUE_FQN_GETTER_INTRINSIC = STATE_FQN.child(Name.special("<get-value>"))
 // END Compose Runtime
 
-// START ComposeInvestigatorConfig.kt
+// START ComposeInvestigatorConfig
 internal val COMPOSE_INVESTIGATOR_CONFIG_FQN = FqName("$ComposeInvestigatorRuntime.ComposeInvestigatorConfig")
 internal val COMPOSE_INVESTIGATOR_CONFIG_INVALIDATION_LOGGER_FQN = COMPOSE_INVESTIGATOR_CONFIG_FQN.child(Name.identifier("invalidationLogger"))
 internal val COMPOSE_INVESTIGATOR_CONFIG_INVALIDATION_LOGGER_FQN_GETTER_INTRINSIC = COMPOSE_INVESTIGATOR_CONFIG_FQN.child(Name.special("<get-invalidationLogger>"))
-// END ComposeInvestigatorConfig.kt
+// END ComposeInvestigatorConfig
 
-// START ComposableInvalidationLogger.kt
+// START ComposableInvalidationLogger
+internal val COMPOSABLE_INVALIDATION_LOGGER_FQN = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationLogger")
+internal val COMPOSABLE_INVALIDATION_LOGGER_INVOKE_FQN = COMPOSABLE_INVALIDATION_LOGGER_FQN.child(Name.identifier("invoke"))
+
 internal val SIMPLE_PARAMETER = FqName("$ComposeInvestigatorRuntime.SimpleParameter")
 internal val CHANGED_FIELD_PAIR = FqName("$ComposeInvestigatorRuntime.ChangedFieldPair")
 
@@ -69,9 +65,9 @@ internal val INVALIDATION_REASON_UNKNOWN_FQN = INVALIDATION_REASON_FQN.child(Nam
 internal val COMPOSABLE_INVALIDATION_TYPE_FQN = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationType")
 internal val COMPOSABLE_INVALIDATION_TYPE_PROCESSED_FQN = COMPOSABLE_INVALIDATION_TYPE_FQN.child(Name.identifier("Processed"))
 internal val COMPOSABLE_INVALIDATION_TYPE_SKIPPED_FQN = COMPOSABLE_INVALIDATION_TYPE_FQN.child(Name.identifier("Skipped"))
-// END ComposableInvalidationLogger.kt
+// END ComposableInvalidationLogger
 
-// START ComposableInvalidationTrackTable.kt
+// START ComposableInvalidationTrackTable
 internal val CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN = FqName("$ComposeInvestigatorRuntime.currentComposableInvalidationTracker")
 internal val CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN_GETTER_INTRINSIC = FqName("$ComposeInvestigatorRuntime.<get-currentComposableInvalidationTracker>")
 
@@ -90,34 +86,34 @@ internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_REGISTER_LISTENER_FQN = COMPOSA
 internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_UNREGISTER_LISTENER_FQN = COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN.child(Name.identifier("unregisterListener"))
 internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_CALL_LISTENERS_FQN = COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN.child(Name.identifier("callListeners"))
 internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_COMPUTE_INVALIDATION_REASON_FQN = COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN.child(Name.identifier("computeInvalidationReason"))
-// END ComposableInvalidationTrackTable.kt
+// END ComposableInvalidationTrackTable
 
-// START DeclarationStability.kt
+// START DeclarationStability
 internal val DECLARATION_STABILITY_FQN = FqName("$ComposeInvestigatorRuntime.DeclarationStability")
 internal val DECLARATION_STABILITY_CERTAIN_FQN = DECLARATION_STABILITY_FQN.child(Name.identifier("Certain"))
 internal val DECLARATION_STABILITY_RUNTIME_FQN = DECLARATION_STABILITY_FQN.child(Name.identifier("Runtime"))
 internal val DECLARATION_STABILITY_UNKNOWN_FQN = DECLARATION_STABILITY_FQN.child(Name.identifier("Unknown"))
 internal val DECLARATION_STABILITY_PARAMETER_FQN = DECLARATION_STABILITY_FQN.child(Name.identifier("Parameter"))
 internal val DECLARATION_STABILITY_COMBINED_FQN = DECLARATION_STABILITY_FQN.child(Name.identifier("Combined"))
-// END DeclarationStability.kt
+// END DeclarationStability
 
-// START ComposableInvalidationEffect.kt
+// START ComposableInvalidationEffect
 internal val COMPOSABLE_INVALIDATION_EFFECT_FQN = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationEffect")
-// END ComposableInvalidationEffect.kt
+// END ComposableInvalidationEffect
 
-// START affect/AffectedField.kt
+// START affect/AffectedField
 internal val AFFECTED_FIELD_FQN = FqName("$ComposeInvestigatorRuntimeAffect.AffectedField")
 internal val AFFECTED_FIELD_VALUE_PARAMETER_FQN = AFFECTED_FIELD_FQN.child(Name.identifier("ValueParameter"))
 internal val AFFECTED_FIELD_STATE_PROPERTY_FQN = AFFECTED_FIELD_FQN.child(Name.identifier("StateProperty"))
-// END affect/AffectableField.kt
+// END affect/AffectableField
 
-// START affect/AffectedComposable.kt
+// START affect/AffectedComposable
 internal val AFFECTED_COMPOSABLE_FQN = FqName("$ComposeInvestigatorRuntimeAffect.AffectedComposable")
-// END affect/AffectedComposable.kt
+// END affect/AffectedComposable
 
-// START helper/IrHelper.kt
+// START helper/IrHelper
 internal val OBTAIN_STATE_PROPERTY_AND_ADD_FQN = FqName("$ComposeInvestigatorRuntime.helper.obtainStatePropertyAndAdd")
-// END helper/IrHelper.kt
+// END helper/IrHelper
 
 public fun CallableId.Companion.fromFqName(fqName: FqName): CallableId =
   CallableId(packageName = fqName.parent(), callableName = fqName.shortName())

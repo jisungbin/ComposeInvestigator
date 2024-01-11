@@ -11,9 +11,10 @@ import androidx.compose.runtime.Immutable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
 
+/** Alternative to `(AffectedComposable, ComposableInvalidationType) -> Unit` that's useful for avoiding boxing. */
 @Immutable
-public fun interface ComposableInvalidationLogger : Function2<AffectedComposable, ComposableInvalidationType, Unit> {
-  override fun invoke(composable: AffectedComposable, type: ComposableInvalidationType)
+public fun interface ComposableInvalidationLogger {
+  public operator fun invoke(composable: AffectedComposable, type: ComposableInvalidationType)
 }
 
 public data class SimpleParameter(
@@ -23,8 +24,8 @@ public data class SimpleParameter(
 
 public data class ChangedFieldPair(public val old: AffectedField, public val new: AffectedField) {
   init {
-    require(old.javaClass.canonicalName == new.javaClass.canonicalName) {
-      "AffectedField must be same type. old=${old.javaClass.canonicalName}, new=${new.javaClass.canonicalName}"
+    require(old.javaClass.name == new.javaClass.name) {
+      "AffectedField must be same type. old=${old.javaClass.name}, new=${new.javaClass.name}"
     }
   }
 }

@@ -7,14 +7,14 @@
 
 package land.sungbin.composeinvestigator.compiler.internal.tracker
 
+import androidx.compose.compiler.plugins.kotlin.KtxNameConventions.IS_TRACE_IN_PROGRESS
+import androidx.compose.compiler.plugins.kotlin.KtxNameConventions.TRACE_EVENT_END
+import androidx.compose.compiler.plugins.kotlin.KtxNameConventions.TRACE_EVENT_START
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSER_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSER_KT_FQN
 import land.sungbin.composeinvestigator.compiler.internal.HASH_CODE_FQN
-import land.sungbin.composeinvestigator.compiler.internal.IS_TRACE_IN_PROGRESS
 import land.sungbin.composeinvestigator.compiler.internal.SKIP_TO_GROUP_END
-import land.sungbin.composeinvestigator.compiler.internal.TRACE_EVENT_END
-import land.sungbin.composeinvestigator.compiler.internal.TRACE_EVENT_START
 import land.sungbin.composeinvestigator.compiler.internal.UNKNOWN_STRING
 import land.sungbin.composeinvestigator.compiler.internal.fromFqName
 import land.sungbin.composeinvestigator.compiler.internal.origin.InvalidationTrackerOrigin
