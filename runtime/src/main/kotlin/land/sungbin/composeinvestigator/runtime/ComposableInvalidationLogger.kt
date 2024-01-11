@@ -80,6 +80,7 @@ public sealed interface InvalidationReason {
   // According to the Compose compiler's comments, this should be determinable via the $changed argument.
   // https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/compiler/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/lower/ComposableFunctionBodyTransformer.kt;l=381-382;drc=ea884612191a32933b697cc5062aa32505be4eaa
   // However, I haven't yet figured out how to determine this, so this type is not used. (in TODO status)
+  // It's probably related to androidx.compose.runtime.changedLowBitMask. (RecomposeScopeImpl.kt)
   @Deprecated("Force is not supported yet.")
   public data object Force : InvalidationReason {
     override fun toString(): String = "A forced recomposition has been requested for the current composable."
