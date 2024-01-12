@@ -25,13 +25,16 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrReturn
 import org.jetbrains.kotlin.ir.expressions.IrStatementContainer
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.name.CallableId
+import org.jetbrains.kotlin.name.Name
 
 internal class InvalidationTrackableTransformer(
   private val context: IrPluginContext,
@@ -47,11 +50,12 @@ internal class InvalidationTrackableTransformer(
       .referenceFunctions(CallableId.fromFqName(MUTABLE_LIST_ADD_FQN))
       .single { fn -> fn.owner.valueParameters.size == 1 }
 
-  override fun transformStateInitializer(expression: IrExpression): IrExpression {
-
+  override fun transformStateInitializer(stateName: Name, initializer: IrExpression): IrExpression {
+    logger("transformStateInitializer: $stateName")
+    return initializer
   }
 
-  override fun transformUpdateScopeBlock(function: IrSimpleFunction, statement: IrStatement): IrStatementContainer {
+  override fun transformUpdateScopeBlock(function: IrSimpleFunction, initializer: IrReturn): IrStatementContainer {
     val newStatements = mutableListOf<IrStatement>()
 
     val currentKey = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function]!!
@@ -134,8 +138,8 @@ internal class InvalidationTrackableTransformer(
     )
     newStatements += logger
 
-    logger("[invalidation processed] dump: ${statement.dump()}")
-    logger("[invalidation processed] dumpKotlinLike: ${statement.dumpKotlinLike()}")
+    logger("[invalidation processed] dump: ${initializer.dump()}")
+    logger("[invalidation processed] dumpKotlinLike: ${initializer.dumpKotlinLike()}")
 
     return IrStatementContainerImpl(statements = newStatements).also {
       logger("[invalidation processed] transformed dump: ${it.dump()}")
@@ -143,7 +147,7 @@ internal class InvalidationTrackableTransformer(
     }
   }
 
-  override fun transformSkipToGroupEndCall(function: IrSimpleFunction, expression: IrExpression): IrStatementContainer {
+  override fun transformSkipToGroupEndCall(function: IrSimpleFunction, initializer: IrCall): IrStatementContainer {
     val currentKey = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function]!!
     val currentUserProvideName = currentKey.userProvideName
 
@@ -172,9 +176,9 @@ internal class InvalidationTrackableTransformer(
       invalidationType = invalidationTypeSkipped,
     )
 
-    val transform = IrStatementContainerImpl(statements = listOf(expression, callListeners, logger))
+    val transform = IrStatementContainerImpl(statements = listOf(initializer, callListeners, logger))
 
-    logger("[invalidation skipped] transformed: ${expression.dumpKotlinLike()} -> ${transform.dumpKotlinLike()}")
+    logger("[invalidation skipped] transformed: ${initializer.dumpKotlinLike()} -> ${transform.dumpKotlinLike()}")
 
     return transform
   }

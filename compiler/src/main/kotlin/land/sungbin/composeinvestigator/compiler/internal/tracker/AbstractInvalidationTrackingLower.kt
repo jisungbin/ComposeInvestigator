@@ -64,6 +64,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
@@ -122,7 +123,7 @@ internal abstract class AbstractInvalidationTrackingLower(
     val trackTable = IrInvalidationTrackTable.create(context, declaration)
     declaration.declarations.add(0, trackTable.prop.also { prop -> prop.setDeclarationsParent(declaration) })
     declaration.transformChildrenVoid(InvalidationTrackTableCallTransformer(context = context, table = trackTable, logger = logger))
-    return withinScope(IrSymbolOwnerWithData(declaration, trackTable)) {
+    return withinScope(IrSymbolOwnerWithData(owner = declaration, data = trackTable)) {
       super.visitFileNew(declaration)
     }
   }
@@ -137,7 +138,10 @@ internal abstract class AbstractInvalidationTrackingLower(
         override fun visitVariable(declaration: IrVariable): IrStatement {
           if (declaration.origin == IrDeclarationOrigin.PROPERTY_DELEGATE) return super.visitVariable(declaration)
           if (declaration.type.isState() && declaration.initializer != null) {
-            declaration.initializer = transformStateInitializer(declaration.initializer!!)
+            declaration.initializer = transformStateInitializer(
+              stateName = declaration.name,
+              initializer = declaration.initializer!!,
+            )
           }
           return super.visitVariable(declaration)
         }
@@ -145,7 +149,10 @@ internal abstract class AbstractInvalidationTrackingLower(
         // var state by remember { mutableStateOf(T) }
         override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty): IrStatement {
           if (declaration.delegate.type.isState() && declaration.delegate.initializer != null) {
-            declaration.delegate.initializer = transformStateInitializer(declaration.delegate.initializer!!)
+            declaration.delegate.initializer = transformStateInitializer(
+              stateName = declaration.name,
+              initializer = declaration.delegate.initializer!!,
+            )
           }
           return super.visitLocalDelegatedProperty(declaration)
         }
@@ -180,7 +187,9 @@ internal abstract class AbstractInvalidationTrackingLower(
         object : IrElementTransformerVoidWithContext() {
           override fun visitBlockBody(body: IrBlockBody): IrBody {
             val returnCall = body.statements.singleOrNull()?.safeAs<IrReturn>() ?: return super.visitBlockBody(body)
-            val transform = withinScope(declaration) { transformUpdateScopeBlock(declaration, returnCall) }
+            val transform = withinScope(declaration) {
+              transformUpdateScopeBlock(function = declaration, initializer = returnCall)
+            }
             body.statements.clear()
             body.statements.addAll(transform.statements)
             return super.visitBlockBody(body)
@@ -208,7 +217,7 @@ internal abstract class AbstractInvalidationTrackingLower(
     // SKIP_TO_GROUP_END is declared in 'androidx.compose.runtime.Composer'
     if (callName != SKIP_TO_GROUP_END || callParentFqn != COMPOSER_FQN) return super.visitElseBranch(branch)
 
-    val transform = transformSkipToGroupEndCall(unsafeCurrentFunction, call)
+    val transform = transformSkipToGroupEndCall(function = unsafeCurrentFunction, initializer = call)
     branch.result = IrBlockImpl(
       startOffset = transform.startOffset,
       endOffset = transform.endOffset,
@@ -226,9 +235,9 @@ internal abstract class AbstractInvalidationTrackingLower(
       else SourceLocation.Location(file = SpecialNames.UNKNOWN_STRING, line = UNDEFINED_OFFSET, column = UNDEFINED_OFFSET)
     }
 
-  protected abstract fun transformStateInitializer(expression: IrExpression): IrExpression
-  protected abstract fun transformUpdateScopeBlock(function: IrSimpleFunction, statement: IrStatement): IrStatementContainer
-  protected abstract fun transformSkipToGroupEndCall(function: IrSimpleFunction, expression: IrExpression): IrStatementContainer
+  protected abstract fun transformStateInitializer(stateName: Name, initializer: IrExpression): IrExpression
+  protected abstract fun transformUpdateScopeBlock(function: IrSimpleFunction, initializer: IrReturn): IrStatementContainer
+  protected abstract fun transformSkipToGroupEndCall(function: IrSimpleFunction, initializer: IrCall): IrStatementContainer
 
   @Suppress("FunctionName")
   protected fun IrStatementContainerImpl(
