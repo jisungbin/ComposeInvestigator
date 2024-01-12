@@ -23,6 +23,7 @@ import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.wasm.ir2wasm.getSourceLocation
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
+import org.jetbrains.kotlin.ir.IrElementBase
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
@@ -59,6 +60,7 @@ import org.jetbrains.kotlin.ir.types.starProjectedType
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.ir.util.setDeclarationsParent
+import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
@@ -125,7 +127,7 @@ internal abstract class AbstractInvalidationTrackingLower(
     }
   }
 
-  // State properties visitor
+  // State properties transformer
   final override fun visitBlock(expression: IrBlock): IrExpression {
     fun IrType.isState() = classOrNull?.isSubtypeOfClass(stateSymbol.starProjectedType.classOrFail) ?: false
 
@@ -134,13 +136,17 @@ internal abstract class AbstractInvalidationTrackingLower(
         // val state = remember { mutableStateOf(T) }
         override fun visitVariable(declaration: IrVariable): IrStatement {
           if (declaration.origin == IrDeclarationOrigin.PROPERTY_DELEGATE) return super.visitVariable(declaration)
-          if (declaration.type.isState()) visitStateProperty(declaration)
+          if (declaration.type.isState() && declaration.initializer != null) {
+            declaration.initializer = transformStateInitializer(declaration.initializer!!)
+          }
           return super.visitVariable(declaration)
         }
 
         // var state by remember { mutableStateOf(T) }
         override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty): IrStatement {
-          if (declaration.delegate.type.isState()) visitStateProperty(declaration.delegate)
+          if (declaration.delegate.type.isState() && declaration.delegate.initializer != null) {
+            declaration.delegate.initializer = transformStateInitializer(declaration.delegate.initializer!!)
+          }
           return super.visitLocalDelegatedProperty(declaration)
         }
       },
@@ -167,13 +173,14 @@ internal abstract class AbstractInvalidationTrackingLower(
       declaration.name == SpecialNames.ANONYMOUS &&
       declaration.visibility == DescriptorVisibilities.LOCAL &&
       declaration.returnType.isUnit() &&
-      declaration.valueParameters.isUpdateScopeLambdaParameters()
+      declaration.valueParameters.isUpdateScopeLambdaParameters() &&
+      declaration.body != null
     ) {
       declaration.body!!.transformChildrenVoid(
         object : IrElementTransformerVoidWithContext() {
           override fun visitBlockBody(body: IrBlockBody): IrBody {
             val returnCall = body.statements.singleOrNull()?.safeAs<IrReturn>() ?: return super.visitBlockBody(body)
-            val transform = transformUpdateScopeBlock(declaration, returnCall)
+            val transform = withinScope(declaration) { transformUpdateScopeBlock(declaration, returnCall) }
             body.statements.clear()
             body.statements.addAll(transform.statements)
             return super.visitBlockBody(body)
@@ -219,9 +226,21 @@ internal abstract class AbstractInvalidationTrackingLower(
       else SourceLocation.Location(file = SpecialNames.UNKNOWN_STRING, line = UNDEFINED_OFFSET, column = UNDEFINED_OFFSET)
     }
 
-  protected abstract fun visitStateProperty(property: IrVariable)
+  protected abstract fun transformStateInitializer(expression: IrExpression): IrExpression
   protected abstract fun transformUpdateScopeBlock(function: IrSimpleFunction, statement: IrStatement): IrStatementContainer
   protected abstract fun transformSkipToGroupEndCall(function: IrSimpleFunction, expression: IrExpression): IrStatementContainer
+
+  @Suppress("FunctionName")
+  protected fun IrStatementContainerImpl(
+    startOffset: Int = UNDEFINED_OFFSET,
+    endOffset: Int = UNDEFINED_OFFSET,
+    statements: List<IrStatement>,
+  ): IrStatementContainer = object : IrStatementContainer, IrElementBase() {
+    override val startOffset = startOffset
+    override val endOffset = endOffset
+    override val statements = statements.toMutableList()
+    override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D) = visitor.visitElement(this, data)
+  }
 
   protected fun irGetValue(value: IrValueDeclaration): IrGetValue =
     IrGetValueImpl(

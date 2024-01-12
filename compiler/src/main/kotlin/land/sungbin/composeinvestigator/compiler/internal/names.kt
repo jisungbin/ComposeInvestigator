@@ -88,6 +88,10 @@ internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_CALL_LISTENERS_FQN = COMPOSABLE
 internal val COMPOSABLE_INVALIDATION_TRACK_TABLE_COMPUTE_INVALIDATION_REASON_FQN = COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN.child(Name.identifier("computeInvalidationReason"))
 // END ComposableInvalidationTrackTable
 
+// START StateObjectTracker
+// TODO
+// END StateObjectTracker
+
 // START DeclarationStability
 internal val DECLARATION_STABILITY_FQN = FqName("$ComposeInvestigatorRuntime.DeclarationStability")
 internal val DECLARATION_STABILITY_CERTAIN_FQN = DECLARATION_STABILITY_FQN.child(Name.identifier("Certain"))
@@ -110,10 +114,6 @@ internal val AFFECTED_FIELD_STATE_PROPERTY_FQN = AFFECTED_FIELD_FQN.child(Name.i
 // START affect/AffectedComposable
 internal val AFFECTED_COMPOSABLE_FQN = FqName("$ComposeInvestigatorRuntimeAffect.AffectedComposable")
 // END affect/AffectedComposable
-
-// START helper/IrHelper
-internal val OBTAIN_STATE_PROPERTY_AND_ADD_FQN = FqName("$ComposeInvestigatorRuntime.helper.obtainStatePropertyAndAdd")
-// END helper/IrHelper
 
 public fun CallableId.Companion.fromFqName(fqName: FqName): CallableId =
   CallableId(packageName = fqName.parent(), callableName = fqName.shortName())

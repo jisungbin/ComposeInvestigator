@@ -15,13 +15,11 @@ import land.sungbin.composeinvestigator.compiler.internal.MUTABLE_LIST_OF_FQN
 import land.sungbin.composeinvestigator.compiler.internal.fromFqName
 import land.sungbin.composeinvestigator.compiler.internal.irInt
 import land.sungbin.composeinvestigator.compiler.internal.irString
-import land.sungbin.composeinvestigator.compiler.internal.origin.InvalidationTrackerOrigin
 import land.sungbin.composeinvestigator.compiler.internal.stability.toIrDeclarationStability
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedComposable
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedField
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.TrackerWritableSlices
 import land.sungbin.composeinvestigator.compiler.internal.tracker.logger.IrInvalidationLogger
-import land.sungbin.composeinvestigator.compiler.util.IrStatementContainerImpl
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
@@ -49,9 +47,12 @@ internal class InvalidationTrackableTransformer(
       .referenceFunctions(CallableId.fromFqName(MUTABLE_LIST_ADD_FQN))
       .single { fn -> fn.owner.valueParameters.size == 1 }
 
+  override fun transformStateInitializer(expression: IrExpression): IrExpression {
+
+  }
+
   override fun transformUpdateScopeBlock(function: IrSimpleFunction, statement: IrStatement): IrStatementContainer {
-    val newFirstStatements = mutableListOf<IrStatement>()
-    val newLastStatements = mutableListOf<IrStatement>()
+    val newStatements = mutableListOf<IrStatement>()
 
     val currentKey = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function]!!
     val currentUserProvideName = currentKey.userProvideName
@@ -68,11 +69,10 @@ internal class InvalidationTrackableTransformer(
       putTypeArgument(0, IrAffectedField.irAffectedFieldSymbol.defaultType)
     }
     val affectedFieldListVar = irTmpVariableInCurrentFun(affectedFieldList, nameHint = "affectFields")
-    newFirstStatements += affectedFieldListVar
+    newStatements += affectedFieldListVar
 
     // The last two arguments are added by the Compose compiler ($composer, $changed)
-    val validValueParamters = function.valueParameters.dropLast(2)
-    for (param in validValueParamters) {
+    for (param in function.valueParameters.dropLast(2)) {
       val name = irString(param.name.asString())
       val valueGetter = irGetValue(param)
       val valueString = irToString(valueGetter)
@@ -95,14 +95,11 @@ internal class InvalidationTrackableTransformer(
         putValueArgument(0, irGetValue(valueParamVariable))
       }
 
-      newFirstStatements += valueParamVariable
-      newFirstStatements += addValueParamToList
+      newStatements += valueParamVariable
+      newStatements += addValueParamToList
     }
 
-    block.obtainStateProperties(statePropListVar = affectedFieldListVar)
-
-    val computeInvalidationReason =
-      currentInvalidationTrackTable.irComputeInvalidationReason(
+    val computeInvalidationReason = currentInvalidationTrackTable.irComputeInvalidationReason(
         composableKeyName = irString(currentKey.keyName),
         fields = irGetValue(affectedFieldListVar),
       )
@@ -110,7 +107,7 @@ internal class InvalidationTrackableTransformer(
       computeInvalidationReason,
       nameHint = "$currentFunctionName\$validationReason",
     )
-    newLastStatements += computeInvalidationReasonVariable
+    newStatements += computeInvalidationReasonVariable
 
     val affectedComposable = IrAffectedComposable.irAffectedComposable(
       composableName = irString(currentFunctionName),
@@ -129,22 +126,21 @@ internal class InvalidationTrackableTransformer(
       composable = affectedComposable,
       type = invalidationTypeProcessed,
     )
-    newLastStatements += callListeners
+    newStatements += callListeners
 
     val logger = IrInvalidationLogger.irLog(
       affectedComposable = affectedComposable,
       invalidationType = invalidationTypeProcessed,
     )
-    newLastStatements += logger
+    newStatements += logger
 
-    block.statements.addAll(1, newFirstStatements)
-    block.statements.addAll(block.statements.lastIndex, newLastStatements)
-    block.origin = InvalidationTrackerOrigin
+    logger("[invalidation processed] dump: ${statement.dump()}")
+    logger("[invalidation processed] dumpKotlinLike: ${statement.dumpKotlinLike()}")
 
-    logger("[invalidation processed] dump: ${block.dump()}")
-    logger("[invalidation processed] dumpKotlinLike: ${block.dumpKotlinLike()}")
-
-    return block
+    return IrStatementContainerImpl(statements = newStatements).also {
+      logger("[invalidation processed] transformed dump: ${it.dump()}")
+      logger("[invalidation processed] transformed dumpKotlinLike: ${it.dumpKotlinLike()}")
+    }
   }
 
   override fun transformSkipToGroupEndCall(function: IrSimpleFunction, expression: IrExpression): IrStatementContainer {
