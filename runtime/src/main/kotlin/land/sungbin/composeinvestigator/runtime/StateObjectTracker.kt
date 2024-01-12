@@ -16,15 +16,17 @@ import androidx.compose.runtime.snapshots.ObserverHandle
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotMutableState
 import androidx.compose.runtime.snapshots.StateObject
+import java.util.concurrent.atomic.AtomicBoolean
 import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateFieldNameMap
 import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateValueChangedListener
 import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateValueGetterMap
 import org.jetbrains.annotations.TestOnly
-import java.util.concurrent.atomic.AtomicBoolean
 
 public data class StateValue(val previousValue: Any?, val newValue: Any?)
 
-public typealias StateValueGetter = (target: StateObject) -> StateValue
+public fun interface StateValueGetter {
+  public operator fun invoke(target: StateObject): StateValue
+}
 
 @Immutable
 public fun interface StateChangedListener {
