@@ -60,7 +60,6 @@ import org.jetbrains.kotlin.ir.types.isSubtypeOfClass
 import org.jetbrains.kotlin.ir.types.makeNullable
 import org.jetbrains.kotlin.ir.types.starProjectedType
 import org.jetbrains.kotlin.ir.types.typeWith
-import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.util.getSimpleFunction
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.kotlinFqName
@@ -219,17 +218,6 @@ internal abstract class AbstractInvalidationTrackingLower(
   //   else -> $composer.skipToGroupEnd()
   // }
   final override fun visitWhen(expression: IrWhen): IrExpression {
-    if (expression.branches.size == 2) {
-      val firstBranch = expression.branches.first()
-      if (
-        firstBranch.condition.safeAs<IrCall>()?.symbol?.owner?.kotlinFqName ==
-        context.irBuiltIns.eqeqSymbol.owner.kotlinFqName &&
-        firstBranch.result.safeAt<>
-      ) {
-
-      }
-    }
-
     return super.visitWhen(expression)
   }
 
@@ -240,7 +228,7 @@ internal abstract class AbstractInvalidationTrackingLower(
   final override fun visitCall(expression: IrCall): IrExpression {
     if (
       expression.dispatchReceiver?.type == scopeUpdateScopeSymbol.defaultType.makeNullable() &&
-      expression.symbol == scopeUpdateScopeUpdateScopeSymbol &&
+      expression.symbol.owner.kotlinFqName == scopeUpdateScopeUpdateScopeSymbol.owner.kotlinFqName &&
       expression.getValueArgument(0) is IrFunctionExpression
     ) {
       val block = expression.getValueArgument(0) as IrFunctionExpression
@@ -253,8 +241,6 @@ internal abstract class AbstractInvalidationTrackingLower(
 
               if (returnTarget !is IrCall || !returnTarget.symbol.owner.hasComposableAnnotation())
                 return super.visitBlockBody(body)
-
-              logger("visitCall blockBody: ${body.dumpKotlinLike()}")
 
               val transformed = transformUpdateScopeBlock(initializer = returnCall)
               body.statements.clear()
