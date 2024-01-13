@@ -49,7 +49,7 @@ internal class TrackerFunctionKeyVisitor(
     val (keyName) = buildKey("fun-$signature")
     val keyInfo = KeyInfo(keyName = keyName, userProvideName = null)
     currentKeys += keyInfo
-    irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, declaration] = keyInfo
+    irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, declaration] = keyInfo
     return super.visitSimpleFunction(declaration)
   }
 }

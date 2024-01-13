@@ -13,6 +13,8 @@ import land.sungbin.composeinvestigator.compiler.internal.ComposableInvalidation
 import land.sungbin.composeinvestigator.compiler.internal.ComposableInvalidationType_PROCESSED
 import land.sungbin.composeinvestigator.compiler.internal.ComposableInvalidationType_SKIPPED
 import land.sungbin.composeinvestigator.compiler.internal.ComposeInvestigatorConfig_INVALIDATION_LOGGER
+import land.sungbin.composeinvestigator.compiler.internal.INVALIDATION_REASON_FQN
+import land.sungbin.composeinvestigator.compiler.internal.InvalidationReason_Invalidate
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.expressions.IrCall
@@ -37,16 +39,27 @@ public object IrInvalidationLogger {
   private var loggerGetterSymbol: IrSimpleFunctionSymbol? = null
   private var loggerInvokerSymbol: IrSimpleFunctionSymbol? = null
 
+  private var invalidateReasonSymbol: IrClassSymbol? = null
+  private var invalidateReasonInvalidateSymbol: IrClassSymbol? = null
+
   private var invalidationTypeSymbol: IrClassSymbol? = null
   private var invalidationTypeProcessedSymbol: IrClassSymbol? = null
   private var invalidationTypeSkippedSymbol: IrClassSymbol? = null
 
   public val irInvalidationTypeSymbol: IrClassSymbol get() = invalidationTypeSymbol!!
 
+  public val irInvalidateReasonSymbol: IrClassSymbol get() = invalidateReasonSymbol!!
+  public val irInvalidateReasonInvalidateSymbol: IrClassSymbol get() = invalidateReasonInvalidateSymbol!!
+
   public fun init(context: IrPluginContext) {
     loggerContainerSymbol = context.referenceClass(ClassId.topLevel(COMPOSE_INVESTIGATOR_CONFIG_FQN))!!
     loggerGetterSymbol = loggerContainerSymbol!!.getPropertyGetter(ComposeInvestigatorConfig_INVALIDATION_LOGGER.asString())!!
     loggerInvokerSymbol = loggerGetterSymbol!!.owner.returnType.classOrFail.getSimpleFunction(ComposableInvalidationLogger_INVOKE.asString())!!
+
+    invalidateReasonSymbol = context.referenceClass(ClassId.topLevel(INVALIDATION_REASON_FQN))!!
+    invalidateReasonInvalidateSymbol = invalidateReasonSymbol!!.owner.sealedSubclasses.single { clz ->
+      clz.owner.name == InvalidationReason_Invalidate
+    }
 
     invalidationTypeSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TYPE_FQN))!!
     invalidationTypeProcessedSymbol = invalidationTypeSymbol!!.owner.sealedSubclasses.single { clz ->

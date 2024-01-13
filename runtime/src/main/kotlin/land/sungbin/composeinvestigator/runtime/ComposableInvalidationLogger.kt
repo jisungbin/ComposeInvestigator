@@ -31,36 +31,34 @@ public data class ChangedFieldPair(public val old: AffectedField, public val new
 public infix fun AffectedField.changedTo(new: AffectedField): ChangedFieldPair =
   ChangedFieldPair(old = this, new = new)
 
-public sealed interface InvalidationReason {
-  override fun toString(): String
+public sealed class InvalidationReason {
+  abstract override fun toString(): String
 
-  public data object Initial : InvalidationReason {
-    override fun toString(): String = "Initial composition."
+  public data object Initial : InvalidationReason() {
+    override fun toString(): String = "[Initial] Initial composition."
   }
 
-  public data object Invalidate : InvalidationReason {
+  public data object Invalidate : InvalidationReason() {
     override fun toString(): String =
-      "An invalidation has been requested for the current RecomposeScope. " +
+      "[Invalidate] An invalidation has been requested for the current composable scope. " +
         "The state value in the body of that composable function has most likely changed."
   }
 
-  public data class FieldChanged(public val changed: List<ChangedFieldPair>) : InvalidationReason {
+  public data class FieldChanged(public val changed: List<ChangedFieldPair>) : InvalidationReason() {
     override fun toString(): String = buildString {
       val sortedChanges = changed.sortedBy { field -> field.old.name }
 
-      appendLine("FieldChanged(")
-      appendLine("  [Parameters]")
+      appendLine("[FieldChanged]")
       sortedChanges.forEachIndexed { index, (old, new) ->
         check(old.name == new.name) { "Field name must be same. old.name=${old.name}, new.name=${new.name}" }
         appendLine(
           """
-          |    ${index + 1}. ${old.name}${if (old is AffectedField.ValueParameter) " <${old.stability}>" else ""}
-          |      Old: ${with(old) { "$valueString ($valueHashCode)" }}
-          |      New: ${with(new) { "$valueString ($valueHashCode)" }}
+          |  ${index + 1}. ${old.name}${if (old is AffectedField.ValueParameter) " <${old.stability}>" else ""}
+          |    Old: ${with(old) { "$valueString ($valueHashCode)" }}
+          |    New: ${with(new) { "$valueString ($valueHashCode)" }}
           """.trimMargin(),
         )
       }
-      appendLine(")")
     }
   }
 
@@ -69,13 +67,13 @@ public sealed interface InvalidationReason {
   // However, I haven't yet figured out how to determine this, so this type is not used. (in TODO status)
   // It's probably related to androidx.compose.runtime.changedLowBitMask. (RecomposeScopeImpl.kt)
   @Deprecated("Force reason is not supported yet.")
-  public data object Force : InvalidationReason {
-    override fun toString(): String = "A forced recomposition has been requested for the current composable."
+  public data object Force : InvalidationReason() {
+    override fun toString(): String = "[Force] A forced recomposition has been requested for the current composable."
   }
 
-  public data class Unknown(public val params: List<ParameterInformation> = emptyList()) : InvalidationReason {
+  public data class Unknown(public val params: List<ParameterInformation>) : InvalidationReason() {
     override fun toString(): String =
-      "No parameters have changed. Perhaps the state value being referenced in the function body has changed. " +
+      "[Unknown] No parameters have changed. Perhaps the state value being referenced in the function body has changed. " +
         "If no state has changed, then some function parameter may be unstable, or a forced invalidation may have " +
         "been requested.${if (params.isNotEmpty()) "\nGiven parameters: ${params.joinToString()}" else ""}"
   }

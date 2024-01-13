@@ -18,5 +18,5 @@ public annotation class ComposeInvestigatorCompilerApi
   "This is an experimental API for ComposeInvestigator and is likely to change" +
     "before becoming stable.",
 )
-@Target(AnnotationTarget.CLASS)
+@Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
 public annotation class ExperimentalComposeInvestigatorApi

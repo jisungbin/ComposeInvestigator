@@ -10,6 +10,7 @@ package land.sungbin.composeinvestigator.compiler.internal.tracker
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSER_FQN
+import land.sungbin.composeinvestigator.compiler.internal.Composer_SKIPPING
 import land.sungbin.composeinvestigator.compiler.internal.Composer_SKIP_TO_GROUP_END
 import land.sungbin.composeinvestigator.compiler.internal.HASH_CODE_FQN
 import land.sungbin.composeinvestigator.compiler.internal.SCOPE_UPDATE_SCOPE_FQN
@@ -25,7 +26,6 @@ import land.sungbin.fastlist.fastLastOrNull
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.wasm.ir2wasm.getSourceLocation
-import org.jetbrains.kotlin.ir.IrElementBase
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
@@ -40,6 +40,7 @@ import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
@@ -60,11 +61,11 @@ import org.jetbrains.kotlin.ir.types.isSubtypeOfClass
 import org.jetbrains.kotlin.ir.types.makeNullable
 import org.jetbrains.kotlin.ir.types.starProjectedType
 import org.jetbrains.kotlin.ir.types.typeWith
+import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.getSimpleFunction
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.ir.util.setDeclarationsParent
-import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
@@ -80,14 +81,17 @@ internal abstract class AbstractInvalidationTrackingLower(
 ) : IrElementTransformerVoidWithContext() {
   private class IrSymbolOwnerWithData<D>(private val owner: IrSymbolOwner, val data: D) : IrSymbolOwner by owner
 
+  @Suppress("MemberVisibilityCanBePrivate")
   protected val composerSymbol = context.referenceClass(ClassId.topLevel(COMPOSER_FQN))!!
-  private val skipToGroupEndSymbol = composerSymbol.getSimpleFunction(Composer_SKIP_TO_GROUP_END.asString())!!
+  protected val nullableComposerType = composerSymbol.defaultType.makeNullable()
+  private val composerSkippingGetterSymbol = composerSymbol.getPropertyGetter(Composer_SKIPPING.asString())!!
+  private val composerSkipToGroupEndSymbol = composerSymbol.getSimpleFunction(Composer_SKIP_TO_GROUP_END.asString())!!
 
   private val scopeUpdateScopeSymbol = context.referenceClass(ClassId.topLevel(SCOPE_UPDATE_SCOPE_FQN))!!
   private val scopeUpdateScopeUpdateScopeSymbol = scopeUpdateScopeSymbol.getSimpleFunction(ScopeUpdateScope_UPDATE_SCOPE.asString())!!
   private val scopeUpdateScopeUpdateScopeBlockType =
     context.irBuiltIns.functionN(2).typeWith(
-      composerSymbol.defaultType.makeNullable(),
+      nullableComposerType,
       context.irBuiltIns.intType,
       context.irBuiltIns.unitType,
     )
@@ -119,18 +123,12 @@ internal abstract class AbstractInvalidationTrackingLower(
       .fastLastOrNull { scope -> scope.irElement is IrSimpleFunction }
       ?.irElement?.cast() ?: error("Cannot find current function")
 
-  protected fun getCurrentFunctionPackage() = unsafeCurrentFunction.kotlinFqName.asString()
-
-  protected fun getCurrentFunctionNameIntercepttedAnonymous(userProvideName: String?) =
-    unsafeCurrentFunction.getFunctionNameIntercepttedAnonymous(userProvideName)
-
   protected fun IrFunction.getFunctionNameIntercepttedAnonymous(userProvideName: String?): String {
     if (userProvideName != null) return userProvideName
     val currentFunctionName = name
     return if (currentFunctionName == SpecialNames.ANONYMOUS) {
       try {
-        val parent = cast<IrSimpleFunction>().parent
-        "${SpecialNames.ANONYMOUS_STRING} in ${parent.kotlinFqName.asString()}"
+        "${SpecialNames.ANONYMOUS_STRING} (${kotlinFqName.asString()})}"
       } catch (_: Exception) {
         SpecialNames.ANONYMOUS_STRING
       }
@@ -138,13 +136,12 @@ internal abstract class AbstractInvalidationTrackingLower(
   }
 
   protected val currentInvalidationTrackTable: IrInvalidationTrackTable?
-    get() =
-      allScopes
-        .fastLastOrNull { scope ->
-          val element = scope.irElement
-          element is IrSymbolOwnerWithData<*> && element.data is IrInvalidationTrackTable
-        }
-        ?.irElement?.cast<IrSymbolOwnerWithData<IrInvalidationTrackTable>>()?.data
+    get() = allScopes
+      .fastLastOrNull { scope ->
+        val element = scope.irElement
+        element is IrSymbolOwnerWithData<*> && element.data is IrInvalidationTrackTable
+      }
+      ?.irElement?.cast<IrSymbolOwnerWithData<IrInvalidationTrackTable>>()?.data
 
   final override fun visitFileNew(declaration: IrFile): IrFile {
     val table = IrInvalidationTrackTable.create(context, declaration)
@@ -212,16 +209,69 @@ internal abstract class AbstractInvalidationTrackingLower(
   //   when {
   //     EQEQ(arg0 = $dirty.and(other = 11), arg1 = 2).not() -> true
   //     else -> $composer.<get-skipping>().not()
-  //   } -> { // BLOCK
-  //     <ENTER HERE> (composable content)
+  //   } -> {
+  //     (composable content) <ENTER HERE>
   //   }
   //   else -> $composer.skipToGroupEnd()
   // }
   final override fun visitWhen(expression: IrWhen): IrExpression {
+    val composable = lastReachedComposable() ?: return super.visitWhen(expression)
+    if (expression.branches.size == 2) {
+      val firstBranch = expression.branches.first()
+      val firstCondition = firstBranch.condition
+      val firstResult = firstBranch.result
+      if (firstResult !is IrBlock) return super.visitWhen(expression)
+      val assertFirstCondition = run {
+        if (
+          firstCondition is IrWhen &&
+          firstCondition.type == context.irBuiltIns.booleanType &&
+          firstCondition.origin == IrStatementOrigin.OROR &&
+          firstCondition.branches.size == 2
+        ) {
+          val nestedBranch = firstCondition.branches
+
+          val assertNestedFirstCondition = run {
+            val nestedFirstCondition = nestedBranch.first().condition
+            // assert 'EQEQ(...).not()'
+            if (
+              nestedFirstCondition is IrCall &&
+              nestedFirstCondition.symbol.owner.kotlinFqName ==
+              context.irBuiltIns.booleanNotSymbol.owner.kotlinFqName &&
+              nestedFirstCondition.dispatchReceiver?.safeAs<IrCall>()?.symbol?.owner?.kotlinFqName ==
+              context.irBuiltIns.eqeqSymbol.owner.kotlinFqName
+            ) {
+              val nestedFirstResult = nestedBranch.first().result
+              // assert '-> true'
+              nestedFirstResult is IrConst<*> && nestedFirstResult.value == true
+            } else false
+          }
+          val aasertNestedSecondCondition = run {
+            val nestedSecondCondition = nestedBranch.last().condition
+            // assert 'else'
+            if (nestedSecondCondition is IrConst<*> && nestedSecondCondition.value == true) {
+              val nestedSecondResult = nestedBranch.last().result
+              // assert '-> $composer.<get-skipping>().not()'
+              nestedSecondResult is IrCall &&
+                nestedSecondResult.symbol.owner.kotlinFqName ==
+                context.irBuiltIns.booleanNotSymbol.owner.kotlinFqName &&
+                nestedSecondResult.dispatchReceiver?.safeAs<IrCall>()?.symbol?.owner?.kotlinFqName ==
+                composerSkippingGetterSymbol.owner.kotlinFqName &&
+                nestedSecondResult.dispatchReceiver?.safeAs<IrCall>()
+                  ?.dispatchReceiver?.safeAs<IrGetValue>()?.type == nullableComposerType
+            } else false
+          }
+
+          assertNestedFirstCondition && aasertNestedSecondCondition
+        } else false
+      }
+      if (assertFirstCondition) {
+        expression.branches[0].result = transformComposableBody(function = composable, block = firstResult)
+      }
+    }
     return super.visitWhen(expression)
   }
 
-  // tmp0_safe_receiver.updateScope(block = local fun <anonymous>($composer: Composer?, $force: Int) {
+  // ScopeUpdateScope?.updateScope(block = local fun <anonymous>($composer: Composer?, $force: Int) {
   //   <ENTER HERE>
   //   return Composable($composer = $composer, $changed = updateChangedFlags(flags = $changed.or(other = 1)))
   // })
@@ -242,7 +292,7 @@ internal abstract class AbstractInvalidationTrackingLower(
               if (returnTarget !is IrCall || !returnTarget.symbol.owner.hasComposableAnnotation())
                 return super.visitBlockBody(body)
 
-              val transformed = transformUpdateScopeBlock(initializer = returnCall)
+              val transformed = transformUpdateScopeBlock(target = returnTarget.symbol.owner, initializer = returnCall)
               body.statements.clear()
               body.statements.addAll(transformed.statements)
               return super.visitBlockBody(body)
@@ -254,17 +304,17 @@ internal abstract class AbstractInvalidationTrackingLower(
     return super.visitCall(expression)
   }
 
-  // <WHEN> when {
+  // when {
   //   ...
-  //   else -> <CALL> $composer.skipToGroupEnd() <ENTER HERE>
+  //   else -> $composer.skipToGroupEnd() <ENTER HERE>
   // }
   final override fun visitElseBranch(branch: IrElseBranch): IrElseBranch {
     val call = branch.result as? IrCall ?: return super.visitElseBranch(branch)
 
-    if (call.symbol.owner.kotlinFqName != skipToGroupEndSymbol.owner.kotlinFqName)
+    if (call.symbol.owner.kotlinFqName != composerSkipToGroupEndSymbol.owner.kotlinFqName)
       return super.visitElseBranch(branch)
 
-    val transformed = transformSkipToGroupEndCall(function = unsafeCurrentFunction, initializer = call)
+    val transformed = transformSkipToGroupEndCall(composable = unsafeCurrentFunction, initializer = call)
     branch.result = IrBlockImpl(
       startOffset = transformed.startOffset,
       endOffset = transformed.endOffset,
@@ -283,21 +333,9 @@ internal abstract class AbstractInvalidationTrackingLower(
     }
 
   protected abstract fun transformStateInitializer(composable: IrSimpleFunction, stateName: Name, initializer: IrExpression): IrExpression
-  protected abstract fun transformComposableBlock(function: IrSimpleFunction, block: IrBlock): IrBlock
-  protected abstract fun transformUpdateScopeBlock(initializer: IrReturn): IrStatementContainer
-  protected abstract fun transformSkipToGroupEndCall(function: IrSimpleFunction, initializer: IrCall): IrStatementContainer
-
-  @Suppress("FunctionName")
-  protected fun IrStatementContainerImpl(
-    statements: List<IrStatement>,
-    startOffset: Int = UNDEFINED_OFFSET,
-    endOffset: Int = UNDEFINED_OFFSET,
-  ): IrStatementContainer = object : IrStatementContainer, IrElementBase() {
-    override val startOffset = startOffset
-    override val endOffset = endOffset
-    override val statements = statements.toMutableList()
-    override fun <R, D> accept(visitor: IrElementVisitor<R, D>, data: D) = visitor.visitElement(this, data)
-  }
+  protected abstract fun transformComposableBody(function: IrSimpleFunction, block: IrBlock): IrBlock
+  protected abstract fun transformUpdateScopeBlock(target: IrSimpleFunction, initializer: IrReturn): IrStatementContainer
+  protected abstract fun transformSkipToGroupEndCall(composable: IrSimpleFunction, initializer: IrCall): IrStatementContainer
 
   protected fun irGetValue(value: IrValueDeclaration): IrGetValue =
     IrGetValueImpl(

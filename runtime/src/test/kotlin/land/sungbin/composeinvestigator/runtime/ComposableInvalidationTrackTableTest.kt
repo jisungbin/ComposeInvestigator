@@ -16,21 +16,21 @@ class ComposableInvalidationTrackTableTest : FeatureSpec() {
     feature("computeInvalidationReason") {
       scenario("when no previous info") {
         val table = ComposableInvalidationTrackTable()
+
         val param = AffectedField.ValueParameter(
           name = "name",
           stability = DeclarationStability.Stable,
           valueString = "value",
           valueHashCode = 0,
         )
-        val invalidationReason = table.computeInvalidationReason(
-          keyName = "keyName",
-          fields = listOf(param),
-        )
+        val reason = table.computeInvalidationReason(keyName = "keyName", fields = listOf(param))
 
         table.affectFields shouldBe mapOf("keyName" to listOf(param))
-        invalidationReason shouldBe InvalidationReason.Invalidate
+        reason shouldBe InvalidationReason.Initial
       }
       scenario("when previous info exists") {
+        val table = ComposableInvalidationTrackTable()
+
         val oldParam = AffectedField.ValueParameter(
           name = "name",
           stability = DeclarationStability.Stable,
@@ -43,19 +43,12 @@ class ComposableInvalidationTrackTableTest : FeatureSpec() {
           valueString = "new value",
           valueHashCode = 1,
         )
-        val table = ComposableInvalidationTrackTable().apply {
-          computeInvalidationReason(
-            keyName = "keyName",
-            fields = listOf(oldParam),
-          )
-        }
-        val invalidationReason = table.computeInvalidationReason(
-          keyName = "keyName",
-          fields = listOf(newParam),
-        )
+
+        table.computeInvalidationReason(keyName = "keyName", fields = listOf(oldParam))
+        val reason = table.computeInvalidationReason(keyName = "keyName", fields = listOf(newParam))
 
         table.affectFields shouldBe mapOf("keyName" to listOf(newParam))
-        invalidationReason shouldBe InvalidationReason.FieldChanged(listOf(oldParam changedTo newParam))
+        reason shouldBe InvalidationReason.FieldChanged(listOf(oldParam changedTo newParam))
       }
     }
     feature("AffectedField.FieldChanged") {
@@ -88,15 +81,13 @@ class ComposableInvalidationTrackTableTest : FeatureSpec() {
         )
 
         changedParam.toString() shouldBe """
-          |FieldChanged(
-          |  [Parameters]
-          |    1. name <Stable>
-          |      Old: value (0)
-          |      New: new value (1)
-          |    2. name2 <Unstable>
-          |      Old: value2 (10)
-          |      New: new value2 (11)
-          |)
+          |[FieldChanged]
+          |  1. name <Stable>
+          |    Old: value (0)
+          |    New: new value (1)
+          |  2. name2 <Unstable>
+          |    Old: value2 (10)
+          |    New: new value2 (11)
           |""".trimMargin()
       }
     }

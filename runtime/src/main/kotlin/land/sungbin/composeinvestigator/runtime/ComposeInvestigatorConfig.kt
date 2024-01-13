@@ -9,18 +9,19 @@ package land.sungbin.composeinvestigator.runtime
 
 import android.util.Log
 
-@Suppress("MemberVisibilityCanBePrivate")
+@ExperimentalComposeInvestigatorApi
 public object ComposeInvestigatorConfig {
+  @Suppress("MemberVisibilityCanBePrivate")
   public const val LOGGER_DEFAULT_TAG: String = "ComposeInvestigator"
 
   public var invalidationLogger: ComposableInvalidationLogger = ComposableInvalidationLogger { composable, type ->
     Log.d(LOGGER_DEFAULT_TAG, "The '${composable.name}' composable has been invalidated.\n$type")
   }
+
   public var stateChangedListener: StateChangedListener = StateChangedListener { composable, name, previousValue, newValue ->
     Log.d(
       LOGGER_DEFAULT_TAG,
-      "The state of '$name' inside '${composable.name}' composable has changed. " +
-        "previousValue=$previousValue, newValue=$newValue",
+      "The state of '$name' inside '${composable.name}' composable has changed. previousValue=$previousValue, newValue=$newValue",
     )
   }
 }

@@ -52,8 +52,8 @@ internal class InvalidationTrackingExtension(private val logger: VerboseLogger) 
     moduleFragment.transformChildrenVoid(
       object : IrElementTransformerVoidWithContext() {
         override fun visitFileNew(declaration: IrFile): IrFile {
-          if (declaration.name == "InvalidationProcessed.kt") {
-            logger("[IR TEST DEBUG DUMP]")
+          if (declaration.name == "SourceForIrDump.kt") {
+            logger("[IR DUMPING TEST RESULT]")
             logger(declaration.dump())
             logger(declaration.dumpKotlinLike())
           }

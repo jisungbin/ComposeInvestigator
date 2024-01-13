@@ -12,12 +12,12 @@ import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.remember
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.cancellation.CancellationException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.cancellation.CancellationException
 
 private val DEFAULT_KEY = arrayOf(Unit)
 
@@ -50,24 +50,18 @@ private class InvalidationEffectScope(
 ) : RememberObserver {
   private val scope = CoroutineScope(parentCoroutineContext)
   private var job: Job? = null
-  private var listener: ComposableInvalidationListener? = null
 
   override fun onRemembered() {
     job?.cancel("Old job was still running!")
     job = scope.launch {
-      listener = task.invoke(this).also { listener ->
-        invalidationTrackTable.registerListener(composableKey, listener)
-      }
+      invalidationTrackTable.registerListener(composableKey, task.invoke(this))
     }
   }
 
   override fun onForgotten() {
     job?.cancel(LeftCompositionCancellationException())
     job = null
-    listener?.let { listener ->
-      invalidationTrackTable.unregisterListener(composableKey, listener)
-    }
-    listener = null
+    invalidationTrackTable.unregisterListener(composableKey)
   }
 
   override fun onAbandoned() {

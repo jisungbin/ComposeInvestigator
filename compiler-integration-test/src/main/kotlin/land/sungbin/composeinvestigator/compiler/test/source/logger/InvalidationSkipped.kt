@@ -14,11 +14,13 @@ import androidx.compose.runtime.currentRecomposeScope
 import land.sungbin.composeinvestigator.runtime.ComposableName
 import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracker
 
+val invalidationSkippedFileTable = currentComposableInvalidationTracker
+
 @Composable
 fun InvalidationSkippedRoot() {
   val recomposeScope = currentRecomposeScope
 
-  Button(onClick = { recomposeScope.invalidate() }) {}
+  Button(onClick = recomposeScope::invalidate) {}
   InvalidationSkippedChild()
 }
 
@@ -32,7 +34,7 @@ fun InvalidationSkippedRoot_CustomName() {
   currentComposableInvalidationTracker.currentComposableName = ComposableName("InvalidationSkippedRoot_custom_name")
   val recomposeScope = currentRecomposeScope
 
-  Button(onClick = { recomposeScope.invalidate() }) {}
+  Button(onClick = recomposeScope::invalidate) {}
   InvalidationSkippedChild_CustomName()
 }
 

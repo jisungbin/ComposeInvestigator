@@ -25,14 +25,13 @@ internal val MUTABLE_LIST_OF_FQN = FqName("kotlin.collections.mutableListOf")
 internal val MUTABLE_LIST_ADD_FQN = FqName("kotlin.collections.MutableList.add")
 
 internal val HASH_CODE_FQN = FqName("kotlin.hashCode")
-
-internal val PAIR_FQN = FqName("kotlin.Pair")
 // END Kotlin Standard Library
 
 // START Compose Runtime
 internal val COMPOSABLE_FQN = FqName("$AndroidxComposeRuntime.Composable")
 internal val COMPOSER_FQN = FqName("$AndroidxComposeRuntime.Composer")
 
+internal val Composer_SKIPPING = Name.identifier("skipping")
 internal val Composer_SKIP_TO_GROUP_END = Name.identifier("skipToGroupEnd")
 
 internal val SCOPE_UPDATE_SCOPE_FQN = FqName("$AndroidxComposeRuntime.ScopeUpdateScope")
@@ -60,7 +59,6 @@ internal val ComposableInvalidationType_SKIPPED = Name.identifier("Skipped")
 
 // START ComposableInvalidationTrackTable
 internal val CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN = FqName("$ComposeInvestigatorRuntime.currentComposableInvalidationTracker")
-internal val CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN_GETTER_INTRINSIC = FqName("$ComposeInvestigatorRuntime.<get-currentComposableInvalidationTracker>")
 
 internal val COMPOSABLE_NAME_FQN = FqName("$ComposeInvestigatorRuntime.ComposableName")
 
@@ -73,13 +71,7 @@ internal val ComposableInvalidationTrackTable_COMPUTE_INVALIDATION_REASON = Name
 
 // START StateObjectTracker
 internal val REGISTER_STATE_OBJECT_TRACKING_FQN = FqName("$ComposeInvestigatorRuntime.registerStateObjectTracking")
-internal val STATE_VALUE_GETTER_FQN = FqName("$ComposeInvestigatorRuntime.StateValueGetter")
-internal val COMPOSE_STATE_OBJECT_VALUE_GETTER_FQN = FqName("$ComposeInvestigatorRuntime.ComposeStateObjectValueGetter")
 // END StateObjectTracker
-
-// START ComposableKeyInfo
-internal val COMPOSABLE_KEY_INFO_FQN = FqName("$ComposeInvestigatorRuntime.ComposableKeyInfo")
-// END ComposableKeyInfo
 
 // START DeclarationStability
 internal val DECLARATION_STABILITY_FQN = FqName("$ComposeInvestigatorRuntime.DeclarationStability")

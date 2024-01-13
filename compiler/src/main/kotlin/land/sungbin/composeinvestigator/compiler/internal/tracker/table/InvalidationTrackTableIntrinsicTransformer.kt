@@ -69,7 +69,7 @@ internal class InvalidationTrackTableIntrinsicTransformer(
       currentComposableNameGetterSymbol.kotlinFqName -> {
         val name = when (val function = lastReachedComposable()) {
           null -> SpecialNames.UNKNOWN_STRING
-          else -> irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function]?.userProvideName ?: function.name.asString()
+          else -> irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, function]?.userProvideName ?: function.name.asString()
         }
 
         IrConstructorCallImpl.fromSymbolOwner(
@@ -88,10 +88,10 @@ internal class InvalidationTrackTableIntrinsicTransformer(
             .getValueArgument(0).cast<IrConstructorCall>()
             .getValueArgument(0).safeAs<IrConst<String>>()?.value
             ?: error("Currently, only string hardcodes are supported as arguments to ComposableName. (${expression.dumpKotlinLike()})")
-          val previousKey = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function]!!
+          val previousKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, function]!!
           val newKey = previousKey.copy(userProvideName = userProvideName)
 
-          irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function] = newKey
+          irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, function] = newKey
           result = true
         }
 
@@ -100,7 +100,7 @@ internal class InvalidationTrackTableIntrinsicTransformer(
       currentComposableKeyNameGetterSymbol.kotlinFqName -> {
         val function = lastReachedComposable()
         irString(
-          if (function != null) irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, function]!!.keyName
+          if (function != null) irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, function]!!.keyName
           else SpecialNames.UNKNOWN_STRING,
         )
       }

@@ -26,6 +26,12 @@ val stateChangeLogger = StateChangedListener { composable, name, previousValue, 
   stateChangeLog.getOrPut(composable.name, ::mutableListOf).add(stateLog)
 }
 
+fun findInvalidationLog(composableName: String): List<ComposableInvalidationType> =
+  invalidationLog.filterKeys { composable -> composable.name == composableName }.values.flatten()
+
+fun findStateChangeLog(composableName: String): List<StateNameValue> =
+  stateChangeLog.filterKeys { name -> name == composableName }.values.flatten()
+
 fun clearInvalidationLog() {
   invalidationLog.clear()
 }
@@ -33,9 +39,3 @@ fun clearInvalidationLog() {
 fun clearStateChangeLog() {
   stateChangeLog.clear()
 }
-
-fun findInvalidationLog(composableName: String): List<ComposableInvalidationType> =
-  invalidationLog.filterKeys { composable -> composable.name == composableName }.values.flatten()
-
-fun findStateChangeLog(composableName: String): List<StateNameValue> =
-  stateChangeLog.filterKeys { name -> name == composableName }.values.flatten()

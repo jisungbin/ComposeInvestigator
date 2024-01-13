@@ -11,6 +11,6 @@ public data class AffectedComposable(
   public val name: String,
   public val pkg: String,
   public val filePath: String,
-  @Deprecated("This value is not yet provided correctly.") public val startLine: Int,
-  @Deprecated("This value is not yet provided correctly.") public val startColumn: Int,
+  public val startLine: Int,
+  public val startColumn: Int,
 )

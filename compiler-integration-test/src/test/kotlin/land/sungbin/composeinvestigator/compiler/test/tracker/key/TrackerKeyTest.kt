@@ -53,10 +53,10 @@ class TrackerKeyTest : ShouldSpec(), IrBaseTest {
       val twoArgFn = irFunctions.single { fn -> fn.valueParameters.size == 2 }
       val threeArgFn = irFunctions.single { fn -> fn.valueParameters.size == 3 }
 
-      val zeroArgFnKey = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, zeroArgFn]!!
-      val oneArgFnKey = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, oneArgFn]!!
-      val twoArgFnKey = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, twoArgFn]!!
-      val threeArgFnKey = irTrace[TrackerWritableSlices.SIMPLE_FUNCTION_KEY, threeArgFn]!!
+      val zeroArgFnKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, zeroArgFn]!!
+      val oneArgFnKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, oneArgFn]!!
+      val twoArgFnKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, twoArgFn]!!
+      val threeArgFnKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, threeArgFn]!!
 
       zeroArgFnKey.keyName shouldBe "fun-one()Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker.key/file-TrackerKeyTestSource.kt"
       oneArgFnKey.keyName shouldBe "fun-one(Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker.key/file-TrackerKeyTestSource.kt"

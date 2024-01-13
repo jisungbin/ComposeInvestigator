@@ -13,14 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
 import land.sungbin.composeinvestigator.runtime.ComposableInvalidationEffect
 import land.sungbin.composeinvestigator.runtime.ComposableInvalidationListener
-import land.sungbin.composeinvestigator.runtime.ComposableInvalidationType
-import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracker
-
-val invalidationListensViaEffects = mutableMapOf<AffectedComposable, MutableList<ComposableInvalidationType>>()
-
-fun findInvalidationListensViaEffects(composableName: String): List<ComposableInvalidationType> =
-  invalidationListensViaEffects.filterKeys { composable -> composable.name == composableName }.values.flatten()
 
 @Composable
 fun Effects_InvalidationSkippedRoot() {
@@ -34,7 +27,7 @@ fun Effects_InvalidationSkippedRoot() {
     }
   }
 
-  Button(onClick = { recomposeScope.invalidate() }) {}
+  Button(onClick = recomposeScope::invalidate) {}
   Effects_InvalidationSkippedChild()
 }
 

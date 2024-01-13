@@ -22,7 +22,7 @@ public object IrAffectedField {
   private var affectedFieldSymbol: IrClassSymbol? = null
   private var valueParameterSymbol: IrClassSymbol? = null
 
-  public val irAffectedFieldSymbol: IrClassSymbol get() = affectedFieldSymbol!!
+  public val irAffectedField: IrClassSymbol get() = affectedFieldSymbol!!
 
   public fun init(context: IrPluginContext) {
     affectedFieldSymbol = context.referenceClass(ClassId.topLevel(AFFECTED_FIELD_FQN))!!
