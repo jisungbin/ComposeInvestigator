@@ -7,17 +7,15 @@
 
 package land.sungbin.composeinvestigator.runtime
 
-import androidx.compose.runtime.Immutable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
 
 /** Alternative to `(AffectedComposable, ComposableInvalidationType) -> Unit` that's useful for avoiding boxing. */
-@Immutable
 public fun interface ComposableInvalidationLogger {
   public operator fun invoke(composable: AffectedComposable, type: ComposableInvalidationType)
 }
 
-public data class SimpleParameter(
+public data class ParameterInformation(
   public val name: String,
   public val stability: DeclarationStability,
 )
@@ -37,42 +35,31 @@ public sealed interface InvalidationReason {
   override fun toString(): String
 
   public data object Initial : InvalidationReason {
-    override fun toString(): String = "Initial composition for building data inside Compose."
+    override fun toString(): String = "Initial composition."
+  }
+
+  public data object Invalidate : InvalidationReason {
+    override fun toString(): String =
+      "An invalidation has been requested for the current RecomposeScope. " +
+        "The state value in the body of that composable function has most likely changed."
   }
 
   public data class FieldChanged(public val changed: List<ChangedFieldPair>) : InvalidationReason {
     override fun toString(): String = buildString {
-      // We print the value parameter first. This order should always be guaranteed by the compiler logic,
-      // but we sort it one more time just in case there are any bugs.
-      val typeSortedFields = changed.sortedByDescending { field -> field.old is AffectedField.ValueParameter }
-      var stateTypePrinted = false
-      var index = 0
+      val sortedChanges = changed.sortedBy { field -> field.old.name }
 
       appendLine("FieldChanged(")
-
       appendLine("  [Parameters]")
-      if (typeSortedFields[0].old !is AffectedField.ValueParameter) {
-        appendLine("    (no changed parameter)")
-      }
-
-      typeSortedFields.forEach { (old, new) ->
+      sortedChanges.forEachIndexed { index, (old, new) ->
         check(old.name == new.name) { "Field name must be same. old.name=${old.name}, new.name=${new.name}" }
-
-        if (old is AffectedField.StateProperty && !stateTypePrinted) {
-          appendLine("  [States]")
-          stateTypePrinted = true
-          index = 0
-        }
-
         appendLine(
           """
-          |    ${++index}. ${old.name}${if (old is AffectedField.ValueParameter) " <${old.stability}>" else ""}
+          |    ${index + 1}. ${old.name}${if (old is AffectedField.ValueParameter) " <${old.stability}>" else ""}
           |      Old: ${with(old) { "$valueString ($valueHashCode)" }}
           |      New: ${with(new) { "$valueString ($valueHashCode)" }}
           """.trimMargin(),
         )
       }
-
       appendLine(")")
     }
   }
@@ -81,15 +68,16 @@ public sealed interface InvalidationReason {
   // https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/compiler/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/lower/ComposableFunctionBodyTransformer.kt;l=381-382;drc=ea884612191a32933b697cc5062aa32505be4eaa
   // However, I haven't yet figured out how to determine this, so this type is not used. (in TODO status)
   // It's probably related to androidx.compose.runtime.changedLowBitMask. (RecomposeScopeImpl.kt)
-  @Deprecated("Force is not supported yet.")
+  @Deprecated("Force reason is not supported yet.")
   public data object Force : InvalidationReason {
     override fun toString(): String = "A forced recomposition has been requested for the current composable."
   }
 
-  public data class Unknown(public val params: List<SimpleParameter> = emptyList()) : InvalidationReason {
-    override fun toString(): String = "Didn't find any fields that are changed from before. " +
-      "Please refer to the project README for more information on why this happens." +
-      if (params.isNotEmpty()) "\ngiven parameters: ${params.joinToString()}" else ""
+  public data class Unknown(public val params: List<ParameterInformation> = emptyList()) : InvalidationReason {
+    override fun toString(): String =
+      "No parameters have changed. Perhaps the state value being referenced in the function body has changed. " +
+        "If no state has changed, then some function parameter may be unstable, or a forced invalidation may have " +
+        "been requested.${if (params.isNotEmpty()) "\nGiven parameters: ${params.joinToString()}" else ""}"
   }
 }
 

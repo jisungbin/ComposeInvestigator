@@ -28,7 +28,7 @@ class ComposableInvalidationTrackTableTest : FeatureSpec() {
         )
 
         table.affectFields shouldBe mapOf("keyName" to listOf(param))
-        invalidationReason shouldBe InvalidationReason.Initial
+        invalidationReason shouldBe InvalidationReason.Invalidate
       }
       scenario("when previous info exists") {
         val oldParam = AffectedField.ValueParameter(
@@ -59,7 +59,7 @@ class ComposableInvalidationTrackTableTest : FeatureSpec() {
       }
     }
     feature("AffectedField.FieldChanged") {
-      scenario("display as String (param only)") {
+      scenario("display as String (params only)") {
         val changedParam = InvalidationReason.FieldChanged(
           listOf(
             AffectedField.ValueParameter(
@@ -73,6 +73,17 @@ class ComposableInvalidationTrackTableTest : FeatureSpec() {
               valueString = "new value",
               valueHashCode = 1,
             ),
+            AffectedField.ValueParameter(
+              name = "name2",
+              stability = DeclarationStability.Unstable,
+              valueString = "value2",
+              valueHashCode = 10,
+            ) changedTo AffectedField.ValueParameter(
+              name = "name2",
+              stability = DeclarationStability.Unstable,
+              valueString = "new value2",
+              valueHashCode = 11,
+            ),
           ),
         )
 
@@ -82,97 +93,9 @@ class ComposableInvalidationTrackTableTest : FeatureSpec() {
           |    1. name <Stable>
           |      Old: value (0)
           |      New: new value (1)
-          |)
-          |""".trimMargin()
-      }
-      scenario("display as String (state only)") {
-        val changedState = InvalidationReason.FieldChanged(
-          listOf(
-            AffectedField.StateProperty(
-              name = "name",
-              valueString = "value",
-              valueHashCode = 0,
-            ) changedTo AffectedField.StateProperty(
-              name = "name",
-              valueString = "new value",
-              valueHashCode = 1,
-            ),
-          ),
-        )
-
-        changedState.toString() shouldBe """
-          |FieldChanged(
-          |  [Parameters]
-          |    (no changed parameter)
-          |  [States]
-          |    1. name
-          |      Old: value (0)
-          |      New: new value (1)
-          |)
-          |""".trimMargin()
-      }
-      scenario("display as String (params and states)") {
-        val changes = InvalidationReason.FieldChanged(
-          listOf(
-            AffectedField.ValueParameter(
-              name = "name",
-              valueString = "value",
-              valueHashCode = 0,
-              stability = DeclarationStability.Stable,
-            ) changedTo AffectedField.ValueParameter(
-              name = "name",
-              valueString = "new value",
-              valueHashCode = 1,
-              stability = DeclarationStability.Stable,
-            ),
-            AffectedField.ValueParameter(
-              name = "name2",
-              valueString = "value2",
-              valueHashCode = 2,
-              stability = DeclarationStability.Stable,
-            ) changedTo AffectedField.ValueParameter(
-              name = "name2",
-              valueString = "new value2",
-              valueHashCode = 3,
-              stability = DeclarationStability.Stable,
-            ),
-            AffectedField.StateProperty(
-              name = "name3",
-              valueString = "value3",
-              valueHashCode = 4,
-            ) changedTo AffectedField.StateProperty(
-              name = "name3",
-              valueString = "new value3",
-              valueHashCode = 5,
-            ),
-            AffectedField.StateProperty(
-              name = "name4",
-              valueString = "value4",
-              valueHashCode = 6,
-            ) changedTo AffectedField.StateProperty(
-              name = "name4",
-              valueString = "new value4",
-              valueHashCode = 7,
-            ),
-          ),
-        )
-
-        changes.toString() shouldBe """
-          |FieldChanged(
-          |  [Parameters]
-          |    1. name <Stable>
-          |      Old: value (0)
-          |      New: new value (1)
-          |    2. name2 <Stable>
-          |      Old: value2 (2)
-          |      New: new value2 (3)
-          |  [States]
-          |    1. name3
-          |      Old: value3 (4)
-          |      New: new value3 (5)
-          |    2. name4
-          |      Old: value4 (6)
-          |      New: new value4 (7)
+          |    2. name2 <Unstable>
+          |      Old: value2 (10)
+          |      New: new value2 (11)
           |)
           |""".trimMargin()
       }

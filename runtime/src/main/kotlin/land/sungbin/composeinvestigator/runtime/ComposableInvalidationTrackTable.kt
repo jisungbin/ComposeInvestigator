@@ -88,12 +88,12 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
 
     return if (changed.isEmpty()) {
       val params = fields.filterIsInstance<AffectedField.ValueParameter>()
-      InvalidationReason.Unknown(params = params.map(AffectedField.ValueParameter::toSimpleParameter))
+      InvalidationReason.Unknown(params = params.map(AffectedField.ValueParameter::toParameterInformation))
     } else {
       InvalidationReason.FieldChanged(changed = changed)
     }
   }
 }
 
-private fun AffectedField.ValueParameter.toSimpleParameter(): SimpleParameter =
-  SimpleParameter(name = name, stability = stability)
+private fun AffectedField.ValueParameter.toParameterInformation(): ParameterInformation =
+  ParameterInformation(name = name, stability = stability)

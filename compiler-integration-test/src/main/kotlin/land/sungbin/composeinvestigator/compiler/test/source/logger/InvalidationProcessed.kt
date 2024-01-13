@@ -18,7 +18,7 @@ import androidx.compose.runtime.setValue
 @Composable
 fun InvalidationProcessedRoot_StateDelegateReference() {
   var count by remember { mutableIntStateOf(0) }
-  Button(onClick = { count = 1 }) {}
+  Button(onClick = { count++ }) {}
   InvalidationProcessedChild_StateDelegateReference(count)
 }
 
@@ -30,7 +30,7 @@ private fun InvalidationProcessedChild_StateDelegateReference(count: Int) {
 @Composable
 fun InvalidationProcessedRoot_StateDirectReference() {
   val count = remember { mutableIntStateOf(0) }
-  Button(onClick = { count.intValue = 1 }) {}
+  Button(onClick = { count.intValue++ }) {}
   InvalidationProcessedChild_StateDirectReference(count.intValue)
 }
 

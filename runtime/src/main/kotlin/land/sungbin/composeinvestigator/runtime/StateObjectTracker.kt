@@ -7,20 +7,22 @@
 
 package land.sungbin.composeinvestigator.runtime
 
-import android.util.Log
 import androidx.compose.runtime.Composer
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.RememberObserver
+import androidx.compose.runtime.State
 import androidx.compose.runtime.cache
 import androidx.compose.runtime.snapshots.ObserverHandle
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotMutableState
 import androidx.compose.runtime.snapshots.StateObject
-import java.util.concurrent.atomic.AtomicBoolean
 import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateFieldNameMap
-import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateValueChangedListener
+import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateLocationMap
 import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateValueGetterMap
+import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.trackedStateObjects
+import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import org.jetbrains.annotations.TestOnly
+import java.util.concurrent.atomic.AtomicBoolean
 
 public data class StateValue(val previousValue: Any?, val newValue: Any?)
 
@@ -30,31 +32,27 @@ public fun interface StateValueGetter {
 
 @Immutable
 public fun interface StateChangedListener {
-  public fun onChanged(stateName: String, previousValue: Any?, newValue: Any?)
-
-  public companion object {
-    public val DefaultLogger: StateChangedListener = StateChangedListener { name, previousValue, newValue ->
-      Log.d(ComposeInvestigatorConfig.LOGGER_DEFAULT_TAG, "The '$name' state has been changed. previousValue=$previousValue, newValue=$newValue")
-    }
-  }
+  public fun onChanged(composable: AffectedComposable, stateName: String, previousValue: Any?, newValue: Any?)
 }
 
 internal object StateObjectTrackManager {
   private val started = AtomicBoolean(false)
   private var previousHandle: ObserverHandle? = null
 
+  internal val trackedStateObjects = mutableMapOf<String, MutableSet<StateObject>>()
   internal val stateFieldNameMap = mutableMapOf<StateObject, String>()
   internal val stateValueGetterMap = mutableMapOf<StateObject, StateValueGetter>()
-  internal val stateValueChangedListener = mutableMapOf<StateObject, StateChangedListener>()
+  internal val stateLocationMap = mutableMapOf<StateObject, AffectedComposable>()
 
   @TestOnly
   internal fun clear() {
     started.set(false)
     previousHandle?.dispose()
 
+    trackedStateObjects.clear()
     stateFieldNameMap.clear()
     stateValueGetterMap.clear()
-    stateValueChangedListener.clear()
+    stateLocationMap.clear()
   }
 
   internal fun ensureStarted() {
@@ -65,41 +63,53 @@ internal object StateObjectTrackManager {
 
           val name = stateFieldNameMap[stateObject] ?: return@loop
           val value = stateValueGetterMap[stateObject]?.invoke(stateObject) ?: return@loop
-          val listener = stateValueChangedListener[stateObject] ?: return@loop
+          val location = stateLocationMap[stateObject] ?: return@loop
 
-          listener.onChanged(stateName = name, previousValue = value.previousValue, newValue = value.newValue)
+          ComposeInvestigatorConfig.stateChangedListener.onChanged(
+            stateName = name,
+            composable = location,
+            previousValue = value.previousValue,
+            newValue = value.newValue,
+          )
         }
       }
     }
   }
 }
 
-public fun ComposableInvalidationTrackTable.registerStateObjectTracking(
+public fun <S : State<*>> ComposableKeyInfo.registerStateObjectTracking(
   composer: Composer,
+  composable: AffectedComposable,
   stateValueGetter: StateValueGetter = ComposeStateObjectValueGetter,
-  listener: StateChangedListener = StateChangedListener.DefaultLogger,
-  vararg stateObjectFields: Pair<String, StateObject>, // first is field name
-) {
+  stateObjectField: Pair<String, S>, // first is field name
+): S {
+  require(stateObjectField.second is StateObject) {
+    "The second value of the stateObjectField must be implemented as a StateObject."
+  }
+
   StateObjectTrackManager.ensureStarted()
+
+  val fieldName = stateObjectField.first
+  val stateObject = stateObjectField.second as StateObject
+
+  trackedStateObjects.getOrPut(keyName, ::mutableSetOf).add(stateObject)
+  stateFieldNameMap.putIfAbsent(stateObject, fieldName)
+  stateValueGetterMap.putIfAbsent(stateObject, stateValueGetter)
+  stateLocationMap.putIfAbsent(stateObject, composable)
+  ComposeStateObjectValueGetter.initialize(stateObject)
 
   val register by lazy {
     object : RememberObserver {
-      override fun onRemembered() {
-        stateObjectFields.forEach { (fieldName, stateObject) ->
-          stateFieldNameMap[stateObject] = fieldName
-          stateValueGetterMap[stateObject] = stateValueGetter
-          stateValueChangedListener[stateObject] = listener
-          ComposeStateObjectValueGetter.initialize(stateObject)
-        }
-      }
+      override fun onRemembered() {}
 
       override fun onForgotten() {
-        stateObjectFields.forEach { (_, stateObject) ->
+        trackedStateObjects.getOrDefault(keyName, emptySet()).forEach { stateObject ->
           stateFieldNameMap.remove(stateObject)
           stateValueGetterMap.remove(stateObject)
-          stateValueChangedListener.remove(stateObject)
+          stateLocationMap.remove(stateObject)
           ComposeStateObjectValueGetter.clean(stateObject)
         }
+        trackedStateObjects.remove(keyName)
       }
 
       override fun onAbandoned() {
@@ -108,9 +118,11 @@ public fun ComposableInvalidationTrackTable.registerStateObjectTracking(
     }
   }
 
-  composer.startReplaceableGroup(currentComposableKeyName.hashCode())
-  composer.cache(composer.changed(currentComposableKeyName)) { register }
+  composer.startReplaceableGroup(keyName.hashCode())
+  composer.cache(composer.changed(keyName)) { register }
   composer.endReplaceableGroup()
+
+  return stateObjectField.second
 }
 
 public object ComposeStateObjectValueGetter : StateValueGetter {

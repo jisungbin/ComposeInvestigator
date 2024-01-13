@@ -14,9 +14,14 @@ import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffec
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.TrackerFunctionKeyVisitor
 import land.sungbin.composeinvestigator.compiler.internal.tracker.logger.IrInvalidationLogger
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
+import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.name
+import org.jetbrains.kotlin.ir.util.dump
+import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
 internal class InvalidationTrackingExtension(private val logger: VerboseLogger) : IrGenerationExtension {
@@ -43,6 +48,18 @@ internal class InvalidationTrackingExtension(private val logger: VerboseLogger) 
         logger = logger,
         stabilityInferencer = stabilityInferencer,
       ),
+    )
+    moduleFragment.transformChildrenVoid(
+      object : IrElementTransformerVoidWithContext() {
+        override fun visitFileNew(declaration: IrFile): IrFile {
+          if (declaration.name == "InvalidationProcessed.kt") {
+            logger("[IR TEST DEBUG DUMP]")
+            logger(declaration.dump())
+            logger(declaration.dumpKotlinLike())
+          }
+          return declaration
+        }
+      },
     )
   }
 }

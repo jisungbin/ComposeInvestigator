@@ -43,11 +43,11 @@ class InvalidationCallbackTest {
       rootListens shouldBeSameSizeAs childListens
 
       rootListens shouldContainExactly listOf(
-        ComposableInvalidationType.Processed(InvalidationReason.Initial),
+        ComposableInvalidationType.Processed(InvalidationReason.Invalidate),
         ComposableInvalidationType.Processed(InvalidationReason.Unknown()),
       )
       childListens shouldContainExactly listOf(
-        ComposableInvalidationType.Processed(InvalidationReason.Initial),
+        ComposableInvalidationType.Processed(InvalidationReason.Invalidate),
         ComposableInvalidationType.Skipped,
       )
     }

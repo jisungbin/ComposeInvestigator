@@ -19,22 +19,32 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshots.StateObject
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
 import io.mockk.every
 import io.mockk.mockk
+import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.mock.compositionTest
 import land.sungbin.composeinvestigator.runtime.mock.expectChanges
 
 class StateObjectTrackerTest : ShouldSpec() {
-  data class STATE(val name: String, val previousValue: Any?, val newValue: Any?)
+  private data class STATE(val composable: AffectedComposable, val name: String, val previousValue: Any?, val newValue: Any?)
+
+  private fun AffectedComposable(name: String) =
+    AffectedComposable(
+      name = name,
+      pkg = "TestPackage",
+      filePath = "TestFilePath",
+      startLine = 0,
+      startColumn = 0,
+    )
 
   init {
     val log = mutableListOf<STATE>()
-    val listener = StateChangedListener { name, previousValue, newValue ->
-      log.add(STATE(name = name, previousValue = previousValue, newValue = newValue))
+
+    ComposeInvestigatorConfig.stateChangedListener = StateChangedListener { composable, name, previousValue, newValue ->
+      log.add(STATE(composable = composable, name = name, previousValue = previousValue, newValue = newValue))
     }
 
     beforeAny {
@@ -58,15 +68,17 @@ class StateObjectTrackerTest : ShouldSpec() {
         val untrackFloatState = mutableFloatStateOf(0f)
 
         compose {
-          table.registerStateObjectTracking(
-            composer = currentComposer,
-            listener = listener,
-            stateObjectFields = arrayOf(
-              "stringState" to stringState as StateObject,
-              "intState" to intState as StateObject,
-              "floatState" to floatState as StateObject,
-            ),
-          )
+          listOf(
+            "stringState" to stringState,
+            "intState" to intState,
+            "floatState" to floatState,
+          ).forEach { stateObjectField ->
+            table.registerStateObjectTracking(
+              composer = currentComposer,
+              composable = AffectedComposable(stateObjectField.first),
+              stateObjectField = stateObjectField,
+            )
+          }
 
           SideEffect {
             stringState.value += " string"
@@ -80,9 +92,9 @@ class StateObjectTrackerTest : ShouldSpec() {
         }
 
         log shouldContainExactlyInAnyOrder listOf(
-          STATE(name = "stringState", previousValue = "string", newValue = "string string"),
-          STATE(name = "intState", previousValue = 0, newValue = 1),
-          STATE(name = "floatState", previousValue = 0f, newValue = 1f),
+          STATE(composable = AffectedComposable("stringState"), name = "stringState", previousValue = "string", newValue = "string string"),
+          STATE(composable = AffectedComposable("intState"), name = "intState", previousValue = 0, newValue = 1),
+          STATE(composable = AffectedComposable("floatState"), name = "floatState", previousValue = 0f, newValue = 1f),
         )
       }
     }
@@ -110,26 +122,30 @@ class StateObjectTrackerTest : ShouldSpec() {
 
           when (key) {
             1 -> {
-              table.registerStateObjectTracking(
-                composer = currentComposer,
-                listener = listener,
-                stateObjectFields = arrayOf(
-                  "stringState" to stringState as StateObject,
-                  "intState" to intState as StateObject,
-                  "floatState" to floatState as StateObject,
-                ),
-              )
+              listOf(
+                "stringState" to stringState,
+                "intState" to intState,
+                "floatState" to floatState,
+              ).forEach { stateObjectField ->
+                table.registerStateObjectTracking(
+                  composer = currentComposer,
+                  composable = AffectedComposable(stateObjectField.first),
+                  stateObjectField = stateObjectField,
+                )
+              }
             }
             2 -> {
-              table.registerStateObjectTracking(
-                composer = currentComposer,
-                listener = listener,
-                stateObjectFields = arrayOf(
-                  "stringState2" to stringState2 as StateObject,
-                  "intState2" to intState2 as StateObject,
-                  "floatState2" to floatState2 as StateObject,
-                ),
-              )
+              listOf(
+                "stringState2" to stringState2,
+                "intState2" to intState2,
+                "floatState2" to floatState2,
+              ).forEach { stateObjectField ->
+                table.registerStateObjectTracking(
+                  composer = currentComposer,
+                  composable = AffectedComposable(stateObjectField.first),
+                  stateObjectField = stateObjectField,
+                )
+              }
             }
           }
 
@@ -146,9 +162,9 @@ class StateObjectTrackerTest : ShouldSpec() {
 
         withClue("The second set of states should not be tracked yet.") {
           log shouldContainExactlyInAnyOrder listOf(
-            STATE(name = "stringState", previousValue = "string", newValue = "string string"),
-            STATE(name = "intState", previousValue = 0, newValue = 1),
-            STATE(name = "floatState", previousValue = 0f, newValue = 1f),
+            STATE(composable = AffectedComposable("stringState"), name = "stringState", previousValue = "string", newValue = "string string"),
+            STATE(composable = AffectedComposable("intState"), name = "intState", previousValue = 0, newValue = 1),
+            STATE(composable = AffectedComposable("floatState"), name = "floatState", previousValue = 0f, newValue = 1f),
           )
         }
 
@@ -158,15 +174,15 @@ class StateObjectTrackerTest : ShouldSpec() {
 
         withClue("The second set of states should be tracked.") {
           log shouldContainExactlyInAnyOrder listOf(
-            STATE(name = "stringState", previousValue = "string", newValue = "string string"),
-            STATE(name = "stringState", previousValue = "string string", newValue = "string string string"),
-            STATE(name = "intState", previousValue = 0, newValue = 1),
-            STATE(name = "intState", previousValue = 1, newValue = 2),
-            STATE(name = "floatState", previousValue = 0f, newValue = 1f),
-            STATE(name = "floatState", previousValue = 1f, newValue = 2f),
-            STATE(name = "stringState2", previousValue = "string2 string2", newValue = "string2 string2 string2"),
-            STATE(name = "intState2", previousValue = 101, newValue = 102),
-            STATE(name = "floatState2", previousValue = 101f, newValue = 102f),
+            STATE(composable = AffectedComposable("stringState"), name = "stringState", previousValue = "string", newValue = "string string"),
+            STATE(composable = AffectedComposable("stringState"), name = "stringState", previousValue = "string string", newValue = "string string string"),
+            STATE(composable = AffectedComposable("intState"), name = "intState", previousValue = 0, newValue = 1),
+            STATE(composable = AffectedComposable("intState"), name = "intState", previousValue = 1, newValue = 2),
+            STATE(composable = AffectedComposable("floatState"), name = "floatState", previousValue = 0f, newValue = 1f),
+            STATE(composable = AffectedComposable("floatState"), name = "floatState", previousValue = 1f, newValue = 2f),
+            STATE(composable = AffectedComposable("stringState2"), name = "stringState2", previousValue = "string2 string2", newValue = "string2 string2 string2"),
+            STATE(composable = AffectedComposable("intState2"), name = "intState2", previousValue = 101, newValue = 102),
+            STATE(composable = AffectedComposable("floatState2"), name = "floatState2", previousValue = 101f, newValue = 102f),
           )
         }
       }
@@ -185,15 +201,17 @@ class StateObjectTrackerTest : ShouldSpec() {
 
         @Composable
         fun Unmountable() {
-          table.registerStateObjectTracking(
-            composer = currentComposer,
-            listener = listener,
-            stateObjectFields = arrayOf(
-              "stringState" to stringState as StateObject,
-              "intState" to intState as StateObject,
-              "floatState" to floatState as StateObject,
-            ),
-          )
+          listOf(
+            "stringState" to stringState,
+            "intState" to intState,
+            "floatState" to floatState,
+          ).forEach { stateObjectField ->
+            table.registerStateObjectTracking(
+              composer = currentComposer,
+              composable = AffectedComposable(stateObjectField.first),
+              stateObjectField = stateObjectField,
+            )
+          }
         }
 
         compose {
@@ -207,9 +225,9 @@ class StateObjectTrackerTest : ShouldSpec() {
 
         withClue("Targeted for state tracking when in Remembered state") {
           log shouldContainExactlyInAnyOrder listOf(
-            STATE(name = "stringState", previousValue = "string", newValue = "string string"),
-            STATE(name = "intState", previousValue = 0, newValue = 1),
-            STATE(name = "floatState", previousValue = 0f, newValue = 1f),
+            STATE(composable = AffectedComposable("stringState"), name = "stringState", previousValue = "string", newValue = "string string"),
+            STATE(composable = AffectedComposable("intState"), name = "intState", previousValue = 0, newValue = 1),
+            STATE(composable = AffectedComposable("floatState"), name = "floatState", previousValue = 0f, newValue = 1f),
           )
         }
 
@@ -218,9 +236,9 @@ class StateObjectTrackerTest : ShouldSpec() {
 
         withClue("When Forgotten, all registered states tracking targets in that group are cleared.") {
           log shouldContainExactlyInAnyOrder listOf(
-            STATE(name = "stringState", previousValue = "string", newValue = "string string"),
-            STATE(name = "intState", previousValue = 0, newValue = 1),
-            STATE(name = "floatState", previousValue = 0f, newValue = 1f),
+            STATE(composable = AffectedComposable("stringState"), name = "stringState", previousValue = "string", newValue = "string string"),
+            STATE(composable = AffectedComposable("intState"), name = "intState", previousValue = 0, newValue = 1),
+            STATE(composable = AffectedComposable("floatState"), name = "floatState", previousValue = 0f, newValue = 1f),
           )
         }
       }

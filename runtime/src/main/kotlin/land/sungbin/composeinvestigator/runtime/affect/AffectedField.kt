@@ -9,6 +9,7 @@ package land.sungbin.composeinvestigator.runtime.affect
 
 import land.sungbin.composeinvestigator.runtime.DeclarationStability
 
+// Design it as a sealed class in case new field types come in the future.
 public sealed interface AffectedField {
   public val name: String
   public val valueString: String
@@ -19,11 +20,5 @@ public sealed interface AffectedField {
     override val valueString: String,
     override val valueHashCode: Int,
     public val stability: DeclarationStability,
-  ) : AffectedField
-
-  public data class StateProperty(
-    override val name: String,
-    override val valueString: String,
-    override val valueHashCode: Int,
   ) : AffectedField
 }

@@ -2,14 +2,26 @@
 
 package land.sungbin.composeinvestigator.compiler.test.source
 
+import androidx.compose.material.Button
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.MutableLongState
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 
 @Composable
-fun InvalidationProcessedRoot_StateDelegateReference() {
-  val countDirect = remember { mutableIntStateOf(0) }
-  var countDelegation by remember { mutableIntStateOf(0) }
+fun MsProducer() {
+  val ms = remember { mutableLongStateOf(System.currentTimeMillis()) }
+  Content(ms)
+}
+
+@Composable
+private fun Content(ms: MutableLongState) {
+  Button(onClick = { ms.longValue = System.currentTimeMillis() }) {}
+  Display(text = ms.longValue.toString())
+}
+
+@Composable
+private fun Display(text: String) {
+  Text(text = text)
 }

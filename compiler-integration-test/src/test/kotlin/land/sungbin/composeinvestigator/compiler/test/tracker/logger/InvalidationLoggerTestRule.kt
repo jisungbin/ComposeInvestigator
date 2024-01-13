@@ -8,7 +8,9 @@
 package land.sungbin.composeinvestigator.compiler.test.tracker.logger
 
 import land.sungbin.composeinvestigator.compiler.test.source.logger.clearInvalidationLog
+import land.sungbin.composeinvestigator.compiler.test.source.logger.clearStateChangeLog
 import land.sungbin.composeinvestigator.compiler.test.source.logger.invalidationLogger
+import land.sungbin.composeinvestigator.compiler.test.source.logger.stateChangeLogger
 import land.sungbin.composeinvestigator.runtime.ComposeInvestigatorConfig
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
@@ -16,11 +18,11 @@ import org.junit.runner.Description
 class InvalidationLoggerTestRule : TestWatcher() {
   override fun starting(description: Description?) {
     ComposeInvestigatorConfig.invalidationLogger = invalidationLogger
-    super.starting(description)
+    ComposeInvestigatorConfig.stateChangedListener = stateChangeLogger
   }
 
   override fun finished(description: Description?) {
-    super.finished(description)
     clearInvalidationLog()
+    clearStateChangeLog()
   }
 }
