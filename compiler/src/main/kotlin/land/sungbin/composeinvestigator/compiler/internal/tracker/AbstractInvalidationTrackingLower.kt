@@ -135,13 +135,10 @@ internal abstract class AbstractInvalidationTrackingLower(
   }
 
   // val state = remember { mutableStateOf(T) }
-  override fun visitVariable(declaration: IrVariable): IrStatement {
+  final override fun visitVariable(declaration: IrVariable): IrStatement {
     val composable = lastReachedComposable() ?: return super.visitVariable(declaration)
     if (declaration.origin == IrDeclarationOrigin.PROPERTY_DELEGATE) return super.visitVariable(declaration)
     if (declaration.isValidStateDeclaration()) {
-      logger("visitVariable: ${declaration.dump()}")
-      logger("visitVariable: ${declaration.dumpKotlinLike()}")
-
       declaration.initializer = transformStateInitializer(
         composable = composable,
         stateName = declaration.name,
@@ -152,10 +149,7 @@ internal abstract class AbstractInvalidationTrackingLower(
   }
 
   // var state by remember { mutableStateOf(T) }
-  override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty): IrStatement {
-    logger("visitLocalDelegatedProperty: ${declaration.dump()}")
-    logger("visitLocalDelegatedProperty: ${declaration.dumpKotlinLike()}")
-
+  final override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty): IrStatement {
     val composable = lastReachedComposable() ?: return super.visitLocalDelegatedProperty(declaration)
     if (declaration.delegate.isValidStateDeclaration()) {
       declaration.delegate.initializer = transformStateInitializer(
@@ -257,6 +251,7 @@ internal abstract class AbstractInvalidationTrackingLower(
               val transformed = transformUpdateScopeBlock(target = returnTarget.symbol.owner, initializer = returnCall)
               body.statements.clear()
               body.statements.addAll(transformed.statements)
+
               return super.visitBlockBody(body)
             }
           },
