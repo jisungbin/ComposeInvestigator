@@ -1,3 +1,5 @@
+@file:Suppress("UnstableApiUsage")
+
 plugins {
   id("com.android.library")
   kotlin("android")
@@ -29,16 +31,27 @@ android {
   composeOptions {
     kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
   }
+
+  testOptions.unitTests {
+    isReturnDefaultValues = true
+    isIncludeAndroidResources = true
+  }
 }
 
 kotlin {
   explicitApi()
   compilerOptions {
+    optIn.add("androidx.compose.runtime.InternalComposeApi")
     optIn.add("land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi")
+    optIn.add("land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi")
   }
 }
 
 dependencies {
   implementation(libs.compose.runtime)
+  implementation(libs.compose.animation)
+  implementation(embeddedKotlin("reflect"))
+  testImplementation(libs.test.mockk)
   testImplementation(libs.test.kotest.junit5)
+  testImplementation(libs.test.kotlin.coroutines)
 }

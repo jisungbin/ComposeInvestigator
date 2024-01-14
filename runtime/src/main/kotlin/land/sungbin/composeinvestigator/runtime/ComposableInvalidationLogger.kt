@@ -7,24 +7,24 @@
 
 package land.sungbin.composeinvestigator.runtime
 
-import androidx.compose.runtime.Immutable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
 
-@Immutable
-public fun interface ComposableInvalidationLogger : Function2<AffectedComposable, ComposableInvalidationType, Unit> {
-  override fun invoke(composable: AffectedComposable, type: ComposableInvalidationType)
+/** Alternative to `(AffectedComposable, ComposableInvalidationType) -> Unit` that's useful for avoiding boxing. */
+public fun interface ComposableInvalidationLogger {
+  public operator fun invoke(composable: AffectedComposable, type: ComposableInvalidationType)
 }
 
-public data class SimpleParameter(
+public data class ParameterInformation(
   public val name: String,
+  public val typeFqName: String,
   public val stability: DeclarationStability,
 )
 
 public data class ChangedFieldPair(public val old: AffectedField, public val new: AffectedField) {
   init {
-    require(old.javaClass.canonicalName == new.javaClass.canonicalName) {
-      "AffectedField must be same type. old=${old.javaClass.canonicalName}, new=${new.javaClass.canonicalName}"
+    require(old.javaClass.name == new.javaClass.name) {
+      "AffectedField must be same type. old=${old.javaClass.name}, new=${new.javaClass.name}"
     }
   }
 }
@@ -32,62 +32,51 @@ public data class ChangedFieldPair(public val old: AffectedField, public val new
 public infix fun AffectedField.changedTo(new: AffectedField): ChangedFieldPair =
   ChangedFieldPair(old = this, new = new)
 
-public sealed interface InvalidationReason {
-  override fun toString(): String
+public sealed class InvalidationReason {
+  abstract override fun toString(): String
 
-  public data object Initial : InvalidationReason {
-    override fun toString(): String = "Initial composition for building data inside Compose."
+  public data object Initial : InvalidationReason() {
+    override fun toString(): String = "[Initial] Initial composition."
   }
 
-  public data class FieldChanged(public val changed: List<ChangedFieldPair>) : InvalidationReason {
+  public data object Invalidate : InvalidationReason() {
+    override fun toString(): String =
+      "[Invalidate] An invalidation has been requested for the current composable scope. " +
+        "The state value in the body of that composable function has most likely changed."
+  }
+
+  public data class FieldChanged(public val changed: List<ChangedFieldPair>) : InvalidationReason() {
     override fun toString(): String = buildString {
-      // We print the value parameter first. This order should always be guaranteed by the compiler logic,
-      // but we sort it one more time just in case there are any bugs.
-      val typeSortedFields = changed.sortedByDescending { field -> field.old is AffectedField.ValueParameter }
-      var stateTypePrinted = false
-      var index = 0
+      val sortedChanges = changed.sortedBy { field -> field.old.name }
 
-      appendLine("FieldChanged(")
-
-      appendLine("  [Parameters]")
-      if (typeSortedFields[0].old !is AffectedField.ValueParameter) {
-        appendLine("    (no changed parameter)")
-      }
-
-      typeSortedFields.forEach { (old, new) ->
+      appendLine("[FieldChanged]")
+      sortedChanges.forEachIndexed { index, (old, new) ->
         check(old.name == new.name) { "Field name must be same. old.name=${old.name}, new.name=${new.name}" }
-
-        if (old is AffectedField.StateProperty && !stateTypePrinted) {
-          appendLine("  [States]")
-          stateTypePrinted = true
-          index = 0
-        }
-
         appendLine(
           """
-          |    ${++index}. ${old.name}${if (old is AffectedField.ValueParameter) " <${old.stability}>" else ""}
-          |      Old: ${with(old) { "$valueString ($valueHashCode)" }}
-          |      New: ${with(new) { "$valueString ($valueHashCode)" }}
+          |  ${index + 1}. ${old.name}${if (old is AffectedField.ValueParameter) " <${old.stability}>" else ""}
+          |    Old: ${with(old) { "$valueString ($valueHashCode)" }}
+          |    New: ${with(new) { "$valueString ($valueHashCode)" }}
           """.trimMargin(),
         )
       }
-
-      appendLine(")")
     }
   }
 
   // According to the Compose compiler's comments, this should be determinable via the $changed argument.
   // https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/compiler/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/lower/ComposableFunctionBodyTransformer.kt;l=381-382;drc=ea884612191a32933b697cc5062aa32505be4eaa
   // However, I haven't yet figured out how to determine this, so this type is not used. (in TODO status)
-  @Deprecated("Force is not supported yet.")
-  public data object Force : InvalidationReason {
-    override fun toString(): String = "A forced recomposition has been requested for the current composable."
+  // It's probably related to androidx.compose.runtime.changedLowBitMask. (RecomposeScopeImpl.kt)
+  @Deprecated("Force reason is not supported yet.")
+  public data object Force : InvalidationReason() {
+    override fun toString(): String = "[Force] A forced recomposition has been requested for the current composable."
   }
 
-  public data class Unknown(public val params: List<SimpleParameter> = emptyList()) : InvalidationReason {
-    override fun toString(): String = "Didn't find any fields that are changed from before. " +
-      "Please refer to the project README for more information on why this happens." +
-      if (params.isNotEmpty()) "\ngiven parameters: ${params.joinToString()}" else ""
+  public data class Unknown(public val params: List<ParameterInformation>) : InvalidationReason() {
+    override fun toString(): String =
+      "[Unknown] No parameters have changed. Perhaps the state value being referenced in the function body has changed. " +
+        "If no state has changed, then some function parameter may be unstable, or a forced invalidation may have " +
+        "been requested.${if (params.isNotEmpty()) "\nGiven parameters: ${params.joinToString()}" else ""}"
   }
 }
 

@@ -8,8 +8,7 @@
 package land.sungbin.composeinvestigator.compiler.internal.tracker.affect
 
 import land.sungbin.composeinvestigator.compiler.internal.AFFECTED_FIELD_FQN
-import land.sungbin.composeinvestigator.compiler.internal.AFFECTED_FIELD_STATE_PROPERTY_FQN
-import land.sungbin.composeinvestigator.compiler.internal.AFFECTED_FIELD_VALUE_PARAMETER_FQN
+import land.sungbin.composeinvestigator.compiler.internal.AffectedField_VALUE_PARAMETER
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -22,47 +21,30 @@ import org.jetbrains.kotlin.name.ClassId
 public object IrAffectedField {
   private var affectedFieldSymbol: IrClassSymbol? = null
   private var valueParameterSymbol: IrClassSymbol? = null
-  private var statePropertySymbol: IrClassSymbol? = null
 
-  public val irAffectedFieldSymbol: IrClassSymbol get() = affectedFieldSymbol!!
+  public val irAffectedField: IrClassSymbol get() = affectedFieldSymbol!!
 
   public fun init(context: IrPluginContext) {
     affectedFieldSymbol = context.referenceClass(ClassId.topLevel(AFFECTED_FIELD_FQN))!!
-    valueParameterSymbol = context.referenceClass(ClassId.topLevel(AFFECTED_FIELD_VALUE_PARAMETER_FQN))!!
-    statePropertySymbol = context.referenceClass(ClassId.topLevel(AFFECTED_FIELD_STATE_PROPERTY_FQN))!!
+    valueParameterSymbol = affectedFieldSymbol!!.owner.sealedSubclasses.single { clz ->
+      clz.owner.name == AffectedField_VALUE_PARAMETER
+    }
   }
 
   public fun irValueParameter(
     name: IrExpression,
+    typeFqName: IrExpression,
     valueString: IrExpression,
     valueHashCode: IrExpression,
     stability: IrExpression,
-  ): IrConstructorCall {
-    val valueParameterSymbol = valueParameterSymbol!!
-    return IrConstructorCallImpl.fromSymbolOwner(
-      type = valueParameterSymbol.defaultType,
-      constructorSymbol = valueParameterSymbol.constructors.single(),
-    ).apply {
-      putValueArgument(0, name)
-      putValueArgument(1, valueString)
-      putValueArgument(2, valueHashCode)
-      putValueArgument(3, stability)
-    }
-  }
-
-  public fun irStateProperty(
-    name: IrExpression,
-    valueString: IrExpression,
-    valueHashCode: IrExpression,
-  ): IrConstructorCall {
-    val statePropertySymbol = statePropertySymbol!!
-    return IrConstructorCallImpl.fromSymbolOwner(
-      type = statePropertySymbol.defaultType,
-      constructorSymbol = statePropertySymbol.constructors.single(),
-    ).apply {
-      putValueArgument(0, name)
-      putValueArgument(1, valueString)
-      putValueArgument(2, valueHashCode)
-    }
+  ): IrConstructorCall = IrConstructorCallImpl.fromSymbolOwner(
+    type = valueParameterSymbol!!.defaultType,
+    constructorSymbol = valueParameterSymbol!!.constructors.single(),
+  ).apply {
+    putValueArgument(0, name)
+    putValueArgument(1, typeFqName)
+    putValueArgument(2, valueString)
+    putValueArgument(3, valueHashCode)
+    putValueArgument(4, stability)
   }
 }

@@ -9,53 +9,46 @@ package land.sungbin.composeinvestigator.compiler.internal.tracker
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.normalize
+import androidx.compose.compiler.plugins.kotlin.irTrace
+import land.sungbin.composeinvestigator.compiler.internal.COMPOSER_FQN
 import land.sungbin.composeinvestigator.compiler.internal.MUTABLE_LIST_ADD_FQN
 import land.sungbin.composeinvestigator.compiler.internal.MUTABLE_LIST_OF_FQN
-import land.sungbin.composeinvestigator.compiler.internal.OBTAIN_STATE_PROPERTY_AND_ADD_FQN
-import land.sungbin.composeinvestigator.compiler.internal.STATE_FQN
+import land.sungbin.composeinvestigator.compiler.internal.REGISTER_STATE_OBJECT_TRACKING_FQN
 import land.sungbin.composeinvestigator.compiler.internal.fromFqName
-import land.sungbin.composeinvestigator.compiler.internal.irInt
-import land.sungbin.composeinvestigator.compiler.internal.irString
-import land.sungbin.composeinvestigator.compiler.internal.origin.InvalidationTrackerOrigin
 import land.sungbin.composeinvestigator.compiler.internal.stability.toIrDeclarationStability
-import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedComposable
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedField
-import land.sungbin.composeinvestigator.compiler.internal.tracker.key.DurableWritableSlices
-import land.sungbin.composeinvestigator.compiler.internal.tracker.key.irTracee
+import land.sungbin.composeinvestigator.compiler.internal.tracker.key.TrackerWritableSlices
 import land.sungbin.composeinvestigator.compiler.internal.tracker.logger.IrInvalidationLogger
+import land.sungbin.composeinvestigator.compiler.origin.StateChangeTrackerOrigin
+import land.sungbin.composeinvestigator.compiler.util.HandledMap
+import land.sungbin.composeinvestigator.compiler.util.IrStatementContainerImpl
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
+import land.sungbin.composeinvestigator.compiler.util.irString
+import land.sungbin.fastlist.fastLastOrNull
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.backend.wasm.ir2wasm.getSourceLocation
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
-import org.jetbrains.kotlin.ir.declarations.IrLocalDelegatedProperty
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
-import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
+import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrReturn
+import org.jetbrains.kotlin.ir.expressions.IrStatementContainer
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
-import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.classOrFail
-import org.jetbrains.kotlin.ir.types.classOrNull
+import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
+import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.defaultType
-import org.jetbrains.kotlin.ir.types.isSubtypeOfClass
-import org.jetbrains.kotlin.ir.types.starProjectedType
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
-import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.name.CallableId
-import org.jetbrains.kotlin.name.ClassId
-import org.jetbrains.kotlin.wasm.ir.source.location.SourceLocation
+import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.SpecialNames
 
 internal class InvalidationTrackableTransformer(
   private val context: IrPluginContext,
   private val logger: VerboseLogger,
   private val stabilityInferencer: StabilityInferencer,
 ) : AbstractInvalidationTrackingLower(context, logger), IrPluginContext by context {
-  private val stateClassType = context.referenceClass(ClassId.topLevel(STATE_FQN))!!.starProjectedType
-
   private val mutableListOfSymbol =
     context
       .referenceFunctions(CallableId.fromFqName(MUTABLE_LIST_OF_FQN))
@@ -65,18 +58,50 @@ internal class InvalidationTrackableTransformer(
       .referenceFunctions(CallableId.fromFqName(MUTABLE_LIST_ADD_FQN))
       .single { fn -> fn.owner.valueParameters.size == 1 }
 
-  private val obtainStatePropertyAndAddSymbol =
-    context.referenceFunctions(CallableId.fromFqName(OBTAIN_STATE_PROPERTY_AND_ADD_FQN)).single()
+  private val registerStateObjectTrackingSymbol =
+    context.referenceFunctions(CallableId.fromFqName(REGISTER_STATE_OBJECT_TRACKING_FQN)).single()
 
-  override fun visitComposableBlock(function: IrSimpleFunction, block: IrBlock): IrBlock {
-    val newFirstStatements = mutableListOf<IrStatement>()
-    val newLastStatements = mutableListOf<IrStatement>()
+  private val handledState = HandledMap()
+  private val handledComposableBody = HandledMap()
+  private val handledUpdateScopeBlock = HandledMap()
+  private val handledSkipToGroupEndCall = HandledMap()
 
-    val currentKey = irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function]!!
-    val currentUserProvideName = currentKey.userProvideName
+  override fun transformStateInitializer(composable: IrSimpleFunction, stateName: Name, initializer: IrExpression): IrExpression {
+    logger("transformStateInitializer: ${initializer.dump()}")
+    logger("transformStateInitializer: ${initializer.dumpKotlinLike()}")
 
-    val currentFunctionName = getCurrentFunctionNameIntercepttedAnonymous(currentUserProvideName)
-    val currentFunctionLocation = function.getSafelyLocation()
+    val functionKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return initializer
+    if (!handledState.handle(functionKey.keyName, stateName)) return initializer
+
+    val nearestComposer = composable.valueParameters.fastLastOrNull { param -> param.type.classFqName == COMPOSER_FQN }!!
+
+    return IrCallImpl.fromSymbolOwner(
+      startOffset = UNDEFINED_OFFSET,
+      endOffset = UNDEFINED_OFFSET,
+      symbol = registerStateObjectTrackingSymbol,
+    ).also { register ->
+      register.extensionReceiver = initializer
+      register.type = initializer.type
+      register.origin = StateChangeTrackerOrigin
+    }.apply {
+      putTypeArgument(0, initializer.type)
+
+      putValueArgument(0, irGetValue(nearestComposer))
+      putValueArgument(1, functionKey.irAffectedComposable)
+      putValueArgument(2, irString(functionKey.keyName))
+      putValueArgument(3, irString(stateName.asString()))
+      // The arguments for index 4 have default values.
+    }.also { transformed ->
+      logger("[StateInitializer] transformed dump: ${transformed.dump()}")
+      logger("[StateInitializer] transformed dumpKotlinLike: ${transformed.dumpKotlinLike()}")
+    }
+  }
+
+  override fun transformComposableBody(function: IrSimpleFunction, block: IrBlock): IrBlock {
+    val currentKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, function] ?: return block
+    if (!handledComposableBody.handle(currentKey.keyName)) return block
+
+    val newStatements = mutableListOf<IrStatement>()
     val currentInvalidationTrackTable = currentInvalidationTrackTable!!
 
     val affectedFieldList = IrCallImpl.fromSymbolOwner(
@@ -84,22 +109,25 @@ internal class InvalidationTrackableTransformer(
       endOffset = UNDEFINED_OFFSET,
       symbol = mutableListOfSymbol,
     ).apply {
-      putTypeArgument(0, IrAffectedField.irAffectedFieldSymbol.defaultType)
+      putTypeArgument(0, IrAffectedField.irAffectedField.defaultType)
     }
     val affectedFieldListVar = irTmpVariableInCurrentFun(affectedFieldList, nameHint = "affectFields")
-    newFirstStatements += affectedFieldListVar
+    newStatements += affectedFieldListVar
 
-    // The last two arguments are added by the Compose compiler ($composer, $changed)
-    val validValueParamters = function.valueParameters.dropLast(2)
-    for (param in validValueParamters) {
+    for (param in function.valueParameters) {
+      // Synthetic arguments are not handled.
+      if (param.name.asString().startsWith('$')) continue
+
       val name = irString(param.name.asString())
-      val valueGetter = irGetValue(param)
-      val valueString = irToString(valueGetter)
-      val valueHashCode = irHashCode(valueGetter)
-      val stability = stabilityInferencer.stabilityOf(valueGetter).normalize().toIrDeclarationStability(context)
+      val typeFqName = irString(param.type.classFqName?.asString() ?: SpecialNames.ANONYMOUS_STRING)
+      val value = irGetValue(param)
+      val valueString = irToString(value)
+      val valueHashCode = irHashCode(value)
+      val stability = stabilityInferencer.stabilityOf(value).normalize().toIrDeclarationStability(context)
 
       val valueParam = IrAffectedField.irValueParameter(
         name = name,
+        typeFqName = typeFqName,
         valueString = valueString,
         valueHashCode = valueHashCode,
         stability = stability,
@@ -114,30 +142,20 @@ internal class InvalidationTrackableTransformer(
         putValueArgument(0, irGetValue(valueParamVariable))
       }
 
-      newFirstStatements += valueParamVariable
-      newFirstStatements += addValueParamToList
+      newStatements += valueParamVariable
+      newStatements += addValueParamToList
     }
 
-    block.obtainStateProperties(statePropListVar = affectedFieldListVar)
-
-    val computeInvalidationReason =
-      currentInvalidationTrackTable.irComputeInvalidationReason(
-        composableKeyName = irString(currentKey.keyName),
-        fields = irGetValue(affectedFieldListVar),
-      )
+    val computeInvalidationReason = currentInvalidationTrackTable.irComputeInvalidationReason(
+      composableKeyName = irString(currentKey.keyName),
+      fields = irGetValue(affectedFieldListVar),
+    )
     val computeInvalidationReasonVariable = irTmpVariableInCurrentFun(
       computeInvalidationReason,
-      nameHint = "$currentFunctionName\$validationReason",
+      nameHint = "${function.name.asString()}\$validationReason",
     )
-    newLastStatements += computeInvalidationReasonVariable
+    newStatements += computeInvalidationReasonVariable
 
-    val affectedComposable = IrAffectedComposable.irAffectedComposable(
-      composableName = irString(currentFunctionName),
-      packageName = irString(getCurrentFunctionPackage()),
-      filePath = irString(currentFunctionLocation.file),
-      startLine = irInt(currentFunctionLocation.line),
-      startColumn = irInt(currentFunctionLocation.column),
-    )
     val invalidationTypeSymbol = IrInvalidationLogger.irInvalidationTypeSymbol
     val invalidationTypeProcessed =
       IrInvalidationLogger.irInvalidationTypeProcessed(reason = irGetValue(computeInvalidationReasonVariable))
@@ -145,127 +163,94 @@ internal class InvalidationTrackableTransformer(
 
     val callListeners = currentInvalidationTrackTable.irCallListeners(
       key = irString(currentKey.keyName),
-      composable = affectedComposable,
+      composable = currentKey.irAffectedComposable,
       type = invalidationTypeProcessed,
     )
-    newLastStatements += callListeners
+    newStatements += callListeners
 
     val logger = IrInvalidationLogger.irLog(
-      affectedComposable = affectedComposable,
+      affectedComposable = currentKey.irAffectedComposable,
       invalidationType = invalidationTypeProcessed,
     )
-    newLastStatements += logger
+    newStatements += logger
 
-    block.statements.addAll(1, newFirstStatements)
-    block.statements.addAll(block.statements.lastIndex, newLastStatements)
-    block.origin = InvalidationTrackerOrigin
+    block.statements.addAll(0, newStatements)
 
-    logger("[invalidation processed] dump: ${block.dump()}")
-    logger("[invalidation processed] dumpKotlinLike: ${block.dumpKotlinLike()}")
-
-    return block
+    return block.also { transformed ->
+      logger("[ComposableBody] transformed dump: ${transformed.dump()}")
+      logger("[ComposableBody] transformed dumpKotlinLike: ${transformed.dumpKotlinLike()}")
+    }
   }
 
-  override fun visitSkipToGroupEndCall(function: IrSimpleFunction, call: IrCall): IrBlock {
-    val currentKey = irTracee[DurableWritableSlices.DURABLE_FUNCTION_KEY, function]!!
-    val currentUserProvideName = currentKey.userProvideName
+  override fun transformUpdateScopeBlock(target: IrSimpleFunction, initializer: IrReturn): IrStatementContainer {
+    @Suppress("LocalVariableName")
+    val NO_CHANGED = IrStatementContainerImpl(statements = listOf(initializer))
 
-    val currentFunctionName = getCurrentFunctionNameIntercepttedAnonymous(currentUserProvideName)
-    val currentFunctionLocation = function.getSafelyLocation()
+    val currentKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, target] ?: return NO_CHANGED
+    if (!handledUpdateScopeBlock.handle(currentKey.keyName)) return NO_CHANGED
+
+    val newStatements = mutableListOf<IrStatement>()
     val currentInvalidationTrackTable = currentInvalidationTrackTable!!
 
-    val affectedComposable = IrAffectedComposable.irAffectedComposable(
-      composableName = irString(currentFunctionName),
-      packageName = irString(getCurrentFunctionPackage()),
-      filePath = irString(currentFunctionLocation.file),
-      startLine = irInt(currentFunctionLocation.line),
-      startColumn = irInt(currentFunctionLocation.column),
+    val invalidationTypeSymbol = IrInvalidationLogger.irInvalidationTypeSymbol
+    val invalidationTypeProcessed = IrInvalidationLogger.irInvalidationTypeProcessed(
+      reason = IrGetObjectValueImpl(
+        startOffset = UNDEFINED_OFFSET,
+        endOffset = UNDEFINED_OFFSET,
+        type = IrInvalidationLogger.irInvalidateReasonSymbol.defaultType,
+        symbol = IrInvalidationLogger.irInvalidateReasonInvalidateSymbol,
+      ),
+    ).apply {
+      type = invalidationTypeSymbol.defaultType
+    }
+
+    val callListeners = currentInvalidationTrackTable.irCallListeners(
+      key = irString(currentKey.keyName),
+      composable = currentKey.irAffectedComposable,
+      type = invalidationTypeProcessed,
     )
+    newStatements += callListeners
+
+    val logger = IrInvalidationLogger.irLog(
+      affectedComposable = currentKey.irAffectedComposable,
+      invalidationType = invalidationTypeProcessed,
+    )
+    newStatements += logger
+
+    newStatements += initializer
+
+    return IrStatementContainerImpl(statements = newStatements).also { transformed ->
+      logger("[ComposableUpdateScope] transformed dump: ${transformed.dump()}")
+      logger("[ComposableUpdateScope] transformed dumpKotlinLike: ${transformed.dumpKotlinLike()}")
+    }
+  }
+
+  override fun transformSkipToGroupEndCall(composable: IrSimpleFunction, initializer: IrCall): IrStatementContainer {
+    @Suppress("LocalVariableName")
+    val NO_CHANGED = IrStatementContainerImpl(statements = listOf(initializer))
+
+    val currentKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return NO_CHANGED
+    if (!handledSkipToGroupEndCall.handle(currentKey.keyName)) return NO_CHANGED
+
+    val currentInvalidationTrackTable = currentInvalidationTrackTable!!
+
     val invalidationTypeSymbol = IrInvalidationLogger.irInvalidationTypeSymbol
     val invalidationTypeSkipped = IrInvalidationLogger.irInvalidationTypeSkipped()
       .apply { type = invalidationTypeSymbol.defaultType }
 
     val callListeners = currentInvalidationTrackTable.irCallListeners(
       key = irString(currentKey.keyName),
-      composable = affectedComposable,
+      composable = currentKey.irAffectedComposable,
       type = invalidationTypeSkipped,
     )
     val logger = IrInvalidationLogger.irLog(
-      affectedComposable = affectedComposable,
+      affectedComposable = currentKey.irAffectedComposable,
       invalidationType = invalidationTypeSkipped,
     )
 
-    val block = IrBlockImpl(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      type = irBuiltIns.unitType,
-      origin = InvalidationTrackerOrigin,
-      statements = listOf(call, callListeners, logger),
-    )
-
-    logger("[invalidation skipped] transformed: ${call.dumpKotlinLike()} -> ${block.dumpKotlinLike()}")
-
-    return block
+    return IrStatementContainerImpl(statements = listOf(callListeners, logger, initializer)).also { transformed ->
+      logger("[ComposableSkipToGroupEnd] transformed dump: ${transformed.dump()}")
+      logger("[ComposableSkipToGroupEnd] transformed dumpKotlinLike: ${transformed.dumpKotlinLike()}")
+    }
   }
-
-  private fun IrBlock.obtainStateProperties(statePropListVar: IrVariable) {
-    val handledLocations = mutableMapOf<SourceLocation, Unit>()
-
-    transform(
-      object : IrElementTransformerVoid() {
-        // val state = remember { mutableStateOf(T) }
-        override fun visitVariable(declaration: IrVariable): IrStatement {
-          if (declaration.origin == IrDeclarationOrigin.PROPERTY_DELEGATE) return super.visitVariable(declaration)
-          if (declaration.type.isComposeState()) {
-            val name = irString(declaration.name.asString())
-            val location = declaration.getSourceLocation(currentFile.fileEntry)
-
-            if (!handledLocations.containsKey(location)) {
-              val statePropAddingCall = IrCallImpl.fromSymbolOwner(
-                startOffset = UNDEFINED_OFFSET,
-                endOffset = UNDEFINED_OFFSET,
-                symbol = obtainStatePropertyAndAddSymbol,
-              ).apply {
-                extensionReceiver = declaration.initializer!!
-                putValueArgument(0, name)
-                putValueArgument(1, irGetValue(statePropListVar))
-              }
-
-              declaration.initializer = statePropAddingCall
-              handledLocations[location] = Unit
-            }
-          }
-          return super.visitVariable(declaration)
-        }
-
-        // var state by remember { mutableStateOf(T) }
-        override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty): IrStatement {
-          if (declaration.delegate.type.isComposeState()) {
-            val name = irString(declaration.name.asString())
-            val location = declaration.delegate.getSourceLocation(currentFile.fileEntry)
-
-            if (!handledLocations.containsKey(location)) {
-              val statePropAddingCall = IrCallImpl.fromSymbolOwner(
-                startOffset = UNDEFINED_OFFSET,
-                endOffset = UNDEFINED_OFFSET,
-                symbol = obtainStatePropertyAndAddSymbol,
-              ).apply {
-                extensionReceiver = declaration.delegate.initializer!!
-                putValueArgument(0, name)
-                putValueArgument(1, irGetValue(statePropListVar))
-                putTypeArgument(0, declaration.type)
-              }
-
-              declaration.delegate.initializer = statePropAddingCall
-              handledLocations[location] = Unit
-            }
-          }
-          return super.visitLocalDelegatedProperty(declaration)
-        }
-      },
-      null,
-    )
-  }
-
-  private fun IrType.isComposeState(): Boolean = classOrNull?.isSubtypeOfClass(stateClassType.classOrFail) ?: false
 }

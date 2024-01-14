@@ -10,8 +10,14 @@ package land.sungbin.composeinvestigator.runtime
 import androidx.compose.runtime.Immutable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
+import land.sungbin.composeinvestigator.runtime.utils.putIfNotPresent
+import org.jetbrains.annotations.TestOnly
 
+@ExperimentalComposeInvestigatorApi
 public val currentComposableInvalidationTracker: ComposableInvalidationTrackTable
+  // TODO: Should we make this a Composable function?
+  // @Composable
+  // @ExplicitGroupsComposable
   get() {
     throw NotImplementedError("Implemented as an intrinsic")
   }
@@ -27,9 +33,10 @@ public annotation class ComposableName(public val name: String)
 
 public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): String = name
 
+@ExperimentalComposeInvestigatorApi
 @Immutable
 public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi public constructor() {
-  private val listeners: MutableMap<String, MutableSet<ComposableInvalidationListener>> = mutableMapOf()
+  private val listeners: MutableMap<String, ComposableInvalidationListener> = mutableMapOf()
   private val affectFieldMap: MutableMap<String, List<AffectedField>> = mutableMapOf()
 
   public val affectFields: Map<String, List<AffectedField>> get() = affectFieldMap
@@ -47,21 +54,22 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
       throw NotImplementedError("Implemented as an intrinsic")
     }
 
-  public fun registerListener(keyName: String, listener: ComposableInvalidationListener) {
-    listeners.getOrPut(keyName, ::mutableSetOf).add(listener)
+  @TestOnly
+  public fun resetAffectFields() {
+    affectFieldMap.clear()
   }
 
-  public fun unregisterListener(keyName: String, listener: ComposableInvalidationListener) {
-    if (listeners.containsKey(keyName)) {
-      listeners[keyName]!!.remove(listener)
-    }
+  public fun registerListener(keyName: String, listener: ComposableInvalidationListener) {
+    listeners.putIfNotPresent(keyName, listener)
+  }
+
+  public fun unregisterListener(keyName: String) {
+    listeners.remove(keyName)
   }
 
   @ComposeInvestigatorCompilerApi
   public fun callListeners(keyName: String, composable: AffectedComposable, type: ComposableInvalidationType) {
-    for (listener in listeners[keyName].orEmpty()) {
-      listener.onInvalidate(composable, type)
-    }
+    listeners[keyName]?.onInvalidate(composable, type)
   }
 
   @ComposeInvestigatorCompilerApi
@@ -84,12 +92,12 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
 
     return if (changed.isEmpty()) {
       val params = fields.filterIsInstance<AffectedField.ValueParameter>()
-      InvalidationReason.Unknown(params = params.map(AffectedField.ValueParameter::toSimpleParameter))
+      InvalidationReason.Unknown(params = params.map(AffectedField.ValueParameter::toParameterInformation))
     } else {
       InvalidationReason.FieldChanged(changed = changed)
     }
   }
 }
 
-private fun AffectedField.ValueParameter.toSimpleParameter(): SimpleParameter =
-  SimpleParameter(name = name, stability = stability)
+private fun AffectedField.ValueParameter.toParameterInformation(): ParameterInformation =
+  ParameterInformation(name = name, typeFqName = typeFqName, stability = stability)

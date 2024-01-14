@@ -11,12 +11,17 @@ import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import land.sungbin.composeinvestigator.compiler.internal.tracker.InvalidationTrackableTransformer
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedComposable
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedField
-import land.sungbin.composeinvestigator.compiler.internal.tracker.key.DurableFunctionKeyTransformer
+import land.sungbin.composeinvestigator.compiler.internal.tracker.key.TrackerFunctionKeyVisitor
 import land.sungbin.composeinvestigator.compiler.internal.tracker.logger.IrInvalidationLogger
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
+import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.ir.declarations.name
+import org.jetbrains.kotlin.ir.util.dump
+import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
 internal class InvalidationTrackingExtension(private val logger: VerboseLogger) : IrGenerationExtension {
@@ -25,17 +30,36 @@ internal class InvalidationTrackingExtension(private val logger: VerboseLogger) 
     IrAffectedField.init(pluginContext)
     IrAffectedComposable.init(pluginContext)
 
-    moduleFragment.transformChildrenVoid(DurableFunctionKeyTransformer(pluginContext))
+    val stabilityInferencer = StabilityInferencer(
+      currentModule = moduleFragment.descriptor,
+      // TODO: support this field
+      externalStableTypeMatchers = emptySet(),
+    )
+
+    moduleFragment.transformChildrenVoid(
+      TrackerFunctionKeyVisitor(
+        context = pluginContext,
+        stabilityInferencer = stabilityInferencer,
+      ),
+    )
     moduleFragment.transformChildrenVoid(
       InvalidationTrackableTransformer(
         context = pluginContext,
         logger = logger,
-        stabilityInferencer = StabilityInferencer(
-          currentModule = moduleFragment.descriptor,
-          // TODO: support this field
-          externalStableTypeMatchers = emptySet(),
-        ),
+        stabilityInferencer = stabilityInferencer,
       ),
+    )
+    moduleFragment.transformChildrenVoid(
+      object : IrElementTransformerVoidWithContext() {
+        override fun visitFileNew(declaration: IrFile): IrFile {
+          if (declaration.name == "SourceForIrDump.kt") {
+            logger("[IR DUMPING TEST RESULT]")
+            logger(declaration.dump())
+            logger(declaration.dumpKotlinLike())
+          }
+          return declaration
+        }
+      },
     )
   }
 }

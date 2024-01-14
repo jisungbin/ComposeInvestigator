@@ -21,7 +21,7 @@ dependencies {
   implementation(libs.jetbrains.annotation)
 
   implementation(libs.fastlist)
-  implementation(libs.compose.compiler) // for StabilityInferencer
+  implementation(libs.compose.compiler)
 
   implementation(libs.autoservice.annotation)
   ksp(libs.autoservice.ksp)

@@ -11,14 +11,7 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
-import land.sungbin.composeinvestigator.runtime.ComposableInvalidationType
-import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracker
-
-val invalidationListensViaManualRegister = mutableMapOf<AffectedComposable, MutableList<ComposableInvalidationType>>()
-
-fun findInvalidationListensViaManualRegister(composableName: String): List<ComposableInvalidationType> =
-  invalidationListensViaManualRegister.filterKeys { composable -> composable.name == composableName }.values.flatten()
 
 @Composable
 fun RegisterListener_InvalidationSkippedRoot() {
@@ -29,7 +22,7 @@ fun RegisterListener_InvalidationSkippedRoot() {
     invalidationListensViaManualRegister.getOrPut(composable, ::mutableListOf).add(type)
   }
 
-  Button(onClick = { recomposeScope.invalidate() }) {}
+  Button(onClick = recomposeScope::invalidate) {}
   RegisterListener_InvalidationSkippedChild()
 }
 

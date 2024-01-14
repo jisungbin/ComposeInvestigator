@@ -7,10 +7,9 @@
 
 package land.sungbin.composeinvestigator.compiler.internal.tracker.table
 
-import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_CALL_LISTENERS_FQN
-import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_COMPUTE_INVALIDATION_REASON_FQN
 import land.sungbin.composeinvestigator.compiler.internal.COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN
-import land.sungbin.composeinvestigator.compiler.internal.fromFqName
+import land.sungbin.composeinvestigator.compiler.internal.ComposableInvalidationTrackTable_CALL_LISTENERS
+import land.sungbin.composeinvestigator.compiler.internal.ComposableInvalidationTrackTable_COMPUTE_INVALIDATION_REASON
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
@@ -33,11 +32,12 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
+import org.jetbrains.kotlin.ir.types.classOrFail
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
 import org.jetbrains.kotlin.ir.util.constructors
+import org.jetbrains.kotlin.ir.util.getSimpleFunction
 import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
-import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 
@@ -79,14 +79,9 @@ public class IrInvalidationTrackTable private constructor(public val prop: IrPro
     public fun create(context: IrPluginContext, currentFile: IrFile): IrInvalidationTrackTable =
       IrInvalidationTrackTable(irInvalidationTrackTableProp(context, currentFile))
         .also { clz ->
-          clz.computeInvalidationReasonSymbol =
-            context
-              .referenceFunctions(CallableId.fromFqName(COMPOSABLE_INVALIDATION_TRACK_TABLE_COMPUTE_INVALIDATION_REASON_FQN))
-              .single()
-          clz.callListenersSymbol =
-            context
-              .referenceFunctions(CallableId.fromFqName(COMPOSABLE_INVALIDATION_TRACK_TABLE_CALL_LISTENERS_FQN))
-              .single()
+          val clzOwner = clz.prop.backingField!!.type.classOrFail
+          clz.computeInvalidationReasonSymbol = clzOwner.getSimpleFunction(ComposableInvalidationTrackTable_COMPUTE_INVALIDATION_REASON.asString())!!
+          clz.callListenersSymbol = clzOwner.getSimpleFunction(ComposableInvalidationTrackTable_CALL_LISTENERS.asString())!!
         }
   }
 }
@@ -99,6 +94,7 @@ public fun IrInvalidationTrackTable.propGetter(): IrCall =
   )
 
 private var invalidationTrackTableClassSymbol: IrClassSymbol? = null
+
 private fun irInvalidationTrackTableProp(context: IrPluginContext, currentFile: IrFile): IrProperty {
   val fileName = currentFile.fileEntry.name.split('/').last()
   val shortName = PackagePartClassUtils.getFilePartShortName(fileName)
@@ -106,7 +102,8 @@ private fun irInvalidationTrackTableProp(context: IrPluginContext, currentFile: 
 
   val superSymbol = invalidationTrackTableClassSymbol ?: (
     context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN))!!
-      .also { symbol -> invalidationTrackTableClassSymbol = symbol })
+      .also { symbol -> invalidationTrackTableClassSymbol = symbol }
+    )
 
   return context.irFactory.buildProperty {
     visibility = DescriptorVisibilities.PRIVATE

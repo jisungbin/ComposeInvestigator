@@ -9,13 +9,13 @@ package land.sungbin.composeinvestigator.compiler.test
 
 import androidx.compose.compiler.plugins.kotlin.ComposeCommandLineProcessor
 import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
-import com.tschuchort.compiletesting.JvmCompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.PluginOption
 import com.tschuchort.compiletesting.SourceFile
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorCommandLineProcessor
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorPluginRegistrar
 import land.sungbin.composeinvestigator.compiler.test.utils.source
+import org.jetbrains.kotlin.cli.common.toBooleanLenient
 import org.jetbrains.kotlin.config.JvmTarget
 import org.junit.Rule
 import org.junit.Test
@@ -30,10 +30,9 @@ class IrDumpingTest {
     compile(source("SourceForIrDump.kt"))
   }
 
-  private fun compile(vararg sourceFiles: SourceFile): JvmCompilationResult =
-    prepareCompilation(*sourceFiles).compile()
+  private fun compile(vararg sourceFiles: SourceFile) = prepareCompilation(*sourceFiles).compile()
 
-  private fun prepareCompilation(vararg sourceFiles: SourceFile): KotlinCompilation =
+  private fun prepareCompilation(vararg sourceFiles: SourceFile) =
     KotlinCompilation().apply {
       workingDir = tempDir.root
       sources = sourceFiles.asList()
@@ -44,13 +43,13 @@ class IrDumpingTest {
         PluginOption(
           pluginId = ComposeInvestigatorCommandLineProcessor.PLUGIN_ID,
           optionName = ComposeInvestigatorCommandLineProcessor.OPTION_VERBOSE.optionName,
-          optionValue = if (System.getenv("CI") == "true") "false" else "true",
+          optionValue = if (System.getenv("CI").toBooleanLenient() == true) "false" else "true",
         ),
-        // PluginOption(
-        //   pluginId = ComposeCommandLineProcessor.PLUGIN_ID,
-        //   optionName = ComposeCommandLineProcessor.LIVE_LITERALS_V2_ENABLED_OPTION.optionName,
-        //   optionValue = "true",
-        // ),
+        PluginOption(
+          pluginId = ComposeCommandLineProcessor.PLUGIN_ID,
+          optionName = ComposeCommandLineProcessor.LIVE_LITERALS_V2_ENABLED_OPTION.optionName,
+          optionValue = "false",
+        ),
       )
       @Suppress("DEPRECATION")
       componentRegistrars = listOf(ComposePluginRegistrar(), ComposeInvestigatorPluginRegistrar())
