@@ -22,7 +22,7 @@ autoservice-ksp = "1.1.0"
 
 fastlist = "0.1.0"
 
-test-mockk = "1.13.8"
+test-mockk = "1.13.9"
 test-kotest = "5.8.0"
 test-junit-core = "4.13.2"
 test-junit-engine = "5.10.1"
