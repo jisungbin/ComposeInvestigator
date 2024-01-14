@@ -33,6 +33,7 @@ public object IrAffectedField {
 
   public fun irValueParameter(
     name: IrExpression,
+    typeFqName: IrExpression,
     valueString: IrExpression,
     valueHashCode: IrExpression,
     stability: IrExpression,
@@ -41,8 +42,9 @@ public object IrAffectedField {
     constructorSymbol = valueParameterSymbol!!.constructors.single(),
   ).apply {
     putValueArgument(0, name)
-    putValueArgument(1, valueString)
-    putValueArgument(2, valueHashCode)
-    putValueArgument(3, stability)
+    putValueArgument(1, typeFqName)
+    putValueArgument(2, valueString)
+    putValueArgument(3, valueHashCode)
+    putValueArgument(4, stability)
   }
 }

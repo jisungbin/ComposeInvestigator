@@ -17,6 +17,7 @@ public fun interface ComposableInvalidationLogger {
 
 public data class ParameterInformation(
   public val name: String,
+  public val typeFqName: String,
   public val stability: DeclarationStability,
 )
 

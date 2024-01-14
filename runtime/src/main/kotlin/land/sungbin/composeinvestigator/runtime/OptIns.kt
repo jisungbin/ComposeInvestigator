@@ -11,6 +11,7 @@ package land.sungbin.composeinvestigator.runtime
   "This API is designed for use with the ComposeInvestigator compiler only; " +
     "manual use may cause undesired results.",
 )
+@Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
 public annotation class ComposeInvestigatorCompilerApi
 
@@ -18,5 +19,6 @@ public annotation class ComposeInvestigatorCompilerApi
   "This is an experimental API for ComposeInvestigator and is likely to change" +
     "before becoming stable.",
 )
+@Retention(AnnotationRetention.BINARY)
 @Target(AnnotationTarget.CLASS, AnnotationTarget.FUNCTION, AnnotationTarget.PROPERTY)
 public annotation class ExperimentalComposeInvestigatorApi

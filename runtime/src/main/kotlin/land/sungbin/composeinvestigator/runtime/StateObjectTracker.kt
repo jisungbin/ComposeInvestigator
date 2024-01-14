@@ -7,7 +7,13 @@
 
 package land.sungbin.composeinvestigator.runtime
 
-import androidx.compose.runtime.State
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationState
+import androidx.compose.animation.core.InfiniteTransition
+import androidx.compose.animation.core.Transition
+import androidx.compose.runtime.Composer
+import androidx.compose.runtime.RememberObserver
+import androidx.compose.runtime.cache
 import androidx.compose.runtime.snapshots.ObserverHandle
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.SnapshotMutableState
@@ -17,8 +23,11 @@ import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateLoc
 import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateValueGetterMap
 import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.trackedStateObjects
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
+import land.sungbin.composeinvestigator.runtime.utils.putIfNotPresent
 import org.jetbrains.annotations.TestOnly
 import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.reflect.KProperty0
+import kotlin.reflect.jvm.isAccessible
 
 public data class StateValue(val previousValue: Any?, val newValue: Any?)
 
@@ -35,6 +44,7 @@ internal object StateObjectTrackManager {
   private var previousHandle: ObserverHandle? = null
 
   internal val trackedStateObjects = mutableMapOf<String, MutableSet<StateObject>>()
+
   internal val stateFieldNameMap = mutableMapOf<StateObject, String>()
   internal val stateValueGetterMap = mutableMapOf<StateObject, StateValueGetter>()
   internal val stateLocationMap = mutableMapOf<StateObject, AffectedComposable>()
@@ -73,53 +83,93 @@ internal object StateObjectTrackManager {
 }
 
 @ExperimentalComposeInvestigatorApi
-public fun <S : State<*>> S.registerStateObjectTracking(
+public fun <State> State.registerStateObjectTracking(
+  composer: Composer,
   composable: AffectedComposable,
   composableKeyName: String,
   stateName: String,
   stateValueGetter: StateValueGetter = ComposeStateObjectValueGetter,
-): S = also {
-  require(this is StateObject) { "State must be implemented as a StateObject. (${this::class.java.name})" }
+): State = also {
+  val state = this ?: return@also
+  val register by lazy {
+    val stateObject = when (state) {
+      is StateObject -> state
+      is Animatable<*, *> -> {
+        val internalStateField = state::class.java.declaredFields.firstOrNull { field ->
+          field.type == AnimationState::class.java
+        }?.apply {
+          isAccessible = true
+        }
+        val animationState = internalStateField?.get(this) as? AnimationState<*, *>
+        animationState?.let { it::value.obtainStateObjectOrNull() }
+      }
+      is AnimationState<*, *> -> state::value.obtainStateObjectOrNull()
+      is Transition<*>.TransitionAnimationState<*, *> -> state::value.obtainStateObjectOrNull()
+      is InfiniteTransition.TransitionAnimationState<*, *> -> state::value.obtainStateObjectOrNull()
+      // Throwing here is reported a bug in the Compose runtime, so we replace it with null to avoid confusing developers.
+      else -> null /* error("Unsupported state type: ${state::class.java}") */
+    }
+
+    object : RememberObserver {
+      override fun onRemembered() {
+        println("stateObject: remembered $stateObject ($stateName in ${composable.fqName}))")
+        @Suppress("NAME_SHADOWING")
+        val stateObject = stateObject ?: return
+
+        trackedStateObjects.getOrPut(composableKeyName, ::mutableSetOf).add(stateObject)
+        stateFieldNameMap.putIfNotPresent(stateObject, stateName)
+        stateValueGetterMap.putIfNotPresent(stateObject, stateValueGetter)
+        stateLocationMap.putIfNotPresent(stateObject, composable)
+        ComposeStateObjectValueGetter.initialize(stateObject)
+      }
+
+      override fun onForgotten() {
+        // getOrDefault is available from API 24 (project minSdk is 21)
+        trackedStateObjects[composableKeyName].orEmpty().forEach { state ->
+          println("stateObject: forgetten $state ($stateName in ${composable.fqName}))")
+
+          stateFieldNameMap.remove(state)
+          stateValueGetterMap.remove(state)
+          stateLocationMap.remove(state)
+          ComposeStateObjectValueGetter.clean(state)
+        }
+        trackedStateObjects.remove(composableKeyName)
+      }
+
+      override fun onAbandoned() {}
+    }
+  }
 
   StateObjectTrackManager.ensureStarted()
 
-  trackedStateObjects.getOrPut(composableKeyName, ::mutableSetOf).add(this)
-  stateFieldNameMap.putIfAbsent(this, stateName)
-  stateValueGetterMap.putIfAbsent(this, stateValueGetter)
-  stateLocationMap.putIfAbsent(this, composable)
-  ComposeStateObjectValueGetter.initialize(this)
-
-  // TODO: Execute the logic below when the composable is destroyed. We can delegate the
-  //  'forgetten' call to the Compose runtime by remembering RememberObserver, but remember
-  //  is implemented by the Compose compiler. Since ComposeInvestigator runs after Compose
-  //  has finished compiling, we can't delegate to the Compose compiler.
-  // trackedStateObjects.getOrDefault(keyName, emptySet()).forEach { stateObject ->
-  //   stateFieldNameMap.remove(stateObject)
-  //   stateValueGetterMap.remove(stateObject)
-  //   stateLocationMap.remove(stateObject)
-  //   ComposeStateObjectValueGetter.clean(stateObject)
-  // }
-  // trackedStateObjects.remove(keyName)
+  composer.startReplaceableGroup(composable.fqName.hashCode() + hashCode() + stateName.hashCode())
+  composer.cache(false) { register }
+  composer.endReplaceableGroup()
 }
 
+private fun KProperty0<*>.obtainStateObjectOrNull() = runCatching {
+  val stateValue = apply { isAccessible = true }.getDelegate()
+  stateValue as? StateObject
+}.getOrNull()
+
 public object ComposeStateObjectValueGetter : StateValueGetter {
+  private val STATE_NO_VALUE = object {
+    override fun toString() = "STATE_NO_VALUE"
+  }
   private val stateValueMap = mutableMapOf<StateObject, StateValue>()
 
-  private fun StateObject.getCurrentValue() = (this as SnapshotMutableState<*>).value
+  // This may be a pointless defense, but we disable read observers for reliability.
+  private fun StateObject.getCurrentValue() = Snapshot.withoutReadObservation {
+    (this as SnapshotMutableState<*>).value
+  }
 
   internal fun initialize(key: StateObject) {
-    stateValueMap.putIfAbsent(
+    stateValueMap.putIfNotPresent(
       key,
-      StateValue(
-        previousValue = object {
-          override fun toString() = "STATE_NO_VALUE"
-        },
-        newValue = key.getCurrentValue(),
-      ),
+      StateValue(previousValue = STATE_NO_VALUE, newValue = key.getCurrentValue()),
     )
   }
 
-  @Suppress("unused")
   internal fun clean(key: StateObject) {
     stateValueMap.remove(key)
   }

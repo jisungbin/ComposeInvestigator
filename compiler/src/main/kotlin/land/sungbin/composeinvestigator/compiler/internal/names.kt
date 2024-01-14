@@ -28,7 +28,6 @@ internal val HASH_CODE_FQN = FqName("kotlin.hashCode")
 // END Kotlin Standard Library
 
 // START Compose Runtime
-internal val COMPOSABLE_FQN = FqName("$AndroidxComposeRuntime.Composable")
 internal val COMPOSER_FQN = FqName("$AndroidxComposeRuntime.Composer")
 
 internal val Composer_SKIPPING = Name.identifier("skipping")
@@ -39,6 +38,10 @@ internal val ScopeUpdateScope_UPDATE_SCOPE = Name.identifier("updateScope")
 
 internal val STATE_FQN = FqName("$AndroidxComposeRuntime.State")
 // END Compose Runtime
+
+// START Compose Animation
+internal val ANIMATABLE_FQN = FqName("androidx.compose.animation.core.Animatable")
+// END Compose Animation
 
 // START ComposeInvestigatorConfig
 internal val COMPOSE_INVESTIGATOR_CONFIG_FQN = FqName("$ComposeInvestigatorRuntime.ComposeInvestigatorConfig")

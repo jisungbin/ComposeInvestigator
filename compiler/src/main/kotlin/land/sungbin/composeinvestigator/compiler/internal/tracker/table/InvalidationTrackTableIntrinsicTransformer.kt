@@ -16,22 +16,23 @@ import land.sungbin.composeinvestigator.compiler.internal.ComposableInvalidation
 import land.sungbin.composeinvestigator.compiler.internal.ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_NAME
 import land.sungbin.composeinvestigator.compiler.internal.UNKNOWN_STRING
 import land.sungbin.composeinvestigator.compiler.internal.fromFqName
-import land.sungbin.composeinvestigator.compiler.internal.irBoolean
-import land.sungbin.composeinvestigator.compiler.internal.irString
+import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedComposable
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.TrackerWritableSlices
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.set
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
+import land.sungbin.composeinvestigator.compiler.util.irString
 import land.sungbin.fastlist.fastLastOrNull
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
+import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
@@ -67,51 +68,50 @@ internal class InvalidationTrackTableIntrinsicTransformer(
     when (expression.symbol.owner.kotlinFqName) {
       currentTableGetterSymbol.kotlinFqName -> table.propGetter()
       currentComposableNameGetterSymbol.kotlinFqName -> {
-        val name = when (val function = lastReachedComposable()) {
-          null -> SpecialNames.UNKNOWN_STRING
-          else -> irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, function]?.userProvideName ?: function.name.asString()
-        }
-
         IrConstructorCallImpl.fromSymbolOwner(
           type = composableNameSymbol.defaultType,
           constructorSymbol = composableNameSymbol.symbol.constructors.single(),
         ).apply {
-          putValueArgument(0, irString(name))
+          putValueArgument(
+            0,
+            lastReachedComposable()
+              ?.let { composable ->
+                IrAffectedComposable.getComposableName(irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.irAffectedComposable)
+              }
+              ?: irString(SpecialNames.UNKNOWN_STRING)
+          )
         }
       }
       currentComposableNameSetterSymbol.kotlinFqName -> {
-        val function = lastReachedComposable()
-        var result = false
-
-        if (function != null) {
+        lastReachedComposable()?.let { composable ->
           val userProvideName = expression
             .getValueArgument(0).cast<IrConstructorCall>()
             .getValueArgument(0).safeAs<IrConst<String>>()?.value
             ?: error("Currently, only string hardcodes are supported as arguments to ComposableName. (${expression.dumpKotlinLike()})")
-          val previousKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, function]!!
-          val newKey = previousKey.copy(userProvideName = userProvideName)
 
-          irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, function] = newKey
-          result = true
+          val previousKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, composable]!!
+          val newAffectedComposable = IrAffectedComposable.copyWith(previousKey.irAffectedComposable, composableName = irString(userProvideName))
+
+          irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, composable] = previousKey.copy(irAffectedComposable = newAffectedComposable)
         }
 
-        irBoolean(result)
+        IrGetObjectValueImpl(
+          startOffset = expression.startOffset,
+          endOffset = expression.endOffset,
+          type = irBuiltIns.unitClass.defaultType,
+          symbol = irBuiltIns.unitClass.owner.symbol,
+        )
       }
       currentComposableKeyNameGetterSymbol.kotlinFqName -> {
-        val function = lastReachedComposable()
-        irString(
-          if (function != null) irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, function]!!.keyName
-          else SpecialNames.UNKNOWN_STRING,
-        )
+        lastReachedComposable()
+          ?.let { composable -> irString(irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.keyName) }
+          ?: irString(SpecialNames.UNKNOWN_STRING)
       }
       else -> super.visitCall(expression)
     }
 
   private fun lastReachedComposable(): IrSimpleFunction? =
     allScopes
-      .fastLastOrNull { scope ->
-        val element = scope.irElement
-        if (element is IrFunction) element.hasComposableAnnotation() else false
-      }
+      .fastLastOrNull { scope -> scope.irElement.safeAs<IrSimpleFunction>()?.hasComposableAnnotation() == true }
       ?.irElement?.safeAs<IrSimpleFunction>()
 }

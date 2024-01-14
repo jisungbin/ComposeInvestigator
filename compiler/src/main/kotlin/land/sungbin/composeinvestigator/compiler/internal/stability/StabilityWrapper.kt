@@ -14,8 +14,8 @@ import land.sungbin.composeinvestigator.compiler.internal.DeclarationStability_C
 import land.sungbin.composeinvestigator.compiler.internal.DeclarationStability_PARAMETER
 import land.sungbin.composeinvestigator.compiler.internal.DeclarationStability_RUNTIME
 import land.sungbin.composeinvestigator.compiler.internal.DeclarationStability_UNKNOWN
-import land.sungbin.composeinvestigator.compiler.internal.irBoolean
-import land.sungbin.composeinvestigator.compiler.internal.irString
+import land.sungbin.composeinvestigator.compiler.util.irBoolean
+import land.sungbin.composeinvestigator.compiler.util.irString
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.expressions.IrConst

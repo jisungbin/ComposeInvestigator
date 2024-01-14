@@ -133,12 +133,14 @@ class InvalidationLoggerTest {
               ChangedFieldPair(
                 old = AffectedField.ValueParameter(
                   name = "delegateCount",
+                  typeFqName = "kotlin.Int",
                   valueString = "0",
                   valueHashCode = 0,
                   stability = DeclarationStability.Stable,
                 ),
                 new = AffectedField.ValueParameter(
                   name = "delegateCount",
+                  typeFqName = "kotlin.Int",
                   valueString = "1",
                   valueHashCode = 1,
                   stability = DeclarationStability.Stable,
@@ -153,12 +155,14 @@ class InvalidationLoggerTest {
               ChangedFieldPair(
                 old = AffectedField.ValueParameter(
                   name = "delegateCount",
+                  typeFqName = "kotlin.Int",
                   valueString = "1",
                   valueHashCode = 1,
                   stability = DeclarationStability.Stable,
                 ),
                 new = AffectedField.ValueParameter(
                   name = "delegateCount",
+                  typeFqName = "kotlin.Int",
                   valueString = "2",
                   valueHashCode = 2,
                   stability = DeclarationStability.Stable,
@@ -202,12 +206,14 @@ class InvalidationLoggerTest {
               ChangedFieldPair(
                 old = AffectedField.ValueParameter(
                   name = "directCount",
+                  typeFqName = "kotlin.Int",
                   valueString = "0",
                   valueHashCode = 0,
                   stability = DeclarationStability.Stable,
                 ),
                 new = AffectedField.ValueParameter(
                   name = "directCount",
+                  typeFqName = "kotlin.Int",
                   valueString = "1",
                   valueHashCode = 1,
                   stability = DeclarationStability.Stable,
@@ -222,12 +228,14 @@ class InvalidationLoggerTest {
               ChangedFieldPair(
                 old = AffectedField.ValueParameter(
                   name = "directCount",
+                  typeFqName = "kotlin.Int",
                   valueString = "1",
                   valueHashCode = 1,
                   stability = DeclarationStability.Stable,
                 ),
                 new = AffectedField.ValueParameter(
                   name = "directCount",
+                  typeFqName = "kotlin.Int",
                   valueString = "2",
                   valueHashCode = 2,
                   stability = DeclarationStability.Stable,

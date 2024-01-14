@@ -12,6 +12,7 @@ package land.sungbin.composeinvestigator.runtime
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -65,7 +66,11 @@ class StateObjectTrackerTest : ShouldSpec() {
         val untrackIntState = mutableIntStateOf(0)
         val untrackFloatState = mutableFloatStateOf(0f)
 
+        var recomposeScope: RecomposeScope? = null
+
         compose {
+          recomposeScope = currentRecomposeScope
+
           listOf(
             "stringState" to stringState,
             "intState" to intState,
@@ -73,6 +78,7 @@ class StateObjectTrackerTest : ShouldSpec() {
           ).forEach { (name, state) ->
             val composable = AffectedComposable(name)
             state.registerStateObjectTracking(
+              composer = currentComposer,
               composable = composable,
               composableKeyName = "KeyName",
               stateName = name,
@@ -95,6 +101,20 @@ class StateObjectTrackerTest : ShouldSpec() {
           STATE(composable = AffectedComposable("intState"), name = "intState", previousValue = 0, newValue = 1),
           STATE(composable = AffectedComposable("floatState"), name = "floatState", previousValue = 0f, newValue = 1f),
         )
+
+        recomposeScope!!.invalidate()
+        expectChanges()
+
+        withClue("No duplicate logs") {
+          log shouldContainExactlyInAnyOrder listOf(
+            STATE(composable = AffectedComposable("stringState"), name = "stringState", previousValue = "string", newValue = "string string"),
+            STATE(composable = AffectedComposable("stringState"), name = "stringState", previousValue = "string string", newValue = "string string string"),
+            STATE(composable = AffectedComposable("intState"), name = "intState", previousValue = 0, newValue = 1),
+            STATE(composable = AffectedComposable("intState"), name = "intState", previousValue = 1, newValue = 2),
+            STATE(composable = AffectedComposable("floatState"), name = "floatState", previousValue = 0f, newValue = 1f),
+            STATE(composable = AffectedComposable("floatState"), name = "floatState", previousValue = 1f, newValue = 2f),
+          )
+        }
       }
     }
     // TODO: Should lazily added states also support change tracking? I'm not sure if this
@@ -124,6 +144,7 @@ class StateObjectTrackerTest : ShouldSpec() {
               ).forEach { (name, state) ->
                 val composable = AffectedComposable(name)
                 state.registerStateObjectTracking(
+                  composer = currentComposer,
                   composable = composable,
                   composableKeyName = "KeyName",
                   stateName = name,
@@ -138,6 +159,7 @@ class StateObjectTrackerTest : ShouldSpec() {
               ).forEach { (name, state) ->
                 val composable = AffectedComposable(name)
                 state.registerStateObjectTracking(
+                  composer = currentComposer,
                   composable = composable,
                   composableKeyName = "KeyName",
                   stateName = name,
@@ -201,6 +223,7 @@ class StateObjectTrackerTest : ShouldSpec() {
           ).forEach { (name, state) ->
             val composable = AffectedComposable(name)
             state.registerStateObjectTracking(
+              composer = currentComposer,
               composable = composable,
               composableKeyName = "KeyName",
               stateName = name,
@@ -228,14 +251,13 @@ class StateObjectTrackerTest : ShouldSpec() {
         mount = false
         expectChanges()
 
-        // TODO
-        // withClue("When Forgotten, all registered states tracking targets in that group are cleared.") {
-        //   log shouldContainExactlyInAnyOrder listOf(
-        //     STATE(composable = AffectedComposable("stringState"), name = "stringState", previousValue = "string", newValue = "string string"),
-        //     STATE(composable = AffectedComposable("intState"), name = "intState", previousValue = 0, newValue = 1),
-        //     STATE(composable = AffectedComposable("floatState"), name = "floatState", previousValue = 0f, newValue = 1f),
-        //   )
-        // }
+        withClue("When Forgotten, all registered states tracking targets in that group are cleared.") {
+          log shouldContainExactlyInAnyOrder listOf(
+            STATE(composable = AffectedComposable("stringState"), name = "stringState", previousValue = "string", newValue = "string string"),
+            STATE(composable = AffectedComposable("intState"), name = "intState", previousValue = 0, newValue = 1),
+            STATE(composable = AffectedComposable("floatState"), name = "floatState", previousValue = 0f, newValue = 1f),
+          )
+        }
       }
     }
   }

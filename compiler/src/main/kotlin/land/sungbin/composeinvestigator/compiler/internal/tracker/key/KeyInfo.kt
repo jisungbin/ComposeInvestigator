@@ -7,7 +7,9 @@
 
 package land.sungbin.composeinvestigator.compiler.internal.tracker.key
 
+import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
+
 public data class KeyInfo(
   public val keyName: String,
-  public val userProvideName: String? = null,
+  public val irAffectedComposable: IrConstructorCall,
 )

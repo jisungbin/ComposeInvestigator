@@ -10,21 +10,21 @@ package land.sungbin.composeinvestigator.compiler.internal.tracker
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.normalize
 import androidx.compose.compiler.plugins.kotlin.irTrace
+import land.sungbin.composeinvestigator.compiler.internal.COMPOSER_FQN
 import land.sungbin.composeinvestigator.compiler.internal.MUTABLE_LIST_ADD_FQN
 import land.sungbin.composeinvestigator.compiler.internal.MUTABLE_LIST_OF_FQN
 import land.sungbin.composeinvestigator.compiler.internal.REGISTER_STATE_OBJECT_TRACKING_FQN
 import land.sungbin.composeinvestigator.compiler.internal.fromFqName
-import land.sungbin.composeinvestigator.compiler.internal.irInt
-import land.sungbin.composeinvestigator.compiler.internal.irString
-import land.sungbin.composeinvestigator.compiler.internal.origin.StateChangeTrackerOrigin
 import land.sungbin.composeinvestigator.compiler.internal.stability.toIrDeclarationStability
-import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedComposable
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedField
 import land.sungbin.composeinvestigator.compiler.internal.tracker.key.TrackerWritableSlices
 import land.sungbin.composeinvestigator.compiler.internal.tracker.logger.IrInvalidationLogger
+import land.sungbin.composeinvestigator.compiler.origin.StateChangeTrackerOrigin
 import land.sungbin.composeinvestigator.compiler.util.HandledMap
 import land.sungbin.composeinvestigator.compiler.util.IrStatementContainerImpl
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
+import land.sungbin.composeinvestigator.compiler.util.irString
+import land.sungbin.fastlist.fastLastOrNull
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -36,13 +36,13 @@ import org.jetbrains.kotlin.ir.expressions.IrReturn
 import org.jetbrains.kotlin.ir.expressions.IrStatementContainer
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
+import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
-import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.name.CallableId
-import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.SpecialNames
 
 internal class InvalidationTrackableTransformer(
   private val context: IrPluginContext,
@@ -67,21 +67,13 @@ internal class InvalidationTrackableTransformer(
   private val handledSkipToGroupEndCall = HandledMap()
 
   override fun transformStateInitializer(composable: IrSimpleFunction, stateName: Name, initializer: IrExpression): IrExpression {
-    return initializer
+    logger("transformStateInitializer: ${initializer.dump()}")
+    logger("transformStateInitializer: ${initializer.dumpKotlinLike()}")
 
     val functionKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return initializer
     if (!handledState.handle(functionKey.keyName, stateName)) return initializer
 
-    val functionLocation = composable.getSafelyLocation()
-    val composableName = composable.getFunctionNameIntercepttedAnonymous(functionKey.userProvideName)
-
-    val affectedComposable = IrAffectedComposable.irAffectedComposable(
-      composableName = irString(composableName),
-      packageName = irString(composable.fqNameWhenAvailable?.parent()?.asString() ?: FqName.ROOT.asString()),
-      filePath = irString(functionLocation.file),
-      startLine = irInt(functionLocation.line),
-      startColumn = irInt(functionLocation.column),
-    )
+    val nearestComposer = composable.valueParameters.fastLastOrNull { param -> param.type.classFqName == COMPOSER_FQN }!!
 
     return IrCallImpl.fromSymbolOwner(
       startOffset = UNDEFINED_OFFSET,
@@ -94,10 +86,11 @@ internal class InvalidationTrackableTransformer(
     }.apply {
       putTypeArgument(0, initializer.type)
 
-      putValueArgument(0, affectedComposable)
-      putValueArgument(1, irString(functionKey.keyName))
-      putValueArgument(2, irString(stateName.asString()))
-      // The arguments for index 3 have default values.
+      putValueArgument(0, irGetValue(nearestComposer))
+      putValueArgument(1, functionKey.irAffectedComposable)
+      putValueArgument(2, irString(functionKey.keyName))
+      putValueArgument(3, irString(stateName.asString()))
+      // The arguments for index 4 have default values.
     }.also { transformed ->
       logger("[StateInitializer] transformed dump: ${transformed.dump()}")
       logger("[StateInitializer] transformed dumpKotlinLike: ${transformed.dumpKotlinLike()}")
@@ -109,11 +102,6 @@ internal class InvalidationTrackableTransformer(
     if (!handledComposableBody.handle(currentKey.keyName)) return block
 
     val newStatements = mutableListOf<IrStatement>()
-
-    val currentUserProvideName = currentKey.userProvideName
-
-    val currentFunctionName = function.getFunctionNameIntercepttedAnonymous(currentUserProvideName)
-    val currentFunctionLocation = function.getSafelyLocation()
     val currentInvalidationTrackTable = currentInvalidationTrackTable!!
 
     val affectedFieldList = IrCallImpl.fromSymbolOwner(
@@ -131,6 +119,7 @@ internal class InvalidationTrackableTransformer(
       if (param.name.asString().startsWith('$')) continue
 
       val name = irString(param.name.asString())
+      val typeFqName = irString(param.type.classFqName?.asString() ?: SpecialNames.ANONYMOUS_STRING)
       val value = irGetValue(param)
       val valueString = irToString(value)
       val valueHashCode = irHashCode(value)
@@ -138,6 +127,7 @@ internal class InvalidationTrackableTransformer(
 
       val valueParam = IrAffectedField.irValueParameter(
         name = name,
+        typeFqName = typeFqName,
         valueString = valueString,
         valueHashCode = valueHashCode,
         stability = stability,
@@ -162,17 +152,9 @@ internal class InvalidationTrackableTransformer(
     )
     val computeInvalidationReasonVariable = irTmpVariableInCurrentFun(
       computeInvalidationReason,
-      nameHint = "$currentFunctionName\$validationReason",
+      nameHint = "${function.name.asString()}\$validationReason",
     )
     newStatements += computeInvalidationReasonVariable
-
-    val affectedComposable = IrAffectedComposable.irAffectedComposable(
-      composableName = irString(currentFunctionName),
-      packageName = irString(function.fqNameWhenAvailable?.parent()?.asString() ?: FqName.ROOT.asString()),
-      filePath = irString(currentFunctionLocation.file),
-      startLine = irInt(currentFunctionLocation.line),
-      startColumn = irInt(currentFunctionLocation.column),
-    )
 
     val invalidationTypeSymbol = IrInvalidationLogger.irInvalidationTypeSymbol
     val invalidationTypeProcessed =
@@ -181,13 +163,13 @@ internal class InvalidationTrackableTransformer(
 
     val callListeners = currentInvalidationTrackTable.irCallListeners(
       key = irString(currentKey.keyName),
-      composable = affectedComposable,
+      composable = currentKey.irAffectedComposable,
       type = invalidationTypeProcessed,
     )
     newStatements += callListeners
 
     val logger = IrInvalidationLogger.irLog(
-      affectedComposable = affectedComposable,
+      affectedComposable = currentKey.irAffectedComposable,
       invalidationType = invalidationTypeProcessed,
     )
     newStatements += logger
@@ -208,20 +190,7 @@ internal class InvalidationTrackableTransformer(
     if (!handledUpdateScopeBlock.handle(currentKey.keyName)) return NO_CHANGED
 
     val newStatements = mutableListOf<IrStatement>()
-
-    val currentUserProvideName = currentKey.userProvideName
-
-    val currentFunctionName = target.getFunctionNameIntercepttedAnonymous(currentUserProvideName)
-    val currentFunctionLocation = target.getSafelyLocation()
     val currentInvalidationTrackTable = currentInvalidationTrackTable!!
-
-    val affectedComposable = IrAffectedComposable.irAffectedComposable(
-      composableName = irString(currentFunctionName),
-      packageName = irString(target.fqNameWhenAvailable?.parent()?.asString() ?: FqName.ROOT.asString()),
-      filePath = irString(currentFunctionLocation.file),
-      startLine = irInt(currentFunctionLocation.line),
-      startColumn = irInt(currentFunctionLocation.column),
-    )
 
     val invalidationTypeSymbol = IrInvalidationLogger.irInvalidationTypeSymbol
     val invalidationTypeProcessed = IrInvalidationLogger.irInvalidationTypeProcessed(
@@ -237,13 +206,13 @@ internal class InvalidationTrackableTransformer(
 
     val callListeners = currentInvalidationTrackTable.irCallListeners(
       key = irString(currentKey.keyName),
-      composable = affectedComposable,
+      composable = currentKey.irAffectedComposable,
       type = invalidationTypeProcessed,
     )
     newStatements += callListeners
 
     val logger = IrInvalidationLogger.irLog(
-      affectedComposable = affectedComposable,
+      affectedComposable = currentKey.irAffectedComposable,
       invalidationType = invalidationTypeProcessed,
     )
     newStatements += logger
@@ -263,19 +232,7 @@ internal class InvalidationTrackableTransformer(
     val currentKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return NO_CHANGED
     if (!handledSkipToGroupEndCall.handle(currentKey.keyName)) return NO_CHANGED
 
-    val currentUserProvideName = currentKey.userProvideName
-
-    val currentFunctionName = composable.getFunctionNameIntercepttedAnonymous(currentUserProvideName)
-    val currentFunctionLocation = composable.getSafelyLocation()
     val currentInvalidationTrackTable = currentInvalidationTrackTable!!
-
-    val affectedComposable = IrAffectedComposable.irAffectedComposable(
-      composableName = irString(currentFunctionName),
-      packageName = irString(composable.fqNameWhenAvailable?.parent()?.asString() ?: FqName.ROOT.asString()),
-      filePath = irString(currentFunctionLocation.file),
-      startLine = irInt(currentFunctionLocation.line),
-      startColumn = irInt(currentFunctionLocation.column),
-    )
 
     val invalidationTypeSymbol = IrInvalidationLogger.irInvalidationTypeSymbol
     val invalidationTypeSkipped = IrInvalidationLogger.irInvalidationTypeSkipped()
@@ -283,11 +240,11 @@ internal class InvalidationTrackableTransformer(
 
     val callListeners = currentInvalidationTrackTable.irCallListeners(
       key = irString(currentKey.keyName),
-      composable = affectedComposable,
+      composable = currentKey.irAffectedComposable,
       type = invalidationTypeSkipped,
     )
     val logger = IrInvalidationLogger.irLog(
-      affectedComposable = affectedComposable,
+      affectedComposable = currentKey.irAffectedComposable,
       invalidationType = invalidationTypeSkipped,
     )
 

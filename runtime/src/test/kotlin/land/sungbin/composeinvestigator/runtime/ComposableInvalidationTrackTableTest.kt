@@ -19,6 +19,7 @@ class ComposableInvalidationTrackTableTest : FeatureSpec() {
 
         val param = AffectedField.ValueParameter(
           name = "name",
+          typeFqName = "kotlin.String",
           stability = DeclarationStability.Stable,
           valueString = "value",
           valueHashCode = 0,
@@ -33,12 +34,14 @@ class ComposableInvalidationTrackTableTest : FeatureSpec() {
 
         val oldParam = AffectedField.ValueParameter(
           name = "name",
+          typeFqName = "kotlin.String",
           stability = DeclarationStability.Stable,
           valueString = "value",
           valueHashCode = 0,
         )
         val newParam = AffectedField.ValueParameter(
           name = "name",
+          typeFqName = "kotlin.String",
           stability = DeclarationStability.Unstable,
           valueString = "new value",
           valueHashCode = 1,
@@ -57,22 +60,26 @@ class ComposableInvalidationTrackTableTest : FeatureSpec() {
           listOf(
             AffectedField.ValueParameter(
               name = "name",
+              typeFqName = "kotlin.String",
               stability = DeclarationStability.Stable,
               valueString = "value",
               valueHashCode = 0,
             ) changedTo AffectedField.ValueParameter(
               name = "name",
+              typeFqName = "kotlin.String",
               stability = DeclarationStability.Stable,
               valueString = "new value",
               valueHashCode = 1,
             ),
             AffectedField.ValueParameter(
               name = "name2",
+              typeFqName = "kotlin.String",
               stability = DeclarationStability.Unstable,
               valueString = "value2",
               valueHashCode = 10,
             ) changedTo AffectedField.ValueParameter(
               name = "name2",
+              typeFqName = "kotlin.String",
               stability = DeclarationStability.Unstable,
               valueString = "new value2",
               valueHashCode = 11,

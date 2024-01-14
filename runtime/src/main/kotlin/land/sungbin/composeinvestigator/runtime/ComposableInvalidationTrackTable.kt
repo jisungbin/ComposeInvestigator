@@ -10,6 +10,7 @@ package land.sungbin.composeinvestigator.runtime
 import androidx.compose.runtime.Immutable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
+import land.sungbin.composeinvestigator.runtime.utils.putIfNotPresent
 import org.jetbrains.annotations.TestOnly
 
 @ExperimentalComposeInvestigatorApi
@@ -59,7 +60,7 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
   }
 
   public fun registerListener(keyName: String, listener: ComposableInvalidationListener) {
-    listeners.putIfAbsent(keyName, listener)
+    listeners.putIfNotPresent(keyName, listener)
   }
 
   public fun unregisterListener(keyName: String) {
@@ -99,4 +100,4 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
 }
 
 private fun AffectedField.ValueParameter.toParameterInformation(): ParameterInformation =
-  ParameterInformation(name = name, stability = stability)
+  ParameterInformation(name = name, typeFqName = typeFqName, stability = stability)

@@ -17,6 +17,7 @@ public sealed interface AffectedField {
 
   public data class ValueParameter(
     override val name: String,
+    public val typeFqName: String,
     override val valueString: String,
     override val valueHashCode: Int,
     public val stability: DeclarationStability,

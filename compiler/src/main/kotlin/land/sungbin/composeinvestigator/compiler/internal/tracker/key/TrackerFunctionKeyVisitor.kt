@@ -13,10 +13,19 @@ import androidx.compose.compiler.plugins.kotlin.irTrace
 import androidx.compose.compiler.plugins.kotlin.lower.ComposableSymbolRemapper
 import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyVisitor
+import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedComposable
+import land.sungbin.composeinvestigator.compiler.util.getSafelyLocation
+import land.sungbin.composeinvestigator.compiler.util.irInt
+import land.sungbin.composeinvestigator.compiler.util.irString
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
+import org.jetbrains.kotlin.ir.types.defaultType
+import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
+import org.jetbrains.kotlin.name.FqName
 
 internal class TrackerFunctionKeyVisitor(
   context: IrPluginContext,
@@ -45,11 +54,26 @@ internal class TrackerFunctionKeyVisitor(
   }
 
   override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
-    val signature = declaration.signatureString()
-    val (keyName) = buildKey("fun-$signature")
-    val keyInfo = KeyInfo(keyName = keyName, userProvideName = null)
+    val (keyName) = buildKey("fun-${declaration.signatureString()}")
+    val location = declaration.getSafelyLocation()
+
+    val affectedComposable = IrAffectedComposable.irAffectedComposable(
+      composableName = irString(declaration.name.asString()),
+      packageName = irString((declaration.fqNameWhenAvailable?.parent() ?: FqName.ROOT).asString()),
+      filePath = irString(location.file),
+      startLine = irInt(location.line),
+      startColumn = irInt(location.column),
+      parent = IrConstImpl.constNull(
+        startOffset = UNDEFINED_OFFSET,
+        endOffset = UNDEFINED_OFFSET,
+        type = IrAffectedComposable.irAffectedComposable.defaultType,
+      ),
+    )
+
+    val keyInfo = KeyInfo(keyName = keyName, irAffectedComposable = affectedComposable)
     currentKeys += keyInfo
     irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, declaration] = keyInfo
+
     return super.visitSimpleFunction(declaration)
   }
 }

@@ -8,6 +8,7 @@
  */
 
 @file:OptIn(InternalComposeApi::class, ExperimentalCoroutinesApi::class)
+@file:Suppress("unused")
 
 package land.sungbin.composeinvestigator.runtime.mock
 
