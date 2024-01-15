@@ -20,10 +20,7 @@ import org.jetbrains.kotlin.config.CompilerConfiguration
 
 @AutoService(ComponentRegistrar::class)
 public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
-  override fun registerProjectComponents(
-    project: MockProject,
-    configuration: CompilerConfiguration,
-  ) {
+  override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
     val verbose = configuration[KEY_VERBOSE]?.toBooleanStrictOrNull() ?: false
     val logger = VerboseLogger(configuration).apply { if (verbose) verbose() }
 

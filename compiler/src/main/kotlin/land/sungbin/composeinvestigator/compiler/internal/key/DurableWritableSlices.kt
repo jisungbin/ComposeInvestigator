@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.internal.tracker.key
+package land.sungbin.composeinvestigator.compiler.internal.key
 
 import androidx.compose.compiler.plugins.kotlin.WeakBindingTrace
 import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.util.slicedMap.BasicWritableSlice
 import org.jetbrains.kotlin.util.slicedMap.RewritePolicy
 import org.jetbrains.kotlin.util.slicedMap.WritableSlice
 
-public object TrackerWritableSlices {
+public object DurableWritableSlices {
   public val DURABLE_FUNCTION_KEY: WritableSlice<IrAttributeContainer, KeyInfo> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
 }
 

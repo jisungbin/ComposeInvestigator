@@ -16,9 +16,9 @@ import land.sungbin.composeinvestigator.compiler.internal.ComposableInvalidation
 import land.sungbin.composeinvestigator.compiler.internal.ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_NAME
 import land.sungbin.composeinvestigator.compiler.internal.UNKNOWN_STRING
 import land.sungbin.composeinvestigator.compiler.internal.fromFqName
+import land.sungbin.composeinvestigator.compiler.internal.key.DurableWritableSlices
+import land.sungbin.composeinvestigator.compiler.internal.key.set
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedComposable
-import land.sungbin.composeinvestigator.compiler.internal.tracker.key.TrackerWritableSlices
-import land.sungbin.composeinvestigator.compiler.internal.tracker.key.set
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
 import land.sungbin.composeinvestigator.compiler.util.irString
 import land.sungbin.fastlist.fastLastOrNull
@@ -50,12 +50,16 @@ internal class InvalidationTrackTableIntrinsicTransformer(
   private val table: IrInvalidationTrackTable,
   @Suppress("unused") private val logger: VerboseLogger,
 ) : IrElementTransformerVoidWithContext(), IrPluginContext by context {
-  private val currentTableGetterSymbol = referenceProperties(CallableId.fromFqName(CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN)).single().owner.getter!!
+  private val currentTableGetterSymbol =
+    referenceProperties(CallableId.fromFqName(CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN)).single().owner.getter!!
 
   private val _tableSymbol = referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN))!!
-  private val currentComposableNameGetterSymbol = _tableSymbol.getPropertyGetter(ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_NAME.asString())!!.owner
-  private val currentComposableNameSetterSymbol = _tableSymbol.getPropertySetter(ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_NAME.asString())!!.owner
-  private val currentComposableKeyNameGetterSymbol = _tableSymbol.getPropertyGetter(ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_KEY_NAME.asString())!!.owner
+  private val currentComposableNameGetterSymbol =
+    _tableSymbol.getPropertyGetter(ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_NAME.asString())!!.owner
+  private val currentComposableNameSetterSymbol =
+    _tableSymbol.getPropertySetter(ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_NAME.asString())!!.owner
+  private val currentComposableKeyNameGetterSymbol =
+    _tableSymbol.getPropertyGetter(ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_KEY_NAME.asString())!!.owner
 
   private val composableNameSymbol = referenceClass(ClassId.topLevel(COMPOSABLE_NAME_FQN))!!.owner
 
@@ -76,7 +80,7 @@ internal class InvalidationTrackTableIntrinsicTransformer(
             0,
             lastReachedComposable()
               ?.let { composable ->
-                IrAffectedComposable.getComposableName(irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.irAffectedComposable)
+                IrAffectedComposable.getComposableName(irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.affectedComposable)
               }
               ?: irString(SpecialNames.UNKNOWN_STRING)
           )
@@ -89,10 +93,10 @@ internal class InvalidationTrackTableIntrinsicTransformer(
             .getValueArgument(0).safeAs<IrConst<String>>()?.value
             ?: error("Currently, only string hardcodes are supported as arguments to ComposableName. (${expression.dumpKotlinLike()})")
 
-          val previousKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, composable]!!
-          val newAffectedComposable = IrAffectedComposable.copyWith(previousKey.irAffectedComposable, composableName = irString(userProvideName))
+          val previousKey = irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, composable]!!
+          val newAffectedComposable = IrAffectedComposable.copyWith(previousKey.affectedComposable, composableName = irString(userProvideName))
 
-          irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, composable] = previousKey.copy(irAffectedComposable = newAffectedComposable)
+          irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, composable] = previousKey.copy(affectedComposable = newAffectedComposable)
         }
 
         IrGetObjectValueImpl(
@@ -104,7 +108,7 @@ internal class InvalidationTrackTableIntrinsicTransformer(
       }
       currentComposableKeyNameGetterSymbol.kotlinFqName -> {
         lastReachedComposable()
-          ?.let { composable -> irString(irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.keyName) }
+          ?.let { composable -> irString(irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.keyName) }
           ?: irString(SpecialNames.UNKNOWN_STRING)
       }
       else -> super.visitCall(expression)
