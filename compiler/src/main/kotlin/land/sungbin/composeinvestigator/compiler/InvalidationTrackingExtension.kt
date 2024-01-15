@@ -8,10 +8,10 @@
 package land.sungbin.composeinvestigator.compiler
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
+import land.sungbin.composeinvestigator.compiler.internal.key.DurableFunctionKeyTransformer
 import land.sungbin.composeinvestigator.compiler.internal.tracker.InvalidationTrackableTransformer
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedComposable
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedField
-import land.sungbin.composeinvestigator.compiler.internal.tracker.key.TrackerFunctionKeyVisitor
 import land.sungbin.composeinvestigator.compiler.internal.tracker.logger.IrInvalidationLogger
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
@@ -37,7 +37,7 @@ internal class InvalidationTrackingExtension(private val logger: VerboseLogger) 
     )
 
     moduleFragment.transformChildrenVoid(
-      TrackerFunctionKeyVisitor(
+      DurableFunctionKeyTransformer(
         context = pluginContext,
         stabilityInferencer = stabilityInferencer,
       ),

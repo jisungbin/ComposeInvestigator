@@ -5,11 +5,11 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.internal.tracker.key
+package land.sungbin.composeinvestigator.compiler.internal.key
 
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 
 public data class KeyInfo(
   public val keyName: String,
-  public val irAffectedComposable: IrConstructorCall,
+  public val affectedComposable: IrConstructorCall,
 )

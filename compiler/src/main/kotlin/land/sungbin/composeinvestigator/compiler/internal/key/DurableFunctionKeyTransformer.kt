@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.internal.tracker.key
+package land.sungbin.composeinvestigator.compiler.internal.key
 
 import androidx.compose.compiler.plugins.kotlin.EmptyModuleMetrics
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
@@ -27,7 +27,7 @@ import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.name.FqName
 
-internal class TrackerFunctionKeyVisitor(
+internal class DurableFunctionKeyTransformer(
   context: IrPluginContext,
   stabilityInferencer: StabilityInferencer,
 ) : DurableKeyTransformer(
@@ -70,9 +70,9 @@ internal class TrackerFunctionKeyVisitor(
       ),
     )
 
-    val keyInfo = KeyInfo(keyName = keyName, irAffectedComposable = affectedComposable)
+    val keyInfo = KeyInfo(keyName = keyName, affectedComposable = affectedComposable)
     currentKeys += keyInfo
-    irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, declaration] = keyInfo
+    irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, declaration] = keyInfo
 
     return super.visitSimpleFunction(declaration)
   }

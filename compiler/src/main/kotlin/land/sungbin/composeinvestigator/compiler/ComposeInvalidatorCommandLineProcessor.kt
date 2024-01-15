@@ -27,11 +27,7 @@ public class ComposeInvestigatorCommandLineProcessor : CommandLineProcessor {
   override val pluginId: String = PLUGIN_ID
   override val pluginOptions: List<CliOption> = listOf(OPTION_VERBOSE)
 
-  override fun processOption(
-    option: AbstractCliOption,
-    value: String,
-    configuration: CompilerConfiguration,
-  ) {
+  override fun processOption(option: AbstractCliOption, value: String, configuration: CompilerConfiguration) {
     when (val optionName = option.optionName) {
       OPTION_VERBOSE.optionName -> configuration.put(KEY_VERBOSE, value)
       else -> throw CliOptionProcessingException("Unknown plugin option: $optionName")

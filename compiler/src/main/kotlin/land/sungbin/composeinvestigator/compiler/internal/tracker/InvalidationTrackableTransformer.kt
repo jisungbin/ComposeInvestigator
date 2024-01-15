@@ -15,9 +15,9 @@ import land.sungbin.composeinvestigator.compiler.internal.MUTABLE_LIST_ADD_FQN
 import land.sungbin.composeinvestigator.compiler.internal.MUTABLE_LIST_OF_FQN
 import land.sungbin.composeinvestigator.compiler.internal.REGISTER_STATE_OBJECT_TRACKING_FQN
 import land.sungbin.composeinvestigator.compiler.internal.fromFqName
+import land.sungbin.composeinvestigator.compiler.internal.key.DurableWritableSlices
 import land.sungbin.composeinvestigator.compiler.internal.stability.toIrDeclarationStability
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedField
-import land.sungbin.composeinvestigator.compiler.internal.tracker.key.TrackerWritableSlices
 import land.sungbin.composeinvestigator.compiler.internal.tracker.logger.IrInvalidationLogger
 import land.sungbin.composeinvestigator.compiler.origin.StateChangeTrackerOrigin
 import land.sungbin.composeinvestigator.compiler.util.HandledMap
@@ -67,10 +67,7 @@ internal class InvalidationTrackableTransformer(
   private val handledSkipToGroupEndCall = HandledMap()
 
   override fun transformStateInitializer(composable: IrSimpleFunction, stateName: Name, initializer: IrExpression): IrExpression {
-    logger("transformStateInitializer: ${initializer.dump()}")
-    logger("transformStateInitializer: ${initializer.dumpKotlinLike()}")
-
-    val functionKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return initializer
+    val functionKey = irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return initializer
     if (!handledState.handle(functionKey.keyName, stateName)) return initializer
 
     val nearestComposer = composable.valueParameters.fastLastOrNull { param -> param.type.classFqName == COMPOSER_FQN }!!
@@ -87,7 +84,7 @@ internal class InvalidationTrackableTransformer(
       putTypeArgument(0, initializer.type)
 
       putValueArgument(0, irGetValue(nearestComposer))
-      putValueArgument(1, functionKey.irAffectedComposable)
+      putValueArgument(1, functionKey.affectedComposable)
       putValueArgument(2, irString(functionKey.keyName))
       putValueArgument(3, irString(stateName.asString()))
       // The arguments for index 4 have default values.
@@ -98,7 +95,7 @@ internal class InvalidationTrackableTransformer(
   }
 
   override fun transformComposableBody(function: IrSimpleFunction, block: IrBlock): IrBlock {
-    val currentKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, function] ?: return block
+    val currentKey = irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, function] ?: return block
     if (!handledComposableBody.handle(currentKey.keyName)) return block
 
     val newStatements = mutableListOf<IrStatement>()
@@ -163,13 +160,13 @@ internal class InvalidationTrackableTransformer(
 
     val callListeners = currentInvalidationTrackTable.irCallListeners(
       key = irString(currentKey.keyName),
-      composable = currentKey.irAffectedComposable,
+      composable = currentKey.affectedComposable,
       type = invalidationTypeProcessed,
     )
     newStatements += callListeners
 
     val logger = IrInvalidationLogger.irLog(
-      affectedComposable = currentKey.irAffectedComposable,
+      affectedComposable = currentKey.affectedComposable,
       invalidationType = invalidationTypeProcessed,
     )
     newStatements += logger
@@ -186,7 +183,7 @@ internal class InvalidationTrackableTransformer(
     @Suppress("LocalVariableName")
     val NO_CHANGED = IrStatementContainerImpl(statements = listOf(initializer))
 
-    val currentKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, target] ?: return NO_CHANGED
+    val currentKey = irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, target] ?: return NO_CHANGED
     if (!handledUpdateScopeBlock.handle(currentKey.keyName)) return NO_CHANGED
 
     val newStatements = mutableListOf<IrStatement>()
@@ -206,13 +203,13 @@ internal class InvalidationTrackableTransformer(
 
     val callListeners = currentInvalidationTrackTable.irCallListeners(
       key = irString(currentKey.keyName),
-      composable = currentKey.irAffectedComposable,
+      composable = currentKey.affectedComposable,
       type = invalidationTypeProcessed,
     )
     newStatements += callListeners
 
     val logger = IrInvalidationLogger.irLog(
-      affectedComposable = currentKey.irAffectedComposable,
+      affectedComposable = currentKey.affectedComposable,
       invalidationType = invalidationTypeProcessed,
     )
     newStatements += logger
@@ -229,7 +226,7 @@ internal class InvalidationTrackableTransformer(
     @Suppress("LocalVariableName")
     val NO_CHANGED = IrStatementContainerImpl(statements = listOf(initializer))
 
-    val currentKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return NO_CHANGED
+    val currentKey = irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return NO_CHANGED
     if (!handledSkipToGroupEndCall.handle(currentKey.keyName)) return NO_CHANGED
 
     val currentInvalidationTrackTable = currentInvalidationTrackTable!!
@@ -240,11 +237,11 @@ internal class InvalidationTrackableTransformer(
 
     val callListeners = currentInvalidationTrackTable.irCallListeners(
       key = irString(currentKey.keyName),
-      composable = currentKey.irAffectedComposable,
+      composable = currentKey.affectedComposable,
       type = invalidationTypeSkipped,
     )
     val logger = IrInvalidationLogger.irLog(
-      affectedComposable = currentKey.irAffectedComposable,
+      affectedComposable = currentKey.affectedComposable,
       invalidationType = invalidationTypeSkipped,
     )
 

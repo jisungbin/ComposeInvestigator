@@ -5,14 +5,14 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.test.tracker.key
+package land.sungbin.composeinvestigator.compiler.test.key
 
 import androidx.compose.compiler.plugins.kotlin.WeakBindingTrace
 import androidx.compose.compiler.plugins.kotlin.irTrace
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.shouldBe
-import land.sungbin.composeinvestigator.compiler.internal.tracker.key.TrackerWritableSlices
+import land.sungbin.composeinvestigator.compiler.internal.key.DurableWritableSlices
 import land.sungbin.composeinvestigator.compiler.test.IrBaseTest
 import land.sungbin.composeinvestigator.compiler.test.buildIrVisiterRegistrar
 import land.sungbin.composeinvestigator.compiler.test.kotlinCompilation
@@ -46,7 +46,7 @@ class TrackerKeyTest : ShouldSpec(), IrBaseTest {
         composeCompiling = false,
         verboseLogging = false,
         additionalVisitor = irVisitor,
-        sourceFiles = arrayOf(source("tracker/key/TrackerKeyTestSource.kt")),
+        sourceFiles = arrayOf(source("key/TrackerKeyTestSource.kt")),
       )
 
       val irTrace = _irTrace!!
@@ -56,10 +56,10 @@ class TrackerKeyTest : ShouldSpec(), IrBaseTest {
       val twoArgFn = irFunctions.single { fn -> fn.valueParameters.size == 2 }
       val threeArgFn = irFunctions.single { fn -> fn.valueParameters.size == 3 }
 
-      val zeroArgFnKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, zeroArgFn]!!
-      val oneArgFnKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, oneArgFn]!!
-      val twoArgFnKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, twoArgFn]!!
-      val threeArgFnKey = irTrace[TrackerWritableSlices.DURABLE_FUNCTION_KEY, threeArgFn]!!
+      val zeroArgFnKey = irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, zeroArgFn]!!
+      val oneArgFnKey = irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, oneArgFn]!!
+      val twoArgFnKey = irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, twoArgFn]!!
+      val threeArgFnKey = irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, threeArgFn]!!
 
       fun assertAffectedComposable(
         target: IrConstructorCall,
@@ -76,38 +76,38 @@ class TrackerKeyTest : ShouldSpec(), IrBaseTest {
         // TODO: assert parent (not yet implemented feature)
       }
 
-      zeroArgFnKey.keyName shouldBe "fun-one()Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker.key/file-TrackerKeyTestSource.kt"
+      zeroArgFnKey.keyName shouldBe "fun-one()Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.key/file-TrackerKeyTestSource.kt"
       assertAffectedComposable(
-        zeroArgFnKey.irAffectedComposable,
+        zeroArgFnKey.affectedComposable,
         expectName = "one",
-        expectPkg = "land.sungbin.composeinvestigator.compiler.test.source.tracker.key",
+        expectPkg = "land.sungbin.composeinvestigator.compiler.test.source.key",
         expectStartLine = 12,
         expectStartColumn = 0,
       )
 
-      oneArgFnKey.keyName shouldBe "fun-one(Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker.key/file-TrackerKeyTestSource.kt"
+      oneArgFnKey.keyName shouldBe "fun-one(Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.key/file-TrackerKeyTestSource.kt"
       assertAffectedComposable(
-        oneArgFnKey.irAffectedComposable,
+        oneArgFnKey.affectedComposable,
         expectName = "one",
-        expectPkg = "land.sungbin.composeinvestigator.compiler.test.source.tracker.key",
+        expectPkg = "land.sungbin.composeinvestigator.compiler.test.source.key",
         expectStartLine = 13,
         expectStartColumn = 0,
       )
 
-      twoArgFnKey.keyName shouldBe "fun-one(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker.key/file-TrackerKeyTestSource.kt"
+      twoArgFnKey.keyName shouldBe "fun-one(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.key/file-TrackerKeyTestSource.kt"
       assertAffectedComposable(
-        twoArgFnKey.irAffectedComposable,
+        twoArgFnKey.affectedComposable,
         expectName = "one",
-        expectPkg = "land.sungbin.composeinvestigator.compiler.test.source.tracker.key",
+        expectPkg = "land.sungbin.composeinvestigator.compiler.test.source.key",
         expectStartLine = 14,
         expectStartColumn = 0,
       )
 
-      threeArgFnKey.keyName shouldBe "fun-one(Any,Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.tracker.key/file-TrackerKeyTestSource.kt"
+      threeArgFnKey.keyName shouldBe "fun-one(Any,Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.key/file-TrackerKeyTestSource.kt"
       assertAffectedComposable(
-        threeArgFnKey.irAffectedComposable,
+        threeArgFnKey.affectedComposable,
         expectName = "one",
-        expectPkg = "land.sungbin.composeinvestigator.compiler.test.source.tracker.key",
+        expectPkg = "land.sungbin.composeinvestigator.compiler.test.source.key",
         expectStartLine = 15,
         expectStartColumn = 0,
       )

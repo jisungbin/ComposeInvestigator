@@ -7,7 +7,7 @@
 
 @file:Suppress("unused", "UNUSED_PARAMETER")
 
-package land.sungbin.composeinvestigator.compiler.test.source.tracker.key
+package land.sungbin.composeinvestigator.compiler.test.source.key
 
 fun one() {}
 fun one(a: Any) {}
