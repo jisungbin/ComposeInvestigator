@@ -70,9 +70,11 @@ internal class InvalidationTrackTableIntrinsicTransformer(
 
   override fun visitCall(expression: IrCall): IrExpression =
     when (expression.symbol.owner.kotlinFqName) {
-      currentTableGetterSymbol.kotlinFqName -> table.propGetter()
+      currentTableGetterSymbol.kotlinFqName -> table.propGetter(startOffset = expression.startOffset, endOffset = expression.endOffset)
       currentComposableNameGetterSymbol.kotlinFqName -> {
         IrConstructorCallImpl.fromSymbolOwner(
+          startOffset = expression.startOffset,
+          endOffset = expression.endOffset,
           type = composableNameSymbol.defaultType,
           constructorSymbol = composableNameSymbol.symbol.constructors.single(),
         ).apply {
@@ -107,9 +109,13 @@ internal class InvalidationTrackTableIntrinsicTransformer(
         )
       }
       currentComposableKeyNameGetterSymbol.kotlinFqName -> {
-        lastReachedComposable()
-          ?.let { composable -> irString(irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.keyName) }
-          ?: irString(SpecialNames.UNKNOWN_STRING)
+        lastReachedComposable()?.let { composable ->
+          irString(
+            irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.keyName,
+            startOffset = expression.startOffset,
+            endOffset = expression.endOffset,
+          )
+        } ?: irString(SpecialNames.UNKNOWN_STRING, startOffset = expression.startOffset, endOffset = expression.endOffset)
       }
       else -> super.visitCall(expression)
     }

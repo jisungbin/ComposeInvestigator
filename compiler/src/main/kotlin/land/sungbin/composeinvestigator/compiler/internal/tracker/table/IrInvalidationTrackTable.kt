@@ -86,10 +86,13 @@ public class IrInvalidationTrackTable private constructor(public val prop: IrPro
   }
 }
 
-public fun IrInvalidationTrackTable.propGetter(): IrCall =
+public fun IrInvalidationTrackTable.propGetter(
+  startOffset: Int = UNDEFINED_OFFSET,
+  endOffset: Int = UNDEFINED_OFFSET,
+): IrCall =
   IrCallImpl.fromSymbolOwner(
-    startOffset = UNDEFINED_OFFSET,
-    endOffset = UNDEFINED_OFFSET,
+    startOffset = startOffset,
+    endOffset = endOffset,
     symbol = prop.getter!!.symbol,
   )
 
