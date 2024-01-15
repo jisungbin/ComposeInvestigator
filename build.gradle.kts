@@ -7,6 +7,8 @@
 
 import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
+import com.android.build.api.variant.AndroidComponentsExtension
+import com.android.build.api.variant.HasUnitTestBuilder
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.jlleitschuh.gradle.ktlint.KtlintExtension
 
@@ -59,6 +61,15 @@ subprojects {
       version.set(rootProject.libs.versions.kotlin.ktlint.source.get())
       android.set(true)
       verbose.set(true)
+    }
+
+    // From: https://github.com/chrisbanes/tivi/blob/0865be537f2859d267efb59dac7d6358eb47effc/gradle/build-logic/convention/src/main/kotlin/app/tivi/gradle/Android.kt#L28-L34
+    extensions.findByType<AndroidComponentsExtension<*, *, *>>()?.run {
+      beforeVariants(selector().withBuildType("release")) { variantBuilder ->
+        (variantBuilder as? HasUnitTestBuilder)?.apply {
+          enableUnitTest = false
+        }
+      }
     }
 
     tasks.withType<KotlinCompile> {
