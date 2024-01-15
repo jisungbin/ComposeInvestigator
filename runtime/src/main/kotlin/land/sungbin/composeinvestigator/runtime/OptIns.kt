@@ -12,7 +12,7 @@ package land.sungbin.composeinvestigator.runtime
     "manual use may cause undesired results.",
 )
 @Retention(AnnotationRetention.BINARY)
-@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR)
+@Target(AnnotationTarget.FUNCTION, AnnotationTarget.CONSTRUCTOR, AnnotationTarget.CLASS)
 public annotation class ComposeInvestigatorCompilerApi
 
 @RequiresOptIn(
