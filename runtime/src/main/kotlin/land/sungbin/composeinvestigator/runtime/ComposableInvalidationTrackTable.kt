@@ -82,7 +82,8 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
       return InvalidationReason.Initial
     }
 
-    for ((index, old) in oldFields.withIndex()) {
+    for (index in oldFields.indices) {
+      val old = oldFields[index]
       val new = fields[index]
       check(old.name == new.name) { "Field name must be same. old.name=${old.name}, new.name=${new.name}" }
       if (old.valueHashCode != new.valueHashCode) changed.add(old changedTo new)
