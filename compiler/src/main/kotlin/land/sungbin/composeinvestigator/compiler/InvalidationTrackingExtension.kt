@@ -8,6 +8,7 @@
 package land.sungbin.composeinvestigator.compiler
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
+import land.sungbin.composeinvestigator.compiler.internal.callstack.ComposableCallstackTransformer
 import land.sungbin.composeinvestigator.compiler.internal.key.DurableFunctionKeyTransformer
 import land.sungbin.composeinvestigator.compiler.internal.tracker.InvalidationTrackableTransformer
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedComposable
@@ -47,6 +48,12 @@ internal class InvalidationTrackingExtension(private val logger: VerboseLogger) 
         context = pluginContext,
         logger = logger,
         stabilityInferencer = stabilityInferencer,
+      ),
+    )
+    moduleFragment.transformChildrenVoid(
+      ComposableCallstackTransformer(
+        context = pluginContext,
+        logger = logger,
       ),
     )
     moduleFragment.transformChildrenVoid(
