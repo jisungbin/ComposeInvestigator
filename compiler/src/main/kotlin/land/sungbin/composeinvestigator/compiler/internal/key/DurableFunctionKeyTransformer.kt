@@ -19,11 +19,8 @@ import land.sungbin.composeinvestigator.compiler.util.irInt
 import land.sungbin.composeinvestigator.compiler.util.irString
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
-import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.name.FqName
 
@@ -63,11 +60,6 @@ internal class DurableFunctionKeyTransformer(
       filePath = irString(location.file),
       startLine = irInt(location.line),
       startColumn = irInt(location.column),
-      parent = IrConstImpl.constNull(
-        startOffset = UNDEFINED_OFFSET,
-        endOffset = UNDEFINED_OFFSET,
-        type = IrAffectedComposable.irAffectedComposable.defaultType,
-      ),
     )
 
     val keyInfo = KeyInfo(keyName = keyName, affectedComposable = affectedComposable)
