@@ -8,8 +8,8 @@
 package land.sungbin.composeinvestigator.compiler
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
+import land.sungbin.composeinvestigator.compiler.internal.callstack.ComposableCallstackTransformer
 import land.sungbin.composeinvestigator.compiler.internal.key.DurableFunctionKeyTransformer
-import land.sungbin.composeinvestigator.compiler.internal.tracker.InvalidationTrackableTransformer
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedComposable
 import land.sungbin.composeinvestigator.compiler.internal.tracker.affect.IrAffectedField
 import land.sungbin.composeinvestigator.compiler.internal.tracker.logger.IrInvalidationLogger
@@ -43,12 +43,18 @@ internal class InvalidationTrackingExtension(private val logger: VerboseLogger) 
       ),
     )
     moduleFragment.transformChildrenVoid(
-      InvalidationTrackableTransformer(
+      ComposableCallstackTransformer(
         context = pluginContext,
         logger = logger,
-        stabilityInferencer = stabilityInferencer,
       ),
     )
+//    moduleFragment.transformChildrenVoid(
+//      InvalidationTrackableTransformer(
+//        context = pluginContext,
+//        logger = logger,
+//        stabilityInferencer = stabilityInferencer,
+//      ),
+//    )
     moduleFragment.transformChildrenVoid(
       object : IrElementTransformerVoidWithContext() {
         override fun visitFileNew(declaration: IrFile): IrFile {

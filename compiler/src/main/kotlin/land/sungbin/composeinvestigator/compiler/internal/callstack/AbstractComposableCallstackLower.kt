@@ -8,10 +8,10 @@
 package land.sungbin.composeinvestigator.compiler.internal.callstack
 
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
-import land.sungbin.composeinvestigator.compiler.internal.COMPOSER_FQN
+import androidx.compose.compiler.plugins.kotlin.irTrace
+import land.sungbin.composeinvestigator.compiler.internal.key.DurableWritableSlices
 import land.sungbin.composeinvestigator.compiler.util.HandledMap
 import land.sungbin.composeinvestigator.compiler.util.VerboseLogger
-import land.sungbin.fastlist.fastAny
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
@@ -19,14 +19,21 @@ import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
+import org.jetbrains.kotlin.ir.expressions.IrVararg
 import org.jetbrains.kotlin.ir.expressions.impl.IrTryImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
 import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.classFqName
+import org.jetbrains.kotlin.ir.util.defaultType
+import org.jetbrains.kotlin.ir.util.isFunction
+import org.jetbrains.kotlin.ir.util.kotlinFqName
+import org.jetbrains.kotlin.ir.util.parentClassOrNull
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.util.OperatorNameConventions
 
-// Once issue #77 is resolved, continue development...
 @Suppress("unused")
 internal abstract class AbstractComposableCallstackLower(
   private val context: IrPluginContext,
@@ -35,61 +42,92 @@ internal abstract class AbstractComposableCallstackLower(
   private val handledFunction = HandledMap()
   private val handledCall = HandledMap()
 
+  @Suppress("UnnecessaryVariable", "NAME_SHADOWING")
   override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
-    @Suppress("UnnecessaryVariable", "RedundantSuppression") // false-positive "RedundantSuppression"
     val parent = declaration
 
-    if (!parent.hasComposableAnnotation() && !parent.hasComposerParam()) return super.visitSimpleFunction(parent)
-    if (!handledFunction.handle(parent)) return super.visitSimpleFunction(parent)
+    if (!parent.hasComposableAnnotation()) return super.visitSimpleFunction(parent)
+    if (!handledFunction.handle(parent.sourceKey())) return super.visitSimpleFunction(parent)
 
     parent.transformChildren(
-      object : IrElementTransformer<IrSimpleFunction> {
-        override fun visitCall(expression: IrCall, data: IrSimpleFunction): IrElement {
-          @Suppress("NAME_SHADOWING")
+      object : IrElementTransformer<Name> {
+        override fun visitCall(expression: IrCall, data: Name): IrElement {
           val parent = data
+          val function = expression.symbol.owner
+          val current = function.name
 
-          val call = expression.symbol.owner as? IrSimpleFunction ?: return super.visitCall(expression, parent)
-          if (!handledCall.handle(call)) return super.visitCall(expression, parent)
+          if (!handledCall.handle(function.sourceKey(), parent.asString())) return super.visitCall(expression, parent)
 
-          if (call.hasComposableAnnotation() || call.hasComposerParam()) {
-            for (index in 0 until expression.valueArgumentsCount) {
-              val param = expression.getValueArgument(index) ?: continue // if user no provide value, it will be null (use default value)
+          if (expression.isComposableInvoke()) return transformComposableCall(parent = parent, expression = expression)
+          if (function.hasComposableAnnotation()) {
+            for (index in 0 until function.valueParameters.size) {
+              val param = function.valueParameters[index]
 
-              val composableLambda = param as? IrFunctionExpression ?: continue // maybe
-              val composable = composableLambda.function // maybe
+              when {
+                // vararg contents: @Composable () -> Unit
+                // (parent is current)
+                param.varargElementType?.hasComposableAnnotation() == true -> {
+                  val composableVararg = expression.getValueArgument(index) as? IrVararg ?: continue
+                  val newComposableVararg = IrVarargImpl(
+                    startOffset = composableVararg.startOffset,
+                    endOffset = composableVararg.endOffset,
+                    type = composableVararg.type,
+                    varargElementType = composableVararg.varargElementType,
+                    elements = composableVararg.elements,
+                  )
 
-              if (composable.hasComposableAnnotation() || composable.hasComposerParam()) { // assert composableLambda is real composableLambda
-                val originalName = composable.name
-                val nameForComposableLambda = Name.identifier("${parent.name.asString()}_${index}_arg")
-                try {
-                  composable.transformChildren(this, composable.apply { name = nameForComposableLambda })
-                } finally {
-                  composable.name = originalName
+                  for (varargIndex in 0 until composableVararg.elements.size) {
+                    val nameForComposableVararg = Name.identifier("${current.asString()}$${param.name.asString()}_$varargIndex")
+
+                    val composableLambda = composableVararg.elements[varargIndex] as? IrFunctionExpression ?: continue
+
+                    val transformed = composableLambda.function.body?.transform(this, nameForComposableVararg)
+                    composableLambda.function.body = transformed
+
+                    newComposableVararg.elements[varargIndex] = composableLambda
+                  }
+
+                  expression.putValueArgument(index, newComposableVararg)
                 }
-                val transformed = transformComposableLambdaValueArgument(
-                  parent = nameForComposableLambda,
-                  expression = composableLambda,
-                )
-                expression.putValueArgument(index, transformed)
+                // content: @Composable () -> Unit
+                // (parent is current)
+                param.type.hasComposableAnnotation() -> {
+                  val nameForComposableLambda = Name.identifier("${current.asString()}$${param.name.asString()}")
+
+                  val composableLambda = expression.getValueArgument(index) as? IrFunctionExpression ?: continue
+                  composableLambda.function.body?.transformChildren(this, nameForComposableLambda)
+
+                  expression.putValueArgument(index, composableLambda)
+                }
               }
             }
-            return transformComposableCall(parent = parent.name, expression = expression)
+
+            return transformComposableCall(parent = parent, expression = expression)
           }
 
           return super.visitCall(expression, parent)
         }
       },
-      parent,
+      parent.name,
     )
 
     return super.visitSimpleFunction(parent)
   }
 
-  abstract fun transformComposableCall(parent: Name, expression: IrCall): IrExpression
-  abstract fun transformComposableLambdaValueArgument(parent: Name, expression: IrFunctionExpression): IrExpression
+  private fun IrCall.isComposableInvoke(): Boolean {
+    val isInvoke = run {
+      if (origin == IrStatementOrigin.INVOKE) return@run true
+      symbol.owner.name == OperatorNameConventions.INVOKE &&
+        symbol.owner.parentClassOrNull?.defaultType?.isFunction() == true
+    }
+    return isInvoke && dispatchReceiver?.type?.hasComposableAnnotation() == true
+  }
 
-  private fun IrSimpleFunction.hasComposerParam() =
-    valueParameters.fastAny { param -> param.type.classFqName == COMPOSER_FQN }
+  private fun IrSimpleFunction.sourceKey(): String =
+    context.irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, this]?.keyName
+      ?: (kotlinFqName.asString() + valueParameters.joinToString { it.type.classFqName.toString() })
+
+  abstract fun transformComposableCall(parent: Name, expression: IrCall): IrExpression
 
   protected fun IrExpression.wrapTryFinally(
     startOffset: Int = this.startOffset,

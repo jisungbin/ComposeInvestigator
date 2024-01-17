@@ -12,11 +12,9 @@ import land.sungbin.composeinvestigator.compiler.util.irString
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.name.Name
 
-// Once issue #77 is resolved, continue development...
 @Suppress("unused")
 internal class ComposableCallstackTransformer(
   private val context: IrPluginContext,
@@ -32,17 +30,5 @@ internal class ComposableCallstackTransformer(
     logger("[ComposableCall] parent: ${parent.asString()}, expression: ${expression.render()}")
     // logger("[ComposableCall] transformed dump: ${transformed.dump()}")
     // logger("[ComposableCall] transformed dumpKotlinLike: ${transformed.dumpKotlinLike()}")
-  }
-
-  override fun transformComposableLambdaValueArgument(
-    parent: Name,
-    expression: IrFunctionExpression,
-  ): IrExpression = expression.wrapTryFinally(
-    tryResult = expression,
-    finallyBlock = irString(parent.asString()),
-  ).also {
-    logger("[ComposableLambdaValueParameter] parent: ${parent.asString()}, expression: ${expression.function.render()}")
-    // logger("[ComposableLambdaValueParameter] transformed dump: ${transformed.dump()}")
-    // logger("[ComposableLambdaValueParameter] transformed dumpKotlinLike: ${transformed.dumpKotlinLike()}")
   }
 }

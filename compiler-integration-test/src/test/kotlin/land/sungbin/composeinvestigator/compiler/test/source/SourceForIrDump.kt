@@ -2,25 +2,31 @@
 
 package land.sungbin.composeinvestigator.compiler.test.source
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.testTag
 
 @Composable
 fun One() {
   Button(onClick = {}) {
-    Text(text = "One Text")
+    Text(text = "Hi!")
   }
-  Two(value = 1)
+  Two(
+    { Text(text = "One") },
+    { Text(text = "Two") },
+    { Text(text = "Three") },
+    { Text(text = "Four") },
+  )
 }
 
 @Composable
-fun Two(value: Any) {
-  Box {
-    Spacer(Modifier.testTag(value.toString()))
+fun Two(vararg contents: @Composable () -> Unit) {
+  contents.forEach { content ->
+    Content(content = content)
   }
+}
+
+@Composable
+fun Content(content: @Composable () -> Unit) {
+  content()
 }

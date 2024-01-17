@@ -8,10 +8,10 @@
 package land.sungbin.composeinvestigator.compiler.util
 
 internal class HandledMap {
-  private val map = mutableMapOf<String, Unit>()
+  private val map = mutableMapOf<Int, Unit>()
 
   fun handle(vararg key: Any): Boolean {
-    val finalKey = key.joinToString(separator = "$", transform = Any::toString)
+    val finalKey = key.contentHashCode()
     return if (map.containsKey(finalKey)) {
       false
     } else {
