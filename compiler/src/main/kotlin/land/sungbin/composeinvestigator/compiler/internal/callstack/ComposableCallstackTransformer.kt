@@ -16,6 +16,8 @@ import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.name.Name
 
+// Once issue #77 is resolved, continue development...
+@Suppress("unused")
 internal class ComposableCallstackTransformer(
   private val context: IrPluginContext,
   private val logger: VerboseLogger,

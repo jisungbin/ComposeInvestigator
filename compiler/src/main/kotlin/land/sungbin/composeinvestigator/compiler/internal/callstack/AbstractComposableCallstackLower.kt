@@ -26,9 +26,11 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformer
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.name.Name
 
+// Once issue #77 is resolved, continue development...
+@Suppress("unused")
 internal abstract class AbstractComposableCallstackLower(
   private val context: IrPluginContext,
-  @Suppress("unused") private val logger: VerboseLogger,
+  private val logger: VerboseLogger,
 ) : IrElementTransformerVoid() {
   private val handledFunction = HandledMap()
   private val handledCall = HandledMap()
