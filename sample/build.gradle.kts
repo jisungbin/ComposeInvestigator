@@ -34,16 +34,10 @@ android {
 
 tasks.withType<KotlinCompile> {
   kotlinOptions {
-    freeCompilerArgs = freeCompilerArgs + listOf(
-      "-P",
-      "plugin:land.sungbin.composeinvestigator.compiler:verbose=true",
-    )
+    freeCompilerArgs = freeCompilerArgs + listOf("-P", "plugin:land.sungbin.composeinvestigator.compiler.callstack:verbose=true")
+    freeCompilerArgs = freeCompilerArgs + listOf("-P", "plugin:land.sungbin.composeinvestigator.compiler.invalidation:verbose=true")
   }
 }
-
-// repositories {
-//   mavenLocal()
-// }
 
 dependencies {
   implementation(libs.androidx.activity)
@@ -51,6 +45,6 @@ dependencies {
   implementation(libs.compose.material)
 
   implementation(projects.runtime)
-  kotlinCompilerPluginClasspath(projects.compiler)
-  // kotlinCompilerPluginClasspath("land.sungbin.composeinvestigator:composeinvestigator-compiler:0.1.0-SNAPSHOT")
+  kotlinCompilerPluginClasspath(projects.compilerCallstackTrack)
+  kotlinCompilerPluginClasspath(projects.compilerInvalidationTrack)
 }

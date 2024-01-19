@@ -50,7 +50,8 @@ kotlin {
     optIn.add("org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction")
     optIn.add("land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi")
     optIn.add("land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi")
-    freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=true")
+    freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler.callstack:verbose=true")
+    freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler.invalidation:verbose=true")
   }
 }
 
@@ -59,8 +60,9 @@ dependencies {
   implementation(libs.compose.material)
   implementation(libs.test.kotest.assertion)
 
-  testImplementation(projects.compiler)
   testImplementation(libs.compose.compiler)
+  testImplementation(projects.compilerCallstackTrack)
+  testImplementation(projects.compilerInvalidationTrack)
 
   testImplementation(libs.kotlin.compiler.embedded)
   testImplementation(libs.test.kotlin.compilation)
@@ -78,5 +80,6 @@ dependencies {
   testRuntimeOnly(libs.test.junit.enigne)
   testImplementation(libs.test.junit.compose)
 
-  kotlinCompilerPluginClasspath(projects.compiler)
+  kotlinCompilerPluginClasspath(projects.compilerCallstackTrack)
+  kotlinCompilerPluginClasspath(projects.compilerInvalidationTrack)
 }

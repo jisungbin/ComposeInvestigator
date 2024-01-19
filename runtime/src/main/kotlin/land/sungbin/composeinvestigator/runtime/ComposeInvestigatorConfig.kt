@@ -14,7 +14,7 @@ public object ComposeInvestigatorConfig {
   @Suppress("MemberVisibilityCanBePrivate")
   public const val LOGGER_DEFAULT_TAG: String = "ComposeInvestigator"
 
-  public var invalidationLogger: ComposableInvalidationLogger = ComposableInvalidationLogger { composable, type ->
+  public var invalidationLogger: ComposableInvalidationLogger = ComposableInvalidationLogger { _, composable, type ->
     Log.d(LOGGER_DEFAULT_TAG, "The '${composable.name}' composable has been invalidated.\n$type")
   }
 

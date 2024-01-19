@@ -15,7 +15,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.every
 import io.mockk.mockk
-import land.sungbin.composeinvestigator.compiler.internal.stability.toIrDeclarationStability
+import land.sungbin.composeinvestigator.compiler.invalidation.internal.stability.toIrDeclarationStability
 import land.sungbin.composeinvestigator.compiler.test.IrBaseTest
 import land.sungbin.composeinvestigator.compiler.test.buildIrVisiterRegistrar
 import land.sungbin.composeinvestigator.compiler.test.emptyIrElementVisitor
@@ -49,7 +49,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
         composeCompiling = false,
         verboseLogging = false,
         additionalVisitor = irVisitor,
-        sourceFiles = arrayOf(source("hello.kt")),
+        sourceFiles = arrayOf(source("EmptySource.kt")),
       )
 
       stableStability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Certain"
@@ -79,7 +79,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
         composeCompiling = false,
         verboseLogging = false,
         additionalVisitor = irVisitor,
-        sourceFiles = arrayOf(source("hello.kt")),
+        sourceFiles = arrayOf(source("EmptySource.kt")),
       )
 
       stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Runtime"
@@ -105,7 +105,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
         composeCompiling = false,
         verboseLogging = false,
         additionalVisitor = irVisitor,
-        sourceFiles = arrayOf(source("hello.kt")),
+        sourceFiles = arrayOf(source("EmptySource.kt")),
       )
 
       stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Unknown"
@@ -131,7 +131,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
         composeCompiling = false,
         verboseLogging = false,
         additionalVisitor = irVisitor,
-        sourceFiles = arrayOf(source("hello.kt")),
+        sourceFiles = arrayOf(source("EmptySource.kt")),
       )
 
       stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Parameter"
@@ -171,7 +171,7 @@ class StabilityWrapperTest : FunSpec(), IrBaseTest {
         composeCompiling = false,
         verboseLogging = false,
         additionalVisitor = irVisitor,
-        sourceFiles = arrayOf(source("hello.kt")),
+        sourceFiles = arrayOf(source("EmptySource.kt")),
       )
 
       stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Combined"
