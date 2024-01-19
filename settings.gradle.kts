@@ -44,7 +44,9 @@ buildCache {
 
 include(
   ":runtime",
-  ":compiler",
+  ":compiler-base",
+  ":compiler-callstack-track",
+  ":compiler-invalidation-track",
   ":compiler-integration-test",
   ":sample",
 )

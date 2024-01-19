@@ -10,9 +10,14 @@ package land.sungbin.composeinvestigator.runtime
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
 
-/** Alternative to `(AffectedComposable, ComposableInvalidationType) -> Unit` that's useful for avoiding boxing. */
+/** Alternative to `() -> Unit` that's useful for avoiding boxing. */
 public fun interface ComposableInvalidationLogger {
-  public operator fun invoke(composable: AffectedComposable, type: ComposableInvalidationType)
+  /** @param callstack Experimental. This parameter may be produces wrong result. */
+  public operator fun invoke(
+    callstack: List<String>,
+    composable: AffectedComposable,
+    type: ComposableInvalidationType,
+  )
 }
 
 public data class ParameterInformation(

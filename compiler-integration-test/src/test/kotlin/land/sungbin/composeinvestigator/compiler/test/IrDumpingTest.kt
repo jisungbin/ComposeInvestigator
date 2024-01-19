@@ -12,8 +12,10 @@ import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.PluginOption
 import com.tschuchort.compiletesting.SourceFile
-import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorCommandLineProcessor
-import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorPluginRegistrar
+import land.sungbin.composeinvestigator.compiler.callstack.ComposableCallstackTrackPluginRegistrar
+import land.sungbin.composeinvestigator.compiler.callstack.ComposableCallstackTrackerCommandLineProcessor
+import land.sungbin.composeinvestigator.compiler.invalidation.ComposableInvalidationTrackPluginRegistrar
+import land.sungbin.composeinvestigator.compiler.invalidation.ComposableInvalidationTrackerCommandLineProcessor
 import land.sungbin.composeinvestigator.compiler.test.utils.source
 import org.jetbrains.kotlin.cli.common.toBooleanLenient
 import org.jetbrains.kotlin.config.JvmTarget
@@ -41,8 +43,13 @@ class IrDumpingTest {
       supportsK2 = false
       pluginOptions = listOf(
         PluginOption(
-          pluginId = ComposeInvestigatorCommandLineProcessor.PLUGIN_ID,
-          optionName = ComposeInvestigatorCommandLineProcessor.OPTION_VERBOSE.optionName,
+          pluginId = ComposableCallstackTrackerCommandLineProcessor.PLUGIN_ID,
+          optionName = ComposableCallstackTrackerCommandLineProcessor.OPTION_VERBOSE.optionName,
+          optionValue = if (System.getenv("CI").toBooleanLenient() == true) "false" else "true",
+        ),
+        PluginOption(
+          pluginId = ComposableInvalidationTrackerCommandLineProcessor.PLUGIN_ID,
+          optionName = ComposableInvalidationTrackerCommandLineProcessor.OPTION_VERBOSE.optionName,
           optionValue = if (System.getenv("CI").toBooleanLenient() == true) "false" else "true",
         ),
         PluginOption(
@@ -52,7 +59,15 @@ class IrDumpingTest {
         ),
       )
       @Suppress("DEPRECATION")
-      componentRegistrars = listOf(ComposePluginRegistrar(), ComposeInvestigatorPluginRegistrar())
-      commandLineProcessors = listOf(ComposeCommandLineProcessor(), ComposeInvestigatorCommandLineProcessor())
+      componentRegistrars = listOf(
+        ComposePluginRegistrar(),
+        ComposableCallstackTrackPluginRegistrar(),
+        ComposableInvalidationTrackPluginRegistrar(),
+      )
+      commandLineProcessors = listOf(
+        ComposeCommandLineProcessor(),
+        ComposableCallstackTrackerCommandLineProcessor(),
+        ComposableInvalidationTrackerCommandLineProcessor(),
+      )
     }
 }

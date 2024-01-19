@@ -101,7 +101,7 @@ public fun <State> State.registerStateObjectTracking(
           isAccessible = true
         }
         val animationState = internalStateField?.get(this) as? AnimationState<*, *>
-        animationState?.let { it::value.obtainStateObjectOrNull() }
+        animationState?.let { state -> state::value.obtainStateObjectOrNull() }
       }
       is AnimationState<*, *> -> state::value.obtainStateObjectOrNull()
       is Transition<*>.TransitionAnimationState<*, *> -> state::value.obtainStateObjectOrNull()
@@ -112,10 +112,7 @@ public fun <State> State.registerStateObjectTracking(
 
     object : RememberObserver {
       override fun onRemembered() {
-        println("stateObject: remembered $stateObject ($stateName in ${composable.fqName}))")
-        @Suppress("NAME_SHADOWING")
-        val stateObject = stateObject ?: return
-
+        stateObject ?: return
         trackedStateObjects.getOrPut(composableKeyName, ::mutableSetOf).add(stateObject)
         stateFieldNameMap.putIfNotPresent(stateObject, stateName)
         stateValueGetterMap.putIfNotPresent(stateObject, stateValueGetter)
@@ -126,8 +123,6 @@ public fun <State> State.registerStateObjectTracking(
       override fun onForgotten() {
         // getOrDefault is available from API 24 (project minSdk is 21)
         trackedStateObjects[composableKeyName].orEmpty().forEach { state ->
-          println("stateObject: forgetten $state ($stateName in ${composable.fqName}))")
-
           stateFieldNameMap.remove(state)
           stateValueGetterMap.remove(state)
           stateLocationMap.remove(state)
@@ -142,7 +137,7 @@ public fun <State> State.registerStateObjectTracking(
 
   StateObjectTrackManager.ensureStarted()
 
-  composer.startReplaceableGroup(composable.fqName.hashCode() + hashCode() + stateName.hashCode())
+  composer.startReplaceableGroup(composable.fqName.hashCode() + state.hashCode() + stateName.hashCode())
   composer.cache(false) { register }
   composer.endReplaceableGroup()
 }

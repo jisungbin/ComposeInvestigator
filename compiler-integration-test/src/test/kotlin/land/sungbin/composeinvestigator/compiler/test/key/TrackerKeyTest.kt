@@ -12,7 +12,7 @@ import androidx.compose.compiler.plugins.kotlin.irTrace
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.shouldBe
-import land.sungbin.composeinvestigator.compiler.internal.key.DurableWritableSlices
+import land.sungbin.composeinvestigator.compiler.invalidation.internal.key.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.test.IrBaseTest
 import land.sungbin.composeinvestigator.compiler.test.buildIrVisiterRegistrar
 import land.sungbin.composeinvestigator.compiler.test.kotlinCompilation
@@ -56,10 +56,10 @@ class TrackerKeyTest : ShouldSpec(), IrBaseTest {
       val twoArgFn = irFunctions.single { fn -> fn.valueParameters.size == 2 }
       val threeArgFn = irFunctions.single { fn -> fn.valueParameters.size == 3 }
 
-      val zeroArgFnKey = irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, zeroArgFn]!!
-      val oneArgFnKey = irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, oneArgFn]!!
-      val twoArgFnKey = irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, twoArgFn]!!
-      val threeArgFnKey = irTrace[DurableWritableSlices.DURABLE_FUNCTION_KEY, threeArgFn]!!
+      val zeroArgFnKey = irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, zeroArgFn]!!
+      val oneArgFnKey = irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, oneArgFn]!!
+      val twoArgFnKey = irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, twoArgFn]!!
+      val threeArgFnKey = irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, threeArgFn]!!
 
       fun assertAffectedComposable(
         target: IrConstructorCall,
@@ -76,38 +76,38 @@ class TrackerKeyTest : ShouldSpec(), IrBaseTest {
         // TODO: assert parent (not yet implemented feature)
       }
 
-      zeroArgFnKey.keyName shouldBe "fun-one()Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.key/file-TrackerKeyTestSource.kt"
+      zeroArgFnKey.keyName shouldBe "fun-one()Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TrackerKeyTestSource.kt"
       assertAffectedComposable(
         zeroArgFnKey.affectedComposable,
         expectName = "one",
-        expectPkg = "land.sungbin.composeinvestigator.compiler.test.source.key",
+        expectPkg = "land.sungbin.composeinvestigator.compiler.test._source.key",
         expectStartLine = 12,
         expectStartColumn = 0,
       )
 
-      oneArgFnKey.keyName shouldBe "fun-one(Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.key/file-TrackerKeyTestSource.kt"
+      oneArgFnKey.keyName shouldBe "fun-one(Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TrackerKeyTestSource.kt"
       assertAffectedComposable(
         oneArgFnKey.affectedComposable,
         expectName = "one",
-        expectPkg = "land.sungbin.composeinvestigator.compiler.test.source.key",
+        expectPkg = "land.sungbin.composeinvestigator.compiler.test._source.key",
         expectStartLine = 13,
         expectStartColumn = 0,
       )
 
-      twoArgFnKey.keyName shouldBe "fun-one(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.key/file-TrackerKeyTestSource.kt"
+      twoArgFnKey.keyName shouldBe "fun-one(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TrackerKeyTestSource.kt"
       assertAffectedComposable(
         twoArgFnKey.affectedComposable,
         expectName = "one",
-        expectPkg = "land.sungbin.composeinvestigator.compiler.test.source.key",
+        expectPkg = "land.sungbin.composeinvestigator.compiler.test._source.key",
         expectStartLine = 14,
         expectStartColumn = 0,
       )
 
-      threeArgFnKey.keyName shouldBe "fun-one(Any,Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.key/file-TrackerKeyTestSource.kt"
+      threeArgFnKey.keyName shouldBe "fun-one(Any,Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TrackerKeyTestSource.kt"
       assertAffectedComposable(
         threeArgFnKey.affectedComposable,
         expectName = "one",
-        expectPkg = "land.sungbin.composeinvestigator.compiler.test.source.key",
+        expectPkg = "land.sungbin.composeinvestigator.compiler.test._source.key",
         expectStartLine = 15,
         expectStartColumn = 0,
       )

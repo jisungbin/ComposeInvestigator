@@ -15,13 +15,15 @@ import com.tschuchort.compiletesting.JvmCompilationResult
 import com.tschuchort.compiletesting.KotlinCompilation
 import com.tschuchort.compiletesting.PluginOption
 import com.tschuchort.compiletesting.SourceFile
-import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorCommandLineProcessor
-import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorPluginRegistrar
+import land.sungbin.composeinvestigator.compiler.callstack.ComposableCallstackTrackPluginRegistrar
+import land.sungbin.composeinvestigator.compiler.callstack.ComposableCallstackTrackerCommandLineProcessor
+import land.sungbin.composeinvestigator.compiler.invalidation.ComposableInvalidationTrackPluginRegistrar
+import land.sungbin.composeinvestigator.compiler.invalidation.ComposableInvalidationTrackerCommandLineProcessor
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.cli.common.toBooleanLenient
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.com.intellij.openapi.extensions.LoadingOrder
-import org.jetbrains.kotlin.compiler.plugin.CommandLineProcessor
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.JvmTarget
@@ -48,8 +50,6 @@ fun IrBaseTest.buildIrVisiterRegistrar(builder: (context: IrPluginContext) -> Ir
               moduleFragment.acceptVoid(builder(pluginContext))
             }
           },
-          // TODO: LoadingOrder("after $COMPOSE_INVESTIGATOR_PLUGIN_ID"),
-          // https://github.com/JetBrains/intellij-community/blob/17ca1d0afb43f824cda948fc3ea4467ebe55b346/platform/extensions/src/com/intellij/openapi/extensions/LoadingOrder.kt#L24
           LoadingOrder.LAST,
           project,
         )
@@ -70,17 +70,28 @@ fun IrBaseTest.kotlinCompilation(
   supportsK2 = false
   pluginOptions = listOf(
     PluginOption(
-      pluginId = ComposeInvestigatorCommandLineProcessor.PLUGIN_ID,
-      optionName = ComposeInvestigatorCommandLineProcessor.OPTION_VERBOSE.optionName,
-      optionValue = if (System.getenv("CI") == "true") "false" else verboseLogging.toString(),
+      pluginId = ComposableCallstackTrackerCommandLineProcessor.PLUGIN_ID,
+      optionName = ComposableCallstackTrackerCommandLineProcessor.OPTION_VERBOSE.optionName,
+      optionValue = if (System.getenv("CI").toBooleanLenient() == true) "false" else verboseLogging.toString(),
+    ),
+    PluginOption(
+      pluginId = ComposableInvalidationTrackerCommandLineProcessor.PLUGIN_ID,
+      optionName = ComposableInvalidationTrackerCommandLineProcessor.OPTION_VERBOSE.optionName,
+      optionValue = if (System.getenv("CI").toBooleanLenient() == true) "false" else verboseLogging.toString(),
     ),
   )
   @Suppress("DEPRECATION")
-  componentRegistrars = mutableListOf<ComponentRegistrar>(ComposeInvestigatorPluginRegistrar()).also { registrars ->
+  componentRegistrars = mutableListOf(
+    ComposableCallstackTrackPluginRegistrar(),
+    ComposableInvalidationTrackPluginRegistrar(),
+  ).also { registrars ->
     if (composeCompiling) registrars.add(0, ComposePluginRegistrar())
     if (additionalVisitor != null) registrars.add(additionalVisitor)
   }
-  commandLineProcessors = mutableListOf<CommandLineProcessor>(ComposeInvestigatorCommandLineProcessor()).also { processors ->
+  commandLineProcessors = mutableListOf(
+    ComposableCallstackTrackerCommandLineProcessor(),
+    ComposableInvalidationTrackerCommandLineProcessor(),
+  ).also { processors ->
     if (composeCompiling) processors.add(0, ComposeCommandLineProcessor())
   }
 }.compile()
