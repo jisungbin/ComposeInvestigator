@@ -1,5 +1,5 @@
 /*
- * Designed and developed by Ji Sungbin 2023.
+ * Developed by Ji Sungbin 2024.
  *
  * Licensed under the MIT.
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
@@ -15,7 +15,7 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.every
 import io.mockk.mockk
-import land.sungbin.composeinvestigator.compiler.invalidation.internal.stability.toIrDeclarationStability
+import land.sungbin.composeinvestigator.compiler.analysis.toIrDeclarationStability
 import land.sungbin.composeinvestigator.compiler.test.IrBaseTest
 import land.sungbin.composeinvestigator.compiler.test.buildIrVisiterRegistrar
 import land.sungbin.composeinvestigator.compiler.test.emptyIrElementVisitor

@@ -1,7 +1,5 @@
-// COPIED FROM https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/runtime/runtime/src/nonEmulatorCommonTest/kotlin/androidx/compose/runtime/mock/ViewApplier.kt;drc=6ab6b818afbb774083b126c73e7737e5af5b720a.
-
 /*
- * Designed and developed by Ji Sungbin 2023.
+ * Developed by Ji Sungbin 2024.
  *
  * Licensed under the MIT.
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
