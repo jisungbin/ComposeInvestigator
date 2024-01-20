@@ -1,7 +1,5 @@
-// COPIED FROM https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/runtime/runtime/src/nonEmulatorCommonTest/kotlin/androidx/compose/runtime/mock/View.kt;drc=4d53400eca9f3ac90c3a3f6cffcbc5bf492ec536.
-
 /*
- * Designed and developed by Ji Sungbin 2023.
+ * Developed by Ji Sungbin 2024.
  *
  * Licensed under the MIT.
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
@@ -46,7 +44,7 @@ open class View {
     if (parent != null) {
       error(
         "Inserting a view named ${view.name} into a view named $name which already has " +
-          "a parent named ${parent.name}"
+          "a parent named ${parent.name}",
       )
     }
     view.parent = this

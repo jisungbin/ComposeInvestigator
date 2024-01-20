@@ -1,7 +1,5 @@
-// COPIED FROM https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/runtime/runtime/src/nonEmulatorCommonTest/kotlin/androidx/compose/runtime/mock/CompositionTest.kt;drc=a377689189fb94f207194bb6cbd384366fe1d92e.
-
 /*
- * Designed and developed by Ji Sungbin 2023.
+ * Developed by Ji Sungbin 2024.
  *
  * Licensed under the MIT.
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
@@ -161,4 +159,4 @@ fun CompositionTestScope.expectNoChanges() {
   assertFalse(changes, "Expected no changes but changes occurred")
 }
 
-fun use(@Suppress("UNUSED_PARAMETER") value: Any) { }
+fun use(@Suppress("UNUSED_PARAMETER") value: Any) {}

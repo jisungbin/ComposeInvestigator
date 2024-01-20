@@ -1,5 +1,5 @@
 /*
- * Designed and developed by Ji Sungbin 2023.
+ * Developed by Ji Sungbin 2024.
  *
  * Licensed under the MIT.
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
@@ -12,7 +12,7 @@ import androidx.compose.compiler.plugins.kotlin.irTrace
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.engine.spec.tempdir
 import io.kotest.matchers.shouldBe
-import land.sungbin.composeinvestigator.compiler.invalidation.internal.key.DurationWritableSlices
+import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.test.IrBaseTest
 import land.sungbin.composeinvestigator.compiler.test.buildIrVisiterRegistrar
 import land.sungbin.composeinvestigator.compiler.test.kotlinCompilation

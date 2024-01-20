@@ -1,3 +1,9 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
+ */
 @file:Suppress("UnstableApiUsage")
 
 plugins {
@@ -51,6 +57,7 @@ dependencies {
   implementation(libs.compose.runtime)
   implementation(libs.compose.animation)
   implementation(embeddedKotlin("reflect"))
+
   testImplementation(libs.test.mockk)
   testImplementation(libs.test.kotest.junit5)
   testImplementation(libs.test.kotlin.coroutines)

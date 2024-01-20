@@ -1,5 +1,5 @@
 /*
- * Designed and developed by Ji Sungbin 2023.
+ * Developed by Ji Sungbin 2024.
  *
  * Licensed under the MIT.
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
@@ -23,7 +23,7 @@ import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateLoc
 import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateValueGetterMap
 import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.trackedStateObjects
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
-import land.sungbin.composeinvestigator.runtime.utils.putIfNotPresent
+import land.sungbin.composeinvestigator.runtime.util.putIfNotPresent
 import org.jetbrains.annotations.TestOnly
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KProperty0

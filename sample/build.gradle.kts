@@ -1,3 +1,10 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
+ */
+
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -34,17 +41,15 @@ android {
 
 tasks.withType<KotlinCompile> {
   kotlinOptions {
-    freeCompilerArgs = freeCompilerArgs + listOf("-P", "plugin:land.sungbin.composeinvestigator.compiler.callstack:verbose=true")
-    freeCompilerArgs = freeCompilerArgs + listOf("-P", "plugin:land.sungbin.composeinvestigator.compiler.invalidation:verbose=true")
+    freeCompilerArgs = freeCompilerArgs + listOf("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=true")
   }
 }
 
 dependencies {
-  implementation(libs.androidx.activity)
   implementation(libs.compose.activity)
   implementation(libs.compose.material)
+  implementation(libs.androidx.activity)
 
   implementation(projects.runtime)
-  kotlinCompilerPluginClasspath(projects.compilerCallstackTrack)
-  kotlinCompilerPluginClasspath(projects.compilerInvalidationTrack)
+  kotlinCompilerPluginClasspath(projects.compiler)
 }

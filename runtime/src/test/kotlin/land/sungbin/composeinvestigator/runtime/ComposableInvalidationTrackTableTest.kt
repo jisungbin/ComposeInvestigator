@@ -1,5 +1,5 @@
 /*
- * Designed and developed by Ji Sungbin 2023.
+ * Developed by Ji Sungbin 2024.
  *
  * Licensed under the MIT.
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
@@ -95,7 +95,8 @@ class ComposableInvalidationTrackTableTest : FeatureSpec() {
           |  2. name2 <Unstable>
           |    Old: value2 (10)
           |    New: new value2 (11)
-          |""".trimMargin()
+          |
+        """.trimMargin()
       }
     }
   }
