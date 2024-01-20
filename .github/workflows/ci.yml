@@ -35,13 +35,7 @@ jobs:
         with:
           gradle-home-cache-cleanup: true
 
-      - name: Code style checks
-        run: ./gradlew ktlintCheck
-
-      - name: Run test
-        run: ./gradlew test --stacktrace
-
-      - name: Run build
+      - name: Run build (includes testing and spotless check)
         run: ./gradlew build --stacktrace
 
       - name: Upload reports
