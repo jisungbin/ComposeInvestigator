@@ -1,75 +1,36 @@
-# WIP 👻👻👻
-
 ## ComposeInvestigator
 
-Composable's forced invalidation[^1] request and invalidation tree building tools.
+Trace the recomposition of a Composable with its cause without any boilerplate code 😎.
 
-[^1]: Commonly known as "recomposition".
+This tool was initiated for personal learning and has not been proven necessary for production. However, it can perform the following tasks:
 
-This tool was started for personal learning and is not proven to be necessary in production, but it
-can do the following things:
-
-- **Request to force invalidate a Composable:** Forces the Composable to be invalidated without
-  handling `State`.
-- **Request to force dispose a Composable:** Disposing of a Composable will initialize any items
-  cached by `key`, such as `remember`, `LaunchedEffect`, and `DisposableEffect`. That is, it
-  initializes the Composable and requests an initial-composition.
-- **Record "real" re-composed Composable:** Simply adding logs to a Composable function and seeing
-  them printed doesn't mean that recomposition has occurred; this feature only logs when it's
-  actually recomposed. ("fake" and "real" recompositions will be discussed in more detail later.)
-
-- **When the root Composable is recomposed, record the child Composables that are recomposed with
-  it:** Help easily identify tangled Composables.
-
-The first and second features can be useful for people who want to control the Composable lifecycle
-without being tied to a `State` or Compose Runtime.
+- Reports if a Composable is skipped during recomposition.
+- Reports if the arguments of a Composable have changed and been recomposed. It can also compare the values before and after the change.
+- Reports if the state values inside a Composable have been modified. It can also compare the values before and after the change.
+- Retrieves the call stack leading up to the invocation of a Composable. This helps identify the specific Composable being recomposed when the same Composable is reused in multiple places.
 
 ---
 
 ### Usage
 
-```kotlin
-@[Composable Invalidable(tag = [String?, default = null], disposable = [Boolean, default = true]) RecompositionRecord(child = [Boolean, default = true])]
-fun HelloWorld() = Unit
+ComposeInvestigator has various runtime APIs, but they are not yet documented. If you want to try it out in advance, you can understand the APIs by checking the runtime test code.
 
-// without Invalidable.tag
+The overall usage will be documented before the stable version is released. In general, it works fine without using any APIs. Just run the app and check the logcat.
 
-ComposeInvestigator.invalidHelloWorld() // auto-generated function
-ComposeInvestigator.disposeHelloWorld() // auto-generated function
+### Under the Hood
 
-// with Invalidable.tag
-
-ComposeInvestigator.invalidHelloWorld{Tag}() // auto-generated function
-ComposeInvestigator.disposeHelloWorld{Tag}() // auto-generated function
-
-// with @InvalidationTrack, each time a Composable is recomposed, its name is printed.
-```
-
-### Under the hood
-
-The core principle behind this tool is the Kotlin Compiler Plugin.
-
-The tool works in two steps.
-
-1. IR modulation of the Composable function. However, this step is performed before the Compose
-   Compiler.
-2. Re-modulating the IR that the Compose Compiler has modulated. It intercepts the IRs that Compose
-   Compiler changes and re-morphs them for this tool.
-
-... TBD
-
-#### "fake" and "real" recompositions
-
-TBD
+ComposeInvestigator is developed using a Kotlin compiler plugin. Detailed information will be documented before the stable version is released.
 
 ---
 
 ### Download
 
-This tool is currently in the early stages of development and **is not yet released**.
+ComposeInvestigator is currently in the technical preview stage, and many tests are missing. Therefore, all usage should not take place in production, and unexpected issues may arise.
+
+If you encounter bugs during use or have new feature suggestions, please report them as issues.
 
 ```kotlin
 plugins {
-  id("land.sungbin.composeinvestigator") version "0.1.0-SNAPSHOT"
+  id("land.sungbin.composeinvestigator") version "0.1.0-dev"
 }
 ```
