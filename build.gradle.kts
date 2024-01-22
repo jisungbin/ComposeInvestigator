@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
   alias(libs.plugins.spotless) apply false
-  alias(libs.plugins.test.gradle.logging) apply false
+  alias(libs.plugins.gradle.test.logging) apply false
   alias(libs.plugins.gradle.publish.maven) apply false
 }
 
@@ -48,73 +48,71 @@ subprojects {
 
   apply {
     plugin(rootProject.libs.plugins.spotless.get().pluginId)
-    plugin(rootProject.libs.plugins.test.gradle.logging.get().pluginId)
+    plugin(rootProject.libs.plugins.gradle.test.logging.get().pluginId)
   }
 
-  afterEvaluate {
-    extensions.configure<SpotlessExtension> {
-      kotlin {
-        target("**/*.kt")
-        targetExclude("**/build/**/*.kt")
-        ktlint(rootProject.libs.versions.ktlint.get()).editorConfigOverride(
-          mapOf(
-            "indent_size" to "2",
-            "ktlint_standard_filename" to "disabled",
-            "ktlint_standard_package-name" to "disabled",
-            "ktlint_standard_property-naming" to "disabled",
-            "ktlint_standard_function-naming" to "disabled",
-            "ktlint_standard_import-ordering" to "disabled",
-            "ktlint_standard_max-line-length" to "disabled",
-            "ktlint_standard_annotation" to "disabled",
-            "ktlint_standard_multiline-if-else" to "disabled",
-            "ktlint_standard_value-argument-comment" to "disabled",
-            "ktlint_standard_value-parameter-comment" to "disabled",
-          )
+  // From https://github.com/chrisbanes/tivi/blob/0865be537f2859d267efb59dac7d6358eb47effc/gradle/build-logic/convention/src/main/kotlin/app/tivi/gradle/Android.kt#L28-L34
+  extensions.findByType<AndroidComponentsExtension<*, *, *>>()?.run {
+    beforeVariants(selector().withBuildType("release")) { variantBuilder ->
+      (variantBuilder as? HasUnitTestBuilder)?.apply {
+        enableUnitTest = false
+      }
+    }
+  }
+
+  extensions.configure<SpotlessExtension> {
+    kotlin {
+      target("**/*.kt")
+      targetExclude("**/build/**/*.kt")
+      ktlint(rootProject.libs.versions.ktlint.get()).editorConfigOverride(
+        mapOf(
+          "indent_size" to "2",
+          "ktlint_standard_filename" to "disabled",
+          "ktlint_standard_package-name" to "disabled",
+          "ktlint_standard_property-naming" to "disabled",
+          "ktlint_standard_function-naming" to "disabled",
+          "ktlint_standard_import-ordering" to "disabled",
+          "ktlint_standard_max-line-length" to "disabled",
+          "ktlint_standard_annotation" to "disabled",
+          "ktlint_standard_multiline-if-else" to "disabled",
+          "ktlint_standard_value-argument-comment" to "disabled",
+          "ktlint_standard_value-parameter-comment" to "disabled",
         )
-        licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
-      }
-      format("kts") {
-        target("**/*.kts")
-        targetExclude("**/build/**/*.kts")
-        // Look for the first line that doesn't have a block comment (assumed to be the license)
-        licenseHeaderFile(rootProject.file("spotless/copyright.kts"), "(^(?![\\/ ]\\*).*$)")
-      }
-      format("xml") {
-        target("**/*.xml")
-        targetExclude("**/build/**/*.xml")
-        // Look for the first XML tag that isn't a comment (<!--) or the xml declaration (<?xml)
-        licenseHeaderFile(rootProject.file("spotless/copyright.xml"), "(<[^!?])")
-      }
+      )
+      licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
     }
+    format("kts") {
+      target("**/*.kts")
+      targetExclude("**/build/**/*.kts")
+      // Look for the first line that doesn't have a block comment (assumed to be the license)
+      licenseHeaderFile(rootProject.file("spotless/copyright.kts"), "(^(?![\\/ ]\\*).*$)")
+    }
+    format("xml") {
+      target("**/*.xml")
+      targetExclude("**/build/**/*.xml")
+      // Look for the first XML tag that isn't a comment (<!--) or the xml declaration (<?xml)
+      licenseHeaderFile(rootProject.file("spotless/copyright.xml"), "(<[^!?])")
+    }
+  }
 
-    extensions.configure<TestLoggerExtension> {
-      theme = ThemeType.MOCHA_PARALLEL
-      slowThreshold = 10_000
-    }
+  extensions.configure<TestLoggerExtension> {
+    theme = ThemeType.MOCHA_PARALLEL
+    slowThreshold = 10_000
+  }
 
-    // From https://github.com/chrisbanes/tivi/blob/0865be537f2859d267efb59dac7d6358eb47effc/gradle/build-logic/convention/src/main/kotlin/app/tivi/gradle/Android.kt#L28-L34
-    extensions.findByType<AndroidComponentsExtension<*, *, *>>()?.run {
-      beforeVariants(selector().withBuildType("release")) { variantBuilder ->
-        (variantBuilder as? HasUnitTestBuilder)?.apply {
-          enableUnitTest = false
-        }
-      }
+  tasks.withType<KotlinCompile> {
+    kotlinOptions {
+      jvmTarget = "17"
+      freeCompilerArgs = freeCompilerArgs + listOf(
+        "-opt-in=kotlin.OptIn",
+        "-opt-in=kotlin.RequiresOptIn",
+      )
     }
+  }
 
-    tasks.withType<KotlinCompile> {
-      kotlinOptions {
-        jvmTarget = "17"
-        freeCompilerArgs = freeCompilerArgs + listOf(
-          "-opt-in=kotlin.OptIn",
-          "-opt-in=kotlin.RequiresOptIn",
-        )
-      }
-    }
-
-    tasks.withType<Test>().configureEach {
-      useJUnitPlatform()
-      outputs.upToDateWhen { false }
-    }
+  tasks.withType<Test>().configureEach {
+    useJUnitPlatform()
+    outputs.upToDateWhen { false }
   }
 }
 
