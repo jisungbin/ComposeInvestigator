@@ -1,4 +1,4 @@
-## ComposeInvestigator
+![image](https://github.com/jisungbin/ComposeInvestigator/assets/40740128/382d11d4-3867-48db-b7b3-e15e16bf20a5)## ComposeInvestigator
 
 Trace the recomposition of a Composable with its cause without any boilerplate code 😎.
 
@@ -34,3 +34,7 @@ plugins {
   id("land.sungbin.composeinvestigator") version "0.1.0-dev"
 }
 ```
+
+### Preview
+
+![image](https://github.com/jisungbin/ComposeInvestigator/assets/40740128/98991bd9-97f2-47a7-9cc9-6f9cd1cda0e3)
