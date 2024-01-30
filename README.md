@@ -1,4 +1,4 @@
-![image](https://github.com/jisungbin/ComposeInvestigator/assets/40740128/382d11d4-3867-48db-b7b3-e15e16bf20a5)## ComposeInvestigator
+## ComposeInvestigator
 
 Trace the recomposition of a Composable with its cause without any boilerplate code 😎.
 
