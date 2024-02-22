@@ -15,7 +15,7 @@ kotlin-ksp = "1.9.22-1.0.17"
 androidx-activity = "1.8.2"
 
 compose-compiler = "1.5.8"
-compose-runtime = "1.6.1"
+compose-runtime = "1.6.2"
 compose-activity = "1.8.2"
 
 autoservice-annotation = "1.1.1"
