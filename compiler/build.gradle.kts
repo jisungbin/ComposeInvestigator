@@ -19,6 +19,7 @@ dependencies {
   compileOnly(projects.compilerHosted)
 }
 
+// https://github.com/johnrengelman/shadow/issues/448#issuecomment-562939439
 project.configurations.implementation.get().isCanBeResolved = true
 
 val shadowJar = tasks.register<ShadowJar>("embeddedPlugin") {
