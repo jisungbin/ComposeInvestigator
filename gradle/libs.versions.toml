@@ -2,6 +2,7 @@
 gradle-android = "8.2.2"
 gradle-publish-maven = "0.27.0"
 gradle-test-logging = "4.0.0"
+gradle-shadow = "8.1.1"
 
 spotless = "6.25.0"
 ktlint = "1.1.1"
@@ -10,16 +11,12 @@ jetbrains-annotation = "24.1.0"
 
 kotlin-core = "1.9.22"
 kotlin-coroutines = "1.8.0"
-kotlin-ksp = "1.9.22-1.0.17"
 
 androidx-activity = "1.8.2"
 
 compose-compiler = "1.5.10"
 compose-runtime = "1.6.2"
 compose-activity = "1.8.2"
-
-autoservice-annotation = "1.1.1"
-autoservice-ksp = "1.1.0"
 
 fastlist = "0.1.0"
 
@@ -33,10 +30,9 @@ test-kotlin-compilation = "0.4.0"
 [plugins]
 gradle-publish-maven = { id = "com.vanniktech.maven.publish", version.ref = "gradle-publish-maven" }
 gradle-test-logging = { id = "com.adarshr.test-logger", version.ref = "gradle-test-logging" }
+gradle-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "gradle-shadow" }
 
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
-
-kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "kotlin-ksp" }
 
 [libraries]
 gradle-android = { module = "com.android.tools.build:gradle", version.ref = "gradle-android" }
@@ -45,18 +41,15 @@ jetbrains-annotation = { module = "org.jetbrains:annotations", version.ref = "je
 
 kotlin-gradle-core = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-core" }
 kotlin-gradle-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin-core" }
-kotlin-compiler-embedded = { module = "org.jetbrains.kotlin:kotlin-compiler-embeddable", version.ref = "kotlin-core" }
+kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler", version.ref = "kotlin-core" }
 
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
 
-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "compose-compiler" }
+compose-compiler = { module = "androidx.compose.compiler:compiler-hosted", version.ref = "compose-compiler" }
 compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose-runtime" }
 compose-animation = { module = "androidx.compose.animation:animation-core", version.ref = "compose-runtime" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose-runtime" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
-
-autoservice-annotation = { module = "com.google.auto.service:auto-service-annotations", version.ref = "autoservice-annotation" }
-autoservice-ksp = { module = "dev.zacsweers.autoservice:auto-service-ksp", version.ref = "autoservice-ksp" }
 
 fastlist = { module = "land.sungbin.fastlist:fastlist", version.ref = "fastlist" }
 

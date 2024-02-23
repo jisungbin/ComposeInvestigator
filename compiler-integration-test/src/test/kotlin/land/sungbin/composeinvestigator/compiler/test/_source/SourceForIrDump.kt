@@ -1,3 +1,5 @@
+@file:Suppress("unused", "TestFunctionName")
+
 /*
  * Developed by Ji Sungbin 2024.
  *
@@ -5,35 +7,16 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-@file:Suppress("TestFunctionName", "ComposableNaming", "unused")
-
 package land.sungbin.composeinvestigator.compiler.test._source
 
-import androidx.compose.material.Button
-import androidx.compose.material.Text
+import androidx.compose.foundation.text.BasicText
 import androidx.compose.runtime.Composable
 
-@Composable
-fun One() {
-  Button(onClick = {}) {
-    Text(text = "Hi!")
-  }
-  Two(
-    { Text(text = "One") },
-    { Text(text = "Two") },
-    { Text(text = "Three") },
-    { Text(text = "Four") },
-  )
+fun main() {
+  println("Hello, world!")
 }
 
 @Composable
-fun Two(vararg contents: @Composable () -> Unit) {
-  contents.forEach { content ->
-    Content(content = content)
-  }
-}
-
-@Composable
-fun Content(content: @Composable () -> Unit) {
-  content()
+fun TestComposable() {
+  BasicText(text = "Hello, world!")
 }

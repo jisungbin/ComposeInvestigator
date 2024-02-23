@@ -45,6 +45,7 @@ buildCache {
 include(
   ":runtime",
   ":compiler",
+  ":compiler-hosted",
   ":compiler-gradle-plugin",
   ":compiler-integration-test",
   ":sample",

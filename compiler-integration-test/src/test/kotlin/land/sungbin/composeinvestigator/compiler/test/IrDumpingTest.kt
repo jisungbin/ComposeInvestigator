@@ -7,20 +7,14 @@
 
 package land.sungbin.composeinvestigator.compiler.test
 
-import land.sungbin.composeinvestigator.compiler.test.utils.source
-import org.junit.Rule
+import land.sungbin.composeinvestigator.compiler.test._source.source
+import land.sungbin.composeinvestigator.compiler.test.kotlincompiler.AbstractCompilerTest
+import land.sungbin.composeinvestigator.compiler.test.kotlincompiler.dumpSrc
 import org.junit.Test
-import org.junit.rules.TemporaryFolder
 
-class IrDumpingTest : IrBaseTest {
-  @get:Rule
-  val tempDir: TemporaryFolder = TemporaryFolder.builder().assureDeletion().build()
-
-  @Test
-  fun debug() {
-    kotlinCompilation(
-      workingDir = tempDir.root,
-      sourceFiles = arrayOf(source("SourceForIrDump.kt")),
-    )
+class IrDumpingTest(useFir: Boolean) : AbstractCompilerTest(useFir = useFir) {
+  @Test fun dump() {
+    val ir = compileToIr(sourceFiles = listOf(source("SourceForIrDump.kt")))
+    println(ir.dumpSrc(useFir = useFir))
   }
 }

@@ -13,7 +13,7 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
-internal class ComposableCallstackTrackingExtension(private val logger: VerboseLogger) : IrGenerationExtension {
+public class ComposableCallstackTrackingExtension(private val logger: VerboseLogger) : IrGenerationExtension {
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
     moduleFragment.transformChildrenVoid(
       ComposableCallstackTrackingTransformer(
