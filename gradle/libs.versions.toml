@@ -9,12 +9,12 @@ ktlint = "1.1.1"
 jetbrains-annotation = "24.1.0"
 
 kotlin-core = "1.9.22"
-kotlin-coroutines = "1.7.3"
+kotlin-coroutines = "1.8.0"
 kotlin-ksp = "1.9.22-1.0.17"
 
 androidx-activity = "1.8.2"
 
-compose-compiler = "1.5.8"
+compose-compiler = "1.5.10"
 compose-runtime = "1.6.2"
 compose-activity = "1.8.2"
 
