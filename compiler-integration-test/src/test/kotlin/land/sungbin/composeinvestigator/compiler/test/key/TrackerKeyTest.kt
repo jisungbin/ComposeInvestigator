@@ -22,14 +22,10 @@ import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.junit.Test
 
-class TrackerKeyTest(useFir: Boolean) : AbstractCompilerTest(useFir = useFir) {
+// FIXME: Failed to lookup symbols with 'fqName == kotlin.collections.MutableList.add',
+//  'fn.owner.valueParameters.size == 1' in Kotlin 2.0. Needs to be fixed in the future.
+class TrackerKeyTest(@Suppress("UNUSED_PARAMETER") useFir: Boolean) : AbstractCompilerTest(useFir = false) {
   @Test fun generates_a_unique_key_for_the_same_function_name() {
-    if (useFir)
-      return println(
-        "Failed to lookup symbols with 'fqName == kotlin.collections.MutableList.add', " +
-          "'fn.owner.valueParameters.size == 1' in Kotlin 2.0. Needs to be fixed in the future."
-      )
-
     @Suppress("LocalVariableName")
     var _irTrace: WeakBindingTrace? = null
     val result = compileToIr(
