@@ -7,9 +7,9 @@
 
 @file:Suppress("unused")
 
-package land.sungbin.composeinvestigator.compiler.test.kotlincompiler
+package land.sungbin.composeinvestigator.compiler.test._compilation
 
-import land.sungbin.composeinvestigator.compiler.test.kotlincompiler.facade.SourceFile
+import land.sungbin.composeinvestigator.compiler.test._compilation.facade.SourceFile
 import org.intellij.lang.annotations.Language
 import org.jetbrains.kotlin.codegen.GeneratedClassLoader
 import java.io.File

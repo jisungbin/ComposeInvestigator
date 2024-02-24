@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.test.kotlincompiler.facade
+package land.sungbin.composeinvestigator.compiler.test._compilation.facade
 
 import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
 import com.intellij.openapi.Disposable
@@ -15,7 +15,7 @@ import com.intellij.openapi.util.text.StringUtilRt
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.impl.PsiFileFactoryImpl
 import com.intellij.testFramework.LightVirtualFile
-import land.sungbin.composeinvestigator.compiler.test.kotlincompiler.exception.TestCompilerException
+import land.sungbin.composeinvestigator.compiler.test._compilation.exception.TestCompilerException
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSourceLocation

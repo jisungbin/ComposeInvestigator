@@ -14,8 +14,8 @@ import io.kotest.matchers.types.shouldBeInstanceOf
 import io.mockk.every
 import io.mockk.mockk
 import land.sungbin.composeinvestigator.compiler.analysis.toIrDeclarationStability
+import land.sungbin.composeinvestigator.compiler.test._compilation.AbstractCompilerTest
 import land.sungbin.composeinvestigator.compiler.test._source.source
-import land.sungbin.composeinvestigator.compiler.test.kotlincompiler.AbstractCompilerTest
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.backend.js.utils.valueArguments
@@ -30,9 +30,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.junit.Test
 
-// FIXME: Failed to lookup symbols with 'fqName == kotlin.collections.MutableList.add',
-//  'fn.owner.valueParameters.size == 1' in Kotlin 2.0. Needs to be fixed in the future.
-class StabilityWrapperTest(@Suppress("UNUSED_PARAMETER") useFir: Boolean) : AbstractCompilerTest(useFir = false) {
+class StabilityWrapperTest : AbstractCompilerTest(useFir = false) {
   @Test fun stability_certain_to_IrDeclarationStability() {
     var stableStability: IrConstructorCall? = null
     var unstableStability: IrConstructorCall? = null

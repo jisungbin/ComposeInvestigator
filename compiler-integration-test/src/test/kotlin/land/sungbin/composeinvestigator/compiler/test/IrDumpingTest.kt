@@ -7,14 +7,12 @@
 
 package land.sungbin.composeinvestigator.compiler.test
 
+import land.sungbin.composeinvestigator.compiler.test._compilation.AbstractCompilerTest
+import land.sungbin.composeinvestigator.compiler.test._compilation.dumpSrc
 import land.sungbin.composeinvestigator.compiler.test._source.source
-import land.sungbin.composeinvestigator.compiler.test.kotlincompiler.AbstractCompilerTest
-import land.sungbin.composeinvestigator.compiler.test.kotlincompiler.dumpSrc
 import org.junit.Test
 
-// FIXME: Failed to lookup symbols with 'fqName == kotlin.collections.MutableList.add',
-//  'fn.owner.valueParameters.size == 1' in Kotlin 2.0. Needs to be fixed in the future.
-class IrDumpingTest(@Suppress("UNUSED_PARAMETER") useFir: Boolean) : AbstractCompilerTest(useFir = false) {
+class IrDumpingTest : AbstractCompilerTest(useFir = false) {
   @Test fun dump() {
     val ir = compileToIr(sourceFiles = listOf(source("SourceForIrDump.kt")))
     println(ir.dumpSrc(useFir = useFir))

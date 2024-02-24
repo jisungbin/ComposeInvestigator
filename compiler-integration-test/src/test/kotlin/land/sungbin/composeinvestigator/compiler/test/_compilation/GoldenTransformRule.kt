@@ -7,8 +7,9 @@
 
 @file:Suppress("SameParameterValue")
 
-package land.sungbin.composeinvestigator.compiler.test.kotlincompiler
+package land.sungbin.composeinvestigator.compiler.test._compilation
 
+import org.jetbrains.kotlin.cli.common.toBooleanLenient
 import org.jetbrains.kotlin.incremental.createDirectory
 import org.junit.Assert
 import org.junit.rules.TestRule
@@ -21,20 +22,18 @@ import java.io.FileNotFoundException
 private const val ENV_GENERATE_GOLDEN = "GENERATE_GOLDEN"
 private const val GOLDEN_FILE_TYPE = "txt"
 
-private fun env(name: String): Boolean = (System.getenv(name) ?: "false").toBoolean()
-private fun envList(name: String): List<String> = (System.getenv(name) ?: "").quotedSplit()
+private fun env(name: String): Boolean = (System.getenv(name) ?: "false").toBooleanLenient() ?: false
+private fun envList(name: String): List<String> = (System.getenv(name).orEmpty()).quotedSplit()
 
 /**
- * GoldenTransformRule
- *
  * Compare transformed IR source to a golden test file. Golden files contain both the
  * pre-transformed and post-transformed source for easier review.
- * To regenerate the set of golden tests, pass GENERATE_GOLDEN=true as an environment variable.
+ * To regenerate the set of golden tests, pass 'GENERATE_GOLDEN=true' as an environment variable.
  *
- * @param pathToGoldens: Path to golden files
- * @param generateGoldens: When true, will generate the golden test file and replace any existing
- * @param generateGoldenFiles: Generate the golden file if the name (without extension, is in the list.
- * @param generateMissingGoldens: When true, will generate a golden file for any that are not found.
+ * @param pathToGoldens Path to golden files.
+ * @param generateGoldens When true, will generate the golden test file and replace any existing.
+ * @param generateGoldenFiles Generate the golden file if the name (without extension, is in the list).
+ * @param generateMissingGoldens When true, will generate a golden file for any that are not found.
  **/
 class GoldenTransformRule(
   private val pathToGoldens: String,
@@ -47,8 +46,7 @@ class GoldenTransformRule(
 
   private val testWatcher = object : TestWatcher() {
     override fun starting(description: Description) {
-      val goldenFilePath = getGoldenFilePath(description.className, description.methodName)
-      goldenFile = File(goldenFilePath)
+      goldenFile = File(getGoldenFilePath(description.className, description.methodName))
       testIdentifier = "${description.className}_${description.methodName}"
     }
   }
@@ -65,7 +63,8 @@ class GoldenTransformRule(
    */
   fun verifyGolden(testInfo: GoldenTransformTestInfo) {
     if (
-      generateGoldens || (!goldenFile.exists() && generateMissingGoldens) ||
+      generateGoldens ||
+      (!goldenFile.exists() && generateMissingGoldens) ||
       goldenFile.nameWithoutExtension in generateGoldenFiles
     ) {
       saveGolden(testInfo)
@@ -81,15 +80,11 @@ class GoldenTransformRule(
 
     // Use absolute path in the assert error so studio shows it as a link
     Assert.assertEquals(
-      /* message = */
-      "Transformed source does not match golden file:" +
-        "\n${goldenFile.absolutePath}\n" +
-        "To regenerate golden files, set GENERATE_GOLDEN=\"${
-          goldenFile.nameWithoutExtension
-        }\" as an env variable (or set it to 'true' " +
-        "to generate all the files).\n" +
-        "The environment variable can be a comma delimited list of names (the quotes are " +
-        "optional)",
+      "Transformed source does not match golden file:\n${goldenFile.absolutePath}\n" +
+        "To regenerate golden files, set GENERATE_GOLDEN=\"${goldenFile.nameWithoutExtension}\" " +
+        "as an env variable (or set it to 'true' to generate all the files).\n" +
+        "The environment variable can be a comma delimited list of names. " +
+        "(the quotes are optional)",
       /* expected = */
       loadedTestInfo.transformed,
       /* actual = */
@@ -106,6 +101,7 @@ class GoldenTransformRule(
 
 /**
  * GoldenTransformTestInfo
+ *
  * @param source The pre-transformed source code.
  * @param transformed Post transformed IR tree source.
  */

@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.test.kotlincompiler
+package land.sungbin.composeinvestigator.compiler.test._compilation
 
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.descriptors.Modality

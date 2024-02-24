@@ -1,3 +1,5 @@
+@file:Suppress("NOTHING_TO_INLINE")
+
 /*
  * Developed by Ji Sungbin 2024.
  *
@@ -7,12 +9,11 @@
 
 package land.sungbin.composeinvestigator.compiler.test._source
 
-import land.sungbin.composeinvestigator.compiler.test.kotlincompiler.facade.SourceFile
+import land.sungbin.composeinvestigator.compiler.test._compilation.facade.SourceFile
 import java.io.File
 
-@Suppress("NOTHING_TO_INLINE")
 inline fun source(filename: String): SourceFile =
-  SourceFile(
-    name = filename,
-    source = File("src/test/kotlin/land/sungbin/composeinvestigator/compiler/test/_source/$filename").readText(),
-  )
+  SourceFile(name = filename, source = sourceString(filename))
+
+inline fun sourceString(filename: String): String =
+  File("src/test/kotlin/land/sungbin/composeinvestigator/compiler/test/_source/$filename").readText()

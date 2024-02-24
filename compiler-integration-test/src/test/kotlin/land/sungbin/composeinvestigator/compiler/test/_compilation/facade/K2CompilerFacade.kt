@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.test.kotlincompiler.facade
+package land.sungbin.composeinvestigator.compiler.test._compilation.facade
 
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.vfs.StandardFileSystems

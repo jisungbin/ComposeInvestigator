@@ -32,8 +32,7 @@ class InvalidationCallbackTest {
   @get:Rule
   val callbackTestRule = InvalidationCallbackTestRule()
 
-  @Test
-  fun invalidation_listens_via_register_listener() {
+  @Test fun invalidation_listens_via_register_listener() {
     compose.setContent { RegisterListener_InvalidationSkippedRoot() }
     compose.onNode(hasClickAction()).performClick()
 
@@ -49,8 +48,7 @@ class InvalidationCallbackTest {
     }
   }
 
-  @Test
-  fun invalidation_listens_via_effects() {
+  @Test fun invalidation_listens_via_effects() {
     compose.setContent { Effects_InvalidationSkippedRoot() }
     compose.onNode(hasClickAction()).performClick()
 

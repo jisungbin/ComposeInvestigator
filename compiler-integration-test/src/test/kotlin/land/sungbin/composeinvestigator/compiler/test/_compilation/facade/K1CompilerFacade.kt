@@ -5,9 +5,9 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.test.kotlincompiler.facade
+package land.sungbin.composeinvestigator.compiler.test._compilation.facade
 
-import land.sungbin.composeinvestigator.compiler.test.kotlincompiler.exception.TestCompilerException
+import land.sungbin.composeinvestigator.compiler.test._compilation.exception.TestCompilerException
 import org.jetbrains.kotlin.backend.jvm.JvmIrCodegenFactory
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.jvm.compiler.CliBindingTrace

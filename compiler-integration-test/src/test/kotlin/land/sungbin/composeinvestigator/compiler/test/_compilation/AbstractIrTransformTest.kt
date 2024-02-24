@@ -5,11 +5,11 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
+@file:Suppress("MemberVisibilityCanBePrivate", "unused")
 
-package land.sungbin.composeinvestigator.compiler.test.kotlincompiler
+package land.sungbin.composeinvestigator.compiler.test._compilation
 
-import land.sungbin.composeinvestigator.compiler.test.kotlincompiler.facade.SourceFile
+import land.sungbin.composeinvestigator.compiler.test._compilation.facade.SourceFile
 import org.intellij.lang.annotations.Language
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.util.dump
@@ -83,7 +83,7 @@ abstract class AbstractIrTransformTest(useFir: Boolean) : AbstractCodegenTest(us
         .replace(@Suppress("RegExpSimplifiable") Regex("(composableLambda[N]?\\([^\"\\n]*)\"(.*)\"\\)")) { match ->
           "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[2], source)}\")"
         }
-        .replace(Regex(@Suppress("RegExpSimplifiable") "(rememberComposableLambda[N]?)\\((-?\\d+)")) { match ->
+        .replace(@Suppress("RegExpSimplifiable") Regex("(rememberComposableLambda[N]?)\\((-?\\d+)")) { match ->
           "${match.groupValues[1]}(<>"
         }
         // replace source keys for joinKey calls
