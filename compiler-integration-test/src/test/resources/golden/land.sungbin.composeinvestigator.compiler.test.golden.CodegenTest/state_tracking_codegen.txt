@@ -1,0 +1,225 @@
+//
+// Source
+// ------------------------------------------
+
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
+ */
+
+@file:Suppress("TestFunctionName", "UNUSED_VARIABLE", "unused")
+@file:OptIn(ExperimentalTransitionApi::class)
+
+package land.sungbin.composeinvestigator.compiler.test._source.codegen
+
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationState
+import androidx.compose.animation.core.ExperimentalTransitionApi
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.VectorConverter
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.rememberTransition
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+
+@Suppress("UnrememberedMutableState", "UnrememberedAnimatable")
+@Composable
+private fun UnrememberedStates() {
+  val state = object : State<Int> {
+    override val value: Int = 0
+  }
+  val mutableState = mutableStateOf(0)
+  val animatable = Animatable(0f)
+  val animationState = AnimationState(
+    typeConverter = Float.VectorConverter,
+    initialValue = 0f,
+  )
+}
+
+@Composable
+private fun RememberedStates() {
+  val state = remember {
+    object : State<Int> {
+      override val value: Int = 0
+    }
+  }
+  val mutableState = remember { mutableStateOf(0) }
+  val animatable = remember { Animatable(0f) }
+  val animationState = remember {
+    AnimationState(
+      typeConverter = Float.VectorConverter,
+      initialValue = 0f,
+    )
+  }
+  val transitionAnimationState =
+    rememberTransition(transitionState = MutableTransitionState(0f))
+      .animateFloat(label = "unremembered") { prevState -> prevState * 2 }
+  val infiniteTransition = rememberInfiniteTransition(label = "unremembered")
+}
+
+//
+// Transformed IR
+// ------------------------------------------
+
+val ComposableInvalidationTrackTableImpl%TestKt: ComposableInvalidationTrackTable = ComposableInvalidationTrackTable()
+@Suppress(names = "UnrememberedMutableState", "UnrememberedAnimatable")
+@Composable
+private fun UnrememberedStates(%composer: Composer?, %changed: Int) {
+  %composer = %composer.startRestartGroup(<>)
+  if (%changed != 0 || !%composer.skipping) {
+    val tmp0_affectFields = mutableListOf()
+    val tmp1_UnrememberedStates%validationReason = ComposableInvalidationTrackTableImpl%TestKt.computeInvalidationReason("fun-UnrememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", tmp0_affectFields)
+    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-UnrememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", AffectedComposable("UnrememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 28, 8), Processed(tmp1_UnrememberedStates%validationReason))
+    ComposeInvestigatorConfig.invalidationLogger(emptyList(), AffectedComposable("UnrememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 28, 8), Processed(tmp1_UnrememberedStates%validationReason))
+    if (isTraceInProgress()) {
+      traceEventStart(<>, %changed, -1, <>)
+    }
+    val state = object : State<Int> {
+      val value: Int = 0
+    }
+    .registerStateObjectTracking(
+      composer = %composer,
+      composable = AffectedComposable("UnrememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 28, 8),
+      composableKeyName = "fun-UnrememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt",
+      stateName = "state"
+    )
+    val mutableState = mutableStateOf(
+      value = 0
+    ).registerStateObjectTracking(
+      composer = %composer,
+      composable = AffectedComposable("UnrememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 28, 8),
+      composableKeyName = "fun-UnrememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt",
+      stateName = "mutableState"
+    )
+    val animatable = Animatable(
+      initialValue = 0.0f
+    ).registerStateObjectTracking(
+      composer = %composer,
+      composable = AffectedComposable("UnrememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 28, 8),
+      composableKeyName = "fun-UnrememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt",
+      stateName = "animatable"
+    )
+    val animationState = AnimationState(
+      typeConverter = Companion.VectorConverter,
+      initialValue = 0.0f
+    ).registerStateObjectTracking(
+      composer = %composer,
+      composable = AffectedComposable("UnrememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 28, 8),
+      composableKeyName = "fun-UnrememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt",
+      stateName = "animationState"
+    )
+    if (isTraceInProgress()) {
+      traceEventEnd()
+    }
+  } else {
+    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-UnrememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", AffectedComposable("UnrememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 28, 8), Skipped)
+    ComposeInvestigatorConfig.invalidationLogger(emptyList(), AffectedComposable("UnrememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 28, 8), Skipped)
+    %composer.skipToGroupEnd()
+  }
+  %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
+    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-UnrememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", AffectedComposable("UnrememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 28, 8), Processed(Invalidate))
+    ComposeInvestigatorConfig.invalidationLogger(emptyList(), AffectedComposable("UnrememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 28, 8), Processed(Invalidate))
+    UnrememberedStates(%composer, updateChangedFlags(%changed or 0b0001))
+  }
+}
+@Composable
+private fun RememberedStates(%composer: Composer?, %changed: Int) {
+  %composer = %composer.startRestartGroup(<>)
+  if (%changed != 0 || !%composer.skipping) {
+    val tmp0_affectFields = mutableListOf()
+    val tmp1_RememberedStates%validationReason = ComposableInvalidationTrackTableImpl%TestKt.computeInvalidationReason("fun-RememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", tmp0_affectFields)
+    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-RememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", AffectedComposable("RememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 41, 8), Processed(tmp1_RememberedStates%validationReason))
+    ComposeInvestigatorConfig.invalidationLogger(emptyList(), AffectedComposable("RememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 41, 8), Processed(tmp1_RememberedStates%validationReason))
+    if (isTraceInProgress()) {
+      traceEventStart(<>, %changed, -1, <>)
+    }
+    val state = %composer.startReplaceableGroup(<>)
+    val tmp0_group = %composer.cache(false) {
+      object : State<Int> {
+        val value: Int = 0
+      }
+    }
+    %composer.endReplaceableGroup()
+    tmp0_group.registerStateObjectTracking(
+      composer = %composer,
+      composable = AffectedComposable("RememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 41, 8),
+      composableKeyName = "fun-RememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt",
+      stateName = "state"
+    )
+    val mutableState = %composer.startReplaceableGroup(<>)
+    val tmp1_group = %composer.cache(false) {
+      mutableStateOf(
+        value = 0
+      )
+    }
+    %composer.endReplaceableGroup()
+    tmp1_group.registerStateObjectTracking(
+      composer = %composer,
+      composable = AffectedComposable("RememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 41, 8),
+      composableKeyName = "fun-RememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt",
+      stateName = "mutableState"
+    )
+    val animatable = %composer.startReplaceableGroup(<>)
+    val tmp2_group = %composer.cache(false) {
+      Animatable(
+        initialValue = 0.0f
+      )
+    }
+    %composer.endReplaceableGroup()
+    tmp2_group.registerStateObjectTracking(
+      composer = %composer,
+      composable = AffectedComposable("RememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 41, 8),
+      composableKeyName = "fun-RememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt",
+      stateName = "animatable"
+    )
+    val animationState = %composer.startReplaceableGroup(<>)
+    val tmp3_group = %composer.cache(false) {
+      AnimationState(
+        typeConverter = Companion.VectorConverter,
+        initialValue = 0.0f
+      )
+    }
+    %composer.endReplaceableGroup()
+    tmp3_group.registerStateObjectTracking(
+      composer = %composer,
+      composable = AffectedComposable("RememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 41, 8),
+      composableKeyName = "fun-RememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt",
+      stateName = "animationState"
+    )
+    val transitionAnimationState = rememberTransition(MutableTransitionState(0.0f), null, %composer, MutableTransitionState.%stable, 0b0010).animateFloat(null, "unremembered", { prevState: Float, %composer: Composer?, %changed: Int ->
+      %composer.startReplaceableGroup(<>)
+      if (isTraceInProgress()) {
+        traceEventStart(<>, %changed, -1, <>)
+      }
+      val tmp0 = prevState * 2
+      if (isTraceInProgress()) {
+        traceEventEnd()
+      }
+      %composer.endReplaceableGroup()
+      tmp0
+    }, %composer, 0b000110000000, 0b0001).registerStateObjectTracking(
+      composer = %composer,
+      composable = AffectedComposable("RememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 41, 8),
+      composableKeyName = "fun-RememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt",
+      stateName = "transitionAnimationState"
+    )
+    val infiniteTransition = rememberInfiniteTransition("unremembered", %composer, 0b0110, 0)
+    if (isTraceInProgress()) {
+      traceEventEnd()
+    }
+  } else {
+    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-RememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", AffectedComposable("RememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 41, 8), Skipped)
+    ComposeInvestigatorConfig.invalidationLogger(emptyList(), AffectedComposable("RememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 41, 8), Skipped)
+    %composer.skipToGroupEnd()
+  }
+  %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
+    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-RememberedStates(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", AffectedComposable("RememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 41, 8), Processed(Invalidate))
+    ComposeInvestigatorConfig.invalidationLogger(emptyList(), AffectedComposable("RememberedStates", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 41, 8), Processed(Invalidate))
+    RememberedStates(%composer, updateChangedFlags(%changed or 0b0001))
+  }
+}

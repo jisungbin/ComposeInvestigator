@@ -34,12 +34,17 @@ abstract class AbstractIrTransformTest(useFir: Boolean) : AbstractCodegenTest(us
     dumpTree: Boolean = false,
     truncateTracingInfoMode: TruncateTracingInfoMode = TruncateTracingInfoMode.TRUNCATE_KEY,
     additionalPaths: List<File> = emptyList(),
+    @Flags flags: Int = CompileFeature_COMPOSE,
   ): String {
     fun IrElement.validate(): IrElement = also(validator)
 
     val keySet = mutableListOf<Int>()
     val files = listOf(SourceFile("Test.kt", source), SourceFile("Extra.kt", extra))
-    val irModule = compileToIr(sourceFiles = files, additionalPaths = additionalPaths)
+    val irModule = compileToIr(
+      sourceFiles = files,
+      additionalPaths = additionalPaths,
+      flags = flags,
+    )
 
     val actualTransformed =
       irModule
@@ -50,8 +55,7 @@ abstract class AbstractIrTransformTest(useFir: Boolean) : AbstractCodegenTest(us
         // replace source keys for start group calls
         .replace(Regex("(%composer\\.start(Restart|Movable|Replaceable)Group\\()-?((0b)?[-\\d]+)")) { match ->
           val stringKey = match.groupValues[3]
-          val key = if (stringKey.startsWith("0b")) Integer.parseInt(stringKey.drop(2), 2)
-          else stringKey.toInt()
+          val key = if (stringKey.startsWith("0b")) stringKey.drop(2).toInt(radix = 2) else stringKey.toInt()
           if (key in keySet) {
             "${match.groupValues[1]}<!DUPLICATE KEY: $key!>"
           } else {
@@ -118,6 +122,7 @@ abstract class AbstractIrTransformTest(useFir: Boolean) : AbstractCodegenTest(us
     dumpTree: Boolean = false,
     truncateTracingInfoMode: TruncateTracingInfoMode = TruncateTracingInfoMode.TRUNCATE_KEY,
     additionalPaths: List<File> = emptyList(),
+    @Flags flags: Int = CompileFeature_COMPOSE,
   ) {
     val actualTransformed = transform(
       source = source,
@@ -126,6 +131,7 @@ abstract class AbstractIrTransformTest(useFir: Boolean) : AbstractCodegenTest(us
       dumpTree = dumpTree,
       truncateTracingInfoMode = truncateTracingInfoMode,
       additionalPaths = additionalPaths,
+      flags = flags,
     )
     assertEquals(
       /* expected = */
@@ -146,6 +152,7 @@ abstract class AbstractIrTransformTest(useFir: Boolean) : AbstractCodegenTest(us
     dumpTree: Boolean = false,
     truncateTracingInfoMode: TruncateTracingInfoMode = TruncateTracingInfoMode.TRUNCATE_KEY,
     additionalPaths: List<File> = emptyList(),
+    @Flags flags: Int = CompileFeature_COMPOSE,
   ) {
     val actualTransformed = transform(
       source = source,
@@ -154,6 +161,7 @@ abstract class AbstractIrTransformTest(useFir: Boolean) : AbstractCodegenTest(us
       dumpTree = dumpTree,
       truncateTracingInfoMode = truncateTracingInfoMode,
       additionalPaths = additionalPaths,
+      flags = flags,
     )
     goldenTransformRule.verifyGolden(
       GoldenTransformTestInfo(
@@ -163,10 +171,10 @@ abstract class AbstractIrTransformTest(useFir: Boolean) : AbstractCodegenTest(us
     )
   }
 
-  private fun MatchResult.isNumber() = groupValues[1].isNotEmpty()
-  private fun MatchResult.number() = groupValues[1].toInt()
   private val MatchResult.text get() = groupValues[0]
+  private fun MatchResult.number() = groupValues[1].toInt()
   private fun MatchResult.isChar(c: String) = text == c
+  private fun MatchResult.isNumber() = groupValues[1].isNotEmpty()
   private fun MatchResult.isFileName() = groups[4] != null
 
   private fun generateSourceInfo(sourceInfo: String, source: String): String {

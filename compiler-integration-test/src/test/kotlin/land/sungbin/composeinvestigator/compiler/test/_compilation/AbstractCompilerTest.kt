@@ -9,6 +9,8 @@
 
 package land.sungbin.composeinvestigator.compiler.test._compilation
 
+import androidx.annotation.IntDef
+import androidx.compose.compiler.plugins.kotlin.ComposeConfiguration
 import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
 import com.intellij.openapi.extensions.LoadingOrder
 import com.intellij.openapi.project.Project
@@ -43,14 +45,28 @@ import java.net.URLClassLoader
 //  'fn.owner.valueParameters.size == 1' in Kotlin 2.0. Needs to be fixed in the future.
 // @RunWith(Parameterized::class)
 abstract class AbstractCompilerTest(val useFir: Boolean) {
+  /** The default flag is [CompileFeature_COMPOSE]. */
+  @IntDef(
+    value = [
+      CompileFeature_NONE,
+      CompileFeature_COMPOSE,
+      CompileFeature_NO_LIVE_LITERAL,
+      CompileFeature_NO_CALLSTACK_TRACKING,
+    ],
+    flag = true,
+  )
+  @Retention(AnnotationRetention.SOURCE)
+  @Target(AnnotationTarget.VALUE_PARAMETER)
+  annotation class Flags
+
+  @Suppress("ConstPropertyName")
   companion object {
     // @JvmStatic
     // @Parameterized.Parameters(name = "useFir = {0}")
     // fun data() = arrayOf<Any>(false, true)
 
-    private fun File.applyExistenceCheck() = apply {
-      if (!exists()) throw NoSuchFileException(this)
-    }
+    private fun File.applyExistenceCheck() =
+      apply { if (!exists()) throw NoSuchFileException(this) }
 
     private val homeDir = run {
       val userDir = System.getProperty("user.dir")
@@ -58,6 +74,15 @@ abstract class AbstractCompilerTest(val useFir: Boolean) {
       val path = FileUtil.toCanonicalPath(dir.absolutePath)
       File(path).applyExistenceCheck().absolutePath
     }
+
+    const val CompileFeature_NONE = 0
+    const val CompileFeature_COMPOSE = 1 shl 0
+
+    // LiveLiteral is enabled by default.
+    const val CompileFeature_NO_LIVE_LITERAL = 1 shl 1
+
+    // Callstack tracking is enabled by default.
+    const val CompileFeature_NO_CALLSTACK_TRACKING = 1 shl 2
 
     @JvmStatic
     @BeforeClass
@@ -88,8 +113,9 @@ abstract class AbstractCompilerTest(val useFir: Boolean) {
   protected open fun CompilerConfiguration.updateConfiguration() {}
 
   private fun createCompilerFacade(
-    additionalPaths: List<File> = listOf(),
+    additionalPaths: List<File> = emptyList(),
     forcedFirSetting: Boolean? = null,
+    @Flags flags: Int = CompileFeature_COMPOSE,
     registerExtensions: Project.(CompilerConfiguration) -> Unit = {},
   ) = KotlinCompilerFacade.create(
     disposable = testRootDisposable,
@@ -98,9 +124,13 @@ abstract class AbstractCompilerTest(val useFir: Boolean) {
       val languageVersion = if (enableFir) LanguageVersion.KOTLIN_2_0 else LanguageVersion.KOTLIN_1_9
       // For tests, allow unstable artifacts compiled with a pre-release compiler
       // as input to stable compilations.
-      val analysisFlags: Map<AnalysisFlag<*>, Any?> = mapOf(
+      val analysisFlags = mapOf<AnalysisFlag<*>, Any?>(
         AnalysisFlags.allowUnstableDependencies to true,
         AnalysisFlags.skipPrereleaseCheck to true,
+        AnalysisFlags.optIn to listOf(
+          "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
+          "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
+        ),
       )
       languageVersionSettings = LanguageVersionSettingsImpl(
         languageVersion = languageVersion,
@@ -117,20 +147,28 @@ abstract class AbstractCompilerTest(val useFir: Boolean) {
       configureJdkClasspathRoots()
     },
     registerExtensions = { configuration ->
-      ComposePluginRegistrar.registerCommonExtensions(this)
-      IrGenerationExtension.registerExtension(
-        project = this,
-        extension = ComposePluginRegistrar.createComposeIrExtension(configuration),
-      )
+      if ((flags and CompileFeature_COMPOSE) != 0) {
+        ComposePluginRegistrar.registerCommonExtensions(this)
+        IrGenerationExtension.registerExtension(
+          project = this,
+          extension = ComposePluginRegistrar.createComposeIrExtension(configuration),
+        )
+      }
+
+      val noLiveLiteral = (flags and CompileFeature_NO_LIVE_LITERAL) != 0
+      configuration.put(ComposeConfiguration.LIVE_LITERALS_ENABLED_KEY, !noLiveLiteral)
+      configuration.put(ComposeConfiguration.LIVE_LITERALS_V2_ENABLED_KEY, !noLiveLiteral)
 
       val logger = VerboseLogger(messageCollector = TestMessageCollector).apply { verbose() }
-      extensionArea
-        .getExtensionPoint(IrGenerationExtension.extensionPointName)
-        .registerExtension(
-          ComposableCallstackTrackingExtension(logger = logger),
-          LoadingOrder.FIRST,
-          this,
-        )
+      if ((flags and CompileFeature_NO_CALLSTACK_TRACKING) == 0) {
+        extensionArea
+          .getExtensionPoint(IrGenerationExtension.extensionPointName)
+          .registerExtension(
+            ComposableCallstackTrackingExtension(logger = logger),
+            LoadingOrder.FIRST,
+            this,
+          )
+      }
       extensionArea
         .getExtensionPoint(IrGenerationExtension.extensionPointName)
         .registerExtension(
@@ -146,15 +184,22 @@ abstract class AbstractCompilerTest(val useFir: Boolean) {
   protected fun analyze(
     platformSources: List<SourceFile>,
     commonSources: List<SourceFile> = emptyList(),
+    @Flags flags: Int = CompileFeature_COMPOSE,
   ): AnalysisResult =
-    createCompilerFacade().analyze(platformFiles = platformSources, commonFiles = commonSources)
+    createCompilerFacade(flags = flags)
+      .analyze(platformFiles = platformSources, commonFiles = commonSources)
 
   protected fun compileToIr(
     sourceFiles: List<SourceFile>,
     additionalPaths: List<File> = emptyList(),
+    @Flags flags: Int = CompileFeature_COMPOSE,
     registerExtensions: Project.(CompilerConfiguration) -> Unit = {},
   ): IrModuleFragment =
-    createCompilerFacade(additionalPaths = additionalPaths, registerExtensions = registerExtensions)
+    createCompilerFacade(
+      additionalPaths = additionalPaths,
+      registerExtensions = registerExtensions,
+      flags = flags,
+    )
       .compileToIr(sourceFiles)
 
   protected fun createClassLoader(
@@ -162,6 +207,7 @@ abstract class AbstractCompilerTest(val useFir: Boolean) {
     commonSourceFiles: List<SourceFile> = emptyList(),
     additionalPaths: List<File> = emptyList(),
     forcedFirSetting: Boolean? = null,
+    @Flags flags: Int = CompileFeature_COMPOSE,
   ): GeneratedClassLoader {
     @Suppress("InconsistentCommentForJavaParameter")
     val classLoader = URLClassLoader(
@@ -172,8 +218,15 @@ abstract class AbstractCompilerTest(val useFir: Boolean) {
     )
     return GeneratedClassLoader(
       /* factory = */
-      createCompilerFacade(additionalPaths = additionalPaths, forcedFirSetting = forcedFirSetting)
-        .compile(platformFiles = platformSourceFiles, commonFiles = commonSourceFiles)
+      createCompilerFacade(
+        additionalPaths = additionalPaths,
+        forcedFirSetting = forcedFirSetting,
+        flags = flags,
+      )
+        .compile(
+          platformFiles = platformSourceFiles,
+          commonFiles = commonSourceFiles,
+        )
         .factory,
       /* parentClassLoader = */
       classLoader,

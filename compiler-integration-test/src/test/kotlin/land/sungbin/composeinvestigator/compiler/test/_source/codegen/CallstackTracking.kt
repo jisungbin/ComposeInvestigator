@@ -1,3 +1,10 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
+ */
+
 @file:Suppress("TestFunctionName")
 
 package land.sungbin.composeinvestigator.compiler.test._source.codegen
@@ -12,10 +19,15 @@ import androidx.compose.ui.Modifier
 
 @Composable
 @Suppress("unused")
-fun Main() {
+private fun Main() {
   Sub()
   Surface { DoubleSub() }
   DeepestSub()
+  VarargContents(
+    { Sub() },
+    { Sub() },
+    { Sub() },
+  )
 }
 
 @Composable
@@ -40,4 +52,9 @@ private fun DeepestSub() {
       }
     }
   }
+}
+
+@Composable
+private fun VarargContents(vararg contents: @Composable () -> Unit) {
+  contents.forEach { content -> content() }
 }
