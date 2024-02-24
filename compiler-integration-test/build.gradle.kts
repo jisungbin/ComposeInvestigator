@@ -61,16 +61,21 @@ kotlin {
   }
 }
 
+afterEvaluate {
+  tasks.withType<Test> {
+    dependsOn(":compiler:embeddedPlugin")
+  }
+}
+
 dependencies {
   implementation(projects.runtime)
   implementation(libs.compose.material)
   implementation(libs.test.kotest.assertion)
 
-  testImplementation(projects.compiler)
+  testImplementation(projects.compilerHosted)
   testImplementation(libs.compose.compiler)
+  testImplementation(libs.kotlin.compiler) // must be 'implementation' (not 'compileOnly')
 
-  testImplementation(libs.kotlin.compiler.embedded)
-  testImplementation(libs.test.kotlin.compilation)
   testImplementation(libs.test.kotlin.coroutines) {
     because("https://github.com/Kotlin/kotlinx.coroutines/issues/3673")
   }

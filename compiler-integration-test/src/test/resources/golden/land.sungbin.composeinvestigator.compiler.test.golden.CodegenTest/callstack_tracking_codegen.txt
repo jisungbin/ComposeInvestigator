@@ -1,0 +1,197 @@
+//
+// Source
+// ------------------------------------------
+
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
+ */
+
+@file:Suppress("TestFunctionName")
+
+package land.sungbin.composeinvestigator.compiler.test._source.codegen
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.text.BasicText
+import androidx.compose.material.Surface
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+
+@Composable
+@Suppress("unused")
+private fun Main() {
+  Sub()
+  Surface { DoubleSub() }
+  DeepestSub()
+  VarargContents(
+    { Sub() },
+    { Sub() },
+    { Sub() },
+  )
+}
+
+@Composable
+private fun Sub() {
+  Box(Modifier)
+}
+
+@Composable
+private fun DoubleSub() {
+  Sub()
+  Sub()
+}
+
+@Composable
+private fun DeepestSub() {
+  Surface {
+    Box {
+      Column {
+        BoxWithConstraints {
+          BasicText(text = maxWidth.value.toString())
+        }
+      }
+    }
+  }
+}
+
+@Composable
+private fun VarargContents(vararg contents: @Composable () -> Unit) {
+  contents.forEach { content -> content() }
+}
+
+//
+// Transformed IR
+// ------------------------------------------
+
+val ComposableInvalidationTrackTableImpl%TestKt: ComposableInvalidationTrackTable = ComposableInvalidationTrackTable()
+val ComposableCallstackTrackerImpl%TestKt: Stack<String> = Stack()
+@Composable
+@Suppress(names = "unused")
+private fun Main() {
+  try {
+    ComposableCallstackTrackerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Main")
+    Sub()
+  } finally {
+    ComposableCallstackTrackerImpl%TestKt.pop()
+  }
+  try {
+    ComposableCallstackTrackerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Main")
+    Surface {
+      try {
+        ComposableCallstackTrackerImpl%TestKt.push("Surface%content")
+        DoubleSub()
+      } finally {
+        ComposableCallstackTrackerImpl%TestKt.pop()
+      }
+    }
+  } finally {
+    ComposableCallstackTrackerImpl%TestKt.pop()
+  }
+  try {
+    ComposableCallstackTrackerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Main")
+    DeepestSub()
+  } finally {
+    ComposableCallstackTrackerImpl%TestKt.pop()
+  }
+  try {
+    ComposableCallstackTrackerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Main")
+    VarargContents({
+      try {
+        ComposableCallstackTrackerImpl%TestKt.push("VarargContents%contents_0")
+        Sub()
+      } finally {
+        ComposableCallstackTrackerImpl%TestKt.pop()
+      }
+    }, {
+      try {
+        ComposableCallstackTrackerImpl%TestKt.push("VarargContents%contents_1")
+        Sub()
+      } finally {
+        ComposableCallstackTrackerImpl%TestKt.pop()
+      }
+    }, {
+      try {
+        ComposableCallstackTrackerImpl%TestKt.push("VarargContents%contents_2")
+        Sub()
+      } finally {
+        ComposableCallstackTrackerImpl%TestKt.pop()
+      }
+    }
+    )
+  } finally {
+    ComposableCallstackTrackerImpl%TestKt.pop()
+  }
+}
+@Composable
+private fun Sub() {
+  try {
+    ComposableCallstackTrackerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Sub")
+    Box(Companion)
+  } finally {
+    ComposableCallstackTrackerImpl%TestKt.pop()
+  }
+}
+@Composable
+private fun DoubleSub() {
+  try {
+    ComposableCallstackTrackerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.DoubleSub")
+    Sub()
+  } finally {
+    ComposableCallstackTrackerImpl%TestKt.pop()
+  }
+  Sub()
+}
+@Composable
+private fun DeepestSub() {
+  try {
+    ComposableCallstackTrackerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.DeepestSub")
+    Surface {
+      try {
+        ComposableCallstackTrackerImpl%TestKt.push("Surface%content")
+        Box {
+          try {
+            ComposableCallstackTrackerImpl%TestKt.push("Box%content")
+            Column {
+              try {
+                ComposableCallstackTrackerImpl%TestKt.push("Column%content")
+                BoxWithConstraints {
+                  try {
+                    ComposableCallstackTrackerImpl%TestKt.push("BoxWithConstraints%content")
+                    BasicText(
+                      text = %this%BoxWithConstraints.maxWidth.value.toString()
+                    )
+                  } finally {
+                    ComposableCallstackTrackerImpl%TestKt.pop()
+                  }
+                }
+              } finally {
+                ComposableCallstackTrackerImpl%TestKt.pop()
+              }
+            }
+          } finally {
+            ComposableCallstackTrackerImpl%TestKt.pop()
+          }
+        }
+      } finally {
+        ComposableCallstackTrackerImpl%TestKt.pop()
+      }
+    }
+  } finally {
+    ComposableCallstackTrackerImpl%TestKt.pop()
+  }
+}
+@Composable
+private fun VarargContents(contents: Array<out @[Composable] Function0<Unit>>) {
+  contents.forEach { content: @[Composable] Function0<Unit> ->
+    try {
+      ComposableCallstackTrackerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.VarargContents")
+      content()
+    } finally {
+      ComposableCallstackTrackerImpl%TestKt.pop()
+    }
+  }
+}

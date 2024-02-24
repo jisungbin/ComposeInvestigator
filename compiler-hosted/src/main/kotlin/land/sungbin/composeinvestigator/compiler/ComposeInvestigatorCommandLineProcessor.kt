@@ -9,7 +9,6 @@
 
 package land.sungbin.composeinvestigator.compiler
 
-import com.google.auto.service.AutoService
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorConfiguration.KEY_ENABLED
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorConfiguration.KEY_VERBOSE
 import org.jetbrains.kotlin.compiler.plugin.AbstractCliOption
@@ -24,7 +23,6 @@ public object ComposeInvestigatorConfiguration {
   public val KEY_VERBOSE: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey<Boolean>("Whether to enable verbose log")
 }
 
-@AutoService(CommandLineProcessor::class)
 public class ComposeInvestigatorCommandLineProcessor : CommandLineProcessor {
   override val pluginId: String = PLUGIN_ID
   override val pluginOptions: List<CliOption> = listOf(OPTION_ENABLED, OPTION_VERBOSE)

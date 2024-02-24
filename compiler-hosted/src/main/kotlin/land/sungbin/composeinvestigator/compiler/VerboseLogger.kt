@@ -15,8 +15,17 @@ import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSourceLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
-public class VerboseLogger(configuration: CompilerConfiguration) {
-  private val messageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
+public class VerboseLogger() {
+  private var messageCollector = MessageCollector.NONE
+
+  public constructor(configuration: CompilerConfiguration) : this() {
+    this.messageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
+  }
+
+  public constructor(messageCollector: MessageCollector) : this() {
+    this.messageCollector = messageCollector
+  }
+
   private var verbose = false
 
   public fun verbose() {

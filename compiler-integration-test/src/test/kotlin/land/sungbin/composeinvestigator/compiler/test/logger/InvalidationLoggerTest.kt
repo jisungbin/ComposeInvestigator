@@ -40,8 +40,7 @@ class InvalidationLoggerTest {
   @get:Rule
   val loggerTestRule = InvalidationLoggerTestRule()
 
-  @Test
-  fun affected_composable() {
+  @Test fun affected_composable() {
     compose.setContent { InvalidationSkippedRoot() }
 
     compose.runOnIdle {
@@ -65,8 +64,7 @@ class InvalidationLoggerTest {
     }
   }
 
-  @Test
-  fun invalidation_skipped() {
+  @Test fun invalidation_skipped() {
     compose.setContent { InvalidationSkippedRoot() }
     compose.onNode(hasClickAction()).performClick()
 
@@ -86,8 +84,7 @@ class InvalidationLoggerTest {
     }
   }
 
-  @Test
-  fun invalidation_skipped_custom_name() {
+  @Test fun invalidation_skipped_custom_name() {
     compose.setContent { InvalidationSkippedRoot_CustomName() }
     compose.onNode(hasClickAction()).performClick()
 
@@ -107,8 +104,7 @@ class InvalidationLoggerTest {
     }
   }
 
-  @Test
-  fun invalidation_processed_state_delegate() {
+  @Test fun invalidation_processed_state_delegate() {
     compose.setContent { InvalidationProcessedRoot_StateDelegateReference() }
     repeat(2) { compose.onNode(hasClickAction()).performClick() }
 
@@ -180,8 +176,7 @@ class InvalidationLoggerTest {
     }
   }
 
-  @Test
-  fun invalidation_processed_state_direct() {
+  @Test fun invalidation_processed_state_direct() {
     compose.setContent { InvalidationProcessedRoot_StateDirectReference() }
     repeat(2) { compose.onNode(hasClickAction()).performClick() }
 

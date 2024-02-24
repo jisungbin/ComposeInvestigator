@@ -27,8 +27,7 @@ class ComposableCallstackTest {
   @get:Rule
   val loggerTestRule = InvalidationLoggerTestRule()
 
-  @Test
-  fun static_callstacks() {
+  @Test fun static_callstacks() {
     compose.setContent { ComposableCallstackRoot_House() }
     compose.onNode(hasClickAction()).performClick()
 

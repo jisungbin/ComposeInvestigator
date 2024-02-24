@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
-internal class ComposableInvalidationTrackingExtension(private val logger: VerboseLogger) : IrGenerationExtension {
+public class ComposableInvalidationTrackingExtension(private val logger: VerboseLogger) : IrGenerationExtension {
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
     IrInvalidationLogger.init(pluginContext)
     IrAffectedField.init(pluginContext)

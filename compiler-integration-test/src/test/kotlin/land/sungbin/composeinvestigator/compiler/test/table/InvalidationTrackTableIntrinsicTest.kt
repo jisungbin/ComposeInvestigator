@@ -29,8 +29,7 @@ class InvalidationTrackTableIntrinsicTest {
   @get:Rule
   val compose = createAndroidComposeRule<ComponentActivity>()
 
-  @Test
-  fun table_instance() {
+  @Test fun table_instance() {
     table1.shouldNotBeNull().shouldBeTypeOf<ComposableInvalidationTrackTable>()
     table2.shouldNotBeNull().shouldBeTypeOf<ComposableInvalidationTrackTable>()
 
@@ -40,16 +39,14 @@ class InvalidationTrackTableIntrinsicTest {
     table2()
   }
 
-  @Test
-  fun composable_name_change() {
+  @Test fun composable_name_change() {
     compose.setContent {
       CurrentComposableName1()
       CurrentComposableName2()
     }
   }
 
-  @Test
-  fun composable_key_name() {
+  @Test fun composable_key_name() {
     compose.setContent {
       CurrentComposableKeyName1()
       CurrentComposableKeyName2()
