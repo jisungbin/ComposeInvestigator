@@ -37,6 +37,7 @@ public val Stack_POP: Name = Name.identifier("pop")
 // START Compose Runtime
 public val COMPOSER_FQN: FqName = FqName("$AndroidxComposeRuntime.Composer")
 
+public val Composer_START_RESTART_GROUP: Name = Name.identifier("startRestartGroup")
 public val Composer_SKIPPING: Name = Name.identifier("skipping")
 public val Composer_SKIP_TO_GROUP_END: Name = Name.identifier("skipToGroupEnd")
 

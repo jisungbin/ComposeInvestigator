@@ -13,13 +13,9 @@ import org.junit.Test
 
 class CodegenTest : AbstractIrTransformTest(useFir = false) {
   @Test fun callstack_tracking_codegen() {
-    verifyGoldenIrTransform(
-      source = sourceString("codegen/CallstackTracking.kt"),
-      flags = CompileFeature_NONE,
-    )
+    verifyGoldenIrTransform(source = sourceString("codegen/CallstackTracking.kt"))
   }
 
-  // TODO: https://github.com/jisungbin/ComposeInvestigator/issues/100
   @Test fun state_tracking_codegen() {
     verifyGoldenIrTransform(
       source = sourceString("codegen/StateTracking.kt"),

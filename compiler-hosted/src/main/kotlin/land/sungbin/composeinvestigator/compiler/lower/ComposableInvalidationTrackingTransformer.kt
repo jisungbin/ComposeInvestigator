@@ -29,7 +29,6 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrReturn
@@ -48,7 +47,12 @@ internal class ComposableInvalidationTrackingTransformer(
   private val context: IrPluginContext,
   private val logger: VerboseLogger,
   private val stabilityInferencer: StabilityInferencer,
-) : AbstractComosableInvalidationTrackLower(context, logger), IrPluginContext by context {
+) : AbstractComosableInvalidationTrackLower(
+  context = context,
+  logger = logger,
+  stabilityInferencer = stabilityInferencer,
+),
+  IrPluginContext by context {
   private val mutableListOfSymbol =
     context
       .referenceFunctions(CallableId.fromFqName(MUTABLE_LIST_OF_FQN))
@@ -94,9 +98,9 @@ internal class ComposableInvalidationTrackingTransformer(
     }
   }
 
-  override fun transformComposableBody(function: IrSimpleFunction, block: IrBlock): IrBlock {
-    val currentKey = irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, function] ?: return block
-    if (!handledComposableBody.handle(currentKey.keyName)) return block
+  override fun transformComposableBody(composable: IrSimpleFunction, body: IrStatementContainer): IrStatementContainer {
+    val currentKey = irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return body
+    if (!handledComposableBody.handle(currentKey.keyName)) return body
 
     val newStatements = mutableListOf<IrStatement>()
     val currentInvalidationTrackTable = currentInvalidationTrackTable!!
@@ -111,7 +115,7 @@ internal class ComposableInvalidationTrackingTransformer(
     val affectedFieldListVar = irTmpVariableInCurrentFun(affectedFieldList, nameHint = "affectFields")
     newStatements += affectedFieldListVar
 
-    for (param in function.valueParameters) {
+    for (param in composable.valueParameters) {
       // Synthetic arguments are not handled.
       if (param.name.asString().startsWith('$')) continue
 
@@ -149,7 +153,7 @@ internal class ComposableInvalidationTrackingTransformer(
     )
     val computeInvalidationReasonVariable = irTmpVariableInCurrentFun(
       computeInvalidationReason,
-      nameHint = "${function.name.asString()}\$validationReason",
+      nameHint = "${composable.name.asString()}\$validationReason",
     )
     newStatements += computeInvalidationReasonVariable
 
@@ -172,9 +176,9 @@ internal class ComposableInvalidationTrackingTransformer(
     )
     newStatements += logger
 
-    block.statements.addAll(0, newStatements)
+    body.statements.addAll(0, newStatements)
 
-    return block.also { transformed ->
+    return body.also { transformed ->
       logger("[ComposableBody] transformed dump: ${transformed.dump()}")
       logger("[ComposableBody] transformed dumpKotlinLike: ${transformed.dumpKotlinLike()}")
     }
