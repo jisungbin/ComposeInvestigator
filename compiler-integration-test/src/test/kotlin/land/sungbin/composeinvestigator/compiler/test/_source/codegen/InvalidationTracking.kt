@@ -23,9 +23,16 @@ private fun Main() {
   var state by remember { mutableIntStateOf(0) }
   Button(onClick = { state++ }) {}
   Counter(count = state)
+  Tv(title = "state", value = state)
 }
 
 @Composable
 private fun Counter(count: Int) {
   Text(text = "$count")
+}
+
+@Suppress("SameParameterValue")
+@Composable
+private fun Tv(title: String, value: Any) {
+  Text(text = "[$title] $value")
 }

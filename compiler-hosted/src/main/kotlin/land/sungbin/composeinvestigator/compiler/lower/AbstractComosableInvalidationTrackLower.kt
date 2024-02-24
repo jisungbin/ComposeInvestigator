@@ -7,11 +7,14 @@
 
 package land.sungbin.composeinvestigator.compiler.lower
 
+import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
+import androidx.compose.compiler.plugins.kotlin.analysis.knownUnstable
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
 import land.sungbin.composeinvestigator.compiler.ANIMATABLE_FQN
 import land.sungbin.composeinvestigator.compiler.COMPOSER_FQN
 import land.sungbin.composeinvestigator.compiler.Composer_SKIPPING
 import land.sungbin.composeinvestigator.compiler.Composer_SKIP_TO_GROUP_END
+import land.sungbin.composeinvestigator.compiler.Composer_START_RESTART_GROUP
 import land.sungbin.composeinvestigator.compiler.EMPTY_LIST_FQN
 import land.sungbin.composeinvestigator.compiler.HASH_CODE_FQN
 import land.sungbin.composeinvestigator.compiler.SCOPE_UPDATE_SCOPE_FQN
@@ -24,6 +27,8 @@ import land.sungbin.composeinvestigator.compiler.origin.ComposableCallstackTrack
 import land.sungbin.composeinvestigator.compiler.origin.ComposableInvalidationTrackerOrigin
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableCallstackTracker
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTrackTable
+import land.sungbin.fastlist.fastAny
+import land.sungbin.fastlist.fastFilterNot
 import land.sungbin.fastlist.fastLastOrNull
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -47,6 +52,7 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrReturn
+import org.jetbrains.kotlin.ir.expressions.IrSetValue
 import org.jetbrains.kotlin.ir.expressions.IrStatementContainer
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.IrWhen
@@ -78,11 +84,13 @@ import java.util.concurrent.atomic.AtomicReference
 public abstract class AbstractComosableInvalidationTrackLower(
   private val context: IrPluginContext,
   private val logger: VerboseLogger,
+  private val stabilityInferencer: StabilityInferencer,
 ) : IrElementTransformerVoidWithContext() {
   private class IrSymbolOwnerWithData<D>(private val owner: IrSymbolOwner, val data: D) : IrSymbolOwner by owner
 
   private val composerSymbol = context.referenceClass(ClassId.topLevel(COMPOSER_FQN))!!
   private val nullableComposerType = composerSymbol.defaultType.makeNullable()
+  private val composerStartRestartGroupSymbol = composerSymbol.getSimpleFunction(Composer_START_RESTART_GROUP.asString())!!
   private val composerSkippingGetterSymbol = composerSymbol.getPropertyGetter(Composer_SKIPPING.asString())!!
   private val composerSkipToGroupEndSymbol = composerSymbol.getSimpleFunction(Composer_SKIP_TO_GROUP_END.asString())!!
 
@@ -198,6 +206,37 @@ public abstract class AbstractComosableInvalidationTrackLower(
     return super.visitLocalDelegatedProperty(declaration)
   }
 
+  // **This logic is only executed when the composable owns an unstable parameter.**
+  // @Composable fun Function($composer: Composer?, $changed: Int) {
+  //   $composer = $composer.startRestartGroup()
+  //   (composable content) <ENTER HERE>
+  //   $composer.endRestartGroup()
+  // }
+  override fun visitBlockBody(body: IrBlockBody): IrBody {
+    val composable = lastReachedComposable() ?: return super.visitBlockBody(body)
+
+    val firstStatement = body.statements.firstOrNull()
+    if (firstStatement is IrSetValue && firstStatement.value is IrCall) {
+      val firstCall = firstStatement.value as IrCall
+      if (firstCall.symbol.owner.kotlinFqName != composerStartRestartGroupSymbol.owner.kotlinFqName)
+        return super.visitBlockBody(body)
+    } else return super.visitBlockBody(body)
+
+    // Synthetic arguments are not handled.
+    val validParameters = composable.valueParameters.fastFilterNot { parameter ->
+      parameter.name.asString().startsWith('$')
+    }
+    val hasUnstableParameter = validParameters.fastAny { parameter ->
+      stabilityInferencer.stabilityOf(parameter.type).knownUnstable()
+    }
+
+    if (!hasUnstableParameter) return super.visitBlockBody(body)
+
+    val transformed = transformComposableBody(composable = composable, body = body) as IrBlockBody
+    return super.visitBlockBody(transformed)
+  }
+
+  // **This logic is only executed when all parameters in the composable are stable.**
   // when {
   //   when {
   //     EQEQ(arg0 = $dirty.and(other = 11), arg1 = 2).not() -> true
@@ -238,7 +277,7 @@ public abstract class AbstractComosableInvalidationTrackLower(
               nestedFirstResult is IrConst<*> && nestedFirstResult.value == true
             } else false
           }
-          val aasertNestedSecondCondition = run {
+          val assertNestedSecondCondition = run {
             val nestedSecondCondition = nestedBranch.last().condition
             // assert 'else'
             if (nestedSecondCondition is IrConst<*> && nestedSecondCondition.value == true) {
@@ -254,11 +293,12 @@ public abstract class AbstractComosableInvalidationTrackLower(
             } else false
           }
 
-          assertNestedFirstCondition && aasertNestedSecondCondition
+          assertNestedFirstCondition && assertNestedSecondCondition
         } else false
       }
       if (assertFirstCondition) {
-        expression.branches[0].result = transformComposableBody(function = composable, block = firstResult)
+        val transformed = transformComposableBody(composable = composable, body = firstResult) as IrBlock
+        expression.branches[0].result = transformed
       }
     }
     return super.visitWhen(expression)
@@ -279,17 +319,16 @@ public abstract class AbstractComosableInvalidationTrackLower(
         block.function.transformChildrenVoid(
           object : IrElementTransformerVoidWithContext() {
             override fun visitBlockBody(body: IrBlockBody): IrBody {
-              val returnCall = body.statements.singleOrNull()?.safeAs<IrReturn>() ?: return super.visitBlockBody(body)
+              val returnCall = body.statements.singleOrNull()?.safeAs<IrReturn>() ?: return body
               val returnTarget = returnCall.value
 
-              if (returnTarget !is IrCall || !returnTarget.symbol.owner.hasComposableAnnotation())
-                return super.visitBlockBody(body)
+              if (returnTarget !is IrCall || !returnTarget.symbol.owner.hasComposableAnnotation()) return body
 
               val transformed = transformUpdateScopeBlock(target = returnTarget.symbol.owner, initializer = returnCall)
               body.statements.clear()
               body.statements.addAll(transformed.statements)
 
-              return super.visitBlockBody(body)
+              return body
             }
           },
         )
@@ -336,7 +375,7 @@ public abstract class AbstractComosableInvalidationTrackLower(
   }
 
   protected abstract fun transformStateInitializer(composable: IrSimpleFunction, stateName: Name, initializer: IrExpression): IrExpression
-  protected abstract fun transformComposableBody(function: IrSimpleFunction, block: IrBlock): IrBlock
+  protected abstract fun transformComposableBody(composable: IrSimpleFunction, body: IrStatementContainer): IrStatementContainer
   protected abstract fun transformUpdateScopeBlock(target: IrSimpleFunction, initializer: IrReturn): IrStatementContainer
   protected abstract fun transformSkipToGroupEndCall(composable: IrSimpleFunction, initializer: IrCall): IrStatementContainer
 
