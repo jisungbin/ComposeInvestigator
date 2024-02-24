@@ -11,7 +11,7 @@ package land.sungbin.composeinvestigator.compiler.test._compilation
 
 import org.jetbrains.kotlin.cli.common.toBooleanLenient
 import org.jetbrains.kotlin.incremental.createDirectory
-import org.junit.Assert
+import org.junit.Assert.assertEquals
 import org.junit.rules.TestRule
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
@@ -79,7 +79,7 @@ class GoldenTransformRule(
     }
 
     // Use absolute path in the assert error so studio shows it as a link
-    Assert.assertEquals(
+    assertEquals(
       "Transformed source does not match golden file:\n${goldenFile.absolutePath}\n" +
         "To regenerate golden files, set GENERATE_GOLDEN=\"${goldenFile.nameWithoutExtension}\" " +
         "as an env variable (or set it to 'true' to generate all the files).\n" +
@@ -100,8 +100,6 @@ class GoldenTransformRule(
 }
 
 /**
- * GoldenTransformTestInfo
- *
  * @param source The pre-transformed source code.
  * @param transformed Post transformed IR tree source.
  */

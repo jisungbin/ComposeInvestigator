@@ -9,7 +9,7 @@ package land.sungbin.composeinvestigator.runtime.affect
 
 import land.sungbin.composeinvestigator.runtime.DeclarationStability
 
-// Design it as a sealed class in case new field types come in the future.
+// Design this as a sealed class in case new field types come in the future.
 public sealed interface AffectedField {
   public val name: String
   public val valueString: String
