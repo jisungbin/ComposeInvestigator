@@ -10,6 +10,7 @@ ktlint = "1.1.1"
 jetbrains-annotation = "24.1.0"
 
 kotlin-core = "1.9.22"
+kotlin-dokka = "1.9.10"
 kotlin-coroutines = "1.8.0"
 
 androidx-activity = "1.8.2"
@@ -31,6 +32,8 @@ test-kotlin-compilation = "0.4.0"
 gradle-publish-maven = { id = "com.vanniktech.maven.publish", version.ref = "gradle-publish-maven" }
 gradle-test-logging = { id = "com.adarshr.test-logger", version.ref = "gradle-test-logging" }
 gradle-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "gradle-shadow" }
+
+kotlin-dokka = { id = "org.jetbrains.dokka", version.ref = "kotlin-dokka" }
 
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 

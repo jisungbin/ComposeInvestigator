@@ -11,3 +11,5 @@
 build
 release
 local.properties
+runtime/api
+documentation
