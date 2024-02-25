@@ -10,6 +10,17 @@
 package land.sungbin.composeinvestigator.runtime
 
 // The name is prefixed with "Declaration" to distinguish it from AOSP's Stability.
+// https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/compiler/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/analysis/Stability.kt;l=74;drc=7d3e127599f8ce142445c944c703cf3c3e6d2b3a
+
+/**
+ * Represents Compose's stability system. See the
+ * [official documentation](https://developer.android.com/jetpack/compose/performance/stability)
+ * for more information about Compose's stability.
+ *
+ * The stability inference algorithm uses the
+ * [Compose Compiler's implementation](https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/compiler/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/analysis/Stability.kt;l=230;drc=7d3e127599f8ce142445c944c703cf3c3e6d2b3a)
+ * of the AOSP standard.
+ */
 public sealed class DeclarationStability {
   public data class Certain(public val stable: Boolean) : DeclarationStability() {
     override fun toString(): String = if (stable) "Stable" else "Unstable"

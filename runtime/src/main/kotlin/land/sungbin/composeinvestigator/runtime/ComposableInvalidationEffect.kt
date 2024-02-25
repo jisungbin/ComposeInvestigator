@@ -8,6 +8,7 @@
 package land.sungbin.composeinvestigator.runtime
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.NonRestartableComposable
 import androidx.compose.runtime.RememberObserver
 import androidx.compose.runtime.currentComposer
@@ -21,8 +22,23 @@ import kotlin.coroutines.cancellation.CancellationException
 
 private val DEFAULT_KEY = arrayOf(Unit)
 
+/**
+ * Register [ComposableInvalidationListener]s and remove them to
+ * match the lifecycle of the composable. The lifecycle algorithm
+ * is the same as [LaunchedEffect].
+ *
+ * @param table The [ComposableInvalidationTrackTable] to register the
+ * listener. You can get it as [currentComposableInvalidationTracker].
+ * @param composableKey A unique key for the current composable. You can
+ * get it as [ComposableInvalidationTrackTable.currentComposableKeyName].
+ * @param keys The keys to be used to determine whether the listener should
+ * be re-registered. Same as [LaunchedEffect]'s `key` parameter.
+ * @param block The [listener][ComposableInvalidationListener] to be
+ * registered and managed.
+ */
 @Composable
 @NonRestartableComposable
+@ExperimentalComposeInvestigatorApi
 public fun ComposableInvalidationEffect(
   table: ComposableInvalidationTrackTable,
   composableKey: String,
