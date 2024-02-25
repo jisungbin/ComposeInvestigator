@@ -10,9 +10,14 @@ package land.sungbin.composeinvestigator.runtime
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
 
-/** Alternative to `() -> Unit` that's useful for avoiding boxing. */
+// Alternative to `() -> Unit` that's useful for avoiding boxing.
+/** @see ComposeInvestigatorConfig.invalidationLogger */
 public fun interface ComposableInvalidationLogger {
-  /** @param callstack Experimental. This parameter may be produces wrong result. */
+  /**
+   * @param callstack *(Experimental. This value may be produces wrong result.)*
+   * Represents all callstacks leading up to the current composable being called
+   * (each shown as a fully-qualified name or simple name).
+   */
   public operator fun invoke(
     callstack: List<String>,
     composable: AffectedComposable,
@@ -20,6 +25,13 @@ public fun interface ComposableInvalidationLogger {
   )
 }
 
+/**
+ * Represents information about the composable function parameters.
+ *
+ * @param name Parameter name
+ * @param typeFqName fully-qualified name of the parameter type
+ * @param stability Stability information for the parameter type
+ */
 public data class ParameterInformation(
   public val name: String,
   public val typeFqName: String,
@@ -37,19 +49,30 @@ public data class ChangedFieldPair(public val old: AffectedField, public val new
 public infix fun AffectedField.changedTo(new: AffectedField): ChangedFieldPair =
   ChangedFieldPair(old = this, new = new)
 
+/** Explains why the composable was invalidated. */
 public sealed class InvalidationReason {
   abstract override fun toString(): String
 
+  /** The first composition (not recomposition). This happens by default. */
   public data object Initial : InvalidationReason() {
     override fun toString(): String = "[Initial] Initial composition."
   }
 
+  /**
+   * The current recompose scope has been requested to be invalidated.
+   * This can be caused by a call to `currentRecomposeScope.invalidate()`
+   * or when a field within that composable has been changed.
+   */
   public data object Invalidate : InvalidationReason() {
     override fun toString(): String =
       "[Invalidate] An invalidation has been requested for the current composable scope. " +
         "The state value in the body of that composable function has most likely changed."
   }
 
+  /**
+   * A field in the composable has been changed. The changed fields
+   * are print sorted by field name.
+   */
   public data class FieldChanged(public val changed: List<ChangedFieldPair>) : InvalidationReason() {
     override fun toString(): String = buildString {
       val sortedChanges = changed.sortedBy { field -> field.old.name }
@@ -68,15 +91,23 @@ public sealed class InvalidationReason {
     }
   }
 
-  // According to the Compose compiler's comments, this should be determinable via the $changed argument.
-  // https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/compiler/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/lower/ComposableFunctionBodyTransformer.kt;l=381-382;drc=ea884612191a32933b697cc5062aa32505be4eaa
-  // However, I haven't yet figured out how to determine this, so this type is not used. (in TODO status)
-  // It's probably related to androidx.compose.runtime.changedLowBitMask. (RecomposeScopeImpl.kt)
-  @Deprecated("Force reason is not supported yet.")
-  public data object Force : InvalidationReason() {
+  /**
+   * @suppress According to the Compose compiler's comments this should be
+   * determinable via the `$changed` argument.
+   *
+   * """the lowest bit of the bitmask is a special bit which forces execution of the function."""
+   * (https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/compiler/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/lower/ComposableFunctionBodyTransformer.kt;l=381-382;drc=ea884612191a32933b697cc5062aa32505be4eaa)
+   *
+   * However, I haven't yet figured out how to determine this, so this type
+   * is not used. It's probably related to `androidx.compose.runtime.changedLowBitMask`.
+   * (in RecomposeScopeImpl.kt)
+   */
+  @Deprecated("Force reason is not supported yet.", level = DeprecationLevel.ERROR)
+  public data object Force /*: InvalidationReason()*/ {
     override fun toString(): String = "[Force] A forced recomposition has been requested for the current composable."
   }
 
+  /** The composable was recomposed, but no changes were detected by ComposeInvestigator. */
   public data class Unknown(public val params: List<ParameterInformation>) : InvalidationReason() {
     override fun toString(): String =
       "[Unknown] No parameters have changed. Perhaps the state value being referenced in the function body has changed. " +
@@ -85,7 +116,11 @@ public sealed class InvalidationReason {
   }
 }
 
+/** Indicates how the composable was invalidated. */
 public sealed class ComposableInvalidationType {
+  /** The composable has actually been recomposed. */
   public data class Processed(public val reason: InvalidationReason) : ComposableInvalidationType()
+
+  /** Recomposition was skipped because there were no changes to the composable. */
   public data object Skipped : ComposableInvalidationType()
 }
