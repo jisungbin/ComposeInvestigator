@@ -130,11 +130,28 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
     affectFieldMap.clear()
   }
 
-  /** This can be used when you need to manually add the [ComposableInvalidationListener] callback. */
+  /**
+   * This can be used when you need to manually add the
+   * [ComposableInvalidationListener] callback. Later,
+   * if the registered callback is no longer valid, you
+   * should call [unregisterListener].
+   *
+   * It is not recommended to register directly this way;
+   * consider the [ComposableInvalidationEffect] API instead.
+   *
+   * @param keyName The key of the composable to register the callback for.
+   * See [currentComposableKeyName].
+   */
   public fun registerListener(keyName: String, listener: ComposableInvalidationListener) {
     listeners.putIfNotPresent(keyName, listener)
   }
 
+  /**
+   * Removes callbacks registered with [registerListener].
+   *
+   * @param keyName The key of the composable to remove the callback for.
+   * See [currentComposableKeyName].
+   */
   public fun unregisterListener(keyName: String) {
     listeners.remove(keyName)
   }
