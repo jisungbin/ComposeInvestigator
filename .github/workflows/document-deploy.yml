@@ -56,7 +56,7 @@ jobs:
         run: cd documentation && mkdocs build && pwd
 
       - name: Build dokka at runtime
-        run: cd .. && pwd && ./gradlew :runtime:dokkaHtml
+        run: pwd && ./gradlew :runtime:dokkaHtml
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
