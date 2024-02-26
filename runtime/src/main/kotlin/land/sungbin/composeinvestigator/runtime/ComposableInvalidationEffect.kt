@@ -24,7 +24,7 @@ private val DEFAULT_KEY = arrayOf(Unit)
 
 /**
  * Register [ComposableInvalidationListener]s and remove them to
- * match the lifecycle of the composable. The lifecycle algorithm
+ * match the lifecycle of the Composable. The lifecycle algorithm
  * is the same as [LaunchedEffect].
  *
  * @param table The [ComposableInvalidationTrackTable] to register the

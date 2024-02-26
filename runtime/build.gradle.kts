@@ -18,7 +18,7 @@ plugins {
 tasks.dokkaHtml {
   moduleName.set("ComposeInvestigator Runtime API")
   moduleVersion.set(project.property("VERSION_NAME") as String)
-  outputDirectory.set(file("api"))
+  outputDirectory.set(rootDir.resolve("documentation/site/runtime/api"))
 
   dokkaSourceSets.configureEach {
     jdkVersion.set(17)

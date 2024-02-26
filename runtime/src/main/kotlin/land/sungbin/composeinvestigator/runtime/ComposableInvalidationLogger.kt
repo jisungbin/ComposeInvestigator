@@ -15,7 +15,7 @@ import land.sungbin.composeinvestigator.runtime.affect.AffectedField
 public fun interface ComposableInvalidationLogger {
   /**
    * @param callstack *(Experimental. This value may be produces wrong result.)*
-   * Represents all callstacks leading up to the current composable being called
+   * Represents all call stacks leading up to the current composable being called
    * (each shown as a fully-qualified name or simple name).
    */
   public operator fun invoke(
@@ -95,7 +95,7 @@ public sealed class InvalidationReason {
    * @suppress According to the Compose compiler's comments this should be
    * determinable via the `$changed` argument.
    *
-   * """the lowest bit of the bitmask is a special bit which forces execution of the function."""
+   * "the lowest bit of the bitmask is a special bit which forces execution of the function."
    * (https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/compiler/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/lower/ComposableFunctionBodyTransformer.kt;l=381-382;drc=ea884612191a32933b697cc5062aa32505be4eaa)
    *
    * However, I haven't yet figured out how to determine this, so this type

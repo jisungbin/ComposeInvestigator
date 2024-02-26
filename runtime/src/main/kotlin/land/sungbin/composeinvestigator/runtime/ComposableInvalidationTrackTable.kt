@@ -7,7 +7,6 @@
 
 package land.sungbin.composeinvestigator.runtime
 
-import androidx.compose.runtime.Composer
 import androidx.compose.runtime.Immutable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
@@ -41,8 +40,7 @@ public annotation class ComposableName(public val name: String)
 public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): String = name
 
 /**
- * Classes that hold data from ComposeInvestigator. If you know Compose internals,
- * this class is similar in nature to [Composer] and [androidx.compose.runtime.SlotTable].
+ * Classes that hold data from ComposeInvestigator.
  *
  * **This class is created as a singleton for *every* file**, so be careful in release
  * environments. (ComposeInvestigator is not recommended for production)
@@ -92,8 +90,6 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
    * If you call this from a composable that is configured as an
    * anonymous function, it will always default to 'anonymous',
    * so it is recommended that you specify your own composable name.
-   * This recommendation will be coming to Android Lint in the future.
-   * [(#90)](https://github.com/jisungbin/ComposeInvestigator/issues/90)
    */
   public var currentComposableName: ComposableName
     get() {

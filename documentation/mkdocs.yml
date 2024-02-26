@@ -32,6 +32,5 @@ nav:
   - 'Overview': 'index.md'
   - 'Advanced': 'advanced.md'
   - 'Under the Hood': 'internals.md'
-  - 'Compose Compatibility Map': 'compatibility.md'
   - 'Change Log': 'changelog.md'
   - 'Runtime API ⏏': 'https://jisungbin.github.io/ComposeInvestigator/runtime/api/'
