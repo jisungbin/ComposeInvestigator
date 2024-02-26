@@ -53,10 +53,10 @@ jobs:
         run: pip install mkdocs-material
 
       - name: Build mkdocs-material
-        run: cd documentation && mkdocs build
+        run: cd documentation && mkdocs build && pwd
 
       - name: Build dokka at runtime
-        run: cd ../.. && pwd && ./gradlew :runtime:dokkaHtml
+        run: cd .. && pwd && ./gradlew :runtime:dokkaHtml
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
