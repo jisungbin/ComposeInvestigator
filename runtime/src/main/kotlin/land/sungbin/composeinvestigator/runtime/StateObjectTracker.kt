@@ -13,6 +13,7 @@ import androidx.compose.animation.core.InfiniteTransition
 import androidx.compose.animation.core.Transition
 import androidx.compose.runtime.Composer
 import androidx.compose.runtime.RememberObserver
+import androidx.compose.runtime.State
 import androidx.compose.runtime.cache
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.snapshots.ObserverHandle
@@ -32,7 +33,24 @@ import kotlin.reflect.jvm.isAccessible
 
 public data class StateValue(val previousValue: Any?, val newValue: Any?)
 
-/** Defines how to get a [StateValue] from a [StateObject]. */
+/**
+ * Defines how to get a [StateObject] from a given object.
+ * If it returns `null`, it means that the object does not
+ * contain a [StateObject].
+ *
+ * Use [ComposeStateObjectGetter] for the default implementation
+ * for Compose basics.
+ */
+public fun interface StateObjectGetter {
+  public operator fun invoke(state: Any): StateObject?
+}
+
+/**
+ * Defines how to get a [StateValue] from a [StateObject].
+ *
+ * Use [ComposeStateObjectValueGetter] for the default implementation
+ * for Compose basics.
+ */
 public fun interface StateValueGetter {
   public operator fun invoke(target: StateObject): StateValue
 }
@@ -99,27 +117,26 @@ internal object StateObjectTrackManager {
  * val state: State = mutableStateOf(1).registerStateObjectTracking()
  * ```
  *
- * Note that value change tracking does not apply to all types that inherit
- * from [androidx.compose.runtime.State], but only to the following limited types:
- *
- * - [StateObject]
- * - [Animatable]
- * - [AnimationState]
- * - [Transition.TransitionAnimationState]
- * - [InfiniteTransition.TransitionAnimationState]
+ * Note that only states where the value of [stateObjectGetter] is not `null`
+ * are tracked for value changes.
  *
  * @receiver State to track value changes.
  * @return The same state object.
  *
  * @param composer The current nearest [Composer] instance.
- * You can get this with the [currentComposer]. (This API is
- * not available outside of Composable)
+ * You can get this with the [currentComposer]. (This API is not available
+ * outside of Composable)
  * @param composable The composable that uses this [state][State].
  * @param composableKeyName The unique key of the [composable].
  * See [ComposableInvalidationTrackTable.currentComposableKeyName].
  * @param stateName The name of the [state][State] to track.
+ * @param stateObjectGetter The method to get the [StateObject] from the [state][State].
+ * If not specified, the default value is [ComposeStateObjectGetter].
  * @param stateValueGetter The method to get the value of the [state][State].
  * If not specified, the default value is [ComposeStateObjectValueGetter].
+ *
+ * @see StateObjectGetter
+ * @see StateValueGetter
  */
 @ExperimentalComposeInvestigatorApi
 public fun <State> State.registerStateObjectTracking(
@@ -127,31 +144,14 @@ public fun <State> State.registerStateObjectTracking(
   composable: AffectedComposable,
   composableKeyName: String,
   stateName: String,
+  stateObjectGetter: StateObjectGetter = ComposeStateObjectGetter,
   stateValueGetter: StateValueGetter = ComposeStateObjectValueGetter,
 ): State = also {
   val state = this ?: return@also
   val register by lazy {
-    val stateObject = when (state) {
-      is StateObject -> state
-      is Animatable<*, *> -> {
-        val internalStateField = state::class.java.declaredFields.firstOrNull { field ->
-          field.type == AnimationState::class.java
-        }?.apply {
-          isAccessible = true
-        }
-        val animationState = internalStateField?.get(this) as? AnimationState<*, *>
-        animationState?.let { state -> state::value.obtainStateObjectOrNull() }
-      }
-      is AnimationState<*, *> -> state::value.obtainStateObjectOrNull()
-      is Transition<*>.TransitionAnimationState<*, *> -> state::value.obtainStateObjectOrNull()
-      is InfiniteTransition.TransitionAnimationState<*, *> -> state::value.obtainStateObjectOrNull()
-      // Throwing here is reported a bug in the Compose runtime, so we replace it with null to avoid confusing developers.
-      else -> null /* error("Unsupported state type: ${state::class.java}") */
-    }
-
     object : RememberObserver {
       override fun onRemembered() {
-        stateObject ?: return
+        val stateObject = stateObjectGetter(state) ?: return
         trackedStateObjects.getOrPut(composableKeyName, ::mutableSetOf).add(stateObject)
         stateFieldNameMap.putIfNotPresent(stateObject, stateName)
         stateValueGetterMap.putIfNotPresent(stateObject, stateValueGetter)
@@ -179,6 +179,38 @@ public fun <State> State.registerStateObjectTracking(
   composer.startReplaceableGroup(composable.fqName.hashCode() + state.hashCode() + stateName.hashCode())
   composer.cache(false) { register }
   composer.endReplaceableGroup()
+}
+
+/**
+ * Gets a [StateObject] from the default [State] implementation in the
+ * Compose, but only the types below can be imported. For other types,
+ * implement them by inheriting from [StateObjectGetter].
+ *
+ * - [StateObject]
+ * - [Animatable]
+ * - [AnimationState]
+ * - [Transition.TransitionAnimationState]
+ * - [InfiniteTransition.TransitionAnimationState]
+ */
+public object ComposeStateObjectGetter : StateObjectGetter {
+  override fun invoke(state: Any): StateObject? =
+    when (state) {
+      is StateObject -> state
+      is Animatable<*, *> -> {
+        val internalStateField = state::class.java.declaredFields.firstOrNull { field ->
+          field.type == AnimationState::class.java
+        }?.apply {
+          isAccessible = true
+        }
+        val animationState = internalStateField?.get(this) as? AnimationState<*, *>
+        animationState?.let { animationState::value.obtainStateObjectOrNull() }
+      }
+      is AnimationState<*, *> -> state::value.obtainStateObjectOrNull()
+      is Transition<*>.TransitionAnimationState<*, *> -> state::value.obtainStateObjectOrNull()
+      is InfiniteTransition.TransitionAnimationState<*, *> -> state::value.obtainStateObjectOrNull()
+      // Throwing here is reported a bug in the Compose runtime, so we replace it with null to avoid confusing developers.
+      else -> null /* error("Unsupported state type: ${state::class.java}") */
+    }
 }
 
 private fun KProperty0<*>.obtainStateObjectOrNull() = runCatching {

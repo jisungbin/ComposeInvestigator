@@ -6,10 +6,31 @@
  */
 @file:Suppress("UnstableApiUsage")
 
+import org.jetbrains.dokka.DokkaConfiguration.Visibility
+
 plugins {
   id("com.android.library")
   kotlin("android")
+  alias(libs.plugins.kotlin.dokka)
   id(libs.plugins.gradle.publish.maven.get().pluginId)
+}
+
+tasks.dokkaHtml {
+  moduleName.set("ComposeInvestigator Runtime API")
+  moduleVersion.set(project.property("VERSION_NAME") as String)
+  outputDirectory.set(rootDir.resolve("documentation/site/runtime/api"))
+
+  dokkaSourceSets.configureEach {
+    jdkVersion.set(17)
+    documentedVisibilities.set(setOf(Visibility.PUBLIC, Visibility.PROTECTED))
+  }
+
+  pluginsMapConfiguration.set(
+    mapOf(
+      "org.jetbrains.dokka.base.DokkaBase" to
+        """{ "footerMessage": "ComposeInvestigator ⓒ 2024 Ji Sungbin" }""",
+    )
+  )
 }
 
 android {

@@ -16,6 +16,13 @@ plugins {
   alias(libs.plugins.spotless) apply false
   alias(libs.plugins.gradle.test.logging) apply false
   alias(libs.plugins.gradle.publish.maven) apply false
+  idea
+}
+
+idea {
+  module {
+    excludeDirs = excludeDirs + listOf(file("runtime/api"), file("documentation"))
+  }
 }
 
 buildscript {
