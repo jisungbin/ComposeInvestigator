@@ -27,7 +27,7 @@ public class ComposeInvestigatorGradleSubplugin : KotlinCompilerPluginSupportPlu
     SubpluginArtifact(
       groupId = "land.sungbin.composeinvestigator",
       artifactId = "composeinvestigator-compiler",
-      version = "0.1.0-dev",
+      version = "1.5.10-0.1.0",
     )
 
   override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = true
@@ -38,7 +38,7 @@ public class ComposeInvestigatorGradleSubplugin : KotlinCompilerPluginSupportPlu
 
     project.dependencies.add(
       kotlinCompilation.implementationConfigurationName,
-      "land.sungbin.composeinvestigator:composeinvestigator-runtime:0.1.0-dev",
+      "land.sungbin.composeinvestigator:composeinvestigator-runtime:1.5.10-0.1.0",
     )
 
     return project.provider {
