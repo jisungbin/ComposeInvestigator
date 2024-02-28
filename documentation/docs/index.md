@@ -1,6 +1,8 @@
-# ComposeInvestigator ![gradle-plugin-version](https://img.shields.io/maven-central/v/land.sungbin.composeinvestigator/composeinvestigator-gradle-plugin?style=flat-square)
+# ComposeInvestigator
 
-Trace the recomposition of a Composable with its cause without any boilerplate code 😎.
+Trace the recomposition[^1] of a Composable with its cause without any boilerplate code 😎.
+
+[^1]: A recomposition can also be called an "invalidation".
 
 This tool was initiated for personal learning and has not been proven necessary for production.
 However, it can perform the following tasks:
@@ -17,11 +19,11 @@ However, it can perform the following tasks:
 
 ---
 
-### Getting Started
+### Getting Started  ![gradle-plugin-version](https://img.shields.io/maven-central/v/land.sungbin.composeinvestigator/composeinvestigator-gradle-plugin?style=flat-square)
 
 Just add a Gradle plugin like this one:
 
-```kotlin
+``` kotlin
 plugins {
   id("land.sungbin.composeinvestigator") version "<version>"
 }

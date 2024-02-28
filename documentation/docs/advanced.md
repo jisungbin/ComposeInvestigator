@@ -13,6 +13,23 @@ For example, you can change the `invalidationLogger` to modify the reporting for
 recomposition occurs, or the `stateChangedListener`to modify the reporting format when a state
 changed.
 
+``` kotlin
+// in Manifest:
+// android:name=".ComposeInvestigatorFormat"
+
+class ComposeInvestigatorFormat : Application() {
+  override fun onCreate() {
+    ComposeInvestigatorConfig.invalidationLogger = ComposableInvalidationLogger { callstacks, composable, type ->
+      println("The '${composable.name}' composable has been invalidated.")
+    }
+    
+    ComposeInvestigatorConfig.stateChangedListener = StateChangedListener { composable, name, previousValue, newValue ->
+      println("The state of '$name' inside '${composable.name}' composable has changed. ($previousValue -> $newValue)")
+    }
+  }
+}
+```
+
 ### Data management classes
 
 ComposeInvestigator has a class, `ComposableInvalidationTrackTable`, for storing data and reporting
@@ -76,8 +93,36 @@ In that case, you can use the `registerListener` API inside the `ComposableInval
 to register additional recomposition event callbacks for a specific composable. These added
 callbacks can be removed with the `unregisterListener` API.
 
+``` kotlin
+@Composable fun RegisterListenerSample() {
+  val table = currentComposableInvalidationTracker
+
+  table.registerListener(keyName = table.currentComposableKeyName) { composable, type ->
+    println("${composable.name} recomposed! ($type)")
+  }
+}
+```
+
+!!! tip
+
+    Listeners are only registered on first composition.
+    (no duplicate registrations across multiple recompositions)
+
 Adding and removing callbacks to match the lifecycle of a Composable can be cumbersome, which is why
 we provide the `ComposableInvalidationEffect` API, which works similarly to `LaunchedEffect`.
+
+``` kotlin
+@Composable fun InvalidationEffectSample() {
+  val table = currentComposableInvalidationTracker
+  val currentKeyName = table.currentComposableKeyName
+
+  ComposableInvalidationEffect(table = table, composableKey = currentKeyName) {
+    ComposableInvalidationListener { composable, type ->
+      println("${composable.name} recomposed! ($type)")
+    }
+  }
+}
+```
 
 ### Add custom status tracking
 
