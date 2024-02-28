@@ -1,7 +1,7 @@
 # Change Log
 
 ComposeInvestigator is heavily dependent on the version of Compose Compiler, so the version of
-ComposeInvestigator follows the format [Compose Compiler Version - ComposeInvestigator Version].
+ComposeInvestigator follows the format `[Compose Compiler Version - ComposeInvestigator Version]`.
 
 ---
 

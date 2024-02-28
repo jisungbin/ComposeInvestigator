@@ -6,7 +6,7 @@ site_author: 'Ji Sungbin'
 repo_name: 'ComposeInvestigator'
 repo_url: 'https://github.com/jisungbin/ComposeInvestigator'
 
-edit_uri: edit/main/docs/
+edit_uri: edit/main/documentation/docs/
 copyright: 'ComposeInvestigator ⓒ 2024 Ji Sungbin'
 
 theme:
@@ -22,6 +22,7 @@ theme:
 
 markdown_extensions:
   - admonition
+  - footnotes
   - toc:
       permalink: true
   - pymdownx.highlight:
