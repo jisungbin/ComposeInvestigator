@@ -18,7 +18,6 @@ val composableCallstack: Stack<String> = Stack()
   $composer = $composer.startRestartGroup()
   if (!$composer.skipping) {
     val affectFields = mutableListOf()
-    
     val argsValueParam = ValueParameter("args", "kotlin.Any", args.toString(), args.hashCode(), Certain(false))
     affectFields.add(argsValueParam)
     
@@ -95,6 +94,50 @@ Recomposition tracing involves three different kinds of code generation.
 2. detect composable invalidation requests
 3. detect composable invalidation skips
 
+Composable argument change detection starts by sending all the arguments of the composable to the
+`ComposableInvalidationTrackTable`. It then calculates which arguments have changed and determines
+the reason for the recomposition.
+
+``` kotlin
+// before
+@Composable fun Main(args: Any) {
+  Text(args.toString())
+}
+
+// after compile
+val composeInvestigatorTable: ComposableInvalidationTrackTable = ComposableInvalidationTrackTable()
+
+@Composable fun Main(args: Any) {
+  val affectFields = mutableListOf()
+  val argsValueParam = ValueParameter("args", "kotlin.Any", args.toString(), args.hashCode(), Certain(false))
+  affectFields.add(argsValueParam)
+  
+  val invalidationReason = composeInvestigatorTable.computeInvalidationReason("fun-Main(Any)Unit", affectFields)
+  
+  Text(args.toString())
+}
+```
+
+If the composable body has been executed, it means that the composable has been recomposed,
+so we generate recomposition logging and event sending code in the first line of the composable body.
+
+``` diff
+// after compile
+val composeInvestigatorTable: ComposableInvalidationTrackTable = ComposableInvalidationTrackTable()
+
+@Composable fun Main(args: Any) {
+  val affectFields = mutableListOf()
+  val argsValueParam = ValueParameter("args", "kotlin.Any", args.toString(), args.hashCode(), Certain(false))
+  affectFields.add(argsValueParam)
+  
+  val invalidationReason = composeInvestigatorTable.computeInvalidationReason("fun-Main(Any)Unit", affectFields)
+  
+  + composeInvestigatorTable.callListeners("fun-Main(Any)Unit", AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(invalidationReason))
+  + ComposeInvestigatorConfig.invalidationLogger(composableCallstack.toList(), AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(invalidationReason))
+  
+  Text(args.toString())
+}
+```
 
 
 ### State change tracking
