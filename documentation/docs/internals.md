@@ -4,7 +4,7 @@ ComposeInvestigator is built by utilizing the Kotlin compiler plugin and the ope
 source of the Compose compiler.
 
 ```{.kotlin title="Before compile"}
-@Composable fun Main() {
+@Composable fun Main(args: Any) {
   val count = mutableStateOf(0)
   Text(text = "Count: $count")
 }
