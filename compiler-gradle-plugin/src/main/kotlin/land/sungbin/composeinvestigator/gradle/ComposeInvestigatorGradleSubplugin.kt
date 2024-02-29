@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.gradleplugin
+package land.sungbin.composeinvestigator.gradle
 
 import org.gradle.api.Project
 import org.gradle.api.provider.Provider
@@ -27,7 +27,7 @@ public class ComposeInvestigatorGradleSubplugin : KotlinCompilerPluginSupportPlu
     SubpluginArtifact(
       groupId = "land.sungbin.composeinvestigator",
       artifactId = "composeinvestigator-compiler",
-      version = "1.5.10-0.1.0",
+      version = VERSION,
     )
 
   override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = true
@@ -38,7 +38,7 @@ public class ComposeInvestigatorGradleSubplugin : KotlinCompilerPluginSupportPlu
 
     project.dependencies.add(
       kotlinCompilation.implementationConfigurationName,
-      "land.sungbin.composeinvestigator:composeinvestigator-runtime:1.5.10-0.1.0",
+      "land.sungbin.composeinvestigator:composeinvestigator-runtime:$VERSION",
     )
 
     return project.provider {
