@@ -42,7 +42,7 @@ gradlePlugin {
   plugins {
     create("composeInvestigatorPlugin") {
       id = "land.sungbin.composeinvestigator"
-      implementationClass = "land.sungbin.composeinvestigator.gradleplugin.ComposeInvestigatorGradleSubplugin"
+      implementationClass = "land.sungbin.composeinvestigator.gradle.ComposeInvestigatorGradleSubplugin"
     }
   }
 }
