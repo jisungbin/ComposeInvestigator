@@ -43,6 +43,9 @@ buildscript {
 }
 
 subprojects {
+  group = project.property("GROUP") as String
+  version = project.property("VERSION_NAME") as String
+
   repositories {
     google {
       content {
@@ -58,7 +61,7 @@ subprojects {
     plugin(rootProject.libs.plugins.gradle.test.logging.get().pluginId)
   }
 
-  // From https://github.com/chrisbanes/tivi/blob/0865be537f2859d267efb59dac7d6358eb47effc/gradle/build-logic/convention/src/main/kotlin/app/tivi/gradle/Android.kt#L28-L34
+  // https://github.com/chrisbanes/tivi/blob/0865be537f2859d267efb59dac7d6358eb47effc/gradle/build-logic/convention/src/main/kotlin/app/tivi/gradle/Android.kt#L28-L34
   extensions.findByType<AndroidComponentsExtension<*, *, *>>()?.run {
     beforeVariants(selector().withBuildType("release")) { variantBuilder ->
       (variantBuilder as? HasUnitTestBuilder)?.apply {
@@ -115,6 +118,11 @@ subprojects {
         "-opt-in=kotlin.OptIn",
         "-opt-in=kotlin.RequiresOptIn",
       )
+
+      // https://github.com/ZacSweers/redacted-compiler-plugin/blob/c866a8ae7b2ab039fee9709c990a5478ac0dc0c7/redacted-compiler-plugin-gradle/build.gradle.kts#L91-L94
+      if (project.hasProperty("POM_ARTIFACT_ID")) {
+        moduleName = project.property("POM_ARTIFACT_ID") as String
+      }
     }
   }
 
