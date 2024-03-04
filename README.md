@@ -13,6 +13,8 @@ However, it can perform the following tasks:
 - **Retrieves the call stack leading up to the invocation of a Composable.** This helps identify the
   specific Composable being recomposed when the same Composable is reused in multiple places.
 
+[*(Read the Medium's introductory post)*](https://jisungbin.medium.com/tracing-recompositions-without-boilerplate-code-e9800db1419e)
+
 ---
 
 ### Getting Started 
