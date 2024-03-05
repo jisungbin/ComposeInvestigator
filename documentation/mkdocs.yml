@@ -28,6 +28,10 @@ markdown_extensions:
   - pymdownx.highlight:
       anchor_linenums: true
   - pymdownx.superfences
+  - pymdownx.saneheaders
+  - mdx_gh_links:
+      user: jisungbin
+      repo: ComposeInvestigator
 
 nav:
   - 'Overview': 'index.md'

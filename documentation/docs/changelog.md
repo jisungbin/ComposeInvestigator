@@ -10,11 +10,14 @@ ComposeInvestigator.
 
 ---
 
-### Unreleased
+## [Unreleased]
 
 - Fixed #123: Tracking `DerivedState` no longer crashes. Instead, due to technical limitations,
   `DerivedState` is not currently supported for tracking state changes.
 
-### 1.5.10-0.1.0
+## [1.5.10-0.1.0] - 2024-02-26
 
 - Initial release.
+
+[Unreleased]: https://github.com/jisungbin/ComposeInvestigator/compare/1.5.10-0.1.0...HEAD
+[1.5.10-0.1.0]: https://github.com/jisungbin/ComposeInvestigator/releases/tag/1.5.10-0.1.0

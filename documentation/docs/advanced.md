@@ -4,7 +4,7 @@ ComposeInvestigator has a nice set of runtime features.
 
 ---
 
-### Customizing reporting formats
+## Customizing reporting formats
 
 ComposeInvestigator has a default reporting format that you can see in`ComposeInvestigatorConfig`.
 The two most important of these are organized as variables, so they can be easily changed.
@@ -30,7 +30,7 @@ class ComposeInvestigatorFormat : Application() {
 }
 ```
 
-### Data management classes
+## Data management classes
 
 ComposeInvestigator has a class, `ComposableInvalidationTrackTable`, for storing data and reporting
 certain events at the right time. This class is initialized as a singleton in every file, so it is
@@ -80,10 +80,9 @@ Column(
 ```  
 
 To prevent composables from being named anonymously, we are developing an Android lint to help you
-name temporary composables in appropriate situations.
-[(#90)](https://github.com/jisungbin/ComposeInvestigator/issues/90)
+name temporary composables in appropriate situations. (#90)
 
-### Add custom invalidation callbacks
+## Add custom invalidation callbacks
 
 By default, all composables are registered as recomposition-tracking targets, but you may want to
 duplicate registing them for arbitrary reasons. (If you have a composable that isn't
@@ -124,7 +123,7 @@ we provide the `ComposableInvalidationEffect` API, which works similarly to `Lau
 }
 ```
 
-### Add custom status tracking
+## Add custom status tracking
 
 By default, any state variable that inherits from `State` or `Animatable` is targeted for state
 tracking. However, if you want to enable state tracking for state variables other than `State` and
