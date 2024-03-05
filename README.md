@@ -1,6 +1,6 @@
-## ComposeInvestigator ![gradle-plugin-version](https://img.shields.io/maven-central/v/land.sungbin.composeinvestigator/composeinvestigator-gradle-plugin?style=flat-square)
+## ComposeInvestigator
 
-Trace the recomposition of a Composable with its cause without any boilerplate code 😎.
+Trace the recomposition of a Composable with its cause without boilerplate code 😎.
 
 This tool was initiated for personal learning and has not been proven necessary for production.
 However, it can perform the following tasks:
@@ -17,7 +17,7 @@ However, it can perform the following tasks:
 
 ---
 
-### Getting Started 
+### Getting Started ![gradle-plugin-version](https://img.shields.io/maven-central/v/land.sungbin.composeinvestigator/composeinvestigator-gradle-plugin?style=flat-square)
 
 Just add a Gradle plugin like this one:
 
@@ -26,6 +26,13 @@ plugins {
   id("land.sungbin.composeinvestigator") version "<version>"
 }
 ```
+
+> [!IMPORTANT]
+> 
+> ComposeInvestigator is heavily dependent on the version of [Compose Compiler](https://developer.android.com/jetpack/androidx/releases/compose-compiler),
+> so the version of ComposeInvestigator follows the format `[Compose Compiler Version - ComposeInvestigator Version]`.
+> 
+> In other words, you need to adjust the Compose Compiler version and Kotlin version to use ComposeInvestigator.
 
 You don't need to use any APIs to get started. But if you're looking for a fancier experience,
 consider using the runtime API.
