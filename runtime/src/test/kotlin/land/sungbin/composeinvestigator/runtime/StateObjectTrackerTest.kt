@@ -14,9 +14,11 @@ import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.currentRecomposeScope
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import io.kotest.assertions.withClue
@@ -56,7 +58,7 @@ class StateObjectTrackerTest : ShouldSpec() {
       ComposeStateObjectValueGetter.clear()
     }
 
-    should("Receive a callback when the state changes") {
+    should("Receive a callback when the State changes") {
       compositionTest {
         val stringState = mutableStateOf("string")
         val intState = mutableIntStateOf(0)
@@ -115,6 +117,38 @@ class StateObjectTrackerTest : ShouldSpec() {
             STATE(composable = AffectedComposable("floatState"), name = "floatState", previousValue = 1f, newValue = 2f),
           )
         }
+      }
+    }
+    // TODO: Changes in DerivedState are not caught by Snapshot.registerApplyObserver,
+    //  so it doesn't detect when they've changed. To resolve the #123 bug, only
+    //  test that no exceptions are thrown for now.
+    should("No exception is thrown even if DerivedState is present") {
+      compositionTest {
+        val firstNumber = mutableIntStateOf(0)
+        val secondNumber = mutableLongStateOf(1000)
+        val summedNumber = derivedStateOf { firstNumber.intValue + secondNumber.longValue }
+
+        var recomposeScope: RecomposeScope? = null
+        var runCount = 0
+
+        compose {
+          recomposeScope = currentRecomposeScope
+
+          summedNumber.registerStateObjectTracking(
+            composer = currentComposer,
+            composable = AffectedComposable("TEST"),
+            composableKeyName = "KeyName",
+            stateName = "summedNumber",
+          )
+
+          SideEffect {
+            firstNumber.intValue++
+            if (runCount++ > 0) secondNumber.longValue++
+          }
+        }
+
+        recomposeScope!!.invalidate()
+        expectChanges()
       }
     }
     should("Registered callbacks are released when the composable reaches the Forgotten lifecycle") {
