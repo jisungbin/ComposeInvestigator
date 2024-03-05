@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvestigator.runtime
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.InfiniteTransition
@@ -18,7 +19,6 @@ import androidx.compose.runtime.cache
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.snapshots.ObserverHandle
 import androidx.compose.runtime.snapshots.Snapshot
-import androidx.compose.runtime.snapshots.SnapshotMutableState
 import androidx.compose.runtime.snapshots.StateObject
 import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateFieldNameMap
 import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateLocationMap
@@ -118,7 +118,8 @@ internal object StateObjectTrackManager {
  * ```
  *
  * Note that only states where the value of [stateObjectGetter] is not `null`
- * are tracked for value changes.
+ * are tracked for value changes. [androidx.compose.runtime.DerivedState] is
+ * not currently supported.
  *
  * @receiver State to track value changes.
  * @return The same state object.
@@ -151,12 +152,26 @@ public fun <State> State.registerStateObjectTracking(
   val register by lazy {
     object : RememberObserver {
       override fun onRemembered() {
-        val stateObject = stateObjectGetter(state) ?: return
-        trackedStateObjects.getOrPut(composableKeyName, ::mutableSetOf).add(stateObject)
-        stateFieldNameMap.putIfNotPresent(stateObject, stateName)
-        stateValueGetterMap.putIfNotPresent(stateObject, stateValueGetter)
-        stateLocationMap.putIfNotPresent(stateObject, composable)
-        ComposeStateObjectValueGetter.initialize(stateObject)
+        try {
+          val stateObject = stateObjectGetter(state) ?: return
+          trackedStateObjects.getOrPut(composableKeyName, ::mutableSetOf).add(stateObject)
+          stateFieldNameMap.putIfNotPresent(stateObject, stateName)
+          stateValueGetterMap.putIfNotPresent(stateObject, stateValueGetter)
+          stateLocationMap.putIfNotPresent(stateObject, composable)
+          ComposeStateObjectValueGetter.initialize(stateObject)
+        } catch (expectedException: UnsupportedOperationException) {
+          Log.e(
+            ComposeInvestigatorConfig.LOGGER_DEFAULT_TAG,
+            "Failed to execute stateValueGetter from the provided StateObject. Please report this as a project issue.",
+            expectedException,
+          )
+        } catch (unexpectedException: Exception) {
+          Log.e(
+            ComposeInvestigatorConfig.LOGGER_DEFAULT_TAG,
+            "State value tracking registration failed. Please report this as a project issue.",
+            unexpectedException,
+          )
+        }
       }
 
       override fun onForgotten() {
@@ -231,7 +246,7 @@ public object ComposeStateObjectValueGetter : StateValueGetter {
 
   // This may be a pointless defense, but we disable read observers for reliability.
   private fun StateObject.getCurrentValue() = Snapshot.withoutReadObservation {
-    (this as SnapshotMutableState<*>).value
+    (this as? State<*>)?.value ?: throw UnsupportedOperationException("Unsupported StateObject type: ${this::class.java}")
   }
 
   internal fun initialize(key: StateObject) {
