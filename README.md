@@ -27,9 +27,10 @@ plugins {
 }
 ```
 
-> [!IMPORTANT]  
-> ComposeInvestigator is heavily dependent on the version of Compose Compiler, so the version of 
-> ComposeInvestigator follows the format [Compose Compiler Version - ComposeInvestigator Version].
+> [!IMPORTANT]
+> 
+> ComposeInvestigator is heavily dependent on the version of [Compose Compiler](https://developer.android.com/jetpack/androidx/releases/compose-compiler),
+> so the version of ComposeInvestigator follows the format `[Compose Compiler Version - ComposeInvestigator Version]`.
 
 You don't need to use any APIs to get started. But if you're looking for a fancier experience,
 consider using the runtime API.
