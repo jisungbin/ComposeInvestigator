@@ -19,11 +19,11 @@ However, it can perform the following tasks:
 
 ### Getting Started ![gradle-plugin-version](https://img.shields.io/maven-central/v/land.sungbin.composeinvestigator/composeinvestigator-gradle-plugin?style=flat-square)
 
-Just add a Gradle plugin like this one:
+Just add the plugin to your module-level Gradle like this:
 
-```kotlin
+```groovy
 plugins {
-  id("land.sungbin.composeinvestigator") version "<version>"
+  id 'land.sungbin.composeinvestigator' version '<version>'
 }
 ```
 
@@ -33,6 +33,17 @@ plugins {
 > so the version of ComposeInvestigator follows the format `[Compose Compiler Version - ComposeInvestigator Version]`.
 > 
 > In other words, you need to adjust the Compose Compiler version and Kotlin version to use ComposeInvestigator.
+
+Snapshots of the development version are available in Sonatype's snapshots repository.
+
+```groovy
+repositories {
+  // ...
+  maven {
+    url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
+  }
+}
+```
 
 You don't need to use any APIs to get started. But if you're looking for a fancier experience,
 consider using the runtime API.

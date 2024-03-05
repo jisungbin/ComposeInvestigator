@@ -52,6 +52,9 @@ jobs:
       - name: Install mkdocs-material via pip
         run: pip install mkdocs-material
 
+      - name: Install mdx-gh-links via pip
+        run: pip install mdx-gh-links
+
       - name: Build mkdocs-material
         run: cd documentation && mkdocs build
 

@@ -53,11 +53,10 @@ val composableCallstack: Stack<String> = Stack()
 
 ---
 
-### Composable call stacks tracking
+## Composable call stacks tracking
 
-Composable callstack tracing has been implemented since
-issue [#77](https://github.com/jisungbin/ComposeInvestigator/issues/77)
-and is still an experimental feature.
+Composable callstack tracing has been implemented since issue #77 and is still an experimental
+feature.
 
 The concept is simple: Wrap all calls to composable functions in `try-finally`, and push the
 parent function name onto the stack before calling the composable. Then pop it from `finally`.
@@ -83,7 +82,7 @@ val composableCallstack: Stack<String> = Stack()
 
 If you have an idea for a better way to track callstacks, please open an issue.
 
-### Recomposition tracking
+## Recomposition tracking
 
 Recomposition tracing involves three different kinds of code generation.
 
@@ -196,7 +195,7 @@ val composeInvestigatorTable: ComposableInvalidationTrackTable = ComposableInval
 }
 ```
 
-### State change tracking
+## State change tracking
 
 All state variables that inherit from `State` or `Animatable` generate `registerStateObjectTracking`
 code to enable tracking of state changes.
