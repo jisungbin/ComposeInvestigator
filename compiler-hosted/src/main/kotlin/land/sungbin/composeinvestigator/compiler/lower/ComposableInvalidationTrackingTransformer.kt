@@ -167,15 +167,18 @@ internal class ComposableInvalidationTrackingTransformer(
       invalidationLogger.irInvalidationTypeProcessed(reason = irGetValue(computeInvalidationReasonVariable))
         .apply { type = invalidationTypeSymbol.defaultType }
 
+    val currentCallstack = currentCallstack()
+
     val callListeners = currentInvalidationTrackTable.irCallListeners(
       key = irString(currentKey.keyName),
+      callstack = currentCallstack,
       composable = currentKey.affectedComposable,
       type = invalidationTypeProcessed,
     )
     newStatements += callListeners
 
     val logger = invalidationLogger.irLog(
-      callstack = currentCallstack(),
+      callstack = currentCallstack,
       affectedComposable = currentKey.affectedComposable,
       invalidationType = invalidationTypeProcessed,
     )
@@ -211,15 +214,18 @@ internal class ComposableInvalidationTrackingTransformer(
       type = invalidationTypeSymbol.defaultType
     }
 
+    val currentCallstack = currentCallstack()
+
     val callListeners = currentInvalidationTrackTable.irCallListeners(
       key = irString(currentKey.keyName),
+      callstack = currentCallstack,
       composable = currentKey.affectedComposable,
       type = invalidationTypeProcessed,
     )
     newStatements += callListeners
 
     val logger = invalidationLogger.irLog(
-      callstack = currentCallstack(),
+      callstack = currentCallstack,
       affectedComposable = currentKey.affectedComposable,
       invalidationType = invalidationTypeProcessed,
     )
@@ -246,13 +252,16 @@ internal class ComposableInvalidationTrackingTransformer(
     val invalidationTypeSkipped = invalidationLogger.irInvalidationTypeSkipped()
       .apply { type = invalidationTypeSymbol.defaultType }
 
+    val currentCallstack = currentCallstack()
+
     val callListeners = currentInvalidationTrackTable.irCallListeners(
       key = irString(currentKey.keyName),
+      callstack = currentCallstack,
       composable = currentKey.affectedComposable,
       type = invalidationTypeSkipped,
     )
     val logger = invalidationLogger.irLog(
-      callstack = currentCallstack(),
+      callstack = currentCallstack,
       affectedComposable = currentKey.affectedComposable,
       invalidationType = invalidationTypeSkipped,
     )

@@ -17,6 +17,7 @@ The last tested versions are both `1.6.2`.
 
 - Eliminated a potential memory leak.
 - Adds the `@NoInvestigation` API to suppress the workings of ComposeInvestigator.
+- Fixed #121: Now pass the callstack information to the `ComposableInvalidationListener`.
 
 ## [1.5.10-0.1.1] - 2024-03-06
 

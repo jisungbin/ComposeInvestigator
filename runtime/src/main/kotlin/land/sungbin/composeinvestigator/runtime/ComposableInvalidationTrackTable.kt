@@ -24,7 +24,12 @@ public val currentComposableInvalidationTracker: ComposableInvalidationTrackTabl
 
 /** A callback that is called whenever a composable is invalidated (recomposed) */
 public fun interface ComposableInvalidationListener {
-  public fun onInvalidate(composable: AffectedComposable, type: ComposableInvalidationType)
+  /**
+   * @param callstack *(Experimental. This value may be produces wrong result.)*
+   * Represents all call stacks leading up to the current composable being called
+   * (each shown as a fully-qualified name or simple name).
+   */
+  public fun onInvalidate(callstack: List<String>, composable: AffectedComposable, type: ComposableInvalidationType)
 }
 
 // We use an annotation class to prevent LiveLiteral transform from the Compose compiler.
@@ -158,8 +163,13 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
 
   /** @suppress ComposeInvestigator compiler-only API */
   @ComposeInvestigatorCompilerApi
-  public fun callListeners(keyName: String, composable: AffectedComposable, type: ComposableInvalidationType) {
-    listeners[keyName]?.onInvalidate(composable, type)
+  public fun callListeners(
+    keyName: String,
+    callstack: List<String>,
+    composable: AffectedComposable,
+    type: ComposableInvalidationType,
+  ) {
+    listeners[keyName]?.onInvalidate(callstack, composable, type)
   }
 
   /** @suppress ComposeInvestigator compiler-only API */

@@ -22,7 +22,7 @@ fun Effects_InvalidationSkippedRoot() {
   val currentKeyName = table.currentComposableKeyName
 
   ComposableInvalidationEffect(table = table, composableKey = currentKeyName) {
-    ComposableInvalidationListener { composable, type ->
+    ComposableInvalidationListener { _, composable, type ->
       invalidationListensViaEffects.getOrPut(composable, ::mutableListOf).add(type)
     }
   }
@@ -37,7 +37,7 @@ private fun Effects_InvalidationSkippedChild() {
   val currentKeyName = table.currentComposableKeyName
 
   ComposableInvalidationEffect(table = table, composableKey = currentKeyName) {
-    ComposableInvalidationListener { composable, type ->
+    ComposableInvalidationListener { _, composable, type ->
       invalidationListensViaEffects.getOrPut(composable, ::mutableListOf).add(type)
     }
   }

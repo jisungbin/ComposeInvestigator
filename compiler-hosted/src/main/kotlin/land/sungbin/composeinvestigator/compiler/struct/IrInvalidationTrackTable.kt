@@ -48,6 +48,7 @@ public class IrInvalidationTrackTable private constructor(public val prop: IrPro
 
   public fun irCallListeners(
     key: IrConst<String>,
+    callstack: IrDeclarationReference,
     composable: IrDeclarationReference,
     type: IrDeclarationReference,
   ): IrCall = IrCallImpl.fromSymbolOwner(
@@ -58,8 +59,9 @@ public class IrInvalidationTrackTable private constructor(public val prop: IrPro
     fn.dispatchReceiver = propGetter()
   }.apply {
     putValueArgument(0, key)
-    putValueArgument(1, composable)
-    putValueArgument(2, type)
+    putValueArgument(1, callstack)
+    putValueArgument(2, composable)
+    putValueArgument(3, type)
   }
 
   public fun irComputeInvalidationReason(
