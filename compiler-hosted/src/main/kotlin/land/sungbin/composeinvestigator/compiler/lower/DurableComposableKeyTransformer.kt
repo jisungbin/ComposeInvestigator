@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.name.FqName
 public class DurableComposableKeyTransformer(
   context: IrPluginContext,
   stabilityInferencer: StabilityInferencer,
+  private val affectedComposable: IrAffectedComposable,
 ) : DurableKeyTransformer(
   keyVisitor = DurableKeyVisitor(),
   context = context,
@@ -58,7 +59,7 @@ public class DurableComposableKeyTransformer(
     val (keyName) = buildKey("fun-${declaration.signatureString()}")
     val location = declaration.getSafelyLocation()
 
-    val affectedComposable = IrAffectedComposable.irAffectedComposable(
+    val affectedComposable = affectedComposable.irAffectedComposable(
       composableName = irString(declaration.name.asString()),
       packageName = irString((declaration.fqNameWhenAvailable?.parent() ?: FqName.ROOT).asString()),
       filePath = irString(location.file),

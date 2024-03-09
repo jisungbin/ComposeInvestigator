@@ -18,17 +18,10 @@ import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.name.ClassId
 
-public object IrAffectedField {
-  private var affectedFieldSymbol: IrClassSymbol? = null
-  private var valueParameterSymbol: IrClassSymbol? = null
-
-  public val irAffectedField: IrClassSymbol get() = affectedFieldSymbol!!
-
-  public fun init(context: IrPluginContext) {
-    affectedFieldSymbol = context.referenceClass(ClassId.topLevel(AFFECTED_FIELD_FQN))!!
-    valueParameterSymbol = affectedFieldSymbol!!.owner.sealedSubclasses.single { clz ->
-      clz.owner.name == AffectedField_VALUE_PARAMETER
-    }
+public class IrAffectedField(context: IrPluginContext) {
+  public val irAffectedField: IrClassSymbol = context.referenceClass(ClassId.topLevel(AFFECTED_FIELD_FQN))!!
+  private val valueParameterSymbol = irAffectedField.owner.sealedSubclasses.single { clz ->
+    clz.owner.name == AffectedField_VALUE_PARAMETER
   }
 
   public fun irValueParameter(
@@ -38,8 +31,8 @@ public object IrAffectedField {
     valueHashCode: IrExpression,
     stability: IrExpression,
   ): IrConstructorCall = IrConstructorCallImpl.fromSymbolOwner(
-    type = valueParameterSymbol!!.defaultType,
-    constructorSymbol = valueParameterSymbol!!.constructors.single(),
+    type = valueParameterSymbol.defaultType,
+    constructorSymbol = valueParameterSymbol.constructors.single(),
   ).apply {
     putValueArgument(0, name)
     putValueArgument(1, typeFqName)

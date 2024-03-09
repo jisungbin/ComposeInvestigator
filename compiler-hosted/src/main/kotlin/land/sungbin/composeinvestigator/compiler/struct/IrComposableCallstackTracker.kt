@@ -44,6 +44,7 @@ import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
+import java.lang.ref.WeakReference
 
 public class IrComposableCallstackTracker private constructor(public val prop: IrProperty) {
   private var pushSymbol: IrSimpleFunctionSymbol? = null
@@ -110,16 +111,16 @@ public fun IrComposableCallstackTracker.propGetter(
   symbol = prop.getter!!.symbol,
 )
 
-private var stackClassSymbol: IrClassSymbol? = null
+private var stackClassSymbol: WeakReference<IrClassSymbol>? = null
 
 private fun irComposableCallstackTrackerProp(context: IrPluginContext, currentFile: IrFile): IrProperty {
   val fileName = currentFile.fileEntry.name.split('/').last()
   val shortName = PackagePartClassUtils.getFilePartShortName(fileName)
   val propName = Name.identifier("ComposableCallstackTrackerImpl\$$shortName")
 
-  val superSymbol = stackClassSymbol ?: (
+  val superSymbol = stackClassSymbol?.get() ?: (
     context.referenceClass(ClassId.topLevel(STACK_FQN))!!
-      .also { symbol -> stackClassSymbol = symbol }
+      .also { symbol -> stackClassSymbol = WeakReference(symbol) }
     )
 
   return context.irFactory.buildProperty {

@@ -25,6 +25,7 @@ import land.sungbin.composeinvestigator.compiler.VerboseLogger
 import land.sungbin.composeinvestigator.compiler.fromFqName
 import land.sungbin.composeinvestigator.compiler.origin.ComposableCallstackTrackerSyntheticOrigin
 import land.sungbin.composeinvestigator.compiler.origin.ComposableInvalidationTrackerOrigin
+import land.sungbin.composeinvestigator.compiler.struct.IrAffectedComposable
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableCallstackTracker
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTrackTable
 import land.sungbin.fastlist.fastAny
@@ -85,6 +86,7 @@ public abstract class AbstractComosableInvalidationTrackLower(
   private val context: IrPluginContext,
   private val logger: VerboseLogger,
   private val stabilityInferencer: StabilityInferencer,
+  private val affectedComposable: IrAffectedComposable,
 ) : IrElementTransformerVoidWithContext() {
   private class IrSymbolOwnerWithData<D>(private val owner: IrSymbolOwner, val data: D) : IrSymbolOwner by owner
 
@@ -164,7 +166,12 @@ public abstract class AbstractComosableInvalidationTrackLower(
     }
 
     val table = IrInvalidationTrackTable.create(context, declaration)
-    val tableCallTransformer = InvalidationTrackTableIntrinsicTransformer(context = context, table = table, logger = logger)
+    val tableCallTransformer = InvalidationTrackTableIntrinsicTransformer(
+      context = context,
+      table = table,
+      logger = logger,
+      affectedComposable = affectedComposable,
+    )
     declaration.declarations.add(0, table.prop.also { prop -> prop.setDeclarationsParent(declaration) })
     declaration.transformChildrenVoid(tableCallTransformer)
 
