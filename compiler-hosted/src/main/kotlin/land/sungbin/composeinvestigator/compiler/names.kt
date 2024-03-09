@@ -51,6 +51,10 @@ public val STATE_FQN: FqName = FqName("$AndroidxComposeRuntime.State")
 public val ANIMATABLE_FQN: FqName = FqName("androidx.compose.animation.core.Animatable")
 // END Compose Animation
 
+// START NoInvestigation
+public val NO_INVESTIGATION_FQN: FqName = FqName("$ComposeInvestigatorRuntime.NoInvestigation")
+// END NoInvestigation
+
 // START ComposeInvestigatorConfig
 public val COMPOSE_INVESTIGATOR_CONFIG_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposeInvestigatorConfig")
 public val ComposeInvestigatorConfig_INVALIDATION_LOGGER: Name = Name.identifier("invalidationLogger")
