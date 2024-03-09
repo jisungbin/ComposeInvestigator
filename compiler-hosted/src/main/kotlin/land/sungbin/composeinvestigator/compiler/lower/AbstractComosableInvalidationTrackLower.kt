@@ -17,6 +17,7 @@ import land.sungbin.composeinvestigator.compiler.Composer_SKIP_TO_GROUP_END
 import land.sungbin.composeinvestigator.compiler.Composer_START_RESTART_GROUP
 import land.sungbin.composeinvestigator.compiler.EMPTY_LIST_FQN
 import land.sungbin.composeinvestigator.compiler.HASH_CODE_FQN
+import land.sungbin.composeinvestigator.compiler.NO_INVESTIGATION_FQN
 import land.sungbin.composeinvestigator.compiler.SCOPE_UPDATE_SCOPE_FQN
 import land.sungbin.composeinvestigator.compiler.STACK_FQN
 import land.sungbin.composeinvestigator.compiler.STATE_FQN
@@ -72,6 +73,7 @@ import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.findDeclaration
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.getSimpleFunction
+import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.ir.util.setDeclarationsParent
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
@@ -111,10 +113,7 @@ public abstract class AbstractComosableInvalidationTrackLower(
   private val emptyListSymbol =
     context
       .referenceFunctions(CallableId.fromFqName(EMPTY_LIST_FQN))
-      .single { symbol ->
-        symbol.owner.valueParameters.isEmpty() &&
-          symbol.owner.typeParameters.size == 1
-      }
+      .single { symbol -> symbol.owner.valueParameters.isEmpty() && symbol.owner.typeParameters.size == 1 }
   private val stringEmptyListCall =
     IrCallImpl.fromSymbolOwner(
       startOffset = UNDEFINED_OFFSET,
@@ -154,8 +153,7 @@ public abstract class AbstractComosableInvalidationTrackLower(
   final override fun visitFileNew(declaration: IrFile): IrFile {
     if (currentCallstackCallReference.get() == null) {
       val callstackProp = declaration.findDeclaration<IrProperty> { prop ->
-        prop.origin == ComposableCallstackTrackerSyntheticOrigin &&
-          prop.backingField?.type?.classFqName == STACK_FQN
+        prop.origin == ComposableCallstackTrackerSyntheticOrigin && prop.backingField?.type?.classFqName == STACK_FQN
       }
       callstackProp?.let {
         val tracker = IrComposableCallstackTracker.from(context, callstackProp)
@@ -164,6 +162,9 @@ public abstract class AbstractComosableInvalidationTrackLower(
         }
       }
     }
+
+    // If the file is @NoInvestigation, skip all processing.
+    if (declaration.hasAnnotation(NO_INVESTIGATION_FQN)) return declaration
 
     val table = IrInvalidationTrackTable.create(context, declaration)
     val tableCallTransformer = InvalidationTrackTableIntrinsicTransformer(
@@ -181,15 +182,23 @@ public abstract class AbstractComosableInvalidationTrackLower(
   }
 
   final override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
+    // If the function itself is @NoInvestigation, all elements contained in this function
+    // will be excluded from investigation.
+    if (declaration.hasAnnotation(NO_INVESTIGATION_FQN)) return declaration
+
+    // Since some of the elements inside the function may be composable, we continue inspection.
     if (!declaration.hasComposableAnnotation()) return super.visitSimpleFunction(declaration)
+
     withinScope(declaration) { declaration.body?.transformChildrenVoid() }
     return super.visitSimpleFunction(declaration)
   }
 
   // val state = remember { mutableStateOf(T) }
   final override fun visitVariable(declaration: IrVariable): IrStatement {
+    if (declaration.origin == IrDeclarationOrigin.PROPERTY_DELEGATE || declaration.hasAnnotation(NO_INVESTIGATION_FQN))
+      return super.visitVariable(declaration)
     val composable = lastReachedComposable() ?: return super.visitVariable(declaration)
-    if (declaration.origin == IrDeclarationOrigin.PROPERTY_DELEGATE) return super.visitVariable(declaration)
+
     if (declaration.isValidStateDeclaration()) {
       declaration.initializer = transformStateInitializer(
         composable = composable,
@@ -202,7 +211,9 @@ public abstract class AbstractComosableInvalidationTrackLower(
 
   // var state by remember { mutableStateOf(T) }
   final override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty): IrStatement {
+    if (declaration.hasAnnotation(NO_INVESTIGATION_FQN)) return super.visitLocalDelegatedProperty(declaration)
     val composable = lastReachedComposable() ?: return super.visitLocalDelegatedProperty(declaration)
+
     if (declaration.delegate.isValidStateDeclaration()) {
       declaration.delegate.initializer = transformStateInitializer(
         composable = composable,

@@ -16,6 +16,7 @@ The last tested versions are both `1.6.2`.
 ## [Unreleased]
 
 - Eliminated a potential memory leak.
+- Adds the `@NoInvestigation` API to suppress the workings of ComposeInvestigator.
 
 ## [1.5.10-0.1.1] - 2024-03-06
 

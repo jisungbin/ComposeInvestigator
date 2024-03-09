@@ -51,6 +51,10 @@ public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): Stri
  *
  * To get the instance of [ComposableInvalidationTrackTable] created in the current file,
  * use [currentComposableInvalidationTracker].
+ *
+ * If a file is annotated with [NoInvestigation], this class will not be instantiated in
+ * that file. If you use this class's APIs, including the [currentComposableInvalidationTracker]
+ * API, without being instantiated, you will receive a runtime error.
  */
 @ExperimentalComposeInvestigatorApi
 @Immutable
