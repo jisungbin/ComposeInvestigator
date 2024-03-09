@@ -20,6 +20,7 @@ import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.analysis.toIrDeclarationStability
 import land.sungbin.composeinvestigator.compiler.fromFqName
 import land.sungbin.composeinvestigator.compiler.origin.StateChangeTrackerOrigin
+import land.sungbin.composeinvestigator.compiler.struct.IrAffectedComposable
 import land.sungbin.composeinvestigator.compiler.struct.IrAffectedField
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationLogger
 import land.sungbin.composeinvestigator.compiler.util.IrStatementContainerImpl
@@ -47,10 +48,14 @@ internal class ComposableInvalidationTrackingTransformer(
   private val context: IrPluginContext,
   private val logger: VerboseLogger,
   private val stabilityInferencer: StabilityInferencer,
+  private val affectedField: IrAffectedField,
+  affectedComposable: IrAffectedComposable,
+  private val invalidationLogger: IrInvalidationLogger,
 ) : AbstractComosableInvalidationTrackLower(
   context = context,
   logger = logger,
   stabilityInferencer = stabilityInferencer,
+  affectedComposable = affectedComposable,
 ),
   IrPluginContext by context {
   private val mutableListOfSymbol =
@@ -110,7 +115,7 @@ internal class ComposableInvalidationTrackingTransformer(
       endOffset = UNDEFINED_OFFSET,
       symbol = mutableListOfSymbol,
     ).apply {
-      putTypeArgument(0, IrAffectedField.irAffectedField.defaultType)
+      putTypeArgument(0, affectedField.irAffectedField.defaultType)
     }
     val affectedFieldListVar = irTmpVariableInCurrentFun(affectedFieldList, nameHint = "affectFields")
     newStatements += affectedFieldListVar
@@ -126,7 +131,7 @@ internal class ComposableInvalidationTrackingTransformer(
       val valueHashCode = irHashCode(value)
       val stability = stabilityInferencer.stabilityOf(value).normalize().toIrDeclarationStability(context)
 
-      val valueParam = IrAffectedField.irValueParameter(
+      val valueParam = affectedField.irValueParameter(
         name = name,
         typeFqName = typeFqName,
         valueString = valueString,
@@ -157,9 +162,9 @@ internal class ComposableInvalidationTrackingTransformer(
     )
     newStatements += computeInvalidationReasonVariable
 
-    val invalidationTypeSymbol = IrInvalidationLogger.irInvalidationTypeSymbol
+    val invalidationTypeSymbol = invalidationLogger.irInvalidationTypeSymbol
     val invalidationTypeProcessed =
-      IrInvalidationLogger.irInvalidationTypeProcessed(reason = irGetValue(computeInvalidationReasonVariable))
+      invalidationLogger.irInvalidationTypeProcessed(reason = irGetValue(computeInvalidationReasonVariable))
         .apply { type = invalidationTypeSymbol.defaultType }
 
     val callListeners = currentInvalidationTrackTable.irCallListeners(
@@ -169,7 +174,7 @@ internal class ComposableInvalidationTrackingTransformer(
     )
     newStatements += callListeners
 
-    val logger = IrInvalidationLogger.irLog(
+    val logger = invalidationLogger.irLog(
       callstack = currentCallstack(),
       affectedComposable = currentKey.affectedComposable,
       invalidationType = invalidationTypeProcessed,
@@ -194,13 +199,13 @@ internal class ComposableInvalidationTrackingTransformer(
     val newStatements = mutableListOf<IrStatement>()
     val currentInvalidationTrackTable = currentInvalidationTrackTable!!
 
-    val invalidationTypeSymbol = IrInvalidationLogger.irInvalidationTypeSymbol
-    val invalidationTypeProcessed = IrInvalidationLogger.irInvalidationTypeProcessed(
+    val invalidationTypeSymbol = invalidationLogger.irInvalidationTypeSymbol
+    val invalidationTypeProcessed = invalidationLogger.irInvalidationTypeProcessed(
       reason = IrGetObjectValueImpl(
         startOffset = UNDEFINED_OFFSET,
         endOffset = UNDEFINED_OFFSET,
-        type = IrInvalidationLogger.irInvalidateReasonSymbol.defaultType,
-        symbol = IrInvalidationLogger.irInvalidateReasonInvalidateSymbol,
+        type = invalidationLogger.irInvalidateReasonSymbol.defaultType,
+        symbol = invalidationLogger.irInvalidateReasonInvalidateSymbol,
       ),
     ).apply {
       type = invalidationTypeSymbol.defaultType
@@ -213,7 +218,7 @@ internal class ComposableInvalidationTrackingTransformer(
     )
     newStatements += callListeners
 
-    val logger = IrInvalidationLogger.irLog(
+    val logger = invalidationLogger.irLog(
       callstack = currentCallstack(),
       affectedComposable = currentKey.affectedComposable,
       invalidationType = invalidationTypeProcessed,
@@ -237,8 +242,8 @@ internal class ComposableInvalidationTrackingTransformer(
 
     val currentInvalidationTrackTable = currentInvalidationTrackTable!!
 
-    val invalidationTypeSymbol = IrInvalidationLogger.irInvalidationTypeSymbol
-    val invalidationTypeSkipped = IrInvalidationLogger.irInvalidationTypeSkipped()
+    val invalidationTypeSymbol = invalidationLogger.irInvalidationTypeSymbol
+    val invalidationTypeSkipped = invalidationLogger.irInvalidationTypeSkipped()
       .apply { type = invalidationTypeSymbol.defaultType }
 
     val callListeners = currentInvalidationTrackTable.irCallListeners(
@@ -246,7 +251,7 @@ internal class ComposableInvalidationTrackingTransformer(
       composable = currentKey.affectedComposable,
       type = invalidationTypeSkipped,
     )
-    val logger = IrInvalidationLogger.irLog(
+    val logger = invalidationLogger.irLog(
       callstack = currentCallstack(),
       affectedComposable = currentKey.affectedComposable,
       invalidationType = invalidationTypeSkipped,

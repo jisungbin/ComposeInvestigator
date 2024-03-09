@@ -12,20 +12,13 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
-import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
-public object IrAffectedComposable {
-  private var affectedComposableSymbol: IrClassSymbol? = null
-
-  public val irAffectedComposable: IrClassSymbol get() = affectedComposableSymbol!!
-
-  public fun init(context: IrPluginContext) {
-    affectedComposableSymbol = context.referenceClass(ClassId.topLevel(AFFECTED_COMPOSABLE_FQN))!!
-  }
+public class IrAffectedComposable(context: IrPluginContext) {
+  private val irAffectedComposable = context.referenceClass(ClassId.topLevel(AFFECTED_COMPOSABLE_FQN))!!
 
   public fun irAffectedComposable(
     composableName: IrConst<String>,
@@ -34,8 +27,8 @@ public object IrAffectedComposable {
     startLine: IrConst<Int>,
     startColumn: IrConst<Int>,
   ): IrConstructorCallImpl = IrConstructorCallImpl.fromSymbolOwner(
-    type = affectedComposableSymbol!!.defaultType,
-    constructorSymbol = affectedComposableSymbol!!.constructors.single(),
+    type = irAffectedComposable.defaultType,
+    constructorSymbol = irAffectedComposable.constructors.single(),
   ).apply {
     putValueArgument(0, composableName)
     putValueArgument(1, packageName)
@@ -50,8 +43,8 @@ public object IrAffectedComposable {
     target: IrConstructorCall,
     composableName: IrConst<String>,
   ): IrConstructorCallImpl = IrConstructorCallImpl.fromSymbolOwner(
-    type = affectedComposableSymbol!!.defaultType,
-    constructorSymbol = affectedComposableSymbol!!.constructors.single(),
+    type = irAffectedComposable.defaultType,
+    constructorSymbol = irAffectedComposable.constructors.single(),
   ).apply {
     putValueArgument(0, composableName)
     putValueArgument(1, target.getValueArgument(1)!!)

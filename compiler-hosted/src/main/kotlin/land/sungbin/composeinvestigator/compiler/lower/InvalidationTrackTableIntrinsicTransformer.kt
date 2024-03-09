@@ -9,6 +9,7 @@ package land.sungbin.composeinvestigator.compiler.lower
 
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
 import androidx.compose.compiler.plugins.kotlin.irTrace
+import androidx.compose.compiler.plugins.kotlin.lower.dumpSrc
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_NAME_FQN
 import land.sungbin.composeinvestigator.compiler.CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN
@@ -37,7 +38,6 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
-import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.getPropertySetter
 import org.jetbrains.kotlin.ir.util.kotlinFqName
@@ -51,6 +51,7 @@ public class InvalidationTrackTableIntrinsicTransformer(
   private val context: IrPluginContext,
   private val table: IrInvalidationTrackTable,
   @Suppress("unused") private val logger: VerboseLogger,
+  private val affectedComposable: IrAffectedComposable,
 ) : IrElementTransformerVoidWithContext(), IrPluginContext by context {
   private val currentTableGetterSymbol =
     referenceProperties(CallableId.fromFqName(CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN)).single().owner.getter!!
@@ -84,7 +85,7 @@ public class InvalidationTrackTableIntrinsicTransformer(
             0,
             lastReachedComposable()
               ?.let { composable ->
-                IrAffectedComposable.getComposableName(irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.affectedComposable)
+                affectedComposable.getComposableName(irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.affectedComposable)
               }
               ?: irString(SpecialNames.UNKNOWN_STRING),
           )
@@ -95,10 +96,10 @@ public class InvalidationTrackTableIntrinsicTransformer(
           val userProvideName = expression
             .getValueArgument(0).cast<IrConstructorCall>()
             .getValueArgument(0).safeAs<IrConst<String>>()?.value
-            ?: error("Currently, only string hardcodes are supported as arguments to ComposableName. (${expression.dumpKotlinLike()})")
+            ?: error("Currently, only string hardcodes are supported as arguments to ComposableName. (${expression.dumpSrc()})")
 
           val previousKey = irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable]!!
-          val newAffectedComposable = IrAffectedComposable.copyWith(previousKey.affectedComposable, composableName = irString(userProvideName))
+          val newAffectedComposable = affectedComposable.copyWith(previousKey.affectedComposable, composableName = irString(userProvideName))
 
           irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable] = previousKey.copy(affectedComposable = newAffectedComposable)
         }

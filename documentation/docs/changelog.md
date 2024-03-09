@@ -15,6 +15,8 @@ The last tested versions are both `1.6.2`.
 
 ## [Unreleased]
 
+- Eliminated a potential memory leak.
+
 ## [1.5.10-0.1.1] - 2024-03-06
 
 - Fixed #123: Tracking `DerivedState` no longer crashes. Instead, due to technical limitations,

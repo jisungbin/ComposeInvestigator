@@ -40,6 +40,7 @@ import org.jetbrains.kotlin.ir.util.getSimpleFunction
 import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
+import java.lang.ref.WeakReference
 
 public class IrInvalidationTrackTable private constructor(public val prop: IrProperty) {
   private var computeInvalidationReasonSymbol: IrSimpleFunctionSymbol? = null
@@ -95,16 +96,16 @@ public fun IrInvalidationTrackTable.propGetter(
   symbol = prop.getter!!.symbol,
 )
 
-private var invalidationTrackTableClassSymbol: IrClassSymbol? = null
+private var invalidationTrackTableClassSymbol: WeakReference<IrClassSymbol>? = null
 
 private fun irInvalidationTrackTableProp(context: IrPluginContext, currentFile: IrFile): IrProperty {
   val fileName = currentFile.fileEntry.name.split('/').last()
   val shortName = PackagePartClassUtils.getFilePartShortName(fileName)
   val propName = Name.identifier("ComposableInvalidationTrackTableImpl\$$shortName")
 
-  val superSymbol = invalidationTrackTableClassSymbol ?: (
+  val superSymbol = invalidationTrackTableClassSymbol?.get() ?: (
     context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN))!!
-      .also { symbol -> invalidationTrackTableClassSymbol = symbol }
+      .also { symbol -> invalidationTrackTableClassSymbol = WeakReference(symbol) }
     )
 
   return context.irFactory.buildProperty {

@@ -20,20 +20,20 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
 public class ComposableInvalidationTrackingExtension(private val logger: VerboseLogger) : IrGenerationExtension {
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-    IrInvalidationLogger.init(pluginContext)
-    IrAffectedField.init(pluginContext)
-    IrAffectedComposable.init(pluginContext)
+    val invalidationLogger = IrInvalidationLogger(pluginContext)
+    val affectedField = IrAffectedField(pluginContext)
+    val affectedComposable = IrAffectedComposable(pluginContext)
 
     val stabilityInferencer = StabilityInferencer(
       currentModule = moduleFragment.descriptor,
-      // TODO: support this field
-      externalStableTypeMatchers = emptySet(),
+      externalStableTypeMatchers = emptySet(), // TODO: support this field
     )
 
     moduleFragment.transformChildrenVoid(
       DurableComposableKeyTransformer(
         context = pluginContext,
         stabilityInferencer = stabilityInferencer,
+        affectedComposable = affectedComposable,
       ),
     )
     moduleFragment.transformChildrenVoid(
@@ -41,6 +41,9 @@ public class ComposableInvalidationTrackingExtension(private val logger: Verbose
         context = pluginContext,
         logger = logger,
         stabilityInferencer = stabilityInferencer,
+        affectedField = affectedField,
+        affectedComposable = affectedComposable,
+        invalidationLogger = invalidationLogger,
       ),
     )
   }
