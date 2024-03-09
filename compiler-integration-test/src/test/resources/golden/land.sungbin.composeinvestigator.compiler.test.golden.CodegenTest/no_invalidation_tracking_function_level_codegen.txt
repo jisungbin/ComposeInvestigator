@@ -63,7 +63,7 @@ private fun Main(%composer: Composer?, %changed: Int) {
   if (%changed != 0 || !%composer.skipping) {
     val tmp0_affectFields = mutableListOf()
     val tmp1_Main%validationReason = ComposableInvalidationTrackTableImpl%TestKt.computeInvalidationReason("fun-Main(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", tmp0_affectFields)
-    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-Main(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", AffectedComposable("Main", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 24, 8), Processed(tmp1_Main%validationReason))
+    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-Main(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("Main", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 24, 8), Processed(tmp1_Main%validationReason))
     ComposeInvestigatorConfig.invalidationLogger(ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("Main", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 24, 8), Processed(tmp1_Main%validationReason))
     if (isTraceInProgress()) {
       traceEventStart(<>, %changed, -1, <>)
@@ -124,12 +124,12 @@ private fun Main(%composer: Composer?, %changed: Int) {
       traceEventEnd()
     }
   } else {
-    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-Main(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", AffectedComposable("Main", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 24, 8), Skipped)
+    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-Main(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("Main", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 24, 8), Skipped)
     ComposeInvestigatorConfig.invalidationLogger(ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("Main", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 24, 8), Skipped)
     %composer.skipToGroupEnd()
   }
   %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-Main(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", AffectedComposable("Main", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 24, 8), Processed(Invalidate))
+    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-Main(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("Main", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 24, 8), Processed(Invalidate))
     ComposeInvestigatorConfig.invalidationLogger(ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("Main", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 24, 8), Processed(Invalidate))
     Main(%composer, updateChangedFlags(%changed or 0b0001))
   }
@@ -193,7 +193,7 @@ private fun Hello(%composer: Composer?, %changed: Int) {
   if (%changed != 0 || !%composer.skipping) {
     val tmp0_affectFields = mutableListOf()
     val tmp1_Hello%validationReason = ComposableInvalidationTrackTableImpl%TestKt.computeInvalidationReason("fun-Hello(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", tmp0_affectFields)
-    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-Hello(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", AffectedComposable("Hello", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 44, 8), Processed(tmp1_Hello%validationReason))
+    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-Hello(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("Hello", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 44, 8), Processed(tmp1_Hello%validationReason))
     ComposeInvestigatorConfig.invalidationLogger(ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("Hello", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 44, 8), Processed(tmp1_Hello%validationReason))
     if (isTraceInProgress()) {
       traceEventStart(<>, %changed, -1, <>)
@@ -208,12 +208,12 @@ private fun Hello(%composer: Composer?, %changed: Int) {
       traceEventEnd()
     }
   } else {
-    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-Hello(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", AffectedComposable("Hello", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 44, 8), Skipped)
+    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-Hello(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("Hello", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 44, 8), Skipped)
     ComposeInvestigatorConfig.invalidationLogger(ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("Hello", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 44, 8), Skipped)
     %composer.skipToGroupEnd()
   }
   %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-Hello(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", AffectedComposable("Hello", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 44, 8), Processed(Invalidate))
+    ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-Hello(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("Hello", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 44, 8), Processed(Invalidate))
     ComposeInvestigatorConfig.invalidationLogger(ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("Hello", "land.sungbin.composeinvestigator.compiler.test._source.codegen", "/Test.kt", 44, 8), Processed(Invalidate))
     Hello(%composer, updateChangedFlags(%changed or 0b0001))
   }
@@ -223,7 +223,7 @@ internal object ComposableSingletons%TestKt {
     if (%changed and 0b01010001 != 0b00010000 || !%composer.skipping) {
       val tmp0_affectFields = mutableListOf()
       val tmp1_<anonymous>%validationReason = ComposableInvalidationTrackTableImpl%TestKt.computeInvalidationReason("fun-RowScope.%anonymous%(Composer,Int)Unit/arg-2/call-composableLambdaInstance/val-lambda-1/class-ComposableSingletons%TestKt/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", tmp0_affectFields)
-      ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-RowScope.%anonymous%(Composer,Int)Unit/arg-2/call-composableLambdaInstance/val-lambda-1/class-ComposableSingletons%TestKt/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", AffectedComposable("<anonymous>", "land.sungbin.composeinvestigator.compiler.test._source.codegen.ComposableSingletons%TestKt.lambda-1", "/Test.kt", 26, 32), Processed(tmp1_<anonymous>%validationReason))
+      ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-RowScope.%anonymous%(Composer,Int)Unit/arg-2/call-composableLambdaInstance/val-lambda-1/class-ComposableSingletons%TestKt/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("<anonymous>", "land.sungbin.composeinvestigator.compiler.test._source.codegen.ComposableSingletons%TestKt.lambda-1", "/Test.kt", 26, 32), Processed(tmp1_<anonymous>%validationReason))
       ComposeInvestigatorConfig.invalidationLogger(ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("<anonymous>", "land.sungbin.composeinvestigator.compiler.test._source.codegen.ComposableSingletons%TestKt.lambda-1", "/Test.kt", 26, 32), Processed(tmp1_<anonymous>%validationReason))
       if (isTraceInProgress()) {
         traceEventStart(<>, %changed, -1, <>)
@@ -233,7 +233,7 @@ internal object ComposableSingletons%TestKt {
         traceEventEnd()
       }
     } else {
-      ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-RowScope.%anonymous%(Composer,Int)Unit/arg-2/call-composableLambdaInstance/val-lambda-1/class-ComposableSingletons%TestKt/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", AffectedComposable("<anonymous>", "land.sungbin.composeinvestigator.compiler.test._source.codegen.ComposableSingletons%TestKt.lambda-1", "/Test.kt", 26, 32), Skipped)
+      ComposableInvalidationTrackTableImpl%TestKt.callListeners("fun-RowScope.%anonymous%(Composer,Int)Unit/arg-2/call-composableLambdaInstance/val-lambda-1/class-ComposableSingletons%TestKt/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt", ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("<anonymous>", "land.sungbin.composeinvestigator.compiler.test._source.codegen.ComposableSingletons%TestKt.lambda-1", "/Test.kt", 26, 32), Skipped)
       ComposeInvestigatorConfig.invalidationLogger(ComposableCallstackTrackerImpl%TestKt.toList(), AffectedComposable("<anonymous>", "land.sungbin.composeinvestigator.compiler.test._source.codegen.ComposableSingletons%TestKt.lambda-1", "/Test.kt", 26, 32), Skipped)
       %composer.skipToGroupEnd()
     }

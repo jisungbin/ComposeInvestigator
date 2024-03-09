@@ -18,7 +18,7 @@ fun RegisterListener_InvalidationSkippedRoot() {
   val recomposeScope = currentRecomposeScope
   val tracker = currentComposableInvalidationTracker
 
-  tracker.registerListener(keyName = tracker.currentComposableKeyName) { composable, type ->
+  tracker.registerListener(keyName = tracker.currentComposableKeyName) { _, composable, type ->
     invalidationListensViaManualRegister.getOrPut(composable, ::mutableListOf).add(type)
   }
 
@@ -30,7 +30,7 @@ fun RegisterListener_InvalidationSkippedRoot() {
 private fun RegisterListener_InvalidationSkippedChild() {
   val tracker = currentComposableInvalidationTracker
 
-  tracker.registerListener(keyName = tracker.currentComposableKeyName) { composable, type ->
+  tracker.registerListener(keyName = tracker.currentComposableKeyName) { _, composable, type ->
     invalidationListensViaManualRegister.getOrPut(composable, ::mutableListOf).add(type)
   }
 
