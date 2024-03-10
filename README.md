@@ -36,7 +36,7 @@ plugins {
 > In other words, you need to adjust the Compose Compiler version and Kotlin version to use ComposeInvestigator.
 >
 > It also depends slightly on the Compose Runtime and Compose Animation versions. 
-> The last tested versions are both `1.6.2`.
+> The last tested versions are both `1.6.3`.
 
 Snapshots of the development version are available in Sonatype's snapshots repository.
 

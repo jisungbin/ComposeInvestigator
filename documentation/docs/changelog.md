@@ -9,14 +9,20 @@ In other words, you need to adjust the Compose Compiler version and Kotlin versi
 ComposeInvestigator.
 
 It also depends slightly on the Compose Runtime and Compose Animation versions.
-The last tested versions are both `1.6.2`.
+The last tested versions are both `1.6.3`.
 
 ---
 
 ## [Unreleased]
 
+## [1.5.10-0.2.0] - 2024-03-10
+
 - Eliminated a potential memory leak.
+- Increase Compose Runtime and Compose Animation versions to 1.6.3.
 - Adds the `@NoInvestigation` API to suppress the workings of ComposeInvestigator.
+
+### Breaking Changes
+
 - Fixed #121: Now pass the callstack information to the `ComposableInvalidationListener`.
 
 ## [1.5.10-0.1.1] - 2024-03-06
@@ -28,6 +34,10 @@ The last tested versions are both `1.6.2`.
 
 - Initial release.
 
-[Unreleased]: https://github.com/jisungbin/ComposeInvestigator/compare/1.5.10-0.1.1...HEAD
+[Unreleased]: https://github.com/jisungbin/ComposeInvestigator/compare/1.5.10-0.2.0...HEAD
+
+[1.5.10-0.2.0]: https://github.com/jisungbin/ComposeInvestigator/releases/tag/1.5.10-0.2.0
+
 [1.5.10-0.1.1]: https://github.com/jisungbin/ComposeInvestigator/releases/tag/1.5.10-0.1.1
+
 [1.5.10-0.1.0]: https://github.com/jisungbin/ComposeInvestigator/releases/tag/1.5.10-0.1.0
