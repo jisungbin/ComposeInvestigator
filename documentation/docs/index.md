@@ -46,6 +46,11 @@ looking for a fancier experience, consider using the runtime API.
 
 If you want to learn about the runtime API, check out our [advanced](advanced.md) page.
 
+## Caveats
+
+- Currently, only Restartable Groups with all stable arguments are supported. In simple terms, most
+  composables are supported, but some special case composables are not. (#99, #133)
+
 ## License
 
 ComposeInvestigator is available under

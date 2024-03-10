@@ -22,7 +22,7 @@ val composableCallstack: Stack<String> = Stack()
     affectFields.add(argsValueParam)
     
     val invalidationReason = composeInvestigatorTable.computeInvalidationReason("fun-Main(Any,Composer,Int)Unit", affectFields)
-    composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(invalidationReason))
+    composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", composableCallstack.toList(), AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(invalidationReason))
     ComposeInvestigatorConfig.invalidationLogger(composableCallstack.toList(), AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(invalidationReason))
     
     val count = mutableStateOf(0).registerStateObjectTracking(
@@ -39,12 +39,12 @@ val composableCallstack: Stack<String> = Stack()
       composableCallstack.pop()
     }
   } else {
-    composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Skipped)
+    composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", composableCallstack.toList(), AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Skipped)
     ComposeInvestigatorConfig.invalidationLogger(composableCallstack.toList(), AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Skipped)
     $composer.skipToGroupEnd()
   }
   $composer.endRestartGroup()?.updateScope { $composer: Composer?, $force: Int ->
-    composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(Invalidate))
+    composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", composableCallstack.toList(), AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(Invalidate))
     ComposeInvestigatorConfig.invalidationLogger(composableCallstack.toList(), AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(Invalidate))
     Main(args, $composer, $changed)
   }
@@ -128,7 +128,7 @@ val composeInvestigatorTable: ComposableInvalidationTrackTable = ComposableInval
   
   val invalidationReason = composeInvestigatorTable.computeInvalidationReason("fun-Main(Any)Unit", affectFields)
   
-  composeInvestigatorTable.callListeners("fun-Main(Any)Unit", AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(invalidationReason))
+  composeInvestigatorTable.callListeners("fun-Main(Any)Unit", callstacks, AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(invalidationReason))
   ComposeInvestigatorConfig.invalidationLogger(callstacks, AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(invalidationReason))
   
   Text(args.toString())
@@ -150,13 +150,13 @@ val composeInvestigatorTable: ComposableInvalidationTrackTable = ComposableInval
   
   val invalidationReason = composeInvestigatorTable.computeInvalidationReason("fun-Main(Any,Composer,Int)Unit", affectFields)
   
-  composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(invalidationReason))
+  composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", callstacks, AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(invalidationReason))
   ComposeInvestigatorConfig.invalidationLogger(callstacks, AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(invalidationReason))
   
   Text(args.toString())
   
   $composer.endRestartGroup()?.updateScope { $composer: Composer?, $force: Int ->
-    composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(Invalidate))
+    composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", callstacks, AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(Invalidate))
     ComposeInvestigatorConfig.invalidationLogger(callstacks, AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(Invalidate))
     Main(args, $composer, $changed)
   }
@@ -178,17 +178,17 @@ val composeInvestigatorTable: ComposableInvalidationTrackTable = ComposableInval
     
     val invalidationReason = composeInvestigatorTable.computeInvalidationReason("fun-Main(Any,Composer,Int)Unit", affectFields)
     
-    composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(invalidationReason))
+    composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", callstacks, AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(invalidationReason))
     ComposeInvestigatorConfig.invalidationLogger(callstacks, AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(invalidationReason))
     
     Text(args.toString())
   } else {
-    composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Skipped)
+    composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", callstacks, AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Skipped)
     ComposeInvestigatorConfig.invalidationLogger(callstacks, AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Skipped)
     $composer.skipToGroupEnd()
   }
   $composer.endRestartGroup()?.updateScope { $composer: Composer?, $force: Int ->
-    composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(Invalidate))
+    composeInvestigatorTable.callListeners("fun-Main(Any,Composer,Int)Unit", callstacks, AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(Invalidate))
     ComposeInvestigatorConfig.invalidationLogger(callstacks, AffectedComposable("Main", "my.package.name", "MyFileName.kt", line, column), Processed(Invalidate))
     Main(args, $composer, $changed)
   }

@@ -129,3 +129,8 @@ By default, any state variable that inherits from `State` or `Animatable` is tar
 tracking. However, if you want to enable state tracking for state variables other than `State` and
 `Animatable`, you can use the `State.registerStateObjectTracking` API. For more information, see the
 documentation for that API.
+
+## Suppress ComposeInvestigator behavior 
+
+If for some reason you need to suppress ComposeInvestigator behavior only to a certain range,
+you can use the `@NoInvestigation` annotation. For more information, see the documentation for that API.
