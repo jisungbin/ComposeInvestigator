@@ -15,6 +15,10 @@ The last tested versions are both `1.6.3`.
 
 ## [Unreleased]
 
+## [1.5.10-0.2.1] - 2024-03-12
+
+- Fixed #136: Tracking `Animatable` no longer crashes.
+
 ## [1.5.10-0.2.0] - 2024-03-10
 
 - Eliminated a potential memory leak.
@@ -34,10 +38,8 @@ The last tested versions are both `1.6.3`.
 
 - Initial release.
 
-[Unreleased]: https://github.com/jisungbin/ComposeInvestigator/compare/1.5.10-0.2.0...HEAD
-
+[Unreleased]: https://github.com/jisungbin/ComposeInvestigator/compare/1.5.10-0.2.1...HEAD
+[1.5.10-0.2.1]: https://github.com/jisungbin/ComposeInvestigator/releases/tag/1.5.10-0.2.1
 [1.5.10-0.2.0]: https://github.com/jisungbin/ComposeInvestigator/releases/tag/1.5.10-0.2.0
-
 [1.5.10-0.1.1]: https://github.com/jisungbin/ComposeInvestigator/releases/tag/1.5.10-0.1.1
-
 [1.5.10-0.1.0]: https://github.com/jisungbin/ComposeInvestigator/releases/tag/1.5.10-0.1.0
