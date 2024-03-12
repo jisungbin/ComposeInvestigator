@@ -217,7 +217,7 @@ public object ComposeStateObjectGetter : StateObjectGetter {
         }?.apply {
           isAccessible = true
         }
-        val animationState = internalStateField?.get(this) as? AnimationState<*, *>
+        val animationState = internalStateField?.get(state) as? AnimationState<*, *>
         animationState?.let { animationState::value.obtainStateObjectOrNull() }
       }
       is AnimationState<*, *> -> state::value.obtainStateObjectOrNull()
