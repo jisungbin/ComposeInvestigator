@@ -9,9 +9,20 @@
 
 package land.sungbin.composeinvestigator.runtime
 
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationState
+import androidx.compose.animation.core.AnimationVector1D
+import androidx.compose.animation.core.ExperimentalTransitionApi
+import androidx.compose.animation.core.InfiniteTransition
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.rememberTransition
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.RecomposeScope
 import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.currentRecomposeScope
 import androidx.compose.runtime.derivedStateOf
@@ -24,10 +35,19 @@ import androidx.compose.runtime.setValue
 import io.kotest.assertions.withClue
 import io.kotest.core.spec.style.ShouldSpec
 import io.kotest.matchers.collections.shouldContainExactlyInAnyOrder
+import io.kotest.matchers.shouldBe
+import land.sungbin.composeinvestigator.runtime.ComposeStateObjectValueGetter.getCurrentValue
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.mock.compositionTest
 import land.sungbin.composeinvestigator.runtime.mock.expectChanges
 
+@Suppress(
+  "UnrememberedMutableState",
+  "UnrememberedAnimatable",
+  "TransitionPropertiesLabel",
+  "InfiniteTransitionLabel",
+)
+@OptIn(ExperimentalTransitionApi::class)
 class StateObjectTrackerTest : ShouldSpec() {
   private data class STATE(
     val composable: AffectedComposable,
@@ -58,6 +78,29 @@ class StateObjectTrackerTest : ShouldSpec() {
       ComposeStateObjectValueGetter.clear()
     }
 
+    should("Retrieves a State value from a StateObject") {
+      compositionTest {
+        var state: MutableState<Float>? = null
+        var animatable: Animatable<Float, AnimationVector1D>? = null
+        var animationState: AnimationState<Float, AnimationVector1D>? = null
+        var transitionState: State<Float>? = null
+        var infiniteTransition: InfiniteTransition? = null
+
+        compose {
+          state = mutableStateOf(1000f)
+          animatable = Animatable(1000f)
+          animationState = AnimationState(initialValue = 1000f)
+          transitionState = rememberTransition(transitionState = MutableTransitionState(1000f)).animateFloat { it }
+          infiniteTransition = rememberInfiniteTransition()
+        }
+
+        ComposeStateObjectGetter(state!!)?.getCurrentValue() shouldBe 1000f
+        ComposeStateObjectGetter(animatable!!)?.getCurrentValue() shouldBe 1000f
+        ComposeStateObjectGetter(animationState!!)?.getCurrentValue() shouldBe 1000f
+        ComposeStateObjectGetter(transitionState!!)?.getCurrentValue() shouldBe 1000f
+        ComposeStateObjectGetter(infiniteTransition!!)?.getCurrentValue() shouldBe null // The initial state produces null.
+      }
+    }
     should("Receive a callback when the State changes") {
       compositionTest {
         val stringState = mutableStateOf("string")
