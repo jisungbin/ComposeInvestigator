@@ -27,6 +27,7 @@ import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.trackedS
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.util.putIfNotPresent
 import org.jetbrains.annotations.TestOnly
+import org.jetbrains.annotations.VisibleForTesting
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KProperty0
 import kotlin.reflect.jvm.isAccessible
@@ -245,8 +246,9 @@ public object ComposeStateObjectValueGetter : StateValueGetter {
   private val stateValueMap = mutableMapOf<StateObject, StateValue>()
 
   // This may be a pointless defense, but we disable read observers for reliability.
-  private fun StateObject.getCurrentValue() = Snapshot.withoutReadObservation {
-    (this as? State<*>)?.value ?: throw UnsupportedOperationException("Unsupported StateObject type: ${this::class.java}")
+  @VisibleForTesting
+  internal fun StateObject.getCurrentValue() = Snapshot.withoutReadObservation {
+    (this as? State<*> ?: throw UnsupportedOperationException("Unsupported StateObject type: ${this::class.java}")).value
   }
 
   internal fun initialize(key: StateObject) {
