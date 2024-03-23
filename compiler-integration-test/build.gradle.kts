@@ -30,6 +30,10 @@ android {
     targetCompatibility = JavaVersion.VERSION_17
   }
 
+  lint {
+    disable.add("MissingClass")
+  }
+
   testOptions {
     unitTests {
       isIncludeAndroidResources = true
