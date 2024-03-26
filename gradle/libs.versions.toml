@@ -26,7 +26,7 @@ test-kotest = "5.8.1"
 test-junit-core = "4.13.2"
 test-junit-engine = "5.10.2"
 test-robolectric = "4.11.1"
-test-kotlin-compilation = "0.4.0"
+test-kotlin-compilation = "0.4.1"
 
 [plugins]
 gradle-publish-maven = { id = "com.vanniktech.maven.publish", version.ref = "gradle-publish-maven" }
