@@ -9,7 +9,7 @@ ktlint = "1.2.1"
 
 jetbrains-annotation = "24.1.0"
 
-kotlin-core = "1.9.23"
+kotlin-core = "2.0.0"
 kotlin-dokka = "1.9.20"
 kotlin-coroutines = "1.8.0"
 
