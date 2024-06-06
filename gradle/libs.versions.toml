@@ -22,7 +22,7 @@ compose-activity = "1.9.0"
 fastlist = "0.1.0"
 
 test-mockk = "1.13.11"
-test-kotest = "5.9.0"
+test-kotest = "5.9.1"
 test-junit-core = "4.13.2"
 test-junit-engine = "5.10.2"
 test-robolectric = "4.12.2"
