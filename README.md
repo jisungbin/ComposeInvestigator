@@ -55,6 +55,10 @@ consider using the runtime API.
 Comprehensive documentation for ComposeInvestigator is available
 on [project website](https://jisungbin.github.io/ComposeInvestigator).
 
+### Known issues
+
+- [#155](https://github.com/jisungbin/ComposeInvestigator/issues/155): Using the R8 build causes a crash.
+
 ### Preview
 
 ![image](https://github.com/jisungbin/ComposeInvestigator/assets/40740128/98991bd9-97f2-47a7-9cc9-6f9cd1cda0e3)
