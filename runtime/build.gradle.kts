@@ -12,6 +12,7 @@ plugins {
   id("com.android.library")
   kotlin("android")
   alias(libs.plugins.kotlin.dokka)
+  alias(libs.plugins.kotlin.compose)
   id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 
@@ -51,14 +52,6 @@ android {
     targetCompatibility = JavaVersion.VERSION_17
   }
 
-  buildFeatures {
-    compose = true
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
-  }
-
   testOptions.unitTests {
     isReturnDefaultValues = true
     isIncludeAndroidResources = true
@@ -68,18 +61,19 @@ android {
 kotlin {
   explicitApi()
   compilerOptions {
-    optIn.add("androidx.compose.runtime.InternalComposeApi")
-    optIn.add("land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi")
-    optIn.add("land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi")
+    optIn.addAll(
+      "androidx.compose.runtime.InternalComposeApi",
+      "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
+      "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
+    )
   }
 }
 
 dependencies {
   implementation(libs.compose.runtime)
   implementation(libs.compose.animation)
-  implementation(embeddedKotlin("reflect"))
+  implementation(embeddedKotlin("reflect")) // TODO remove kotlin-reflect usage. This is large dependency.
 
+  testImplementation(kotlin("test-junit5"))
   testImplementation(libs.test.mockk)
-  testImplementation(libs.test.kotest.junit5)
-  testImplementation(libs.test.kotlin.coroutines)
 }

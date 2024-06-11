@@ -16,13 +16,11 @@ import com.intellij.openapi.extensions.LoadingOrder
 import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
+import java.io.File
+import java.net.URLClassLoader
 import land.sungbin.composeinvestigator.compiler.ComposableCallstackTrackingExtension
 import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTrackingExtension
 import land.sungbin.composeinvestigator.compiler.VerboseLogger
-import land.sungbin.composeinvestigator.compiler.test._compilation.facade.AnalysisResult
-import land.sungbin.composeinvestigator.compiler.test._compilation.facade.KotlinCompilerFacade
-import land.sungbin.composeinvestigator.compiler.test._compilation.facade.SourceFile
-import land.sungbin.composeinvestigator.compiler.test._compilation.facade.TestMessageCollector
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.cli.jvm.config.addJvmClasspathRoots
 import org.jetbrains.kotlin.cli.jvm.config.configureJdkClasspathRoots
@@ -38,8 +36,6 @@ import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.junit.After
 import org.junit.BeforeClass
-import java.io.File
-import java.net.URLClassLoader
 
 // FIXME: Failed to lookup symbols with 'fqName == kotlin.collections.MutableList.add',
 //  'fn.owner.valueParameters.size == 1' in Kotlin 2.0. Needs to be fixed in the future.

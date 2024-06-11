@@ -10,6 +10,7 @@
 plugins {
   id("com.android.library")
   kotlin("android")
+  alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -44,23 +45,16 @@ android {
       }
     }
   }
-
-  buildFeatures {
-    compose = true
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
-    useLiveLiterals = true
-  }
 }
 
 kotlin {
   compilerOptions {
-    optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
-    optIn.add("org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction")
-    optIn.add("land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi")
-    optIn.add("land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi")
+    optIn.addAll(
+      "org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi",
+      "org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction",
+      "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
+      "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
+    )
     freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=false")
   }
 }
@@ -74,24 +68,22 @@ afterEvaluate {
 dependencies {
   implementation(projects.runtime)
   implementation(libs.compose.material)
-  implementation(libs.test.kotest.assertion)
+  implementation(libs.test.assertk)
 
   testImplementation(projects.compilerHosted)
-  testImplementation(libs.compose.compiler)
-  testImplementation(libs.kotlin.compiler) // must be 'implementation' (not 'compileOnly')
+  testImplementation(libs.kotlin.compiler.core)
+  testImplementation(libs.kotlin.compiler.compose) // must be 'implementation' (not 'compileOnly')
 
   testImplementation(libs.test.kotlin.coroutines) {
     because("https://github.com/Kotlin/kotlinx.coroutines/issues/3673")
   }
 
   testImplementation(libs.test.mockk)
-  testImplementation(libs.test.kotest.junit5)
   testImplementation(libs.test.robolectric) {
     because("https://stackoverflow.com/a/64287388/14299073")
   }
 
-  testImplementation(libs.test.junit.core)
-  testRuntimeOnly(libs.test.junit.enigne)
+  testImplementation(kotlin("test-junit5"))
   testImplementation(libs.test.junit.compose)
 
   kotlinCompilerPluginClasspath(projects.compiler)

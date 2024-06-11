@@ -9,14 +9,13 @@
 
 package land.sungbin.composeinvestigator.compiler.test._compilation
 
-import land.sungbin.composeinvestigator.compiler.test._compilation.facade.SourceFile
+import java.io.File
 import org.intellij.lang.annotations.Language
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.util.dump
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
-import java.io.File
 
 abstract class AbstractIrTransformTest(useFir: Boolean) : AbstractCodegenTest(useFir) {
   @get:Rule

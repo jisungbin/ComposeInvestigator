@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.visitors.IrElementVisitor
 
-public class IrStatementContainerImpl(
+public class IrStatementContainerSimpleImpl(
   statements: List<IrStatement>,
   override val startOffset: Int = UNDEFINED_OFFSET,
   override val endOffset: Int = UNDEFINED_OFFSET,

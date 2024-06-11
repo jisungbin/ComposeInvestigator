@@ -9,10 +9,9 @@
 
 package land.sungbin.composeinvestigator.compiler.test._compilation
 
-import land.sungbin.composeinvestigator.compiler.test._compilation.facade.SourceFile
+import java.io.File
 import org.intellij.lang.annotations.Language
 import org.jetbrains.kotlin.codegen.GeneratedClassLoader
-import java.io.File
 
 abstract class AbstractCodegenTest(useFir: Boolean) : AbstractCompilerTest(useFir) {
   private fun dumpClasses(loader: GeneratedClassLoader) {

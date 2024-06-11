@@ -9,7 +9,7 @@
 
 package land.sungbin.composeinvestigator.compiler.test._source
 
-import land.sungbin.composeinvestigator.compiler.test._compilation.facade.SourceFile
+import land.sungbin.composeinvestigator.compiler.test._compilation.SourceFile
 import java.io.File
 
 inline fun source(filename: String): SourceFile =

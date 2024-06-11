@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.test._compilation.facade
+package land.sungbin.composeinvestigator.compiler.test._compilation
 
 import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
 import com.intellij.openapi.Disposable
@@ -15,7 +15,7 @@ import com.intellij.openapi.util.text.StringUtilRt
 import com.intellij.psi.PsiFileFactory
 import com.intellij.psi.impl.PsiFileFactoryImpl
 import com.intellij.testFramework.LightVirtualFile
-import land.sungbin.composeinvestigator.compiler.test._compilation.exception.TestCompilerException
+import java.nio.charset.StandardCharsets
 import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSourceLocation
@@ -34,7 +34,6 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.util.IrMessageLogger
 import org.jetbrains.kotlin.psi.KtFile
 import org.jetbrains.kotlin.resolve.AnalyzingUtils
-import java.nio.charset.StandardCharsets
 
 class SourceFile(
   val name: String,
@@ -47,28 +46,24 @@ class SourceFile(
       name.substring(name.lastIndexOf('\\') + 1)
     }
 
+    LightVirtualFile()
+
     val virtualFile = object : LightVirtualFile(
-      /* name = */
-      shortName,
-      /* language = */
-      KotlinLanguage.INSTANCE,
-      /* text = */
-      StringUtilRt.convertLineSeparators(source),
+      /* name = */ shortName,
+      /* language = */ KotlinLanguage.INSTANCE,
+      /* text = */ StringUtilRt.convertLineSeparators(source),
     ) {
       override fun getPath(): String = "${this@SourceFile.path}/$name"
+    }.apply {
+      charset = StandardCharsets.UTF_8
     }
-    virtualFile.charset = StandardCharsets.UTF_8
 
     val factory = PsiFileFactory.getInstance(project) as PsiFileFactoryImpl
     val ktFile = factory.trySetupPsiForFile(
-      /* virtualFile = */
-      virtualFile,
-      /* language = */
-      KotlinLanguage.INSTANCE,
-      /* physical = */
-      true,
-      /* markAsCopy = */
-      false,
+      /* virtualFile = */ virtualFile,
+      /* language = */ KotlinLanguage.INSTANCE,
+      /* physical = */ true,
+      /* markAsCopy = */ false,
     ) as KtFile
 
     if (!ignoreParseErrors) {
@@ -91,15 +86,15 @@ interface AnalysisResult {
 
 abstract class KotlinCompilerFacade(val environment: KotlinCoreEnvironment) {
   abstract fun analyze(platformFiles: List<SourceFile>, commonFiles: List<SourceFile>): AnalysisResult
-
   abstract fun compile(platformFiles: List<SourceFile>, commonFiles: List<SourceFile>): GenerationState
+
   abstract fun compileToIr(files: List<SourceFile>): IrModuleFragment
 
   companion object {
     fun create(
       disposable: Disposable,
       updateConfiguration: CompilerConfiguration.() -> Unit,
-      registerExtensions: Project.(CompilerConfiguration) -> Unit,
+      registerExtensions: Project.(configuration: CompilerConfiguration) -> Unit,
     ): KotlinCompilerFacade {
       val configuration = CompilerConfiguration().apply {
         put(CommonConfigurationKeys.MODULE_NAME, "test-module")
@@ -122,11 +117,7 @@ abstract class KotlinCompilerFacade(val environment: KotlinCoreEnvironment) {
 
       environment.project.registerExtensions(configuration)
 
-      return if (configuration.languageVersionSettings.languageVersion.usesK2) {
-        K2CompilerFacade(environment)
-      } else {
-        K1CompilerFacade(environment)
-      }
+      return K2CompilerFacade(environment)
     }
   }
 }
@@ -141,7 +132,8 @@ object TestMessageCollector : MessageCollector {
     location: CompilerMessageSourceLocation?,
   ) {
     if (severity === CompilerMessageSeverity.ERROR) {
-      val finalMessage = if (location == null) message else "(${location.path}:${location.line}:${location.column}) $message"
+      val finalMessage =
+        if (location == null) message else "(${location.path}:${location.line}:${location.column}) $message"
       throw AssertionError(finalMessage)
     }
   }

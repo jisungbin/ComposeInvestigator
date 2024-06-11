@@ -8,8 +8,9 @@
 package land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall
 
 import androidx.compose.runtime.Composable
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeSameInstanceAs
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import assertk.assertions.isSameInstanceAs
 import land.sungbin.composeinvestigator.runtime.ComposableName
 import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracker
 import land.sungbin.composeinvestigator.runtime.getValue
@@ -17,19 +18,19 @@ import land.sungbin.composeinvestigator.runtime.getValue
 val table1 = currentComposableInvalidationTracker
 
 fun table1() {
-  table1 shouldBeSameInstanceAs currentComposableInvalidationTracker
+  assertThat(table1).isSameInstanceAs(currentComposableInvalidationTracker)
 }
 
 @Composable
 fun CurrentComposableName1() {
   val prevComposableName by table1.currentComposableName
-  prevComposableName shouldBe "CurrentComposableName1"
+  assertThat(prevComposableName).isEqualTo("CurrentComposableName1")
 
   table1.currentComposableName = ComposableName("ChangedComposableName1")
-  table1.currentComposableName.name shouldBe "ChangedComposableName1"
+  assertThat(table1.currentComposableName.name).isEqualTo("ChangedComposableName1")
 }
 
 @Composable
 fun CurrentComposableKeyName1() {
-  table1.currentComposableKeyName shouldBe "fun-CurrentComposableKeyName1(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall/file-TableCallFile1.kt"
+  assertThat(table1.currentComposableKeyName).isEqualTo("fun-CurrentComposableKeyName1(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall/file-TableCallFile1.kt")
 }

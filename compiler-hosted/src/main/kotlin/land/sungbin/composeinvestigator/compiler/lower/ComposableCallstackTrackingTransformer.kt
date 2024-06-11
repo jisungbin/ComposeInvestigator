@@ -31,7 +31,7 @@ internal class ComposableCallstackTrackingTransformer(
         origin = ComposableCallstackTrackerOrigin,
         statements = listOf(
           tracker.irPush(irString(parent.asString())),
-          expression, // TODO: remove offsets
+          expression, // TODO remove offsets
         ),
       ),
       finallyBlock = tracker.irPop(),

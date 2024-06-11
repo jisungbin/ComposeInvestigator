@@ -36,12 +36,6 @@ pluginManagement {
   }
 }
 
-buildCache {
-  local {
-    removeUnusedEntriesAfterDays = 7
-  }
-}
-
 include(
   ":runtime",
   ":compiler",
