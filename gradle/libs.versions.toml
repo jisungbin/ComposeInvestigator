@@ -16,7 +16,7 @@ kotlin-coroutines = "1.8.0"
 androidx-activity = "1.9.0"
 
 compose-compiler = "1.5.11"
-compose-runtime = "1.6.4"
+compose-runtime = "1.6.8"
 compose-activity = "1.9.0"
 
 fastlist = "0.1.0"
