@@ -27,16 +27,6 @@ idea {
 }
 
 buildscript {
-  repositories {
-    google {
-      content {
-        includeGroupByRegex(".*google.*")
-        includeGroupByRegex(".*android.*")
-      }
-    }
-    mavenCentral()
-  }
-
   dependencies {
     classpath(libs.kotlin.gradle.core)
     classpath(libs.gradle.android)
@@ -46,16 +36,6 @@ buildscript {
 subprojects {
   group = project.property("GROUP") as String
   version = project.property("VERSION_NAME") as String
-
-  repositories {
-    google {
-      content {
-        includeGroupByRegex(".*google.*")
-        includeGroupByRegex(".*android.*")
-      }
-    }
-    mavenCentral()
-  }
 
   apply {
     plugin(rootProject.libs.plugins.spotless.get().pluginId)

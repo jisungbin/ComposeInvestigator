@@ -12,7 +12,7 @@ plugins {
   id("com.android.library")
   kotlin("android")
   alias(libs.plugins.kotlin.dokka)
-  alias(libs.plugins.kotlin.compose)
+   alias(libs.plugins.kotlin.compose)
   id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 

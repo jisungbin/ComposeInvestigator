@@ -22,6 +22,11 @@ pluginManagement {
       }
     }
     mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") {
+      content {
+        includeGroupByRegex("org\\.jetbrains\\.kotlin.*")
+      }
+    }
     maven("https://jitpack.io") {
       content {
         includeGroup("com.github.takahirom")
@@ -32,6 +37,23 @@ pluginManagement {
   resolutionStrategy.eachPlugin {
     if (requested.id.id == "com.github.takahirom.decomposer") {
       useModule("com.github.takahirom:decomposer:main-SNAPSHOT")
+    }
+  }
+}
+
+dependencyResolutionManagement {
+  repositories {
+    google {
+      content {
+        includeGroupByRegex(".*google.*")
+        includeGroupByRegex(".*android.*")
+      }
+    }
+    mavenCentral()
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") {
+      content {
+        includeGroupByRegex("org\\.jetbrains\\.kotlin.*")
+      }
     }
   }
 }

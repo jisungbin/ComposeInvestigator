@@ -11,7 +11,7 @@ import land.sungbin.composeinvestigator.compiler.test._compilation.AbstractIrTra
 import land.sungbin.composeinvestigator.compiler.test._source.sourceString
 import org.junit.Test
 
-class CodegenTest : AbstractIrTransformTest(useFir = false) {
+class CodegenTest : AbstractIrTransformTest() {
   @Test fun callstack_tracking_codegen() {
     verifyGoldenIrTransform(source = sourceString("codegen/CallstackTracking.kt"))
   }
@@ -19,7 +19,7 @@ class CodegenTest : AbstractIrTransformTest(useFir = false) {
   @Test fun state_tracking_codegen() {
     verifyGoldenIrTransform(
       source = sourceString("codegen/StateTracking.kt"),
-      flags = CompileFeature_COMPOSE or CompileFeature_NO_CALLSTACK_TRACKING,
+      flags = Flags.COMPOSE or Flags.NO_CALLSTACK_TRACKING,
     )
   }
 

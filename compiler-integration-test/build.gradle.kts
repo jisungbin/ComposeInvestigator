@@ -68,6 +68,7 @@ afterEvaluate {
 dependencies {
   implementation(projects.runtime)
   implementation(libs.compose.material)
+  implementation(libs.jetbrains.annotation)
   implementation(libs.test.assertk)
 
   testImplementation(projects.compilerHosted)

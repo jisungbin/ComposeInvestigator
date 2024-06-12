@@ -9,7 +9,7 @@ plugins {
   id("com.android.application")
   kotlin("android")
   id("com.github.takahirom.decomposer")
-  alias(libs.plugins.kotlin.compose)
+   alias(libs.plugins.kotlin.compose)
 }
 
 android {

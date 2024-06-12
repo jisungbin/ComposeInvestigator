@@ -1,60 +1,51 @@
-/*
- * Developed by Ji Sungbin 2024.
- *
- * Licensed under the MIT.
- * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
- */
-
 @file:Suppress("MemberVisibilityCanBePrivate", "unused")
 
 package land.sungbin.composeinvestigator.compiler.test._compilation
 
+import androidx.compose.compiler.plugins.kotlin.lower.dumpSrc
 import java.io.File
+import land.sungbin.composeinvestigator.compiler.test._compilation.compiler.SourceFile
 import org.intellij.lang.annotations.Language
+import org.intellij.lang.annotations.MagicConstant
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.util.dump
 import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 
-abstract class AbstractIrTransformTest(useFir: Boolean) : AbstractCodegenTest(useFir) {
+abstract class AbstractIrTransformTest : AbstractCompilerTest() {
   @get:Rule
   val classesDirectory: TemporaryFolder = TemporaryFolder.builder().assureDeletion().build()
 
   @get:Rule
-  val goldenTransformRule = GoldenTransformRule("src/test/resources/golden")
+  val goldenTransformRule = GoldenTransformRule(goldensPath = "src/test/resources/golden")
 
   fun transform(
-    @Language("kotlin")
-    source: String,
-    @Language("kotlin")
-    extra: String = "",
+    @Language("kotlin") source: String,
+    @Language("kotlin") extra: String = "",
     validator: (element: IrElement) -> Unit = {},
     dumpTree: Boolean = false,
     truncateTracingInfoMode: TruncateTracingInfoMode = TruncateTracingInfoMode.TRUNCATE_KEY,
     additionalPaths: List<File> = emptyList(),
-    @Flags flags: Int = CompileFeature_COMPOSE,
+    @MagicConstant(flagsFromClass = Flags::class) flags: Int = Flags.COMPOSE,
   ): String {
-    fun IrElement.validate(): IrElement = also(validator)
+    fun IrElement.validate() = also(validator)
 
     val keySet = mutableListOf<Int>()
     val files = listOf(SourceFile("Test.kt", source), SourceFile("Extra.kt", extra))
-    val irModule = compileToIr(
-      sourceFiles = files,
-      additionalPaths = additionalPaths,
-      flags = flags,
-    )
+    val irModule = compileToIr(sourceFiles = files, additionalPaths = additionalPaths, flags = flags)
 
+    @Suppress("RegExpSimplifiable")
     val actualTransformed =
       irModule
         .files[0]
         .validate()
-        .dumpSrc(useFir = useFir)
+        .dumpSrc(useFir = true)
         .replace('$', '%')
         // replace source keys for start group calls
-        .replace(Regex("(%composer\\.start(Restart|Movable|Replaceable)Group\\()-?((0b)?[-\\d]+)")) { match ->
+        .replace(Regex("(%composer\\.start(Restart|Movable|Replaceable|Replace)Group\\()-?((0b)?[-\\d]+)")) { match ->
           val stringKey = match.groupValues[3]
-          val key = if (stringKey.startsWith("0b")) stringKey.drop(2).toInt(radix = 2) else stringKey.toInt()
+          val key = if (stringKey.startsWith("0b")) Integer.parseInt(stringKey.drop(2), 2) else stringKey.toInt()
           if (key in keySet) {
             "${match.groupValues[1]}<!DUPLICATE KEY: $key!>"
           } else {
@@ -69,24 +60,21 @@ abstract class AbstractIrTransformTest(useFir: Boolean) : AbstractCodegenTest(us
         // TODO(174715171): capture actual values for testing
         .replace(Regex("traceEventStart\\(-?\\d+, (%dirty|%changed|-1), (%dirty1|%changed1|-1), (.*)")) { match ->
           when (truncateTracingInfoMode) {
-            TruncateTracingInfoMode.TRUNCATE_KEY ->
-              "traceEventStart(<>, ${match.groupValues[1]}, ${match.groupValues[2]}, <>)"
-
-            TruncateTracingInfoMode.KEEP_INFO_STRING ->
-              "traceEventStart(<>, ${match.groupValues[1]}, ${match.groupValues[2]}, ${match.groupValues[3]}"
+            TruncateTracingInfoMode.TRUNCATE_KEY -> "traceEventStart(<>, ${match.groupValues[1]}, ${match.groupValues[2]}, <>)"
+            TruncateTracingInfoMode.KEEP_INFO_STRING -> "traceEventStart(<>, ${match.groupValues[1]}, ${match.groupValues[2]}, ${match.groupValues[3]}"
           }
         }
         // replace source information with source it references
-        .replace(Regex("(%composer\\.start(Restart|Movable|Replaceable)Group\\([^\"\\n]*)\"(.*)\"\\)")) { match ->
+        .replace(Regex("(%composer\\.start(Restart|Movable|Replaceable|Replace)Group\\([^\"\\n]*)\"(.*)\"\\)")) { match ->
           "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[4], source)}\")"
         }
         .replace(Regex("(sourceInformation(MarkerStart)?\\(.*)\"(.*)\"\\)")) { match ->
           "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[3], source)}\")"
         }
-        .replace(@Suppress("RegExpSimplifiable") Regex("(composableLambda[N]?\\([^\"\\n]*)\"(.*)\"\\)")) { match ->
+        .replace(Regex("(composableLambda[N]?\\([^\"\\n]*)\"(.*)\"\\)")) { match ->
           "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[2], source)}\")"
         }
-        .replace(@Suppress("RegExpSimplifiable") Regex("(rememberComposableLambda[N]?)\\((-?\\d+)")) { match ->
+        .replace(Regex("(rememberComposableLambda[N]?)\\((-?\\d+)")) { match ->
           "${match.groupValues[1]}(<>"
         }
         // replace source keys for joinKey calls
@@ -112,16 +100,14 @@ abstract class AbstractIrTransformTest(useFir: Boolean) : AbstractCodegenTest(us
   }
 
   fun verifyIrTransform(
-    @Language("kotlin")
-    source: String,
+    @Language("kotlin") source: String,
     expectedTransformed: String,
-    @Language("kotlin")
-    extra: String = "",
+    @Language("kotlin") extra: String = "",
     validator: (element: IrElement) -> Unit = {},
     dumpTree: Boolean = false,
     truncateTracingInfoMode: TruncateTracingInfoMode = TruncateTracingInfoMode.TRUNCATE_KEY,
     additionalPaths: List<File> = emptyList(),
-    @Flags flags: Int = CompileFeature_COMPOSE,
+    @MagicConstant(flagsFromClass = Flags::class) flags: Int = Flags.COMPOSE,
   ) {
     val actualTransformed = transform(
       source = source,
@@ -137,21 +123,18 @@ abstract class AbstractIrTransformTest(useFir: Boolean) : AbstractCodegenTest(us
       expectedTransformed
         .trimIndent()
         .trimTrailingWhitespacesAndAddNewlineAtEOF(),
-      /* actual = */
-      actualTransformed,
+      /* actual = */ actualTransformed,
     )
   }
 
   fun verifyGoldenIrTransform(
-    @Language("kotlin")
-    source: String,
-    @Language("kotlin")
-    extra: String = "",
+    @Language("kotlin") source: String,
+    @Language("kotlin") extra: String = "",
     validator: (element: IrElement) -> Unit = {},
     dumpTree: Boolean = false,
     truncateTracingInfoMode: TruncateTracingInfoMode = TruncateTracingInfoMode.TRUNCATE_KEY,
     additionalPaths: List<File> = emptyList(),
-    @Flags flags: Int = CompileFeature_COMPOSE,
+    @MagicConstant(flagsFromClass = Flags::class) flags: Int = Flags.COMPOSE,
   ) {
     val actualTransformed = transform(
       source = source,
@@ -250,15 +233,15 @@ abstract class AbstractIrTransformTest(useFir: Boolean) : AbstractCodegenTest(us
   }
 
   enum class TruncateTracingInfoMode {
-    TRUNCATE_KEY, // truncates only the `key` parameter
-    KEEP_INFO_STRING, // truncates everything except for the `info` string
+    /** truncates only the `key` parameter */
+    TRUNCATE_KEY,
+
+    /** truncates everything except for the `info` string */
+    KEEP_INFO_STRING,
   }
 }
 
-private fun String.trimTrailingWhitespaces(): String =
-  split('\n').joinToString(separator = "\n", transform = String::trimEnd)
-
 private fun String.trimTrailingWhitespacesAndAddNewlineAtEOF(): String =
-  trimTrailingWhitespaces().let { result ->
-    if (result.endsWith("\n")) result else result + "\n"
-  }
+  split('\n')
+    .joinToString(separator = "\n", transform = String::trimEnd)
+    .let { result -> if (result.endsWith("\n")) result else result + "\n" }
