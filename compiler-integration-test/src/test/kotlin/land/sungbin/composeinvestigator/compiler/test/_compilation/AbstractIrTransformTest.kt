@@ -52,7 +52,7 @@ abstract class AbstractIrTransformTest : AbstractK2CompilerTest() {
         // replace source keys for start group calls
         .replace(Regex("(%composer\\.start(Restart|Movable|Replaceable|Replace)Group\\()-?((0b)?[-\\d]+)")) { match ->
           val stringKey = match.groupValues[3]
-          val key = if (stringKey.startsWith("0b")) Integer.parseInt(stringKey.drop(2), 2) else stringKey.toInt()
+          val key = if (stringKey.startsWith("0b")) stringKey.drop(2).toInt(radix = 2) else stringKey.toInt()
           if (key in keySet) {
             "${match.groupValues[1]}<!DUPLICATE KEY: $key!>"
           } else {
