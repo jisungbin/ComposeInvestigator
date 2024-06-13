@@ -16,8 +16,7 @@ import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 
 public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
-  // TODO: https://github.com/jisungbin/ComposeInvestigator/issues/91
-  override val supportsK2: Boolean = false
+  override val supportsK2: Boolean = true
 
   // This deprecated override is safe to use up to Kotlin 2.1.0 by KT-55300.
   // Also see: https://youtrack.jetbrains.com/issue/KT-52665/Deprecate-ComponentRegistrar#focus=Change-27-7999959.0-0

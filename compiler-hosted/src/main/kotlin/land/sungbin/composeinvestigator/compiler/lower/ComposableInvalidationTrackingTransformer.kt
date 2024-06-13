@@ -23,7 +23,7 @@ import land.sungbin.composeinvestigator.compiler.origin.StateChangeTrackerOrigin
 import land.sungbin.composeinvestigator.compiler.struct.IrAffectedComposable
 import land.sungbin.composeinvestigator.compiler.struct.IrAffectedField
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationLogger
-import land.sungbin.composeinvestigator.compiler.util.IrStatementContainerImpl
+import land.sungbin.composeinvestigator.compiler.util.IrStatementContainerSimpleImpl
 import land.sungbin.composeinvestigator.compiler.util.irString
 import land.sungbin.fastlist.fastLastOrNull
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -194,7 +194,7 @@ internal class ComposableInvalidationTrackingTransformer(
 
   override fun transformUpdateScopeBlock(target: IrSimpleFunction, initializer: IrReturn): IrStatementContainer {
     @Suppress("LocalVariableName")
-    val NO_CHANGED = IrStatementContainerImpl(statements = listOf(initializer))
+    val NO_CHANGED = IrStatementContainerSimpleImpl(statements = listOf(initializer))
 
     val currentKey = irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, target] ?: return NO_CHANGED
     if (!handledUpdateScopeBlock.handle(currentKey.keyName)) return NO_CHANGED
@@ -233,7 +233,7 @@ internal class ComposableInvalidationTrackingTransformer(
 
     newStatements += initializer
 
-    return IrStatementContainerImpl(statements = newStatements).also { transformed ->
+    return IrStatementContainerSimpleImpl(statements = newStatements).also { transformed ->
       logger("[ComposableUpdateScope] transformed dump: ${transformed.dump()}")
       logger("[ComposableUpdateScope] transformed dumpKotlinLike: ${transformed.dumpKotlinLike()}")
     }
@@ -241,7 +241,7 @@ internal class ComposableInvalidationTrackingTransformer(
 
   override fun transformSkipToGroupEndCall(composable: IrSimpleFunction, initializer: IrCall): IrStatementContainer {
     @Suppress("LocalVariableName")
-    val NO_CHANGED = IrStatementContainerImpl(statements = listOf(initializer))
+    val NO_CHANGED = IrStatementContainerSimpleImpl(statements = listOf(initializer))
 
     val currentKey = irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return NO_CHANGED
     if (!handledSkipToGroupEndCall.handle(currentKey.keyName)) return NO_CHANGED
@@ -266,7 +266,7 @@ internal class ComposableInvalidationTrackingTransformer(
       invalidationType = invalidationTypeSkipped,
     )
 
-    return IrStatementContainerImpl(statements = listOf(callListeners, logger, initializer)).also { transformed ->
+    return IrStatementContainerSimpleImpl(statements = listOf(callListeners, logger, initializer)).also { transformed ->
       logger("[ComposableSkipToGroupEnd] transformed dump: ${transformed.dump()}")
       logger("[ComposableSkipToGroupEnd] transformed dumpKotlinLike: ${transformed.dumpKotlinLike()}")
     }

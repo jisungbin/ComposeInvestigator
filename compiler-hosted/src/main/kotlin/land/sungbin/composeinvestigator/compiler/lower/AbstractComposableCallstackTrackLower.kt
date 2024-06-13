@@ -8,6 +8,7 @@
 package land.sungbin.composeinvestigator.compiler.lower
 
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
+import java.util.concurrent.atomic.AtomicReference
 import land.sungbin.composeinvestigator.compiler.AndroidxComposeRuntime
 import land.sungbin.composeinvestigator.compiler.HandledMap
 import land.sungbin.composeinvestigator.compiler.VerboseLogger
@@ -40,7 +41,6 @@ import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.util.OperatorNameConventions
-import java.util.concurrent.atomic.AtomicReference
 
 public abstract class AbstractComposableCallstackTrackLower(
   private val context: IrPluginContext,

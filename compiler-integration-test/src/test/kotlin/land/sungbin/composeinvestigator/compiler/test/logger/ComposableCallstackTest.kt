@@ -12,7 +12,8 @@ import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import io.kotest.matchers.collections.shouldHaveSingleElement
+import assertk.assertThat
+import assertk.assertions.containsOnly
 import land.sungbin.composeinvestigator.compiler.test.source.logger.ComposableCallstackRoot_House
 import land.sungbin.composeinvestigator.compiler.test.source.logger.findCallstacks
 import org.junit.Rule
@@ -39,12 +40,12 @@ class ComposableCallstackTest {
       val mirror = findCallstacks("Mirror")
       val spider = findCallstacks("Spider")
 
-      house.toSet() shouldHaveSingleElement ""
-      door.toSet() shouldHaveSingleElement "land.sungbin.composeinvestigator.compiler.test.source.logger.ComposableCallstackRoot_House -> Column\$content"
-      knock.toSet() shouldHaveSingleElement "land.sungbin.composeinvestigator.compiler.test.source.logger.ComposableCallstackRoot_House -> Column\$content -> land.sungbin.composeinvestigator.compiler.test.source.logger.Door"
-      window.toSet() shouldHaveSingleElement "land.sungbin.composeinvestigator.compiler.test.source.logger.ComposableCallstackRoot_House -> Column\$content"
-      mirror.toSet() shouldHaveSingleElement "land.sungbin.composeinvestigator.compiler.test.source.logger.ComposableCallstackRoot_House -> Column\$content -> land.sungbin.composeinvestigator.compiler.test.source.logger.Window"
-      spider.toSet() shouldHaveSingleElement "land.sungbin.composeinvestigator.compiler.test.source.logger.ComposableCallstackRoot_House -> Column\$content -> land.sungbin.composeinvestigator.compiler.test.source.logger.Window -> land.sungbin.composeinvestigator.compiler.test.source.logger.Mirror"
+      assertThat(house.toSet()).containsOnly("")
+      assertThat(door.toSet()).containsOnly("land.sungbin.composeinvestigator.compiler.test.source.logger.ComposableCallstackRoot_House -> Column\$content")
+      assertThat(knock.toSet()).containsOnly("land.sungbin.composeinvestigator.compiler.test.source.logger.ComposableCallstackRoot_House -> Column\$content -> land.sungbin.composeinvestigator.compiler.test.source.logger.Door")
+      assertThat(window.toSet()).containsOnly("land.sungbin.composeinvestigator.compiler.test.source.logger.ComposableCallstackRoot_House -> Column\$content")
+      assertThat(mirror.toSet()).containsOnly("land.sungbin.composeinvestigator.compiler.test.source.logger.ComposableCallstackRoot_House -> Column\$content -> land.sungbin.composeinvestigator.compiler.test.source.logger.Window")
+      assertThat(spider.toSet()).containsOnly("land.sungbin.composeinvestigator.compiler.test.source.logger.ComposableCallstackRoot_House -> Column\$content -> land.sungbin.composeinvestigator.compiler.test.source.logger.Window -> land.sungbin.composeinvestigator.compiler.test.source.logger.Mirror")
     }
   }
 }

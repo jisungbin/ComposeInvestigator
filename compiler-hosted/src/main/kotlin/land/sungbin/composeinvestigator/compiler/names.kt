@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler
 
+import land.sungbin.fastlist.fastJoinToString
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -106,8 +107,48 @@ public val AffectedField_VALUE_PARAMETER: Name = Name.identifier("ValueParameter
 public val AFFECTED_COMPOSABLE_FQN: FqName = FqName("$ComposeInvestigatorRuntimeAffect.AffectedComposable")
 // END affect/AffectedComposable
 
-public fun CallableId.Companion.fromFqName(fqName: FqName): CallableId =
-  CallableId(packageName = fqName.parent(), callableName = fqName.shortName())
+// TODO testing
+public fun CallableId.Companion.fromFqName(fqName: FqName): CallableId {
+  val paths = fqName.pathSegments() as List<Name>
+  val lastUppercaseIndex = paths.indexOfLast { path -> path.asString().first().isUpperCase() }
+
+  if (lastUppercaseIndex == paths.lastIndex) {
+    // a.b.c.D -> packageName, callableName
+    return CallableId(
+      packageName = FqName(paths.subList(0, /* exclusive */ lastUppercaseIndex).fastJoinToString(".", transform = Name::asString)),
+      callableName = paths.last(),
+    )
+  }
+
+  if (lastUppercaseIndex != -1) {
+    val firstUppercaseIndex = paths.indexOfFirst { path -> path.asString().first().isUpperCase() }
+
+    return if (firstUppercaseIndex == lastUppercaseIndex) {
+      // a.b.c.D.e -> packageName, className, callableName
+      CallableId(
+        packageName = FqName(paths.subList(0, /* exclusive */ lastUppercaseIndex).fastJoinToString(".", transform = Name::asString)),
+        className = FqName(paths[lastUppercaseIndex].asString()),
+        callableName = paths.last(),
+      )
+    } else {
+      // a.b.c.D.E.f -> packageName, classNames callableName
+      CallableId(
+        packageName = FqName(paths.subList(0, /* exclusive */ firstUppercaseIndex).fastJoinToString(".", transform = Name::asString)),
+        className = FqName(paths.subList(firstUppercaseIndex, /* exclusive */ lastUppercaseIndex + 1).fastJoinToString(".", transform = Name::asString)),
+        callableName = paths.last(),
+      )
+    }
+  }
+
+  // a.b.c.d -> packageName, callableName
+  check(lastUppercaseIndex == -1) {
+    "The CallableId parsing logic for the given FqName is invalid. (fqName=${fqName.asString()})"
+  }
+  return CallableId(
+    packageName = FqName(paths.subList(0, /* exclusive */ paths.lastIndex).fastJoinToString(".", transform = Name::asString)),
+    callableName = paths.last(),
+  )
+}
 
 @Suppress("UnusedReceiverParameter")
 public val SpecialNames.UNKNOWN_STRING: String get() = "<unknown>"

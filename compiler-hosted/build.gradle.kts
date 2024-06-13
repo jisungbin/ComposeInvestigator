@@ -10,21 +10,25 @@ plugins {
   id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 
-sourceSets {
-  getByName("main").java.srcDir("src/main/kotlin")
+sourceSets.main {
+  java.srcDir("src/main/kotlin")
 }
 
 kotlin {
   explicitApi()
   compilerOptions {
-    optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
-    optIn.add("org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction")
+    optIn.addAll(
+      "org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi",
+      "org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction",
+      // Only works with IR phase, not FIR.
+      // See https://kotlinlang.slack.com/archives/C7L3JB43G/p1700429910462239.
+      "org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI",
+    )
   }
 }
 
 dependencies {
-  compileOnly(libs.kotlin.compiler)
-
-  implementation(libs.compose.compiler)
+  compileOnly(libs.kotlin.compiler.core)
+  implementation(libs.kotlin.compiler.compose)
   implementation(libs.jetbrains.annotation)
 }

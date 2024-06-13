@@ -12,6 +12,7 @@ plugins {
   id("com.android.library")
   kotlin("android")
   alias(libs.plugins.kotlin.dokka)
+  alias(libs.plugins.kotlin.compose)
   id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 
@@ -51,14 +52,6 @@ android {
     targetCompatibility = JavaVersion.VERSION_17
   }
 
-  buildFeatures {
-    compose = true
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
-  }
-
   testOptions.unitTests {
     isReturnDefaultValues = true
     isIncludeAndroidResources = true
@@ -68,18 +61,28 @@ android {
 kotlin {
   explicitApi()
   compilerOptions {
-    optIn.add("androidx.compose.runtime.InternalComposeApi")
-    optIn.add("land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi")
-    optIn.add("land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi")
+    optIn.addAll(
+      "androidx.compose.runtime.InternalComposeApi",
+      "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
+      "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
+    )
   }
 }
 
 dependencies {
   implementation(libs.compose.runtime)
   implementation(libs.compose.animation)
-  implementation(embeddedKotlin("reflect"))
+  implementation(kotlin("reflect")) // TODO remove kotlin-reflect usage. This is large dependency.
 
-  testImplementation(libs.test.mockk)
-  testImplementation(libs.test.kotest.junit5)
+  testImplementation(kotlin("test-junit5"))
+  testImplementation(libs.test.assertk)
   testImplementation(libs.test.kotlin.coroutines)
+
+  // noinspection UseTomlInstead
+  testImplementation("androidx.compose.runtime:runtime-test-utils:1.8.0-SNAPSHOT") {
+    isTransitive = false
+
+    // Why snapshot?
+    because("https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/runtime/runtime-test-utils/build.gradle;l=68;drc=aa3aa01c08fc9d9e7c13260b4f2fe89dfa2a58f1")
+  }
 }

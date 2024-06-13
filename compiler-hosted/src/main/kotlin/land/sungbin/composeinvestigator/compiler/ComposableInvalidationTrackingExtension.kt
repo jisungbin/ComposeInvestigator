@@ -26,7 +26,7 @@ public class ComposableInvalidationTrackingExtension(private val logger: Verbose
 
     val stabilityInferencer = StabilityInferencer(
       currentModule = moduleFragment.descriptor,
-      externalStableTypeMatchers = emptySet(), // TODO: support this field
+      externalStableTypeMatchers = emptySet(), // TODO supports this field
     )
 
     moduleFragment.transformChildrenVoid(

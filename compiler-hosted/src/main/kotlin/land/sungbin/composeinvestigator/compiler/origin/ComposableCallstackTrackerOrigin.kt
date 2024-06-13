@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler.origin
 
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.IrStatementOriginImpl
 
-public data object ComposableCallstackTrackerOrigin : IrStatementOriginImpl("GENERATED_COMPOSABLE_CALLSTACK_TRACKER_MEMBER")
+public val ComposableCallstackTrackerOrigin: IrStatementOrigin = IrStatementOriginImpl("GENERATED_COMPOSABLE_CALLSTACK_TRACKER_MEMBER")

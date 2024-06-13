@@ -16,7 +16,7 @@ import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.wasm.ir.source.location.SourceLocation
 
 public fun IrFunction.getSafelyLocation(): SourceLocation.Location =
-  getSourceLocation(file.fileEntry).let { location ->
+  getSourceLocation(file).let { location ->
     if (location is SourceLocation.Location) location.copy(line = location.line + 1) // Humans read from 1.
     else SourceLocation.Location(file = SpecialNames.UNKNOWN_STRING, line = UNDEFINED_OFFSET, column = UNDEFINED_OFFSET)
   }

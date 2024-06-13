@@ -20,6 +20,9 @@ import androidx.compose.runtime.currentComposer
 import androidx.compose.runtime.snapshots.ObserverHandle
 import androidx.compose.runtime.snapshots.Snapshot
 import androidx.compose.runtime.snapshots.StateObject
+import java.util.concurrent.atomic.AtomicBoolean
+import kotlin.reflect.KProperty0
+import kotlin.reflect.jvm.isAccessible
 import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateFieldNameMap
 import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateLocationMap
 import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateValueGetterMap
@@ -28,9 +31,6 @@ import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.util.putIfNotPresent
 import org.jetbrains.annotations.TestOnly
 import org.jetbrains.annotations.VisibleForTesting
-import java.util.concurrent.atomic.AtomicBoolean
-import kotlin.reflect.KProperty0
-import kotlin.reflect.jvm.isAccessible
 
 public data class StateValue(val previousValue: Any?, val newValue: Any?)
 

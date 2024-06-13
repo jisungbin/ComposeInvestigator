@@ -1,5 +1,5 @@
 [versions]
-gradle-android = "8.4.1"
+gradle-android = "8.4.2"
 gradle-publish-maven = "0.28.0"
 gradle-test-logging = "4.0.0"
 gradle-shadow = "8.1.1"
@@ -9,24 +9,25 @@ ktlint = "1.2.1"
 
 jetbrains-annotation = "24.1.0"
 
-kotlin-core = "1.9.23"
+# TODO use the stable version
+kotlin-core = "2.0.20-dev-6176" # https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev/org/jetbrains/kotlin/kotlin-compiler/
 kotlin-dokka = "1.9.20"
-kotlin-coroutines = "1.8.0"
+kotlin-coroutines = "1.9.0-RC" # K2
 
 androidx-activity = "1.9.0"
 
-compose-compiler = "1.5.11"
-compose-runtime = "1.6.4"
+compose-runtime = "1.6.8"
 compose-activity = "1.9.0"
 
 fastlist = "0.1.0"
 
+test-assertk = "0.28.1"
 test-mockk = "1.13.11"
-test-kotest = "5.9.0"
+test-robolectric = "4.11.1"
+
+# Some of our tests use JUnit4 because we include an Android module.
 test-junit-core = "4.13.2"
 test-junit-engine = "5.10.2"
-test-robolectric = "4.12.2"
-test-kotlin-compilation = "0.4.1"
 
 [plugins]
 gradle-publish-maven = { id = "com.vanniktech.maven.publish", version.ref = "gradle-publish-maven" }
@@ -34,6 +35,7 @@ gradle-test-logging = { id = "com.adarshr.test-logger", version.ref = "gradle-te
 gradle-shadow = { id = "com.github.johnrengelman.shadow", version.ref = "gradle-shadow" }
 
 kotlin-dokka = { id = "org.jetbrains.dokka", version.ref = "kotlin-dokka" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin-core" }
 
 spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 
@@ -44,11 +46,11 @@ jetbrains-annotation = { module = "org.jetbrains:annotations", version.ref = "je
 
 kotlin-gradle-core = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin", version.ref = "kotlin-core" }
 kotlin-gradle-api = { module = "org.jetbrains.kotlin:kotlin-gradle-plugin-api", version.ref = "kotlin-core" }
-kotlin-compiler = { module = "org.jetbrains.kotlin:kotlin-compiler", version.ref = "kotlin-core" }
+kotlin-compiler-core = { module = "org.jetbrains.kotlin:kotlin-compiler", version.ref = "kotlin-core" }
+kotlin-compiler-compose = { module = "org.jetbrains.kotlin:kotlin-compose-compiler-plugin", version.ref = "kotlin-core" }
 
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
 
-compose-compiler = { module = "androidx.compose.compiler:compiler-hosted", version.ref = "compose-compiler" }
 compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose-runtime" }
 compose-animation = { module = "androidx.compose.animation:animation-core", version.ref = "compose-runtime" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose-runtime" }
@@ -56,14 +58,12 @@ compose-activity = { module = "androidx.activity:activity-compose", version.ref 
 
 fastlist = { module = "land.sungbin.fastlist:fastlist", version.ref = "fastlist" }
 
+test-assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "test-assertk" }
 test-mockk = { module = "io.mockk:mockk", version.ref = "test-mockk" }
-test-kotest-junit5 = { module = "io.kotest:kotest-runner-junit5", version.ref = "test-kotest" }
-test-kotest-assertion = { module = "io.kotest:kotest-assertions-core", version.ref = "test-kotest" }
 test-junit-core = { module = "junit:junit", version.ref = "test-junit-core" }
 test-junit-enigne = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "test-junit-engine" }
 test-junit-compose = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-runtime" }
 test-robolectric = { module = "org.robolectric:robolectric", version.ref = "test-robolectric" }
 test-kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
-test-kotlin-compilation = { module = "dev.zacsweers.kctfork:core", version.ref = "test-kotlin-compilation" }
 
 ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" } # for Renovate

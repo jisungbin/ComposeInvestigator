@@ -15,10 +15,8 @@ plugins {
 }
 
 // Thanks for https://github.com/ZacSweers/redacted-compiler-plugin/blob/c866a8ae7b2ab039fee9709c990a5478ac0dc0c7/redacted-compiler-plugin-gradle/build.gradle.kts#L21-L34
-sourceSets {
-  main {
-    java.srcDir(layout.buildDirectory.dir("generated/sources/version-template/kotlin/main"))
-  }
+sourceSets.main {
+  java.srcDir(layout.buildDirectory.dir("generated/sources/version-template/kotlin/main"))
 }
 
 val copyVersionTemplateProvider =

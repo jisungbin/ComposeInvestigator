@@ -7,24 +7,27 @@
 
 package land.sungbin.composeinvestigator.runtime
 
-import io.kotest.core.spec.style.ShouldSpec
-import io.kotest.matchers.shouldBe
+import assertk.assertThat
+import assertk.assertions.isEqualTo
+import kotlin.test.Test
 
-class DeclarationStabilityTest : ShouldSpec() {
-  init {
-    should("Meaningful toString") {
-      DeclarationStability.Certain(true).toString() shouldBe "Stable"
-      DeclarationStability.Certain(false).toString() shouldBe "Unstable"
-      DeclarationStability.Runtime("name").toString() shouldBe "Runtime(name)"
-      DeclarationStability.Unknown("name").toString() shouldBe "Uncertain(name)"
-      DeclarationStability.Parameter("name").toString() shouldBe "Parameter(name)"
+class DeclarationStabilityTest {
+  @Test
+  fun printAsString() {
+    assertThat(DeclarationStability.Certain(true).toString()).isEqualTo("Stable")
+    assertThat(DeclarationStability.Certain(false).toString()).isEqualTo("Unstable")
+    assertThat(DeclarationStability.Runtime("name").toString()).isEqualTo("Runtime(name)")
+    assertThat(DeclarationStability.Unknown("name").toString()).isEqualTo("Uncertain(name)")
+    assertThat(DeclarationStability.Parameter("name").toString()).isEqualTo("Parameter(name)")
+    assertThat(
       DeclarationStability.Combined(
         DeclarationStability.Certain(true),
         DeclarationStability.Certain(false),
         DeclarationStability.Runtime("name"),
-        DeclarationStability.Unknown("name"),
-        DeclarationStability.Parameter("name"),
-      ).toString() shouldBe "Stable,Unstable,Runtime(name),Uncertain(name),Parameter(name)"
-    }
+        DeclarationStability.Unknown("name2"),
+        DeclarationStability.Parameter("name3"),
+      ).toString(),
+    )
+      .isEqualTo("Stable,Unstable,Runtime(name),Uncertain(name2),Parameter(name3)")
   }
 }

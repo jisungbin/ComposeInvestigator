@@ -8,6 +8,7 @@
 package land.sungbin.composeinvestigator.compiler.lower
 
 import androidx.compose.compiler.plugins.kotlin.EmptyModuleMetrics
+import androidx.compose.compiler.plugins.kotlin.FeatureFlags
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.irTrace
 import androidx.compose.compiler.plugins.kotlin.lower.ComposableSymbolRemapper
@@ -37,6 +38,7 @@ public class DurableComposableKeyTransformer(
   symbolRemapper = ComposableSymbolRemapper(),
   stabilityInferencer = stabilityInferencer,
   metrics = EmptyModuleMetrics,
+  featureFlags = FeatureFlags(),
 ),
   IrPluginContext by context {
   private var currentKeys = mutableListOf<ComposableKeyInfo>()

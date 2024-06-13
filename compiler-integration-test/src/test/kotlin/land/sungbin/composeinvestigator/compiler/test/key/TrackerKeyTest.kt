@@ -9,9 +9,10 @@ package land.sungbin.composeinvestigator.compiler.test.key
 
 import androidx.compose.compiler.plugins.kotlin.WeakBindingTrace
 import androidx.compose.compiler.plugins.kotlin.irTrace
-import io.kotest.matchers.shouldBe
+import assertk.assertThat
+import assertk.assertions.isEqualTo
 import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
-import land.sungbin.composeinvestigator.compiler.test._compilation.AbstractCompilerTest
+import land.sungbin.composeinvestigator.compiler.test._compilation.AbstractK2CompilerTest
 import land.sungbin.composeinvestigator.compiler.test._source.source
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -22,13 +23,13 @@ import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.junit.Test
 
-class TrackerKeyTest : AbstractCompilerTest(useFir = false) {
+class TrackerKeyTest : AbstractK2CompilerTest() {
   @Test fun generates_a_unique_key_for_the_same_function_name() {
     @Suppress("LocalVariableName")
     var _irTrace: WeakBindingTrace? = null
     val result = compileToIr(
       sourceFiles = listOf(source("key/TrackerKeyTestSource.kt")),
-      registerExtensions = {
+      additionalRegisterExtensions = {
         IrGenerationExtension.registerExtension(
           project = this,
           extension = object : IrGenerationExtension {
@@ -60,15 +61,15 @@ class TrackerKeyTest : AbstractCompilerTest(useFir = false) {
       expectStartLine: Int,
       expectStartColumn: Int,
     ) {
-      target.getValueArgument(0).safeAs<IrConst<String>>()?.value shouldBe expectName
-      target.getValueArgument(1).safeAs<IrConst<String>>()?.value shouldBe expectPkg
+      assertThat(target.getValueArgument(0).safeAs<IrConst<String>>()?.value).isEqualTo(expectName)
+      assertThat(target.getValueArgument(1).safeAs<IrConst<String>>()?.value).isEqualTo(expectPkg)
       // 'filePath' value is machine dependent, so we don't test it.
-      target.getValueArgument(3).safeAs<IrConst<Int>>()?.value shouldBe expectStartLine
-      target.getValueArgument(4).safeAs<IrConst<Int>>()?.value shouldBe expectStartColumn
+      assertThat(target.getValueArgument(3).safeAs<IrConst<Int>>()?.value).isEqualTo(expectStartLine)
+      assertThat(target.getValueArgument(4).safeAs<IrConst<Int>>()?.value).isEqualTo(expectStartColumn)
       // TODO: assert parent (not yet implemented feature)
     }
 
-    zeroArgFnKey.keyName shouldBe "fun-one()Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TrackerKeyTestSource.kt"
+    assertThat(zeroArgFnKey.keyName).isEqualTo("fun-one()Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TrackerKeyTestSource.kt")
     assertAffectedComposable(
       zeroArgFnKey.affectedComposable,
       expectName = "one",
@@ -77,7 +78,7 @@ class TrackerKeyTest : AbstractCompilerTest(useFir = false) {
       expectStartColumn = 0,
     )
 
-    oneArgFnKey.keyName shouldBe "fun-one(Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TrackerKeyTestSource.kt"
+    assertThat(oneArgFnKey.keyName).isEqualTo("fun-one(Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TrackerKeyTestSource.kt")
     assertAffectedComposable(
       oneArgFnKey.affectedComposable,
       expectName = "one",
@@ -86,7 +87,7 @@ class TrackerKeyTest : AbstractCompilerTest(useFir = false) {
       expectStartColumn = 0,
     )
 
-    twoArgFnKey.keyName shouldBe "fun-one(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TrackerKeyTestSource.kt"
+    assertThat(twoArgFnKey.keyName).isEqualTo("fun-one(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TrackerKeyTestSource.kt")
     assertAffectedComposable(
       twoArgFnKey.affectedComposable,
       expectName = "one",
@@ -95,7 +96,7 @@ class TrackerKeyTest : AbstractCompilerTest(useFir = false) {
       expectStartColumn = 0,
     )
 
-    threeArgFnKey.keyName shouldBe "fun-one(Any,Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TrackerKeyTestSource.kt"
+    assertThat(threeArgFnKey.keyName).isEqualTo("fun-one(Any,Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TrackerKeyTestSource.kt")
     assertAffectedComposable(
       threeArgFnKey.affectedComposable,
       expectName = "one",

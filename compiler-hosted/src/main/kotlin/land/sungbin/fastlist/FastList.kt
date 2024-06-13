@@ -7,6 +7,8 @@
 
 @file:OptIn(ExperimentalContracts::class)
 
+// TODO moving to the 'util' package
+
 package land.sungbin.fastlist
 
 import kotlin.contracts.ExperimentalContracts
@@ -266,7 +268,7 @@ public inline fun <T, R : Comparable<R>> List<T>.fastMaxOfOrNull(selector: (T) -
  */
 public inline fun <T, R> List<T>.fastZipWithNext(transform: (T, T) -> R): List<R> {
   contract { callsInPlace(transform) }
-  if (size == 0 || size == 1) return emptyList()
+  if (isEmpty() || size == 1) return emptyList()
   val result = mutableListOf<R>()
   var current = get(0)
   // `until` as we don't want to invoke this for the last element, since that won't have a `next`
@@ -471,7 +473,7 @@ public fun <T, A : Appendable> List<T>.fastJoinTo(
       buffer.appendElement(element, transform)
     } else break
   }
-  if (limit >= 0 && count > limit) buffer.append(truncated)
+  if (limit in 0..<count) buffer.append(truncated)
   buffer.append(postfix)
   return buffer
 }

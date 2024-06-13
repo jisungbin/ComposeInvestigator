@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler.struct
 
+import java.lang.ref.WeakReference
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN
 import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTrackTable_CALL_LISTENERS
 import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTrackTable_COMPUTE_INVALIDATION_REASON
@@ -29,7 +30,6 @@ import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
 import org.jetbrains.kotlin.ir.expressions.IrValueAccessExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.classOrFail
@@ -40,7 +40,6 @@ import org.jetbrains.kotlin.ir.util.getSimpleFunction
 import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
-import java.lang.ref.WeakReference
 
 public class IrInvalidationTrackTable private constructor(public val prop: IrProperty) {
   private var computeInvalidationReasonSymbol: IrSimpleFunctionSymbol? = null
@@ -124,7 +123,7 @@ private fun irInvalidationTrackTableProp(context: IrPluginContext, currentFile: 
     }.also { field ->
       field.parent = currentFile
       field.correspondingPropertySymbol = prop.symbol
-      field.initializer = IrExpressionBodyImpl(
+      field.initializer = context.irFactory.createExpressionBody(
         startOffset = SYNTHETIC_OFFSET,
         endOffset = SYNTHETIC_OFFSET,
         expression = IrConstructorCallImpl.fromSymbolOwner(

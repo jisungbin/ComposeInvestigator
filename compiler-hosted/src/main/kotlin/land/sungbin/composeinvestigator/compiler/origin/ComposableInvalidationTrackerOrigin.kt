@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler.origin
 
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.IrStatementOriginImpl
 
-public data object ComposableInvalidationTrackerOrigin : IrStatementOriginImpl("GENERATED_COMPOSABLE_INVALIDATION_TRACKER_MEMBER")
+public val ComposableInvalidationTrackerOrigin: IrStatementOrigin = IrStatementOriginImpl("GENERATED_COMPOSABLE_INVALIDATION_TRACKER_MEMBER")

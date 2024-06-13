@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler
 
+// TODO is this really the best approach?
 public class HandledMap {
   private val map = mutableMapOf<Int, Unit>()
 

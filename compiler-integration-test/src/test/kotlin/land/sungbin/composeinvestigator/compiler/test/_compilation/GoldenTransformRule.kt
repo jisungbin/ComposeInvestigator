@@ -9,6 +9,8 @@
 
 package land.sungbin.composeinvestigator.compiler.test._compilation
 
+import java.io.File
+import java.io.FileNotFoundException
 import org.jetbrains.kotlin.cli.common.toBooleanLenient
 import org.jetbrains.kotlin.incremental.createDirectory
 import org.junit.Assert.assertEquals
@@ -16,8 +18,6 @@ import org.junit.rules.TestRule
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
 import org.junit.runners.model.Statement
-import java.io.File
-import java.io.FileNotFoundException
 
 private const val ENV_GENERATE_GOLDEN = "GENERATE_GOLDEN"
 private const val GOLDEN_FILE_TYPE = "txt"
@@ -30,13 +30,13 @@ private fun envList(name: String): List<String> = (System.getenv(name).orEmpty()
  * pre-transformed and post-transformed source for easier review.
  * To regenerate the set of golden tests, pass 'GENERATE_GOLDEN=true' as an environment variable.
  *
- * @param pathToGoldens Path to golden files.
+ * @param goldensPath Path to golden files.
  * @param generateGoldens When true, will generate the golden test file and replace any existing.
  * @param generateGoldenFiles Generate the golden file if the name (without extension, is in the list).
  * @param generateMissingGoldens When true, will generate a golden file for any that are not found.
  **/
 class GoldenTransformRule(
-  private val pathToGoldens: String,
+  private val goldensPath: String,
   private val generateGoldens: Boolean = env(ENV_GENERATE_GOLDEN),
   private val generateGoldenFiles: Set<String> = envList(ENV_GENERATE_GOLDEN).toSet(),
   private val generateMissingGoldens: Boolean = true,
@@ -52,7 +52,7 @@ class GoldenTransformRule(
   }
 
   private fun getGoldenFilePath(className: String, methodName: String) =
-    "$pathToGoldens/$className/$methodName.$GOLDEN_FILE_TYPE"
+    "$goldensPath/$className/$methodName.$GOLDEN_FILE_TYPE"
 
   override fun apply(base: Statement, description: Description): Statement =
     base.run { testWatcher.apply(this, description) }
@@ -80,15 +80,14 @@ class GoldenTransformRule(
 
     // Use absolute path in the assert error so studio shows it as a link
     assertEquals(
+      /* message = */
       "Transformed source does not match golden file:\n${goldenFile.absolutePath}\n" +
         "To regenerate golden files, set GENERATE_GOLDEN=\"${goldenFile.nameWithoutExtension}\" " +
         "as an env variable (or set it to 'true' to generate all the files).\n" +
         "The environment variable can be a comma delimited list of names. " +
         "(the quotes are optional)",
-      /* expected = */
-      loadedTestInfo.transformed,
-      /* actual = */
-      testInfo.transformed,
+      /* expected = */ loadedTestInfo.transformed,
+      /* actual = */ testInfo.transformed,
     )
   }
 

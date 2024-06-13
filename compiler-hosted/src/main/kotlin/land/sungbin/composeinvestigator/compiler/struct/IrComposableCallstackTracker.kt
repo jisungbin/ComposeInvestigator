@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler.struct
 
+import java.lang.ref.WeakReference
 import land.sungbin.composeinvestigator.compiler.ITERABLE_TO_LIST_FQN
 import land.sungbin.composeinvestigator.compiler.STACK_FQN
 import land.sungbin.composeinvestigator.compiler.Stack_POP
@@ -30,7 +31,6 @@ import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrExpressionBodyImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.classFqName
@@ -44,7 +44,6 @@ import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
-import java.lang.ref.WeakReference
 
 public class IrComposableCallstackTracker private constructor(public val prop: IrProperty) {
   private var pushSymbol: IrSimpleFunctionSymbol? = null
@@ -138,7 +137,7 @@ private fun irComposableCallstackTrackerProp(context: IrPluginContext, currentFi
     }.also { field ->
       field.parent = currentFile
       field.correspondingPropertySymbol = prop.symbol
-      field.initializer = IrExpressionBodyImpl(
+      field.initializer = context.irFactory.createExpressionBody(
         startOffset = SYNTHETIC_OFFSET,
         endOffset = SYNTHETIC_OFFSET,
         expression = IrConstructorCallImpl.fromSymbolOwner(
