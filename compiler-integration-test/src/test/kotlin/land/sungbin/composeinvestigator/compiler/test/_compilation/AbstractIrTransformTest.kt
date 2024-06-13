@@ -1,3 +1,10 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
+ */
+
 @file:Suppress("MemberVisibilityCanBePrivate", "unused")
 
 package land.sungbin.composeinvestigator.compiler.test._compilation
@@ -13,7 +20,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.rules.TemporaryFolder
 
-abstract class AbstractIrTransformTest : AbstractCompilerTest() {
+abstract class AbstractIrTransformTest : AbstractK2CompilerTest() {
   @get:Rule
   val classesDirectory: TemporaryFolder = TemporaryFolder.builder().assureDeletion().build()
 

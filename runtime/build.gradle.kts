@@ -12,7 +12,7 @@ plugins {
   id("com.android.library")
   kotlin("android")
   alias(libs.plugins.kotlin.dokka)
-   alias(libs.plugins.kotlin.compose)
+  alias(libs.plugins.kotlin.compose)
   id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 
@@ -72,8 +72,17 @@ kotlin {
 dependencies {
   implementation(libs.compose.runtime)
   implementation(libs.compose.animation)
-  implementation(embeddedKotlin("reflect")) // TODO remove kotlin-reflect usage. This is large dependency.
+  implementation(kotlin("reflect")) // TODO remove kotlin-reflect usage. This is large dependency.
 
   testImplementation(kotlin("test-junit5"))
-  testImplementation(libs.test.mockk)
+  testImplementation(libs.test.assertk)
+  testImplementation(libs.test.kotlin.coroutines)
+
+  // noinspection UseTomlInstead
+  testImplementation("androidx.compose.runtime:runtime-test-utils:1.8.0-SNAPSHOT") {
+    isTransitive = false
+
+    // Why snapshot?
+    because("https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/runtime/runtime-test-utils/build.gradle;l=68;drc=aa3aa01c08fc9d9e7c13260b4f2fe89dfa2a58f1")
+  }
 }

@@ -10,6 +10,7 @@ package land.sungbin.composeinvestigator.compiler.lower
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.knownUnstable
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
+import java.util.concurrent.atomic.AtomicReference
 import land.sungbin.composeinvestigator.compiler.ANIMATABLE_FQN
 import land.sungbin.composeinvestigator.compiler.COMPOSER_FQN
 import land.sungbin.composeinvestigator.compiler.Composer_SKIPPING
@@ -82,7 +83,6 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
-import java.util.concurrent.atomic.AtomicReference
 
 public abstract class AbstractComosableInvalidationTrackLower(
   private val context: IrPluginContext,

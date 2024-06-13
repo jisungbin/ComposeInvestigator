@@ -26,14 +26,14 @@ class CodegenTest : AbstractIrTransformTest() {
   @Test fun no_state_tracking_codegen() {
     verifyGoldenIrTransform(
       source = sourceString("codegen/NoStateTracking.kt"),
-      flags = CompileFeature_COMPOSE or CompileFeature_NO_CALLSTACK_TRACKING,
+      flags = Flags.COMPOSE or Flags.NO_CALLSTACK_TRACKING,
     )
   }
 
   @Test fun invalidation_tracking_codegen() {
     verifyGoldenIrTransform(
       source = sourceString("codegen/InvalidationTracking.kt"),
-      flags = CompileFeature_COMPOSE or CompileFeature_NO_CALLSTACK_TRACKING,
+      flags = Flags.COMPOSE or Flags.NO_CALLSTACK_TRACKING,
     )
   }
 
@@ -48,7 +48,7 @@ class CodegenTest : AbstractIrTransformTest() {
   @Test fun table_intrinsic_call_codegen() {
     verifyGoldenIrTransform(
       source = sourceString("codegen/TableIntrinsicCall.kt"),
-      flags = CompileFeature_NONE,
+      flags = Flags.NONE,
     )
   }
 }

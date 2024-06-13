@@ -1,3 +1,10 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
+ */
+
 package land.sungbin.composeinvestigator.compiler.test._compilation.compiler
 
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
@@ -15,7 +22,7 @@ object ErrorMessageCollector : MessageCollector {
     if (severity === CompilerMessageSeverity.ERROR) {
       throw AssertionError(
         if (location == null) message
-        else "(${location.path}:${location.line}:${location.column}) $message"
+        else "(${location.path}:${location.line}:${location.column}) $message",
       )
     }
   }

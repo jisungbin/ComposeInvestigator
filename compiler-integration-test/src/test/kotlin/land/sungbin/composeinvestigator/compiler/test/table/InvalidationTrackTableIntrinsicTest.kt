@@ -10,9 +10,10 @@ package land.sungbin.composeinvestigator.compiler.test.table
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import io.kotest.matchers.nulls.shouldNotBeNull
-import io.kotest.matchers.types.shouldBeTypeOf
-import io.kotest.matchers.types.shouldNotBeSameInstanceAs
+import assertk.assertThat
+import assertk.assertions.hasClass
+import assertk.assertions.isNotNull
+import assertk.assertions.isSameInstanceAs
 import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.CurrentComposableKeyName1
 import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.CurrentComposableKeyName2
 import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.CurrentComposableName1
@@ -30,10 +31,10 @@ class InvalidationTrackTableIntrinsicTest {
   val compose = createAndroidComposeRule<ComponentActivity>()
 
   @Test fun table_instance() {
-    table1.shouldNotBeNull().shouldBeTypeOf<ComposableInvalidationTrackTable>()
-    table2.shouldNotBeNull().shouldBeTypeOf<ComposableInvalidationTrackTable>()
+    assertThat(table1).isNotNull().hasClass<ComposableInvalidationTrackTable>()
+    assertThat(table2).isNotNull().hasClass<ComposableInvalidationTrackTable>()
 
-    table1 shouldNotBeSameInstanceAs table2
+    assertThat(table1).isSameInstanceAs(table2)
 
     table1()
     table2()

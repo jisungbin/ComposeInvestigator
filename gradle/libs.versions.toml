@@ -16,7 +16,7 @@ kotlin-coroutines = "1.9.0-RC" # K2
 
 androidx-activity = "1.9.0"
 
-compose-runtime = "1.6.7"
+compose-runtime = "1.6.8"
 compose-activity = "1.9.0"
 
 fastlist = "0.1.0"
@@ -24,6 +24,10 @@ fastlist = "0.1.0"
 test-assertk = "0.28.1"
 test-mockk = "1.13.11"
 test-robolectric = "4.11.1"
+
+# Some of our tests use JUnit4 because we include an Android module.
+test-junit-core = "4.13.2"
+test-junit-engine = "5.10.2"
 
 [plugins]
 gradle-publish-maven = { id = "com.vanniktech.maven.publish", version.ref = "gradle-publish-maven" }
@@ -56,6 +60,8 @@ fastlist = { module = "land.sungbin.fastlist:fastlist", version.ref = "fastlist"
 
 test-assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "test-assertk" }
 test-mockk = { module = "io.mockk:mockk", version.ref = "test-mockk" }
+test-junit-core = { module = "junit:junit", version.ref = "test-junit-core" }
+test-junit-enigne = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "test-junit-engine" }
 test-junit-compose = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-runtime" }
 test-robolectric = { module = "org.robolectric:robolectric", version.ref = "test-robolectric" }
 test-kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }

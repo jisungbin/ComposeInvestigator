@@ -52,6 +52,7 @@ kotlin {
     optIn.addAll(
       "org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi",
       "org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction",
+      "org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI",
       "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
       "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
     )
@@ -84,8 +85,9 @@ dependencies {
     because("https://stackoverflow.com/a/64287388/14299073")
   }
 
-  testImplementation(kotlin("test-junit5"))
+  testImplementation(libs.test.junit.core)
   testImplementation(libs.test.junit.compose)
+  testRuntimeOnly(libs.test.junit.enigne)
 
   kotlinCompilerPluginClasspath(projects.compiler)
 }

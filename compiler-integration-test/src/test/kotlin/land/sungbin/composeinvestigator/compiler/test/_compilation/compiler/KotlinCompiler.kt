@@ -51,7 +51,7 @@ abstract class KotlinCompiler(val environment: KotlinCoreEnvironment) {
       }
       require(
         configuration[JVMConfigurationKeys.IR] == true &&
-          configuration[CommonConfigurationKeys.USE_FIR] == true
+          configuration[CommonConfigurationKeys.USE_FIR] == true,
       ) {
         "FIR and IR must be enabled for the Kotlin compiler."
       }

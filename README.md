@@ -6,14 +6,17 @@ This tool was initiated for personal learning and has not been proven necessary 
 However, it can perform the following tasks:
 
 - **Reports if a Composable is skipped during recomposition.**
-- **Reports if the arguments of a Composable have changed and been recomposed.** It can also compare the
+- **Reports if the arguments of a Composable have changed and been recomposed.** It can also compare
+  the
   values before and after the change.
-- **Reports if the state values inside a Composable have been modified.** It can also compare the values
+- **Reports if the state values inside a Composable have been modified.** It can also compare the
+  values
   before and after the change.
 - **Retrieves the call stack leading up to the invocation of a Composable.** This helps identify the
   specific Composable being recomposed when the same Composable is reused in multiple places.
 
-[*(Read the Medium's introductory post)*](https://jisungbin.medium.com/tracing-recompositions-without-boilerplate-code-e9800db1419e)
+[*(Read the Medium's introductory
+post)*](https://jisungbin.medium.com/tracing-recompositions-without-boilerplate-code-e9800db1419e)
 
 ---
 
@@ -31,11 +34,13 @@ plugins {
 >
 > ComposeInvestigator is heavily dependent on the version
 > of [Compose Compiler](https://developer.android.com/jetpack/androidx/releases/compose-compiler),
-> so the version of ComposeInvestigator follows the format `[Compose Compiler Version - ComposeInvestigator Version]`.
+> so the version of ComposeInvestigator follows the
+> format `[Compose Compiler Version - ComposeInvestigator Version]`.
 >
-> In other words, you need to adjust the Compose Compiler version and Kotlin version to use ComposeInvestigator.
+> In other words, you need to adjust the Compose Compiler version and Kotlin version to use
+> ComposeInvestigator.
 >
-> It also depends slightly on the Compose Runtime and Compose Animation versions. 
+> It also depends slightly on the Compose Runtime and Compose Animation versions.
 > The last tested versions are both `1.6.3`.
 
 Snapshots of the development version are available in Sonatype's snapshots repository.
@@ -57,7 +62,8 @@ on [project website](https://jisungbin.github.io/ComposeInvestigator).
 
 ### Known issues
 
-- [#155](https://github.com/jisungbin/ComposeInvestigator/issues/155): Using the R8 build causes a crash.
+- [#155](https://github.com/jisungbin/ComposeInvestigator/issues/155): Using the R8 build causes a
+  crash.
 
 ### Preview
 

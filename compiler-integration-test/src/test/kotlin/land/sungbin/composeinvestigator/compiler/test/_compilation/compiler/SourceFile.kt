@@ -1,3 +1,10 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
+ */
+
 package land.sungbin.composeinvestigator.compiler.test._compilation.compiler
 
 import com.intellij.openapi.project.Project
@@ -24,7 +31,7 @@ data class SourceFile(
     val virtualFile = object : LightVirtualFile(
       /* name = */ shortName,
       /* language = */ KotlinLanguage.INSTANCE,
-      /* text = */ StringUtilRt.convertLineSeparators(source)
+      /* text = */ StringUtilRt.convertLineSeparators(source),
     ) {
       override fun getPath() = "${this@SourceFile.path}/$name"
     }.apply {

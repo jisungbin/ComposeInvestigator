@@ -9,28 +9,16 @@
 
 package land.sungbin.composeinvestigator.compiler
 
-import org.jetbrains.kotlin.cli.common.CLIConfigurationKeys
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSourceLocation
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.messageCollector
 
-public class VerboseLogger() {
-  private var messageCollector = MessageCollector.NONE
-
-  public constructor(configuration: CompilerConfiguration) : this() {
-    this.messageCollector = configuration.get(CLIConfigurationKeys.MESSAGE_COLLECTOR_KEY, MessageCollector.NONE)
-  }
-
-  public constructor(messageCollector: MessageCollector) : this() {
-    this.messageCollector = messageCollector
-  }
-
+public class VerboseLogger(configuration: CompilerConfiguration) {
+  private val messageCollector = configuration.messageCollector
   private var verbose = false
 
-  public fun verbose() {
-    verbose = true
-  }
+  public fun verbose(): VerboseLogger = apply { verbose = true }
 
   public fun warn(message: Any?, location: CompilerMessageSourceLocation?) {
     if (verbose) {

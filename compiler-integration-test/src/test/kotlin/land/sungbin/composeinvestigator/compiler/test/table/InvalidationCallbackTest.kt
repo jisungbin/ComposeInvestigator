@@ -12,8 +12,8 @@ import androidx.compose.ui.test.hasClickAction
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.performClick
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import io.kotest.matchers.collections.shouldContainExactly
-import io.kotest.matchers.collections.shouldHaveSingleElement
+import assertk.assertThat
+import assertk.assertions.containsExactly
 import land.sungbin.composeinvestigator.compiler.test.source.table.callback.Effects_InvalidationSkippedRoot
 import land.sungbin.composeinvestigator.compiler.test.source.table.callback.RegisterListener_InvalidationSkippedRoot
 import land.sungbin.composeinvestigator.compiler.test.source.table.callback.findInvalidationListensViaEffects
@@ -40,11 +40,13 @@ class InvalidationCallbackTest {
       val rootListens = findInvalidationListensViaManualRegister("RegisterListener_InvalidationSkippedRoot")
       val childListens = findInvalidationListensViaManualRegister("RegisterListener_InvalidationSkippedChild")
 
-      rootListens shouldContainExactly listOf(
-        ComposableInvalidationType.Processed(InvalidationReason.Invalidate),
-        ComposableInvalidationType.Processed(InvalidationReason.Unknown(params = emptyList())),
+      assertThat(rootListens).containsExactly(
+        listOf(
+          ComposableInvalidationType.Processed(InvalidationReason.Invalidate),
+          ComposableInvalidationType.Processed(InvalidationReason.Unknown(params = emptyList())),
+        ),
       )
-      childListens shouldHaveSingleElement ComposableInvalidationType.Skipped
+      assertThat(childListens).containsExactly(ComposableInvalidationType.Skipped)
     }
   }
 
@@ -56,11 +58,13 @@ class InvalidationCallbackTest {
       val rootListens = findInvalidationListensViaEffects("Effects_InvalidationSkippedRoot")
       val childListens = findInvalidationListensViaEffects("Effects_InvalidationSkippedChild")
 
-      rootListens shouldContainExactly listOf(
-        ComposableInvalidationType.Processed(InvalidationReason.Invalidate),
-        ComposableInvalidationType.Processed(InvalidationReason.Unknown(params = emptyList())),
+      assertThat(rootListens).containsExactly(
+        listOf(
+          ComposableInvalidationType.Processed(InvalidationReason.Invalidate),
+          ComposableInvalidationType.Processed(InvalidationReason.Unknown(params = emptyList())),
+        ),
       )
-      childListens shouldHaveSingleElement ComposableInvalidationType.Skipped
+      assertThat(childListens).containsExactly(ComposableInvalidationType.Skipped)
     }
   }
 }

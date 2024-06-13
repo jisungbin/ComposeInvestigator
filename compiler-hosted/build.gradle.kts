@@ -21,6 +21,7 @@ kotlin {
       "org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi",
       "org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction",
       // Only works with IR phase, not FIR.
+      // See https://kotlinlang.slack.com/archives/C7L3JB43G/p1700429910462239.
       "org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI",
     )
   }

@@ -1,3 +1,10 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
+ */
+
 @file:Suppress("SameParameterValue")
 
 package land.sungbin.composeinvestigator.compiler.test._compilation
@@ -80,7 +87,7 @@ class GoldenTransformRule(
         "The environment variable can be a comma delimited list of names. " +
         "(the quotes are optional)",
       /* expected = */ loadedTestInfo.transformed,
-      /* actual = */ testInfo.transformed
+      /* actual = */ testInfo.transformed,
     )
   }
 

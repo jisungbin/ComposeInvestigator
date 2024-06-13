@@ -1,3 +1,10 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
+ */
+
 @file:Suppress("UnstableApiUsage")
 
 package land.sungbin.composeinvestigator.compiler.test._compilation
@@ -5,6 +12,7 @@ package land.sungbin.composeinvestigator.compiler.test._compilation
 import androidx.compose.compiler.plugins.kotlin.ComposeConfiguration
 import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
 import com.intellij.openapi.extensions.LoadingOrder
+import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
 import java.io.File
@@ -12,7 +20,6 @@ import land.sungbin.composeinvestigator.compiler.ComposableCallstackTrackingExte
 import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTrackingExtension
 import land.sungbin.composeinvestigator.compiler.VerboseLogger
 import land.sungbin.composeinvestigator.compiler.test._compilation.compiler.AnalysisResult
-import land.sungbin.composeinvestigator.compiler.test._compilation.compiler.ErrorMessageCollector
 import land.sungbin.composeinvestigator.compiler.test._compilation.compiler.KotlinCompiler
 import land.sungbin.composeinvestigator.compiler.test._compilation.compiler.SourceFile
 import org.intellij.lang.annotations.MagicConstant
@@ -22,6 +29,7 @@ import org.jetbrains.kotlin.cli.jvm.config.configureJdkClasspathRoots
 import org.jetbrains.kotlin.config.AnalysisFlag
 import org.jetbrains.kotlin.config.AnalysisFlags
 import org.jetbrains.kotlin.config.ApiVersion
+import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.config.LanguageVersion
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
@@ -30,7 +38,7 @@ import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.junit.After
 import org.junit.BeforeClass
 
-abstract class AbstractCompilerTest {
+abstract class AbstractK2CompilerTest {
   object Flags {
     @Suppress("unused")
     const val NONE = 0
@@ -84,6 +92,7 @@ abstract class AbstractCompilerTest {
 
   private fun createCompiler(
     additionalPaths: List<File> = emptyList(),
+    additionalRegisterExtensions: Project.(configuration: CompilerConfiguration) -> Unit = {},
     @MagicConstant(flagsFromClass = Flags::class) flags: Int = Flags.COMPOSE,
   ) =
     KotlinCompiler.create(
@@ -125,7 +134,7 @@ abstract class AbstractCompilerTest {
         configuration.put(ComposeConfiguration.LIVE_LITERALS_ENABLED_KEY, useLiveLiteral)
         configuration.put(ComposeConfiguration.LIVE_LITERALS_V2_ENABLED_KEY, useLiveLiteral)
 
-        val logger = VerboseLogger(messageCollector = ErrorMessageCollector).apply { verbose() }
+        val logger = VerboseLogger(configuration).verbose()
         if ((flags and Flags.NO_CALLSTACK_TRACKING) == 0) {
           extensionArea
             .getExtensionPoint(IrGenerationExtension.extensionPointName)
@@ -142,22 +151,26 @@ abstract class AbstractCompilerTest {
             LoadingOrder.LAST,
             this,
           )
-      }
+
+        additionalRegisterExtensions(configuration)
+      },
     )
 
   protected fun analyze(
     platformSources: List<SourceFile>,
     commonSources: List<SourceFile> = listOf(),
+    additionalRegisterExtensions: Project.(configuration: CompilerConfiguration) -> Unit = {},
     @MagicConstant(flagsFromClass = Flags::class) flags: Int = Flags.COMPOSE,
   ): AnalysisResult =
-    createCompiler(flags = flags)
+    createCompiler(additionalRegisterExtensions = additionalRegisterExtensions, flags = flags)
       .analyze(platformFiles = platformSources, commonFiles = commonSources)
 
   protected fun compileToIr(
     sourceFiles: List<SourceFile>,
     additionalPaths: List<File> = emptyList(),
+    additionalRegisterExtensions: Project.(configuration: CompilerConfiguration) -> Unit = {},
     @MagicConstant(flagsFromClass = Flags::class) flags: Int = Flags.COMPOSE,
   ): IrModuleFragment =
-    createCompiler(additionalPaths = additionalPaths, flags = flags)
+    createCompiler(additionalPaths = additionalPaths, additionalRegisterExtensions = additionalRegisterExtensions, flags = flags)
       .compileToIr(sourceFiles)
 }
