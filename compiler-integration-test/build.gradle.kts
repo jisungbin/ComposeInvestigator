@@ -74,7 +74,7 @@ dependencies {
 
   testImplementation(projects.compilerHosted)
   testImplementation(libs.kotlin.compiler.core)
-  testImplementation(libs.kotlin.compiler.compose) // must be 'implementation' (not 'compileOnly')
+  testImplementation(libs.kotlin.compiler.compose)
 
   testImplementation(libs.test.kotlin.coroutines) {
     because("https://github.com/Kotlin/kotlinx.coroutines/issues/3673")

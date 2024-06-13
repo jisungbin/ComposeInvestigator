@@ -16,19 +16,23 @@ pluginManagement {
   repositories {
     gradlePluginPortal()
     google {
-      content {
+      mavenContent {
         includeGroupByRegex(".*google.*")
         includeGroupByRegex(".*android.*")
       }
     }
-    mavenCentral()
+    mavenCentral {
+      mavenContent {
+        releasesOnly()
+      }
+    }
     maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") {
-      content {
+      mavenContent {
         includeGroupByRegex("org\\.jetbrains\\.kotlin.*")
       }
     }
     maven("https://jitpack.io") {
-      content {
+      mavenContent {
         includeGroup("com.github.takahirom")
       }
     }
@@ -57,7 +61,7 @@ dependencyResolutionManagement {
       }
     }
     maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") {
-      content {
+      mavenContent {
         includeGroupByRegex("org\\.jetbrains\\.kotlin.*")
       }
     }
