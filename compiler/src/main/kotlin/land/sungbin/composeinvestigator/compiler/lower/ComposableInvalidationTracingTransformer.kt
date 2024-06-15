@@ -14,12 +14,12 @@ import land.sungbin.composeinvestigator.compiler.COMPOSER_FQN
 import land.sungbin.composeinvestigator.compiler.HandledMap
 import land.sungbin.composeinvestigator.compiler.MUTABLE_LIST_ADD_FQN
 import land.sungbin.composeinvestigator.compiler.MUTABLE_LIST_OF_FQN
-import land.sungbin.composeinvestigator.compiler.REGISTER_STATE_OBJECT_TRACKING_FQN
+import land.sungbin.composeinvestigator.compiler.REGISTER_STATE_OBJECT_TRACING_FQN
 import land.sungbin.composeinvestigator.compiler.VerboseLogger
 import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.analysis.toIrDeclarationStability
 import land.sungbin.composeinvestigator.compiler.fromFqName
-import land.sungbin.composeinvestigator.compiler.origin.StateChangeTrackerOrigin
+import land.sungbin.composeinvestigator.compiler.origin.StateChangeTracerOrigin
 import land.sungbin.composeinvestigator.compiler.struct.IrAffectedComposable
 import land.sungbin.composeinvestigator.compiler.struct.IrAffectedField
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationLogger
@@ -44,14 +44,14 @@ import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
 
-internal class ComposableInvalidationTrackingTransformer(
+internal class ComposableInvalidationTracingTransformer(
   private val context: IrPluginContext,
   private val logger: VerboseLogger,
   private val stabilityInferencer: StabilityInferencer,
   private val affectedField: IrAffectedField,
   affectedComposable: IrAffectedComposable,
   private val invalidationLogger: IrInvalidationLogger,
-) : AbstractComosableInvalidationTrackLower(
+) : AbstractComosableInvalidationTraceLower(
   context = context,
   logger = logger,
   stabilityInferencer = stabilityInferencer,
@@ -67,8 +67,8 @@ internal class ComposableInvalidationTrackingTransformer(
       .referenceFunctions(CallableId.fromFqName(MUTABLE_LIST_ADD_FQN))
       .single { fn -> fn.owner.valueParameters.size == 1 }
 
-  private val registerStateObjectTrackingSymbol =
-    context.referenceFunctions(CallableId.fromFqName(REGISTER_STATE_OBJECT_TRACKING_FQN)).single()
+  private val registerStateObjectTracingSymbol =
+    context.referenceFunctions(CallableId.fromFqName(REGISTER_STATE_OBJECT_TRACING_FQN)).single()
 
   private val handledState = HandledMap()
   private val handledComposableBody = HandledMap()
@@ -84,11 +84,11 @@ internal class ComposableInvalidationTrackingTransformer(
     return IrCallImpl.fromSymbolOwner(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,
-      symbol = registerStateObjectTrackingSymbol,
+      symbol = registerStateObjectTracingSymbol,
     ).also { register ->
       register.extensionReceiver = initializer
       register.type = initializer.type
-      register.origin = StateChangeTrackerOrigin
+      register.origin = StateChangeTracerOrigin
     }.apply {
       putTypeArgument(0, initializer.type)
 
@@ -108,7 +108,7 @@ internal class ComposableInvalidationTrackingTransformer(
     if (!handledComposableBody.handle(currentKey.keyName)) return body
 
     val newStatements = mutableListOf<IrStatement>()
-    val currentInvalidationTrackTable = currentInvalidationTrackTable!!
+    val currentInvalidationTraceTable = currentInvalidationTraceTable!!
 
     val affectedFieldList = IrCallImpl.fromSymbolOwner(
       startOffset = UNDEFINED_OFFSET,
@@ -152,7 +152,7 @@ internal class ComposableInvalidationTrackingTransformer(
       newStatements += addValueParamToList
     }
 
-    val computeInvalidationReason = currentInvalidationTrackTable.irComputeInvalidationReason(
+    val computeInvalidationReason = currentInvalidationTraceTable.irComputeInvalidationReason(
       composableKeyName = irString(currentKey.keyName),
       fields = irGetValue(affectedFieldListVar),
     )
@@ -169,7 +169,7 @@ internal class ComposableInvalidationTrackingTransformer(
 
     val currentCallstack = currentCallstack()
 
-    val callListeners = currentInvalidationTrackTable.irCallListeners(
+    val callListeners = currentInvalidationTraceTable.irCallListeners(
       key = irString(currentKey.keyName),
       callstack = currentCallstack,
       composable = currentKey.affectedComposable,
@@ -200,7 +200,7 @@ internal class ComposableInvalidationTrackingTransformer(
     if (!handledUpdateScopeBlock.handle(currentKey.keyName)) return NO_CHANGED
 
     val newStatements = mutableListOf<IrStatement>()
-    val currentInvalidationTrackTable = currentInvalidationTrackTable!!
+    val currentInvalidationTraceTable = currentInvalidationTraceTable!!
 
     val invalidationTypeSymbol = invalidationLogger.irInvalidationTypeSymbol
     val invalidationTypeProcessed = invalidationLogger.irInvalidationTypeProcessed(
@@ -216,7 +216,7 @@ internal class ComposableInvalidationTrackingTransformer(
 
     val currentCallstack = currentCallstack()
 
-    val callListeners = currentInvalidationTrackTable.irCallListeners(
+    val callListeners = currentInvalidationTraceTable.irCallListeners(
       key = irString(currentKey.keyName),
       callstack = currentCallstack,
       composable = currentKey.affectedComposable,
@@ -246,7 +246,7 @@ internal class ComposableInvalidationTrackingTransformer(
     val currentKey = irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return NO_CHANGED
     if (!handledSkipToGroupEndCall.handle(currentKey.keyName)) return NO_CHANGED
 
-    val currentInvalidationTrackTable = currentInvalidationTrackTable!!
+    val currentInvalidationTraceTable = currentInvalidationTraceTable!!
 
     val invalidationTypeSymbol = invalidationLogger.irInvalidationTypeSymbol
     val invalidationTypeSkipped = invalidationLogger.irInvalidationTypeSkipped()
@@ -254,7 +254,7 @@ internal class ComposableInvalidationTrackingTransformer(
 
     val currentCallstack = currentCallstack()
 
-    val callListeners = currentInvalidationTrackTable.irCallListeners(
+    val callListeners = currentInvalidationTraceTable.irCallListeners(
       key = irString(currentKey.keyName),
       callstack = currentCallstack,
       composable = currentKey.affectedComposable,

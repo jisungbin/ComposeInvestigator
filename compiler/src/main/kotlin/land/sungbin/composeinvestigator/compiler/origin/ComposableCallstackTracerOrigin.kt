@@ -9,6 +9,6 @@ package land.sungbin.composeinvestigator.compiler.origin
 
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 
-public data object ComposableInvalidationTrackerOrigin : IrStatementOrigin {
-  override val debugName: String = "GENERATED_COMPOSABLE_INVALIDATION_TRACKER_MEMBER"
+public data object ComposableCallstackTracerOrigin : IrStatementOrigin {
+  override val debugName: String = "GENERATED_COMPOSABLE_CALLSTACK_TRACER_MEMBER"
 }

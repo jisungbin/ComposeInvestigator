@@ -7,16 +7,16 @@
 
 package land.sungbin.composeinvestigator.compiler
 
-import land.sungbin.composeinvestigator.compiler.lower.ComposableCallstackTrackingTransformer
+import land.sungbin.composeinvestigator.compiler.lower.ComposableCallstackTracingTransformer
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
-public class ComposableCallstackTrackingExtension(private val logger: VerboseLogger) : IrGenerationExtension {
+public class ComposableCallstackTracingExtension(private val logger: VerboseLogger) : IrGenerationExtension {
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
     moduleFragment.transformChildrenVoid(
-      ComposableCallstackTrackingTransformer(
+      ComposableCallstackTracingTransformer(
         context = pluginContext,
         logger = logger,
       ),

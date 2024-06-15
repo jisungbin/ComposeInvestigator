@@ -62,7 +62,7 @@ kotlin {
 
 afterEvaluate {
   tasks.withType<Test> {
-    dependsOn(":compiler:embeddedPlugin")
+    dependsOn(":compiler-embeddable:embeddedPlugin")
   }
 }
 

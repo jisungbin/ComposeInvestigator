@@ -13,10 +13,10 @@ import assertk.assertions.isEqualTo
 import kotlin.test.Test
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
 
-class ComposableInvalidationTrackTableTest {
+class ComposableInvalidationTraceTableTest {
   @Test
   fun computeInvalidationReasonWhenNoPreviousInfo() {
-    val table = ComposableInvalidationTrackTable()
+    val table = ComposableInvalidationTraceTable()
 
     val param = AffectedField.ValueParameter(
       name = "name",
@@ -33,7 +33,7 @@ class ComposableInvalidationTrackTableTest {
 
   @Test
   fun computeInvalidationReasonWhenPreviousInfoExists() {
-    val table = ComposableInvalidationTrackTable()
+    val table = ComposableInvalidationTraceTable()
 
     val oldParam = AffectedField.ValueParameter(
       name = "name",

@@ -47,7 +47,7 @@ private fun Tv(title: String, value: Any) {
 // Transformed IR
 // ------------------------------------------
 
-val ComposableCallstackTrackerImpl%TestKt: Stack<String> = Stack()
+val ComposableCallstackTracerImpl%TestKt: Stack<String> = Stack()
 @Suppress(names = "unused")
 @Composable
 @ComposableTarget(applier = "androidx.compose.ui.UiComposable")
@@ -74,7 +74,7 @@ private fun Main(%composer: Composer?, %changed: Int) {
       }
     }
     try {
-      ComposableCallstackTrackerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Main")
+      ComposableCallstackTracerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Main")
       Button(<block>{
         %composer.startReplaceableGroup(<>)
         val tmp1_group = %composer.cache(false) {
@@ -86,19 +86,19 @@ private fun Main(%composer: Composer?, %changed: Int) {
         tmp1_group
       }, null, false, null, null, null, null, null, null, ComposableSingletons%TestKt.lambda-1, %composer, 0b00110000000000000000000000000110, 0b000111111110)
     } finally {
-      ComposableCallstackTrackerImpl%TestKt.pop()
+      ComposableCallstackTracerImpl%TestKt.pop()
     }
     try {
-      ComposableCallstackTrackerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Main")
+      ComposableCallstackTracerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Main")
       Counter(<get-state>(), %composer, 0)
     } finally {
-      ComposableCallstackTrackerImpl%TestKt.pop()
+      ComposableCallstackTracerImpl%TestKt.pop()
     }
     try {
-      ComposableCallstackTrackerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Main")
+      ComposableCallstackTracerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Main")
       Tv("state", <get-state>(), %composer, 0b0110)
     } finally {
-      ComposableCallstackTrackerImpl%TestKt.pop()
+      ComposableCallstackTracerImpl%TestKt.pop()
     }
     if (isTraceInProgress()) {
       traceEventEnd()
@@ -123,10 +123,10 @@ private fun Counter(count: Int, %composer: Composer?, %changed: Int) {
       traceEventStart(<>, %dirty, -1, <>)
     }
     try {
-      ComposableCallstackTrackerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Counter")
+      ComposableCallstackTracerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Counter")
       Text("%count", null, <unsafe-coerce>(0L), <unsafe-coerce>(0L), null, null, null, <unsafe-coerce>(0L), null, null, <unsafe-coerce>(0L), <unsafe-coerce>(0), false, 0, 0, null, null, %composer, 0, 0, 0b00011111111111111110)
     } finally {
-      ComposableCallstackTrackerImpl%TestKt.pop()
+      ComposableCallstackTracerImpl%TestKt.pop()
     }
     if (isTraceInProgress()) {
       traceEventEnd()
@@ -146,10 +146,10 @@ private fun Tv(title: String, value: Any, %composer: Composer?, %changed: Int) {
     traceEventStart(<>, %changed, -1, <>)
   }
   try {
-    ComposableCallstackTrackerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Tv")
+    ComposableCallstackTracerImpl%TestKt.push("land.sungbin.composeinvestigator.compiler.test._source.codegen.Tv")
     Text("[%title] %value", null, <unsafe-coerce>(0L), <unsafe-coerce>(0L), null, null, null, <unsafe-coerce>(0L), null, null, <unsafe-coerce>(0L), <unsafe-coerce>(0), false, 0, 0, null, null, %composer, 0, 0, 0b00011111111111111110)
   } finally {
-    ComposableCallstackTrackerImpl%TestKt.pop()
+    ComposableCallstackTracerImpl%TestKt.pop()
   }
   if (isTraceInProgress()) {
     traceEventEnd()

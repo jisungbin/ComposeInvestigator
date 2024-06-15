@@ -10,12 +10,12 @@
 package land.sungbin.composeinvestigator.compiler.test._source.codegen
 
 import androidx.compose.runtime.Composable
-import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracker
+import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
 
 @Composable
 @Suppress("unused")
 private fun Variable() {
-  val table = currentComposableInvalidationTracker
+  val table = currentComposableInvalidationTracer
 
   println("Current Composable name is \"${table.currentComposableName.name}\".")
   println("Current Composable keyName is '${table.currentComposableKeyName}'.")
@@ -24,8 +24,8 @@ private fun Variable() {
 @Composable
 @Suppress("unused")
 private fun Direct() {
-  currentComposableInvalidationTracker
+  currentComposableInvalidationTracer
 
-  println("Current Composable name is \"${currentComposableInvalidationTracker.currentComposableName.name}\".")
-  println("Current Composable keyName is '${currentComposableInvalidationTracker.currentComposableKeyName}'.")
+  println("Current Composable name is \"${currentComposableInvalidationTracer.currentComposableName.name}\".")
+  println("Current Composable keyName is '${currentComposableInvalidationTracer.currentComposableKeyName}'.")
 }

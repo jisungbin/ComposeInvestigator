@@ -30,7 +30,7 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
     project.extensionArea
       .getExtensionPoint(IrGenerationExtension.extensionPointName)
       .registerExtension(
-        ComposableCallstackTrackingExtension(logger = logger),
+        ComposableCallstackTracingExtension(logger = logger),
         LoadingOrder.FIRST,
         project,
       )
@@ -38,7 +38,7 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
     project.extensionArea
       .getExtensionPoint(IrGenerationExtension.extensionPointName)
       .registerExtension(
-        ComposableInvalidationTrackingExtension(logger = logger),
+        ComposableInvalidationTracingExtension(logger = logger),
         LoadingOrder.LAST,
         project,
       )

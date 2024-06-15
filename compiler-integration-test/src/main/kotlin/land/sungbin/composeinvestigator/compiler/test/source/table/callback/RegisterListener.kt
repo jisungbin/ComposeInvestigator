@@ -11,14 +11,14 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
-import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracker
+import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
 
 @Composable
 fun RegisterListener_InvalidationSkippedRoot() {
   val recomposeScope = currentRecomposeScope
-  val tracker = currentComposableInvalidationTracker
+  val tracer = currentComposableInvalidationTracer
 
-  tracker.registerListener(keyName = tracker.currentComposableKeyName) { _, composable, type ->
+  tracer.registerListener(keyName = tracer.currentComposableKeyName) { _, composable, type ->
     invalidationListensViaManualRegister.getOrPut(composable, ::mutableListOf).add(type)
   }
 
@@ -28,9 +28,9 @@ fun RegisterListener_InvalidationSkippedRoot() {
 
 @Composable
 private fun RegisterListener_InvalidationSkippedChild() {
-  val tracker = currentComposableInvalidationTracker
+  val tracer = currentComposableInvalidationTracer
 
-  tracker.registerListener(keyName = tracker.currentComposableKeyName) { _, composable, type ->
+  tracer.registerListener(keyName = tracer.currentComposableKeyName) { _, composable, type ->
     invalidationListensViaManualRegister.getOrPut(composable, ::mutableListOf).add(type)
   }
 

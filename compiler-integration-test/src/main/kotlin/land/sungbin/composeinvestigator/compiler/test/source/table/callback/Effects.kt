@@ -13,12 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
 import land.sungbin.composeinvestigator.runtime.ComposableInvalidationEffect
 import land.sungbin.composeinvestigator.runtime.ComposableInvalidationListener
-import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracker
+import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
 
 @Composable
 fun Effects_InvalidationSkippedRoot() {
   val recomposeScope = currentRecomposeScope
-  val table = currentComposableInvalidationTracker
+  val table = currentComposableInvalidationTracer
   val currentKeyName = table.currentComposableKeyName
 
   ComposableInvalidationEffect(table = table, composableKey = currentKeyName) {
@@ -33,7 +33,7 @@ fun Effects_InvalidationSkippedRoot() {
 
 @Composable
 private fun Effects_InvalidationSkippedChild() {
-  val table = currentComposableInvalidationTracker
+  val table = currentComposableInvalidationTracer
   val currentKeyName = table.currentComposableKeyName
 
   ComposableInvalidationEffect(table = table, composableKey = currentKeyName) {

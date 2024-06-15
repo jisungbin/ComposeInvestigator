@@ -14,12 +14,12 @@
 package land.sungbin.composeinvestigator.compiler.test._source.codegen
 
 import androidx.compose.runtime.Composable
-import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracker
+import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
 
 @Composable
 @Suppress("unused")
 private fun Variable() {
-  val table = currentComposableInvalidationTracker
+  val table = currentComposableInvalidationTracer
 
   println("Current Composable name is \"${table.currentComposableName.name}\".")
   println("Current Composable keyName is '${table.currentComposableKeyName}'.")
@@ -28,29 +28,29 @@ private fun Variable() {
 @Composable
 @Suppress("unused")
 private fun Direct() {
-  currentComposableInvalidationTracker
+  currentComposableInvalidationTracer
 
-  println("Current Composable name is \"${currentComposableInvalidationTracker.currentComposableName.name}\".")
-  println("Current Composable keyName is '${currentComposableInvalidationTracker.currentComposableKeyName}'.")
+  println("Current Composable name is \"${currentComposableInvalidationTracer.currentComposableName.name}\".")
+  println("Current Composable keyName is '${currentComposableInvalidationTracer.currentComposableKeyName}'.")
 }
 
 //
 // Transformed IR
 // ------------------------------------------
 
-val ComposableInvalidationTrackTableImpl%TestKt: ComposableInvalidationTrackTable = ComposableInvalidationTrackTable()
-val ComposableCallstackTrackerImpl%TestKt: Stack<String> = Stack()
+val ComposableInvalidationTraceTableImpl%TestKt: ComposableInvalidationTraceTable = ComposableInvalidationTraceTable()
+val ComposableCallstackTracerImpl%TestKt: Stack<String> = Stack()
 @Composable
 @Suppress(names = "unused")
 private fun Variable() {
-  val table = ComposableInvalidationTrackTableImpl%TestKt
+  val table = ComposableInvalidationTraceTableImpl%TestKt
   println("Current Composable name is "%{@ComposableName(name = "Variable").name}".")
   println("Current Composable keyName is 'fun-Variable()Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt'.")
 }
 @Composable
 @Suppress(names = "unused")
 private fun Direct() {
-  ComposableInvalidationTrackTableImpl%TestKt
+  ComposableInvalidationTraceTableImpl%TestKt
   println("Current Composable name is "%{@ComposableName(name = "Direct").name}".")
   println("Current Composable keyName is 'fun-Direct()Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.codegen/file-Test.kt'.")
 }

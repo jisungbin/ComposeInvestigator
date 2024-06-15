@@ -16,8 +16,8 @@ import com.intellij.openapi.project.Project
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
 import java.io.File
-import land.sungbin.composeinvestigator.compiler.ComposableCallstackTrackingExtension
-import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTrackingExtension
+import land.sungbin.composeinvestigator.compiler.ComposableCallstackTracingExtension
+import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTracingExtension
 import land.sungbin.composeinvestigator.compiler.VerboseLogger
 import land.sungbin.composeinvestigator.compiler.test._compilation.compiler.AnalysisResult
 import land.sungbin.composeinvestigator.compiler.test._compilation.compiler.KotlinCompiler
@@ -49,8 +49,8 @@ abstract class AbstractK2CompilerTest {
     /** Enable LiveLiteral in Compose */
     const val LIVE_LITERAL = 1 shl 1
 
-    /** Disable callstack tracking */
-    const val NO_CALLSTACK_TRACKING = 1 shl 2
+    /** Disable callstack tracing */
+    const val NO_CALLSTACK_TRACING = 1 shl 2
   }
 
   companion object {
@@ -135,11 +135,11 @@ abstract class AbstractK2CompilerTest {
         configuration.put(ComposeConfiguration.LIVE_LITERALS_V2_ENABLED_KEY, useLiveLiteral)
 
         val logger = VerboseLogger(configuration).verbose()
-        if ((flags and Flags.NO_CALLSTACK_TRACKING) == 0) {
+        if ((flags and Flags.NO_CALLSTACK_TRACING) == 0) {
           extensionArea
             .getExtensionPoint(IrGenerationExtension.extensionPointName)
             .registerExtension(
-              ComposableCallstackTrackingExtension(logger = logger),
+              ComposableCallstackTracingExtension(logger = logger),
               LoadingOrder.FIRST,
               this,
             )
@@ -147,7 +147,7 @@ abstract class AbstractK2CompilerTest {
         extensionArea
           .getExtensionPoint(IrGenerationExtension.extensionPointName)
           .registerExtension(
-            ComposableInvalidationTrackingExtension(logger = logger),
+            ComposableInvalidationTracingExtension(logger = logger),
             LoadingOrder.LAST,
             this,
           )

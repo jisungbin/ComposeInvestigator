@@ -12,7 +12,7 @@ import java.util.concurrent.atomic.AtomicReference
 import land.sungbin.composeinvestigator.compiler.AndroidxComposeRuntime
 import land.sungbin.composeinvestigator.compiler.HandledMap
 import land.sungbin.composeinvestigator.compiler.VerboseLogger
-import land.sungbin.composeinvestigator.compiler.struct.IrComposableCallstackTracker
+import land.sungbin.composeinvestigator.compiler.struct.IrComposableCallstackTracer
 import land.sungbin.fastlist.fastJoinToString
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrElement
@@ -42,25 +42,25 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.util.OperatorNameConventions
 
-public abstract class AbstractComposableCallstackTrackLower(
+public abstract class AbstractComposableCallstackTraceLower(
   private val context: IrPluginContext,
   @Suppress("unused") private val logger: VerboseLogger,
 ) : IrElementTransformerVoid() {
   private val handledFunction = HandledMap()
   private val handledCall = HandledMap()
 
-  private val trackerReference: AtomicReference<IrComposableCallstackTracker?> = AtomicReference()
-  protected val tracker: IrComposableCallstackTracker
-    get() = checkNotNull(trackerReference.get()) {
-      "The callstack tracker was not generated, please report it as a project bug."
+  private val tracerReference: AtomicReference<IrComposableCallstackTracer?> = AtomicReference()
+  protected val tracer: IrComposableCallstackTracer
+    get() = checkNotNull(tracerReference.get()) {
+      "The callstack tracer was not generated, please report it as a project bug."
     }
 
   final override fun visitFile(declaration: IrFile): IrFile {
-    if (trackerReference.get() == null) {
-      val tracker = IrComposableCallstackTracker.create(context, declaration)
-      declaration.declarations.add(0, tracker.prop.also { prop -> prop.setDeclarationsParent(declaration) })
-      check(trackerReference.compareAndSet(null, tracker)) {
-        "The callstack tracker was already generated, please report it as a project bug."
+    if (tracerReference.get() == null) {
+      val tracer = IrComposableCallstackTracer.create(context, declaration)
+      declaration.declarations.add(0, tracer.prop.also { prop -> prop.setDeclarationsParent(declaration) })
+      check(tracerReference.compareAndSet(null, tracer)) {
+        "The callstack tracer was already generated, please report it as a project bug."
       }
     }
     return super.visitFile(declaration)

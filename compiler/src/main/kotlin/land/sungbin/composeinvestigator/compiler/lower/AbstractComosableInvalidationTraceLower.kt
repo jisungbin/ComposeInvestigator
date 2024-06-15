@@ -25,11 +25,11 @@ import land.sungbin.composeinvestigator.compiler.STATE_FQN
 import land.sungbin.composeinvestigator.compiler.ScopeUpdateScope_UPDATE_SCOPE
 import land.sungbin.composeinvestigator.compiler.VerboseLogger
 import land.sungbin.composeinvestigator.compiler.fromFqName
-import land.sungbin.composeinvestigator.compiler.origin.ComposableCallstackTrackerSyntheticOrigin
-import land.sungbin.composeinvestigator.compiler.origin.ComposableInvalidationTrackerOrigin
+import land.sungbin.composeinvestigator.compiler.origin.ComposableCallstackTracerSyntheticOrigin
+import land.sungbin.composeinvestigator.compiler.origin.ComposableInvalidationTracerOrigin
 import land.sungbin.composeinvestigator.compiler.struct.IrAffectedComposable
-import land.sungbin.composeinvestigator.compiler.struct.IrComposableCallstackTracker
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTrackTable
+import land.sungbin.composeinvestigator.compiler.struct.IrComposableCallstackTracer
+import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
 import land.sungbin.fastlist.fastAny
 import land.sungbin.fastlist.fastFilterNot
 import land.sungbin.fastlist.fastLastOrNull
@@ -84,7 +84,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
-public abstract class AbstractComosableInvalidationTrackLower(
+public abstract class AbstractComosableInvalidationTraceLower(
   private val context: IrPluginContext,
   private val logger: VerboseLogger,
   private val stabilityInferencer: StabilityInferencer,
@@ -140,25 +140,25 @@ public abstract class AbstractComosableInvalidationTrackLower(
       .fastLastOrNull { scope -> scope.irElement.safeAs<IrSimpleFunction>()?.hasComposableAnnotation() == true }
       ?.irElement?.safeAs<IrSimpleFunction>()
 
-  protected val currentInvalidationTrackTable: IrInvalidationTrackTable?
+  protected val currentInvalidationTraceTable: IrInvalidationTraceTable?
     get() = allScopes
       .fastLastOrNull { scope ->
         val element = scope.irElement
-        element is IrSymbolOwnerWithData<*> && element.data is IrInvalidationTrackTable
+        element is IrSymbolOwnerWithData<*> && element.data is IrInvalidationTraceTable
       }
-      ?.irElement?.cast<IrSymbolOwnerWithData<IrInvalidationTrackTable>>()?.data
+      ?.irElement?.cast<IrSymbolOwnerWithData<IrInvalidationTraceTable>>()?.data
 
   private val currentCallstackCallReference: AtomicReference<IrCall?> = AtomicReference()
 
   final override fun visitFileNew(declaration: IrFile): IrFile {
     if (currentCallstackCallReference.get() == null) {
       val callstackProp = declaration.findDeclaration<IrProperty> { prop ->
-        prop.origin == ComposableCallstackTrackerSyntheticOrigin && prop.backingField?.type?.classFqName == STACK_FQN
+        prop.origin == ComposableCallstackTracerSyntheticOrigin && prop.backingField?.type?.classFqName == STACK_FQN
       }
       callstackProp?.let {
-        val tracker = IrComposableCallstackTracker.from(context, callstackProp)
-        check(currentCallstackCallReference.compareAndSet(null, tracker.irCopy())) {
-          "The callstack tracker was already assigned, please report it as a project bug."
+        val tracer = IrComposableCallstackTracer.from(context, callstackProp)
+        check(currentCallstackCallReference.compareAndSet(null, tracer.irCopy())) {
+          "The callstack tracer was already assigned, please report it as a project bug."
         }
       }
     }
@@ -166,8 +166,8 @@ public abstract class AbstractComosableInvalidationTrackLower(
     // If the file is @NoInvestigation, skip all processing.
     if (declaration.hasAnnotation(NO_INVESTIGATION_FQN)) return declaration
 
-    val table = IrInvalidationTrackTable.create(context, declaration)
-    val tableCallTransformer = InvalidationTrackTableIntrinsicTransformer(
+    val table = IrInvalidationTraceTable.create(context, declaration)
+    val tableCallTransformer = InvalidationTraceTableIntrinsicTransformer(
       context = context,
       table = table,
       logger = logger,
@@ -371,7 +371,7 @@ public abstract class AbstractComosableInvalidationTrackLower(
       startOffset = transformed.startOffset,
       endOffset = transformed.endOffset,
       type = context.irBuiltIns.unitType,
-      origin = ComposableInvalidationTrackerOrigin,
+      origin = ComposableInvalidationTracerOrigin,
       statements = transformed.statements,
     )
 

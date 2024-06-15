@@ -14,9 +14,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracker
+import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
 
-val invalidationProcessedFileTable = currentComposableInvalidationTracker
+val invalidationProcessedFileTable = currentComposableInvalidationTracer
 
 @Composable
 fun InvalidationProcessedRoot_StateDelegateReference() {
