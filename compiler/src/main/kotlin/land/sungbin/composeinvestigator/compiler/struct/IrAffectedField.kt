@@ -26,7 +26,7 @@ public class IrAffectedField(context: IrPluginContext) {
 
   public fun irValueParameter(
     name: IrExpression,
-    typeFqName: IrExpression,
+    typeName: IrExpression,
     valueString: IrExpression,
     valueHashCode: IrExpression,
     stability: IrExpression,
@@ -35,7 +35,7 @@ public class IrAffectedField(context: IrPluginContext) {
     constructorSymbol = valueParameterSymbol.constructors.single(),
   ).apply {
     putValueArgument(0, name)
-    putValueArgument(1, typeFqName)
+    putValueArgument(1, typeName)
     putValueArgument(2, valueString)
     putValueArgument(3, valueHashCode)
     putValueArgument(4, stability)

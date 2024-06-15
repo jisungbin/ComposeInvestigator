@@ -7,9 +7,8 @@
 
 package land.sungbin.composeinvestigator.runtime.affect
 
-import land.sungbin.composeinvestigator.runtime.DeclarationStability
+import land.sungbin.composeinvestigator.runtime.Stability
 
-// Design this as a sealed class in case new field types come in the future.
 /** Define the fields that are affected by the state change. */
 public sealed interface AffectedField {
   /** Field name */
@@ -24,14 +23,14 @@ public sealed interface AffectedField {
   /**
    * The value parameter is changed.
    *
-   * @param typeFqName fully-qualified name of the parameter type
+   * @param typeName fully-qualified name of the parameter type
    * @param stability Stability information for the parameter type
    */
   public data class ValueParameter(
     override val name: String,
-    public val typeFqName: String,
+    public val typeName: String,
     override val valueString: String,
     override val valueHashCode: Int,
-    public val stability: DeclarationStability,
+    public val stability: Stability,
   ) : AffectedField
 }

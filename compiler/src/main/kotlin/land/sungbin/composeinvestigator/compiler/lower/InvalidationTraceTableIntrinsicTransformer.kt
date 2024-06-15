@@ -10,6 +10,7 @@ package land.sungbin.composeinvestigator.compiler.lower
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
 import androidx.compose.compiler.plugins.kotlin.irTrace
 import androidx.compose.compiler.plugins.kotlin.lower.dumpSrc
+import androidx.compose.compiler.plugins.kotlin.lower.includeFileNameInExceptionTrace
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_NAME_FQN
 import land.sungbin.composeinvestigator.compiler.CURRENT_COMPOSABLE_INVALIDATION_TRACER_FQN
@@ -28,6 +29,7 @@ import land.sungbin.fastlist.fastLastOrNull
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
+import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
@@ -66,6 +68,11 @@ public class InvalidationTraceTableIntrinsicTransformer(
 
   private val composableNameSymbol = referenceClass(ClassId.topLevel(COMPOSABLE_NAME_FQN))!!.owner
 
+  override fun visitFileNew(declaration: IrFile): IrFile =
+    includeFileNameInExceptionTrace(declaration) {
+      super.visitFile(declaration)
+    }
+
   override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
     withinScope(declaration) { declaration.body?.transformChildrenVoid() }
     return super.visitSimpleFunction(declaration)
@@ -85,7 +92,7 @@ public class InvalidationTraceTableIntrinsicTransformer(
             0,
             lastReachedComposable()
               ?.let { composable ->
-                affectedComposable.getComposableName(irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.affectedComposable)
+                affectedComposable.getName(irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.affectedComposable)
               }
               ?: irString(SpecialNames.UNKNOWN_STRING),
           )
@@ -99,7 +106,7 @@ public class InvalidationTraceTableIntrinsicTransformer(
             ?: error("Currently, only string hardcodes are supported as arguments to ComposableName. (${expression.dumpSrc()})")
 
           val previousKey = irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable]!!
-          val newAffectedComposable = affectedComposable.copyWith(previousKey.affectedComposable, composableName = irString(userProvideName))
+          val newAffectedComposable = affectedComposable.copyWith(previousKey.affectedComposable, name = irString(userProvideName))
 
           irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable] = previousKey.copy(affectedComposable = newAffectedComposable)
         }

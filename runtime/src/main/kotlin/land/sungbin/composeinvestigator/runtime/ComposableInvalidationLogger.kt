@@ -10,35 +10,31 @@ package land.sungbin.composeinvestigator.runtime
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.affect.AffectedField
 
-// Alternative to `() -> Unit` that's useful for avoiding boxing.
 /** @see ComposeInvestigatorConfig.invalidationLogger */
 public fun interface ComposableInvalidationLogger {
-  /**
-   * @param callstack *(Experimental. This value may be produces wrong result.)*
-   * Represents all call stacks leading up to the current composable being called
-   * (each shown as a fully-qualified name or simple name).
-   */
-  public operator fun invoke(
-    callstack: List<String>,
-    composable: AffectedComposable,
-    type: ComposableInvalidationType,
-  )
+  public fun log(composable: AffectedComposable, type: ComposableInvalidationType)
 }
 
 /**
  * Represents information about the composable function parameters.
  *
  * @param name Parameter name
- * @param typeFqName fully-qualified name of the parameter type
+ * @param typeName fully-qualified name of the parameter type
  * @param stability Stability information for the parameter type
  */
 public data class ParameterInformation(
   public val name: String,
-  public val typeFqName: String,
-  public val stability: DeclarationStability,
+  public val typeName: String,
+  public val stability: Stability,
 )
 
-public data class ChangedFieldPair(public val old: AffectedField, public val new: AffectedField) {
+/**
+ * Indicates which fields have changed as a result of the recomposition.
+ *
+ * @param old Field before recomposition
+ * @param new Field after recomposition
+ */
+public data class FieldChanged(public val old: AffectedField, public val new: AffectedField) {
   init {
     require(old.javaClass.name == new.javaClass.name) {
       "AffectedField must be same type. old=${old.javaClass.name}, new=${new.javaClass.name}"
@@ -46,10 +42,11 @@ public data class ChangedFieldPair(public val old: AffectedField, public val new
   }
 }
 
-public infix fun AffectedField.changedTo(new: AffectedField): ChangedFieldPair =
-  ChangedFieldPair(old = this, new = new)
+/** Create a [FieldChanged] with [this] as `old` and [new] as `new`. */
+public infix fun AffectedField.changedTo(new: AffectedField): FieldChanged =
+  FieldChanged(old = this, new = new)
 
-/** Explains why the composable was invalidated. */
+/** Explains why the composable was recomposed. */
 public sealed class InvalidationReason {
   abstract override fun toString(): String
 
@@ -59,21 +56,21 @@ public sealed class InvalidationReason {
   }
 
   /**
-   * The current recompose scope has been requested to be invalidated.
-   * This can be caused by a call to `currentRecomposeScope.invalidate()`
-   * or when a field within that composable has been changed.
+   * The current recompose scope has been requested to be recomposed. This can be
+   * caused by a call to `currentRecomposeScope.invalidate()` or when a field within
+   * that composable has been changed.
    */
   public data object Invalidate : InvalidationReason() {
     override fun toString(): String =
-      "[Invalidate] An invalidation has been requested for the current composable scope. " +
+      "[Invalidate] An recomposition has been requested for the current composable scope. " +
         "The state value in the body of that composable function has most likely changed."
   }
 
   /**
-   * A field in the composable has been changed. The changed fields
-   * are print sorted by field name.
+   * A field in the composable has been changed. The changed fields are print sorted by
+   * field name.
    */
-  public data class FieldChanged(public val changed: List<ChangedFieldPair>) : InvalidationReason() {
+  public data class FieldChanged(public val changed: List<land.sungbin.composeinvestigator.runtime.FieldChanged>) : InvalidationReason() {
     override fun toString(): String = buildString {
       val sortedChanges = changed.sortedBy { field -> field.old.name }
 
@@ -92,15 +89,14 @@ public sealed class InvalidationReason {
   }
 
   /**
-   * @suppress According to the Compose compiler's comments this should be
-   * determinable via the `$changed` argument.
+   * @suppress According to the Compose compiler's comments this should be determinable via
+   * the `$changed` argument.
    *
    * "the lowest bit of the bitmask is a special bit which forces execution of the function."
    * (https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/compiler/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/lower/ComposableFunctionBodyTransformer.kt;l=381-382;drc=ea884612191a32933b697cc5062aa32505be4eaa)
    *
-   * However, I haven't yet figured out how to determine this, so this type
-   * is not used. It's probably related to `androidx.compose.runtime.changedLowBitMask`.
-   * (in RecomposeScopeImpl.kt)
+   * However, I haven't yet figured out how to determine this, so this type is not used.
+   * It's probably related to `androidx.compose.runtime.changedLowBitMask`. (in RecomposeScopeImpl.kt)
    */
   @Deprecated("Force reason is not supported yet.", level = DeprecationLevel.ERROR)
   public data object Force /*: InvalidationReason()*/ {
@@ -116,7 +112,7 @@ public sealed class InvalidationReason {
   }
 }
 
-/** Indicates how the composable was invalidated. */
+/** Indicates how the composable was recomposed. */
 public sealed class ComposableInvalidationType {
   /** The composable has actually been recomposed. */
   public data class Processed(public val reason: InvalidationReason) : ComposableInvalidationType()

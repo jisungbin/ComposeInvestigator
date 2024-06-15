@@ -19,7 +19,7 @@ import assertk.assertions.prop
 import assertk.assertions.single
 import io.mockk.every
 import io.mockk.mockk
-import land.sungbin.composeinvestigator.compiler.analysis.toIrDeclarationStability
+import land.sungbin.composeinvestigator.compiler.analysis.toIrOwnStability
 import land.sungbin.composeinvestigator.compiler.test._compilation.AbstractK2CompilerTest
 import land.sungbin.composeinvestigator.compiler.test._source.source
 import land.sungbin.composeinvestigator.compiler.test.cast
@@ -48,8 +48,8 @@ class StabilityWrapperTest : AbstractK2CompilerTest() {
           project = this,
           extension = object : IrGenerationExtension {
             override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-              stableStability = Stability.Stable.toIrDeclarationStability(pluginContext)
-              unstableStability = Stability.Unstable.toIrDeclarationStability(pluginContext)
+              stableStability = Stability.Stable.toIrOwnStability(pluginContext)
+              unstableStability = Stability.Unstable.toIrOwnStability(pluginContext)
             }
           },
         )
@@ -86,7 +86,7 @@ class StabilityWrapperTest : AbstractK2CompilerTest() {
           project = this,
           extension = object : IrGenerationExtension {
             override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-              stability = Stability.Runtime(stabilityDeclarationClass).toIrDeclarationStability(pluginContext)
+              stability = Stability.Runtime(stabilityDeclarationClass).toIrOwnStability(pluginContext)
             }
           },
         )
@@ -116,7 +116,7 @@ class StabilityWrapperTest : AbstractK2CompilerTest() {
           project = this,
           extension = object : IrGenerationExtension {
             override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-              stability = Stability.Unknown(stabilityDeclarationClass).toIrDeclarationStability(pluginContext)
+              stability = Stability.Unknown(stabilityDeclarationClass).toIrOwnStability(pluginContext)
             }
           },
         )
@@ -146,7 +146,7 @@ class StabilityWrapperTest : AbstractK2CompilerTest() {
           project = this,
           extension = object : IrGenerationExtension {
             override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-              stability = Stability.Parameter(stabilityDeclarationClass).toIrDeclarationStability(pluginContext)
+              stability = Stability.Parameter(stabilityDeclarationClass).toIrOwnStability(pluginContext)
             }
           },
         )
@@ -190,7 +190,7 @@ class StabilityWrapperTest : AbstractK2CompilerTest() {
                   Stability.Unknown(unknownDeclarationClass),
                   Stability.Parameter(parameterDeclarationClass),
                 ),
-              ).toIrDeclarationStability(pluginContext)
+              ).toIrOwnStability(pluginContext)
             }
           },
         )

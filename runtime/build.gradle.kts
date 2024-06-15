@@ -72,7 +72,6 @@ kotlin {
 dependencies {
   implementation(libs.compose.runtime)
   implementation(libs.compose.animation)
-  implementation(kotlin("reflect")) // TODO remove kotlin-reflect usage. This is large dependency.
 
   testImplementation(kotlin("test-junit5"))
   testImplementation(libs.test.assertk)

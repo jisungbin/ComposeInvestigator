@@ -9,7 +9,6 @@ package land.sungbin.composeinvestigator.compiler.struct
 
 import java.lang.ref.WeakReference
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN
-import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTraceTable_CALL_LISTENERS
 import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
@@ -26,7 +25,6 @@ import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
-import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
 import org.jetbrains.kotlin.ir.expressions.IrValueAccessExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
@@ -43,25 +41,6 @@ import org.jetbrains.kotlin.name.Name
 
 public class IrInvalidationTraceTable private constructor(public val prop: IrProperty) {
   private var computeInvalidationReasonSymbol: IrSimpleFunctionSymbol? = null
-  private var callListenersSymbol: IrSimpleFunctionSymbol? = null
-
-  public fun irCallListeners(
-    key: IrConst<String>,
-    callstack: IrDeclarationReference,
-    composable: IrDeclarationReference,
-    type: IrDeclarationReference,
-  ): IrCall = IrCallImpl.fromSymbolOwner(
-    startOffset = UNDEFINED_OFFSET,
-    endOffset = UNDEFINED_OFFSET,
-    symbol = callListenersSymbol!!,
-  ).also { fn ->
-    fn.dispatchReceiver = propGetter()
-  }.apply {
-    putValueArgument(0, key)
-    putValueArgument(1, callstack)
-    putValueArgument(2, composable)
-    putValueArgument(3, type)
-  }
 
   public fun irComputeInvalidationReason(
     composableKeyName: IrConst<String>,
@@ -83,7 +62,6 @@ public class IrInvalidationTraceTable private constructor(public val prop: IrPro
         .also { clz ->
           val clzOwner = clz.prop.backingField!!.type.classOrFail
           clz.computeInvalidationReasonSymbol = clzOwner.getSimpleFunction(ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON.asString())!!
-          clz.callListenersSymbol = clzOwner.getSimpleFunction(ComposableInvalidationTraceTable_CALL_LISTENERS.asString())!!
         }
   }
 }

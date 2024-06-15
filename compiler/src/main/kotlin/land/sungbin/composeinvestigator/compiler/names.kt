@@ -29,10 +29,6 @@ public val MUTABLE_LIST_OF_FQN: FqName = FqName("kotlin.collections.mutableListO
 public val MUTABLE_LIST_ADD_FQN: FqName = FqName("kotlin.collections.MutableList.add")
 
 public val HASH_CODE_FQN: FqName = FqName("kotlin.hashCode")
-
-public val STACK_FQN: FqName = FqName("java.util.Stack")
-public val Stack_PUSH: Name = Name.identifier("push")
-public val Stack_POP: Name = Name.identifier("pop")
 // END Kotlin/Java Standard Library
 
 // START Compose Runtime
@@ -44,13 +40,7 @@ public val Composer_SKIP_TO_GROUP_END: Name = Name.identifier("skipToGroupEnd")
 
 public val SCOPE_UPDATE_SCOPE_FQN: FqName = FqName("$AndroidxComposeRuntime.ScopeUpdateScope")
 public val ScopeUpdateScope_UPDATE_SCOPE: Name = Name.identifier("updateScope")
-
-public val STATE_FQN: FqName = FqName("$AndroidxComposeRuntime.State")
 // END Compose Runtime
-
-// START Compose Animation
-public val ANIMATABLE_FQN: FqName = FqName("androidx.compose.animation.core.Animatable")
-// END Compose Animation
 
 // START NoInvestigation
 public val NO_INVESTIGATION_FQN: FqName = FqName("$ComposeInvestigatorRuntime.NoInvestigation")
@@ -63,7 +53,7 @@ public val ComposeInvestigatorConfig_INVALIDATION_LOGGER: Name = Name.identifier
 
 // START ComposableInvalidationLogger
 public val COMPOSABLE_INVALIDATION_LOGGER_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationLogger")
-public val ComposableInvalidationLogger_INVOKE: Name = Name.identifier("invoke")
+public val ComposableInvalidationLogger_LOG: Name = Name.identifier("log")
 
 public val INVALIDATION_REASON_FQN: FqName = FqName("$ComposeInvestigatorRuntime.InvalidationReason")
 public val InvalidationReason_Invalidate: Name = Name.identifier("Invalidate")
@@ -81,21 +71,16 @@ public val COMPOSABLE_NAME_FQN: FqName = FqName("$ComposeInvestigatorRuntime.Com
 public val COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationTraceTable")
 public val ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_NAME: Name = Name.identifier("currentComposableName")
 public val ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_KEY_NAME: Name = Name.identifier("currentComposableKeyName")
-public val ComposableInvalidationTraceTable_CALL_LISTENERS: Name = Name.identifier("callListeners")
 public val ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON: Name = Name.identifier("computeInvalidationReason")
 // END ComposableInvalidationTraceTable
 
-// START StateObjectTracer
-public val REGISTER_STATE_OBJECT_TRACING_FQN: FqName = FqName("$ComposeInvestigatorRuntime.registerStateObjectTracing")
-// END StateObjectTracer
-
 // START DeclarationStability
-public val DECLARATION_STABILITY_FQN: FqName = FqName("$ComposeInvestigatorRuntime.DeclarationStability")
-public val DeclarationStability_CERTAIN: Name = Name.identifier("Certain")
-public val DeclarationStability_RUNTIME: Name = Name.identifier("Runtime")
-public val DeclarationStability_UNKNOWN: Name = Name.identifier("Unknown")
-public val DeclarationStability_PARAMETER: Name = Name.identifier("Parameter")
-public val DeclarationStability_COMBINED: Name = Name.identifier("Combined")
+public val STABILITY_FQN: FqName = FqName("$ComposeInvestigatorRuntime.Stability")
+public val Stability_CERTAIN: Name = Name.identifier("Certain")
+public val Stability_RUNTIME: Name = Name.identifier("Runtime")
+public val Stability_UNKNOWN: Name = Name.identifier("Unknown")
+public val Stability_PARAMETER: Name = Name.identifier("Parameter")
+public val Stability_COMBINED: Name = Name.identifier("Combined")
 // END DeclarationStability
 
 // START affect/AffectedField

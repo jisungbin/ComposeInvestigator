@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracetablecall
+package land.sungbin.composeinvestigator.compiler.test.source.table
 
 import androidx.compose.runtime.Composable
 import assertk.assertThat
