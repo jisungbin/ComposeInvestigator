@@ -24,7 +24,7 @@ public object ComposeInvestigatorConfig {
   }
 
   /**
-   * This callback is called whenever the state value being tracked changes.
+   * This callback is called whenever the state value being traced changes.
    * This field is variable, so you can easily customize this.
    */
   public var stateChangedListener: StateChangedListener = StateChangedListener { composable, name, previousValue, newValue ->

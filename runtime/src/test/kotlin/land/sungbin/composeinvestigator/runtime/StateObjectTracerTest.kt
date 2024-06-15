@@ -44,7 +44,7 @@ import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 
 @Suppress("UnrememberedMutableState", "UnrememberedAnimatable", "TransitionPropertiesLabel", "InfiniteTransitionLabel")
 @OptIn(ExperimentalTransitionApi::class)
-class StateObjectTrackerTest {
+class StateObjectTracerTest {
   private data class STATE(
     val composable: AffectedComposable,
     val name: String,
@@ -72,7 +72,7 @@ class StateObjectTrackerTest {
   @BeforeTest
   fun clear() {
     log.clear()
-    StateObjectTrackManager.clear()
+    StateObjectTraceManager.clear()
     ComposeStateObjectValueGetter.clear()
   }
 
@@ -105,9 +105,9 @@ class StateObjectTrackerTest {
     val intState = mutableIntStateOf(0)
     val floatState = mutableFloatStateOf(0f)
 
-    val untrackStringState = mutableStateOf("string")
-    val untrackIntState = mutableIntStateOf(0)
-    val untrackFloatState = mutableFloatStateOf(0f)
+    val untraceStringState = mutableStateOf("string")
+    val untraceIntState = mutableIntStateOf(0)
+    val untraceFloatState = mutableFloatStateOf(0f)
 
     var recomposeScope: RecomposeScope? = null
 
@@ -120,7 +120,7 @@ class StateObjectTrackerTest {
         "floatState" to floatState,
       ).forEach { (name, state) ->
         val composable = AffectedComposable(name)
-        state.registerStateObjectTracking(
+        state.registerStateObjectTracing(
           composer = currentComposer,
           composable = composable,
           composableKeyName = "KeyName",
@@ -133,9 +133,9 @@ class StateObjectTrackerTest {
         intState.intValue++
         floatState.floatValue++
 
-        untrackStringState.value += " string"
-        untrackIntState.intValue++
-        untrackFloatState.floatValue++
+        untraceStringState.value += " string"
+        untraceIntState.intValue++
+        untraceFloatState.floatValue++
       }
     }
 
@@ -177,7 +177,7 @@ class StateObjectTrackerTest {
     compose {
       recomposeScope = currentRecomposeScope
 
-      summedNumber.registerStateObjectTracking(
+      summedNumber.registerStateObjectTracing(
         composer = currentComposer,
         composable = AffectedComposable("TEST"),
         composableKeyName = "KeyName",
@@ -210,7 +210,7 @@ class StateObjectTrackerTest {
         "floatState" to floatState,
       ).forEach { (name, state) ->
         val composable = AffectedComposable(name)
-        state.registerStateObjectTracking(
+        state.registerStateObjectTracing(
           composer = currentComposer,
           composable = composable,
           composableKeyName = "KeyName",
@@ -228,7 +228,7 @@ class StateObjectTrackerTest {
       }
     }
 
-    assertThat(log, name = "Targeted for state tracking when in Remembered state").containsExactlyInAnyOrder(
+    assertThat(log, name = "Targeted for state tracing when in Remembered state").containsExactlyInAnyOrder(
       listOf(
         STATE(composable = AffectedComposable("stringState"), name = "stringState", previousValue = "string", newValue = "string string"),
         STATE(composable = AffectedComposable("intState"), name = "intState", previousValue = 0, newValue = 1),
@@ -239,7 +239,7 @@ class StateObjectTrackerTest {
     mount = false
     expectChanges()
 
-    assertThat(log, name = "When Forgotten, all registered states tracking targets in that group are cleared.").containsExactlyInAnyOrder(
+    assertThat(log, name = "When Forgotten, all registered states tracing targets in that group are cleared.").containsExactlyInAnyOrder(
       listOf(
         STATE(composable = AffectedComposable("stringState"), name = "stringState", previousValue = "string", newValue = "string string"),
         STATE(composable = AffectedComposable("intState"), name = "intState", previousValue = 0, newValue = 1),

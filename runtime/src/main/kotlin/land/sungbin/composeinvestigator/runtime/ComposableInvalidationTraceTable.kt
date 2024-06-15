@@ -13,9 +13,9 @@ import land.sungbin.composeinvestigator.runtime.affect.AffectedField
 import land.sungbin.composeinvestigator.runtime.util.putIfNotPresent
 import org.jetbrains.annotations.TestOnly
 
-/** Returns the [ComposableInvalidationTrackTable] assigned to the current file. */
+/** Returns the [ComposableInvalidationTraceTable] assigned to the current file. */
 @ExperimentalComposeInvestigatorApi
-public val currentComposableInvalidationTracker: ComposableInvalidationTrackTable
+public val currentComposableInvalidationTracer: ComposableInvalidationTraceTable
   // TODO: Should we make this a Composable function?
   // @[Composable ExplicitGroupsComposable]
   get() {
@@ -35,7 +35,7 @@ public fun interface ComposableInvalidationListener {
 // We use an annotation class to prevent LiveLiteral transform from the Compose compiler.
 /**
  * Returns the name of the current composable.
- * See [ComposableInvalidationTrackTable.currentComposableName].
+ * See [ComposableInvalidationTraceTable.currentComposableName].
  */
 @Target()
 @Retention(AnnotationRetention.SOURCE)
@@ -54,16 +54,16 @@ public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): Stri
  * ComposeInvestigator, and you should be very careful about controlling this
  * instance directly.
  *
- * To get the instance of [ComposableInvalidationTrackTable] created in the current file,
- * use [currentComposableInvalidationTracker].
+ * To get the instance of [ComposableInvalidationTraceTable] created in the current file,
+ * use [currentComposableInvalidationTracer].
  *
  * If a file is annotated with [NoInvestigation], this class will not be instantiated in
- * that file. If you use this class's APIs, including the [currentComposableInvalidationTracker]
+ * that file. If you use this class's APIs, including the [currentComposableInvalidationTracer]
  * API, without being instantiated, you will receive a runtime error.
  */
 @ExperimentalComposeInvestigatorApi
 @Immutable
-public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi public constructor() {
+public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi public constructor() {
   private val listeners: MutableMap<String, ComposableInvalidationListener> = mutableMapOf()
   private val affectFieldMap: MutableMap<String, List<AffectedField>> = mutableMapOf()
 
@@ -82,7 +82,7 @@ public class ComposableInvalidationTrackTable @ComposeInvestigatorCompilerApi pu
    *
    * ```
    * @Composable fun MyComposable() {
-   *   val table = currentComposableInvalidationTracker
+   *   val table = currentComposableInvalidationTracer
    *
    *   val prevName by table.currentComposableName
    *   assertEquals(prevName, "MyComposable") // pass

@@ -5,20 +5,20 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall
+package land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracetablecall
 
 import androidx.compose.runtime.Composable
 import assertk.assertThat
 import assertk.assertions.isEqualTo
 import assertk.assertions.isSameInstanceAs
 import land.sungbin.composeinvestigator.runtime.ComposableName
-import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracker
+import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
 import land.sungbin.composeinvestigator.runtime.getValue
 
-val table1 = currentComposableInvalidationTracker
+val table1 = currentComposableInvalidationTracer
 
 fun table1() {
-  assertThat(table1).isSameInstanceAs(currentComposableInvalidationTracker)
+  assertThat(table1).isSameInstanceAs(currentComposableInvalidationTracer)
 }
 
 @Composable
@@ -32,5 +32,5 @@ fun CurrentComposableName1() {
 
 @Composable
 fun CurrentComposableKeyName1() {
-  assertThat(table1.currentComposableKeyName).isEqualTo("fun-CurrentComposableKeyName1(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall/file-TableCallFile1.kt")
+  assertThat(table1.currentComposableKeyName).isEqualTo("fun-CurrentComposableKeyName1(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracetablecall/file-TableCallFile1.kt")
 }

@@ -27,10 +27,10 @@ private val DEFAULT_KEY = arrayOf(Unit)
  * match the lifecycle of the Composable. The lifecycle algorithm
  * is the same as [LaunchedEffect].
  *
- * @param table The [ComposableInvalidationTrackTable] to register the
- * listener. You can get it as [currentComposableInvalidationTracker].
+ * @param table The [ComposableInvalidationTraceTable] to register the
+ * listener. You can get it as [currentComposableInvalidationTracer].
  * @param composableKey A unique key for the current composable. You can
- * get it as [ComposableInvalidationTrackTable.currentComposableKeyName].
+ * get it as [ComposableInvalidationTraceTable.currentComposableKeyName].
  * @param keys The keys to be used to determine whether the listener should
  * be re-registered. Same as [LaunchedEffect]'s `key` parameter.
  * @param block The [listener][ComposableInvalidationListener] to be
@@ -40,7 +40,7 @@ private val DEFAULT_KEY = arrayOf(Unit)
 @NonRestartableComposable
 @ExperimentalComposeInvestigatorApi
 public fun ComposableInvalidationEffect(
-  table: ComposableInvalidationTrackTable,
+  table: ComposableInvalidationTraceTable,
   composableKey: String,
   vararg keys: Any?,
   block: suspend CoroutineScope.() -> ComposableInvalidationListener,
@@ -52,7 +52,7 @@ public fun ComposableInvalidationEffect(
     InvalidationEffectScope(
       parentCoroutineContext = applyContext,
       composableKey = composableKey,
-      invalidationTrackTable = table,
+      invalidationTraceTable = table,
       task = block,
     )
   }
@@ -61,7 +61,7 @@ public fun ComposableInvalidationEffect(
 private class InvalidationEffectScope(
   parentCoroutineContext: CoroutineContext,
   private val composableKey: String,
-  private val invalidationTrackTable: ComposableInvalidationTrackTable,
+  private val invalidationTraceTable: ComposableInvalidationTraceTable,
   private val task: suspend CoroutineScope.() -> ComposableInvalidationListener,
 ) : RememberObserver {
   private val scope = CoroutineScope(parentCoroutineContext)
@@ -70,14 +70,14 @@ private class InvalidationEffectScope(
   override fun onRemembered() {
     job?.cancel("Old job was still running!")
     job = scope.launch {
-      invalidationTrackTable.registerListener(composableKey, task.invoke(this))
+      invalidationTraceTable.registerListener(composableKey, task.invoke(this))
     }
   }
 
   override fun onForgotten() {
     job?.cancel(LeftCompositionCancellationException())
     job = null
-    invalidationTrackTable.unregisterListener(composableKey)
+    invalidationTraceTable.unregisterListener(composableKey)
   }
 
   override fun onAbandoned() {

@@ -14,25 +14,25 @@ import assertk.assertThat
 import assertk.assertions.hasClass
 import assertk.assertions.isNotNull
 import assertk.assertions.isSameInstanceAs
-import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.CurrentComposableKeyName1
-import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.CurrentComposableKeyName2
-import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.CurrentComposableName1
-import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.CurrentComposableName2
-import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.table1
-import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracktablecall.table2
-import land.sungbin.composeinvestigator.runtime.ComposableInvalidationTrackTable
+import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracetablecall.CurrentComposableKeyName1
+import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracetablecall.CurrentComposableKeyName2
+import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracetablecall.CurrentComposableName1
+import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracetablecall.CurrentComposableName2
+import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracetablecall.table1
+import land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracetablecall.table2
+import land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(AndroidJUnit4::class)
-class InvalidationTrackTableIntrinsicTest {
+class InvalidationTraceTableIntrinsicTest {
   @get:Rule
   val compose = createAndroidComposeRule<ComponentActivity>()
 
   @Test fun table_instance() {
-    assertThat(table1).isNotNull().hasClass<ComposableInvalidationTrackTable>()
-    assertThat(table2).isNotNull().hasClass<ComposableInvalidationTrackTable>()
+    assertThat(table1).isNotNull().hasClass<ComposableInvalidationTraceTable>()
+    assertThat(table2).isNotNull().hasClass<ComposableInvalidationTraceTable>()
 
     assertThat(table1).isSameInstanceAs(table2)
 

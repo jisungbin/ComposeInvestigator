@@ -23,10 +23,10 @@ import androidx.compose.runtime.snapshots.StateObject
 import java.util.concurrent.atomic.AtomicBoolean
 import kotlin.reflect.KProperty0
 import kotlin.reflect.jvm.isAccessible
-import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateFieldNameMap
-import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateLocationMap
-import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.stateValueGetterMap
-import land.sungbin.composeinvestigator.runtime.StateObjectTrackManager.trackedStateObjects
+import land.sungbin.composeinvestigator.runtime.StateObjectTraceManager.stateFieldNameMap
+import land.sungbin.composeinvestigator.runtime.StateObjectTraceManager.stateLocationMap
+import land.sungbin.composeinvestigator.runtime.StateObjectTraceManager.stateValueGetterMap
+import land.sungbin.composeinvestigator.runtime.StateObjectTraceManager.tracedStateObjects
 import land.sungbin.composeinvestigator.runtime.affect.AffectedComposable
 import land.sungbin.composeinvestigator.runtime.util.putIfNotPresent
 import org.jetbrains.annotations.TestOnly
@@ -61,11 +61,11 @@ public fun interface StateChangedListener {
   public fun onChanged(composable: AffectedComposable, stateName: String, previousValue: Any?, newValue: Any?)
 }
 
-internal object StateObjectTrackManager {
+internal object StateObjectTraceManager {
   private val started = AtomicBoolean(false)
   private var previousHandle: ObserverHandle? = null
 
-  internal val trackedStateObjects = mutableMapOf<String, MutableSet<StateObject>>()
+  internal val tracedStateObjects = mutableMapOf<String, MutableSet<StateObject>>()
 
   internal val stateFieldNameMap = mutableMapOf<StateObject, String>()
   internal val stateValueGetterMap = mutableMapOf<StateObject, StateValueGetter>()
@@ -76,7 +76,7 @@ internal object StateObjectTrackManager {
     started.set(false)
     previousHandle?.dispose()
 
-    trackedStateObjects.clear()
+    tracedStateObjects.clear()
     stateFieldNameMap.clear()
     stateValueGetterMap.clear()
     stateLocationMap.clear()
@@ -108,21 +108,21 @@ internal object StateObjectTrackManager {
  * Reports when a change in a [given state][State] value is detected.
  *
  * If the variable's type inherits from [androidx.compose.runtime.State] or [Animatable],
- * it will automatically have [registerStateObjectTracking] attached to the trailing.
+ * it will automatically have [registerStateObjectTracing] attached to the trailing.
  *
  * ```
  * // before
  * val state: State = mutableStateOf(1)
  *
  * // after compile
- * val state: State = mutableStateOf(1).registerStateObjectTracking()
+ * val state: State = mutableStateOf(1).registerStateObjectTracing()
  * ```
  *
  * Note that only states where the value of [stateObjectGetter] is not `null`
- * are tracked for value changes. [androidx.compose.runtime.DerivedState] is
+ * are traced for value changes. [androidx.compose.runtime.DerivedState] is
  * not currently supported.
  *
- * @receiver State to track value changes.
+ * @receiver State to trace value changes.
  * @return The same state object.
  *
  * @param composer The current nearest [Composer] instance.
@@ -130,8 +130,8 @@ internal object StateObjectTrackManager {
  * outside of Composable)
  * @param composable The composable that uses this [state][State].
  * @param composableKeyName The unique key of the [composable].
- * See [ComposableInvalidationTrackTable.currentComposableKeyName].
- * @param stateName The name of the [state][State] to track.
+ * See [ComposableInvalidationTraceTable.currentComposableKeyName].
+ * @param stateName The name of the [state][State] to trace.
  * @param stateObjectGetter The method to get the [StateObject] from the [state][State].
  * If not specified, the default value is [ComposeStateObjectGetter].
  * @param stateValueGetter The method to get the value of the [state][State].
@@ -141,7 +141,7 @@ internal object StateObjectTrackManager {
  * @see StateValueGetter
  */
 @ExperimentalComposeInvestigatorApi
-public fun <State> State.registerStateObjectTracking(
+public fun <State> State.registerStateObjectTracing(
   composer: Composer,
   composable: AffectedComposable,
   composableKeyName: String,
@@ -155,7 +155,7 @@ public fun <State> State.registerStateObjectTracking(
       override fun onRemembered() {
         try {
           val stateObject = stateObjectGetter(state) ?: return
-          trackedStateObjects.getOrPut(composableKeyName, ::mutableSetOf).add(stateObject)
+          tracedStateObjects.getOrPut(composableKeyName, ::mutableSetOf).add(stateObject)
           stateFieldNameMap.putIfNotPresent(stateObject, stateName)
           stateValueGetterMap.putIfNotPresent(stateObject, stateValueGetter)
           stateLocationMap.putIfNotPresent(stateObject, composable)
@@ -169,7 +169,7 @@ public fun <State> State.registerStateObjectTracking(
         } catch (unexpectedException: Exception) {
           Log.e(
             ComposeInvestigatorConfig.LOGGER_DEFAULT_TAG,
-            "State value tracking registration failed. Please report this as a project issue.",
+            "State value tracing registration failed. Please report this as a project issue.",
             unexpectedException,
           )
         }
@@ -177,20 +177,20 @@ public fun <State> State.registerStateObjectTracking(
 
       override fun onForgotten() {
         // getOrDefault is available from API 24 (project minSdk is 21)
-        trackedStateObjects[composableKeyName].orEmpty().forEach { state ->
+        tracedStateObjects[composableKeyName].orEmpty().forEach { state ->
           stateFieldNameMap.remove(state)
           stateValueGetterMap.remove(state)
           stateLocationMap.remove(state)
           ComposeStateObjectValueGetter.clean(state)
         }
-        trackedStateObjects.remove(composableKeyName)
+        tracedStateObjects.remove(composableKeyName)
       }
 
       override fun onAbandoned() {}
     }
   }
 
-  StateObjectTrackManager.ensureStarted()
+  StateObjectTraceManager.ensureStarted()
 
   composer.startReplaceableGroup(composable.fqName.hashCode() + state.hashCode() + stateName.hashCode())
   composer.cache(false) { register }

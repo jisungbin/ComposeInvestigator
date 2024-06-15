@@ -10,18 +10,18 @@ package land.sungbin.composeinvestigator.compiler.lower
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
 import androidx.compose.compiler.plugins.kotlin.irTrace
 import androidx.compose.compiler.plugins.kotlin.lower.dumpSrc
-import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN
+import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_NAME_FQN
-import land.sungbin.composeinvestigator.compiler.CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN
-import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_KEY_NAME
-import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_NAME
+import land.sungbin.composeinvestigator.compiler.CURRENT_COMPOSABLE_INVALIDATION_TRACER_FQN
+import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_KEY_NAME
+import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_NAME
 import land.sungbin.composeinvestigator.compiler.UNKNOWN_STRING
 import land.sungbin.composeinvestigator.compiler.VerboseLogger
 import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.analysis.set
 import land.sungbin.composeinvestigator.compiler.fromFqName
 import land.sungbin.composeinvestigator.compiler.struct.IrAffectedComposable
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTrackTable
+import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
 import land.sungbin.composeinvestigator.compiler.struct.propGetter
 import land.sungbin.composeinvestigator.compiler.util.irString
 import land.sungbin.fastlist.fastLastOrNull
@@ -47,22 +47,22 @@ import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
-public class InvalidationTrackTableIntrinsicTransformer(
+public class InvalidationTraceTableIntrinsicTransformer(
   private val context: IrPluginContext,
-  private val table: IrInvalidationTrackTable,
+  private val table: IrInvalidationTraceTable,
   @Suppress("unused") private val logger: VerboseLogger,
   private val affectedComposable: IrAffectedComposable,
 ) : IrElementTransformerVoidWithContext(), IrPluginContext by context {
   private val currentTableGetterSymbol =
-    referenceProperties(CallableId.fromFqName(CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN)).single().owner.getter!!
+    referenceProperties(CallableId.fromFqName(CURRENT_COMPOSABLE_INVALIDATION_TRACER_FQN)).single().owner.getter!!
 
-  private val _tableSymbol = referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN))!!
+  private val _tableSymbol = referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN))!!
   private val currentComposableNameGetterSymbol =
-    _tableSymbol.getPropertyGetter(ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_NAME.asString())!!.owner
+    _tableSymbol.getPropertyGetter(ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_NAME.asString())!!.owner
   private val currentComposableNameSetterSymbol =
-    _tableSymbol.getPropertySetter(ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_NAME.asString())!!.owner
+    _tableSymbol.getPropertySetter(ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_NAME.asString())!!.owner
   private val currentComposableKeyNameGetterSymbol =
-    _tableSymbol.getPropertyGetter(ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_KEY_NAME.asString())!!.owner
+    _tableSymbol.getPropertyGetter(ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_KEY_NAME.asString())!!.owner
 
   private val composableNameSymbol = referenceClass(ClassId.topLevel(COMPOSABLE_NAME_FQN))!!.owner
 

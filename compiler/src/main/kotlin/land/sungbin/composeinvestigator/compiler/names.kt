@@ -73,21 +73,21 @@ public val ComposableInvalidationType_PROCESSED: Name = Name.identifier("Process
 public val ComposableInvalidationType_SKIPPED: Name = Name.identifier("Skipped")
 // END ComposableInvalidationLogger
 
-// START ComposableInvalidationTrackTable
-public val CURRENT_COMPOSABLE_INVALIDATION_TRACKER_FQN: FqName = FqName("$ComposeInvestigatorRuntime.currentComposableInvalidationTracker")
+// START ComposableInvalidationTraceTable
+public val CURRENT_COMPOSABLE_INVALIDATION_TRACER_FQN: FqName = FqName("$ComposeInvestigatorRuntime.currentComposableInvalidationTracer")
 
 public val COMPOSABLE_NAME_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableName")
 
-public val COMPOSABLE_INVALIDATION_TRACK_TABLE_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationTrackTable")
-public val ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_NAME: Name = Name.identifier("currentComposableName")
-public val ComposableInvalidationTrackTable_CURRENT_COMPOSABLE_KEY_NAME: Name = Name.identifier("currentComposableKeyName")
-public val ComposableInvalidationTrackTable_CALL_LISTENERS: Name = Name.identifier("callListeners")
-public val ComposableInvalidationTrackTable_COMPUTE_INVALIDATION_REASON: Name = Name.identifier("computeInvalidationReason")
-// END ComposableInvalidationTrackTable
+public val COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationTraceTable")
+public val ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_NAME: Name = Name.identifier("currentComposableName")
+public val ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_KEY_NAME: Name = Name.identifier("currentComposableKeyName")
+public val ComposableInvalidationTraceTable_CALL_LISTENERS: Name = Name.identifier("callListeners")
+public val ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON: Name = Name.identifier("computeInvalidationReason")
+// END ComposableInvalidationTraceTable
 
-// START StateObjectTracker
-public val REGISTER_STATE_OBJECT_TRACKING_FQN: FqName = FqName("$ComposeInvestigatorRuntime.registerStateObjectTracking")
-// END StateObjectTracker
+// START StateObjectTracer
+public val REGISTER_STATE_OBJECT_TRACING_FQN: FqName = FqName("$ComposeInvestigatorRuntime.registerStateObjectTracing")
+// END StateObjectTracer
 
 // START DeclarationStability
 public val DECLARATION_STABILITY_FQN: FqName = FqName("$ComposeInvestigatorRuntime.DeclarationStability")

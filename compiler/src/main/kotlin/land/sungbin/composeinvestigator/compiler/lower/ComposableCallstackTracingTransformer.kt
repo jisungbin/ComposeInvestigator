@@ -8,7 +8,7 @@
 package land.sungbin.composeinvestigator.compiler.lower
 
 import land.sungbin.composeinvestigator.compiler.VerboseLogger
-import land.sungbin.composeinvestigator.compiler.origin.ComposableCallstackTrackerOrigin
+import land.sungbin.composeinvestigator.compiler.origin.ComposableCallstackTracerOrigin
 import land.sungbin.composeinvestigator.compiler.util.irString
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -18,23 +18,23 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 import org.jetbrains.kotlin.ir.util.render
 import org.jetbrains.kotlin.name.FqName
 
-internal class ComposableCallstackTrackingTransformer(
+internal class ComposableCallstackTracingTransformer(
   private val context: IrPluginContext,
   private val logger: VerboseLogger,
-) : AbstractComposableCallstackTrackLower(context, logger), IrPluginContext by context {
+) : AbstractComposableCallstackTraceLower(context, logger), IrPluginContext by context {
   override fun transformComposableCall(parent: FqName, expression: IrCall): IrExpression =
     expression.wrapTryFinally(
       tryResult = IrBlockImpl(
         startOffset = UNDEFINED_OFFSET,
         endOffset = UNDEFINED_OFFSET,
         type = expression.type,
-        origin = ComposableCallstackTrackerOrigin,
+        origin = ComposableCallstackTracerOrigin,
         statements = listOf(
-          tracker.irPush(irString(parent.asString())),
+          tracer.irPush(irString(parent.asString())),
           expression, // TODO remove offsets
         ),
       ),
-      finallyBlock = tracker.irPop(),
+      finallyBlock = tracer.irPop(),
     ).also {
       logger("[ComposableCall] parent: ${parent.asString()}, expression: ${expression.render()}")
     }

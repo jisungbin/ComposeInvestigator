@@ -13,7 +13,7 @@ import land.sungbin.composeinvestigator.compiler.STACK_FQN
 import land.sungbin.composeinvestigator.compiler.Stack_POP
 import land.sungbin.composeinvestigator.compiler.Stack_PUSH
 import land.sungbin.composeinvestigator.compiler.fromFqName
-import land.sungbin.composeinvestigator.compiler.origin.ComposableCallstackTrackerSyntheticOrigin
+import land.sungbin.composeinvestigator.compiler.origin.ComposableCallstackTracerSyntheticOrigin
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
@@ -45,7 +45,7 @@ import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 
-public class IrComposableCallstackTracker private constructor(public val prop: IrProperty) {
+public class IrComposableCallstackTracer private constructor(public val prop: IrProperty) {
   private var pushSymbol: IrSimpleFunctionSymbol? = null
   private var popSymbol: IrSimpleFunctionSymbol? = null
   private var toListSymbol: IrSimpleFunctionSymbol? = null
@@ -80,7 +80,7 @@ public class IrComposableCallstackTracker private constructor(public val prop: I
     }
 
   public companion object {
-    private fun IrComposableCallstackTracker.init(context: IrPluginContext) {
+    private fun IrComposableCallstackTracer.init(context: IrPluginContext) {
       val owner = prop.backingField!!.type.classOrFail
       pushSymbol = owner.getSimpleFunction(Stack_PUSH.asString())!!
       popSymbol = owner.getSimpleFunction(Stack_POP.asString())!!
@@ -93,15 +93,15 @@ public class IrComposableCallstackTracker private constructor(public val prop: I
           }
     }
 
-    public fun from(context: IrPluginContext, prop: IrProperty): IrComposableCallstackTracker =
-      IrComposableCallstackTracker(prop).apply { init(context) }
+    public fun from(context: IrPluginContext, prop: IrProperty): IrComposableCallstackTracer =
+      IrComposableCallstackTracer(prop).apply { init(context) }
 
-    public fun create(context: IrPluginContext, currentFile: IrFile): IrComposableCallstackTracker =
-      IrComposableCallstackTracker(irComposableCallstackTrackerProp(context, currentFile)).apply { init(context) }
+    public fun create(context: IrPluginContext, currentFile: IrFile): IrComposableCallstackTracer =
+      IrComposableCallstackTracer(irComposableCallstackTracerProp(context, currentFile)).apply { init(context) }
   }
 }
 
-public fun IrComposableCallstackTracker.propGetter(
+public fun IrComposableCallstackTracer.propGetter(
   startOffset: Int = UNDEFINED_OFFSET,
   endOffset: Int = UNDEFINED_OFFSET,
 ): IrCall = IrCallImpl.fromSymbolOwner(
@@ -112,10 +112,10 @@ public fun IrComposableCallstackTracker.propGetter(
 
 private var stackClassSymbol: WeakReference<IrClassSymbol>? = null
 
-private fun irComposableCallstackTrackerProp(context: IrPluginContext, currentFile: IrFile): IrProperty {
+private fun irComposableCallstackTracerProp(context: IrPluginContext, currentFile: IrFile): IrProperty {
   val fileName = currentFile.fileEntry.name.split('/').last()
   val shortName = PackagePartClassUtils.getFilePartShortName(fileName)
-  val propName = Name.identifier("ComposableCallstackTrackerImpl\$$shortName")
+  val propName = Name.identifier("ComposableCallstackTracerImpl\$$shortName")
 
   val superSymbol = stackClassSymbol?.get() ?: (
     context.referenceClass(ClassId.topLevel(STACK_FQN))!!
@@ -125,7 +125,7 @@ private fun irComposableCallstackTrackerProp(context: IrPluginContext, currentFi
   return context.irFactory.buildProperty {
     visibility = DescriptorVisibilities.INTERNAL
     name = propName
-    origin = ComposableCallstackTrackerSyntheticOrigin
+    origin = ComposableCallstackTracerSyntheticOrigin
   }.also { prop ->
     prop.parent = currentFile
     prop.backingField = context.irFactory.buildField {

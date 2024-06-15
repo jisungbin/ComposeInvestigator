@@ -16,17 +16,17 @@ package land.sungbin.composeinvestigator.runtime
  * 3. `@NoInvestigation val myState = mutableStateOf(0)`
  * 4. `@NoInvestigation val myState by mutableStateOf(0)`
  *
- * If a composable function is annotated with this, state variable tracking
- * in the function body is also disabled. If you want to disable tracking
- * for a composable function, but want to enable tracking of state variables
+ * If a composable function is annotated with this, state variable tracing
+ * in the function body is also disabled. If you want to disable tracing
+ * for a composable function, but want to enable tracing of state variables
  * in the body of that function, you must enable it directly with the
- * [registerStateObjectTracking] API.
+ * [registerStateObjectTracing] API.
  *
  * ```
  * @Composable @NoInvestigation fun MyComposable() {
- *   val state = remember { mutableStateOf(1).registerStateObjectTracking() }
+ *   val state = remember { mutableStateOf(1).registerStateObjectTracing() }
  *   // Or, you can use delegation.
- *   val state2 by remember { mutableStateOf(1).registerStateObjectTracking() }
+ *   val state2 by remember { mutableStateOf(1).registerStateObjectTracing() }
  * }
  * ```
  *
