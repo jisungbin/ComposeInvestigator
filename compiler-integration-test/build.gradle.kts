@@ -72,7 +72,7 @@ dependencies {
   implementation(libs.jetbrains.annotation)
   implementation(libs.test.assertk)
 
-  testImplementation(projects.compilerHosted)
+  testImplementation(projects.compiler)
   testImplementation(libs.kotlin.compiler.core)
   testImplementation(libs.kotlin.compiler.compose)
 
@@ -89,5 +89,5 @@ dependencies {
   testImplementation(libs.test.junit.compose)
   testRuntimeOnly(libs.test.junit.enigne)
 
-  kotlinCompilerPluginClasspath(projects.compiler)
+  kotlinCompilerPluginClasspath(projects.compilerEmbeddable)
 }
