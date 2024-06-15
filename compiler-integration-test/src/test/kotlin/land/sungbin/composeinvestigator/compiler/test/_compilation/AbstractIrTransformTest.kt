@@ -12,6 +12,8 @@ package land.sungbin.composeinvestigator.compiler.test._compilation
 import androidx.compose.compiler.plugins.kotlin.lower.dumpSrc
 import java.io.File
 import land.sungbin.composeinvestigator.compiler.test._compilation.compiler.SourceFile
+import land.sungbin.composeinvestigator.compiler.test.golden.GoldenTransformRule
+import land.sungbin.composeinvestigator.compiler.test.golden.GoldenTransformTestInfo
 import org.intellij.lang.annotations.Language
 import org.intellij.lang.annotations.MagicConstant
 import org.jetbrains.kotlin.ir.IrElement
@@ -52,7 +54,7 @@ abstract class AbstractIrTransformTest : AbstractK2CompilerTest() {
         // replace source keys for start group calls
         .replace(Regex("(%composer\\.start(Restart|Movable|Replaceable|Replace)Group\\()-?((0b)?[-\\d]+)")) { match ->
           val stringKey = match.groupValues[3]
-          val key = if (stringKey.startsWith("0b")) Integer.parseInt(stringKey.drop(2), 2) else stringKey.toInt()
+          val key = if (stringKey.startsWith("0b")) stringKey.drop(2).toInt(radix = 2) else stringKey.toInt()
           if (key in keySet) {
             "${match.groupValues[1]}<!DUPLICATE KEY: $key!>"
           } else {

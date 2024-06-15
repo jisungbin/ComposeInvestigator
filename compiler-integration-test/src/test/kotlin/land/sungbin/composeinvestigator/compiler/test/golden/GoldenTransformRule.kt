@@ -7,7 +7,7 @@
 
 @file:Suppress("SameParameterValue")
 
-package land.sungbin.composeinvestigator.compiler.test._compilation
+package land.sungbin.composeinvestigator.compiler.test.golden
 
 import java.io.File
 import java.io.FileNotFoundException

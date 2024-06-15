@@ -77,8 +77,8 @@ dependencyResolutionManagement {
 include(
   ":runtime",
   ":compiler",
-  ":compiler-hosted",
-  ":compiler-gradle-plugin",
   ":compiler-integration-test",
+  ":compiler-embeddable",
+  ":compiler-gradle-plugin",
   ":sample",
 )
