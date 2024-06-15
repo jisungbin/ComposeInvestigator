@@ -19,25 +19,13 @@ import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTra
 val invalidationProcessedFileTable = currentComposableInvalidationTracer
 
 @Composable
-fun InvalidationProcessedRoot_StateDelegateReference() {
-  var delegateState by remember { mutableIntStateOf(0) }
-  Button(onClick = { delegateState++ }) {}
-  InvalidationProcessedChild_StateDelegateReference(delegateState)
+fun InvalidationProcessedRoot() {
+  var state by remember { mutableIntStateOf(0) }
+  Button(onClick = { state++ }) {}
+  InvalidationProcessedChild(state)
 }
 
 @Composable
-private fun InvalidationProcessedChild_StateDelegateReference(delegateCount: Int) {
-  Text(text = "$delegateCount")
-}
-
-@Composable
-fun InvalidationProcessedRoot_StateDirectReference() {
-  val directState = remember { mutableIntStateOf(0) }
-  Button(onClick = { directState.intValue++ }) {}
-  InvalidationProcessedChild_StateDirectReference(directState.intValue)
-}
-
-@Composable
-private fun InvalidationProcessedChild_StateDirectReference(directCount: Int) {
-  Text(text = "$directCount")
+private fun InvalidationProcessedChild(count: Int) {
+  Text(text = "$count")
 }

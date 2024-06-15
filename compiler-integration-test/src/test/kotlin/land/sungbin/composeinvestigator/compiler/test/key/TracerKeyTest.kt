@@ -57,52 +57,44 @@ class TracerKeyTest : AbstractK2CompilerTest() {
     fun assertAffectedComposable(
       target: IrConstructorCall,
       expectName: String,
-      expectPkg: String,
-      expectStartLine: Int,
-      expectStartColumn: Int,
+      expectPackage: String,
+      expectFilename: String,
     ) {
       assertThat(target.getValueArgument(0).safeAs<IrConst<String>>()?.value).isEqualTo(expectName)
-      assertThat(target.getValueArgument(1).safeAs<IrConst<String>>()?.value).isEqualTo(expectPkg)
-      // 'filePath' value is machine dependent, so we don't test it.
-      assertThat(target.getValueArgument(3).safeAs<IrConst<Int>>()?.value).isEqualTo(expectStartLine)
-      assertThat(target.getValueArgument(4).safeAs<IrConst<Int>>()?.value).isEqualTo(expectStartColumn)
-      // TODO: assert parent (not yet implemented feature)
+      assertThat(target.getValueArgument(1).safeAs<IrConst<String>>()?.value).isEqualTo(expectPackage)
+      assertThat(target.getValueArgument(2).safeAs<IrConst<String>>()?.value).isEqualTo(expectFilename)
     }
 
     assertThat(zeroArgFnKey.keyName).isEqualTo("fun-one()Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TracerKeyTestSource.kt")
     assertAffectedComposable(
       zeroArgFnKey.affectedComposable,
       expectName = "one",
-      expectPkg = "land.sungbin.composeinvestigator.compiler.test._source.key",
-      expectStartLine = 12,
-      expectStartColumn = 0,
+      expectPackage = "land.sungbin.composeinvestigator.compiler.test._source.key",
+      expectFilename = "TracerKeyTestSource.kt",
     )
 
     assertThat(oneArgFnKey.keyName).isEqualTo("fun-one(Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TracerKeyTestSource.kt")
     assertAffectedComposable(
       oneArgFnKey.affectedComposable,
       expectName = "one",
-      expectPkg = "land.sungbin.composeinvestigator.compiler.test._source.key",
-      expectStartLine = 13,
-      expectStartColumn = 0,
+      expectPackage = "land.sungbin.composeinvestigator.compiler.test._source.key",
+      expectFilename = "TracerKeyTestSource.kt",
     )
 
     assertThat(twoArgFnKey.keyName).isEqualTo("fun-one(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TracerKeyTestSource.kt")
     assertAffectedComposable(
       twoArgFnKey.affectedComposable,
       expectName = "one",
-      expectPkg = "land.sungbin.composeinvestigator.compiler.test._source.key",
-      expectStartLine = 14,
-      expectStartColumn = 0,
+      expectPackage = "land.sungbin.composeinvestigator.compiler.test._source.key",
+      expectFilename = "TracerKeyTestSource.kt",
     )
 
     assertThat(threeArgFnKey.keyName).isEqualTo("fun-one(Any,Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler.test._source.key/file-TracerKeyTestSource.kt")
     assertAffectedComposable(
       threeArgFnKey.affectedComposable,
       expectName = "one",
-      expectPkg = "land.sungbin.composeinvestigator.compiler.test._source.key",
-      expectStartLine = 15,
-      expectStartColumn = 0,
+      expectPackage = "land.sungbin.composeinvestigator.compiler.test._source.key",
+      expectFilename = "TracerKeyTestSource.kt",
     )
   }
 }

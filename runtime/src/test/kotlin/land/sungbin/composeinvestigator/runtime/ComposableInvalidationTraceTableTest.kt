@@ -20,8 +20,8 @@ class ComposableInvalidationTraceTableTest {
 
     val param = AffectedField.ValueParameter(
       name = "name",
-      typeFqName = "kotlin.String",
-      stability = DeclarationStability.Stable,
+      typeName = "kotlin.String",
+      stability = Stability.Stable,
       valueString = "value",
       valueHashCode = 0,
     )
@@ -37,15 +37,15 @@ class ComposableInvalidationTraceTableTest {
 
     val oldParam = AffectedField.ValueParameter(
       name = "name",
-      typeFqName = "kotlin.String",
-      stability = DeclarationStability.Stable,
+      typeName = "kotlin.String",
+      stability = Stability.Stable,
       valueString = "value",
       valueHashCode = 0,
     )
     val newParam = AffectedField.ValueParameter(
       name = "name",
-      typeFqName = "kotlin.String",
-      stability = DeclarationStability.Unstable,
+      typeName = "kotlin.String",
+      stability = Stability.Unstable,
       valueString = "new value",
       valueHashCode = 1,
     )
@@ -61,31 +61,37 @@ class ComposableInvalidationTraceTableTest {
   fun fieldChangedDisplayAsParamsOnlyString() {
     val changedParam = InvalidationReason.FieldChanged(
       listOf(
-        AffectedField.ValueParameter(
-          name = "name",
-          typeFqName = "kotlin.String",
-          stability = DeclarationStability.Stable,
-          valueString = "value",
-          valueHashCode = 0,
-        ) changedTo AffectedField.ValueParameter(
-          name = "name",
-          typeFqName = "kotlin.String",
-          stability = DeclarationStability.Stable,
-          valueString = "new value",
-          valueHashCode = 1,
+        FieldChanged(
+          old = AffectedField.ValueParameter(
+            name = "name",
+            typeName = "kotlin.String",
+            stability = Stability.Stable,
+            valueString = "value",
+            valueHashCode = 0,
+          ),
+          new = AffectedField.ValueParameter(
+            name = "name",
+            typeName = "kotlin.String",
+            stability = Stability.Stable,
+            valueString = "new value",
+            valueHashCode = 1,
+          ),
         ),
-        AffectedField.ValueParameter(
-          name = "name2",
-          typeFqName = "kotlin.String",
-          stability = DeclarationStability.Unstable,
-          valueString = "value2",
-          valueHashCode = 10,
-        ) changedTo AffectedField.ValueParameter(
-          name = "name2",
-          typeFqName = "kotlin.String",
-          stability = DeclarationStability.Unstable,
-          valueString = "new value2",
-          valueHashCode = 11,
+        FieldChanged(
+          old = AffectedField.ValueParameter(
+            name = "name2",
+            typeName = "kotlin.String",
+            stability = Stability.Unstable,
+            valueString = "value2",
+            valueHashCode = 10,
+          ),
+          new = AffectedField.ValueParameter(
+            name = "name2",
+            typeName = "kotlin.String",
+            stability = Stability.Unstable,
+            valueString = "new value2",
+            valueHashCode = 11,
+          ),
         ),
       ),
     )

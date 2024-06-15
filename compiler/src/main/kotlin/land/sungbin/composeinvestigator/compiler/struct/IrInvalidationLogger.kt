@@ -9,7 +9,7 @@ package land.sungbin.composeinvestigator.compiler.struct
 
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INVALIDATION_TYPE_FQN
 import land.sungbin.composeinvestigator.compiler.COMPOSE_INVESTIGATOR_CONFIG_FQN
-import land.sungbin.composeinvestigator.compiler.ComposableInvalidationLogger_INVOKE
+import land.sungbin.composeinvestigator.compiler.ComposableInvalidationLogger_LOG
 import land.sungbin.composeinvestigator.compiler.ComposableInvalidationType_PROCESSED
 import land.sungbin.composeinvestigator.compiler.ComposableInvalidationType_SKIPPED
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorConfig_INVALIDATION_LOGGER
@@ -36,7 +36,7 @@ import org.jetbrains.kotlin.name.ClassId
 public class IrInvalidationLogger(context: IrPluginContext) {
   private var loggerContainerSymbol = context.referenceClass(ClassId.topLevel(COMPOSE_INVESTIGATOR_CONFIG_FQN))!!
   private var loggerGetterSymbol = loggerContainerSymbol.getPropertyGetter(ComposeInvestigatorConfig_INVALIDATION_LOGGER.asString())!!
-  private var loggerInvokerSymbol = loggerGetterSymbol.owner.returnType.classOrFail.getSimpleFunction(ComposableInvalidationLogger_INVOKE.asString())!!
+  private var loggerLogSymbol = loggerGetterSymbol.owner.returnType.classOrFail.getSimpleFunction(ComposableInvalidationLogger_LOG.asString())!!
 
   public val irInvalidateReasonSymbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(INVALIDATION_REASON_FQN))!!
   public val irInvalidateReasonInvalidateSymbol: IrClassSymbol =
@@ -51,13 +51,12 @@ public class IrInvalidationLogger(context: IrPluginContext) {
     irInvalidationTypeSymbol.owner.sealedSubclasses.single { clz -> clz.owner.name == ComposableInvalidationType_SKIPPED }
 
   public fun irLog(
-    callstack: IrDeclarationReference,
     affectedComposable: IrDeclarationReference,
     invalidationType: IrDeclarationReference,
   ): IrCall = IrCallImpl.fromSymbolOwner(
     startOffset = UNDEFINED_OFFSET,
     endOffset = UNDEFINED_OFFSET,
-    symbol = loggerInvokerSymbol,
+    symbol = loggerLogSymbol,
   ).also { invokeCall ->
     invokeCall.dispatchReceiver = IrCallImpl.fromSymbolOwner(
       startOffset = UNDEFINED_OFFSET,
@@ -72,9 +71,8 @@ public class IrInvalidationLogger(context: IrPluginContext) {
       )
     }
   }.apply {
-    putValueArgument(0, callstack)
-    putValueArgument(1, affectedComposable)
-    putValueArgument(2, invalidationType)
+    putValueArgument(0, affectedComposable)
+    putValueArgument(1, invalidationType)
   }
 
   public fun irInvalidationTypeProcessed(reason: IrExpression): IrConstructorCall =

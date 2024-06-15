@@ -18,13 +18,13 @@ import land.sungbin.composeinvestigator.compiler.analysis.ComposableKeyInfo
 import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.analysis.set
 import land.sungbin.composeinvestigator.compiler.struct.IrAffectedComposable
-import land.sungbin.composeinvestigator.compiler.util.getSafelyLocation
-import land.sungbin.composeinvestigator.compiler.util.irInt
 import land.sungbin.composeinvestigator.compiler.util.irString
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.name
+import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.name.FqName
 
@@ -59,14 +59,11 @@ public class DurableComposableKeyTransformer(
 
   override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
     val (keyName) = buildKey("fun-${declaration.signatureString()}")
-    val location = declaration.getSafelyLocation()
 
     val affectedComposable = affectedComposable.irAffectedComposable(
-      composableName = irString(declaration.name.asString()),
-      packageName = irString((declaration.fqNameWhenAvailable?.parent() ?: FqName.ROOT).asString()),
-      filePath = irString(location.file),
-      startLine = irInt(location.line),
-      startColumn = irInt(location.column),
+      name = irString(declaration.name.asString()),
+      pkg = irString((declaration.fqNameWhenAvailable?.parent() ?: FqName.ROOT).asString()),
+      filename = irString(declaration.file.name),
     )
 
     val keyInfo = ComposableKeyInfo(keyName = keyName, affectedComposable = affectedComposable)

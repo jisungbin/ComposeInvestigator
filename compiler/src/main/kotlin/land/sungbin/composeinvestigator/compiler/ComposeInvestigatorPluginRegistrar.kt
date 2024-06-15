@@ -27,14 +27,8 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
     val verbose = configuration[ComposeInvestigatorConfiguration.KEY_VERBOSE] ?: false
     val logger = VerboseLogger(configuration).apply { if (verbose) verbose() }
 
-    project.extensionArea
-      .getExtensionPoint(IrGenerationExtension.extensionPointName)
-      .registerExtension(
-        ComposableCallstackTracingExtension(logger = logger),
-        LoadingOrder.FIRST,
-        project,
-      )
-
+    // We need to explicitly define the LAST order because ComposeInvestigator should
+    // run after the Compose compiler is applied.
     project.extensionArea
       .getExtensionPoint(IrGenerationExtension.extensionPointName)
       .registerExtension(

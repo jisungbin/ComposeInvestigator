@@ -21,35 +21,29 @@ public class IrAffectedComposable(context: IrPluginContext) {
   private val irAffectedComposable = context.referenceClass(ClassId.topLevel(AFFECTED_COMPOSABLE_FQN))!!
 
   public fun irAffectedComposable(
-    composableName: IrConst<String>,
-    packageName: IrConst<String>,
-    filePath: IrConst<String>,
-    startLine: IrConst<Int>,
-    startColumn: IrConst<Int>,
+    name: IrConst<String>,
+    pkg: IrConst<String>,
+    filename: IrConst<String>,
   ): IrConstructorCallImpl = IrConstructorCallImpl.fromSymbolOwner(
     type = irAffectedComposable.defaultType,
     constructorSymbol = irAffectedComposable.constructors.single(),
   ).apply {
-    putValueArgument(0, composableName)
-    putValueArgument(1, packageName)
-    putValueArgument(2, filePath)
-    putValueArgument(3, startLine)
-    putValueArgument(4, startColumn)
+    putValueArgument(0, name)
+    putValueArgument(1, pkg)
+    putValueArgument(2, filename)
   }
 
-  public fun getComposableName(target: IrConstructorCall): IrConst<String> = target.getValueArgument(0)!!.cast()
+  public fun getName(target: IrConstructorCall): IrConst<String> = target.getValueArgument(0)!!.cast()
 
   public fun copyWith(
     target: IrConstructorCall,
-    composableName: IrConst<String>,
+    name: IrConst<String>,
   ): IrConstructorCallImpl = IrConstructorCallImpl.fromSymbolOwner(
     type = irAffectedComposable.defaultType,
     constructorSymbol = irAffectedComposable.constructors.single(),
   ).apply {
-    putValueArgument(0, composableName)
+    putValueArgument(0, name)
     putValueArgument(1, target.getValueArgument(1)!!)
     putValueArgument(2, target.getValueArgument(2)!!)
-    putValueArgument(3, target.getValueArgument(3)!!)
-    putValueArgument(4, target.getValueArgument(4)!!)
   }
 }

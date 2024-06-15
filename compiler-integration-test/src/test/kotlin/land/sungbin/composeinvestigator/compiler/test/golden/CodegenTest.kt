@@ -12,20 +12,9 @@ import land.sungbin.composeinvestigator.compiler.test._source.sourceString
 import org.junit.Test
 
 class CodegenTest : AbstractIrTransformTest() {
-  @Test fun callstack_tracing_codegen() {
-    verifyGoldenIrTransform(source = sourceString("codegen/CallstackTracing.kt"))
-  }
-
   @Test fun state_tracing_codegen() {
     verifyGoldenIrTransform(
       source = sourceString("codegen/StateTracing.kt"),
-      flags = Flags.COMPOSE or Flags.NO_CALLSTACK_TRACING,
-    )
-  }
-
-  @Test fun no_state_tracing_codegen() {
-    verifyGoldenIrTransform(
-      source = sourceString("codegen/NoStateTracing.kt"),
       flags = Flags.COMPOSE or Flags.NO_CALLSTACK_TRACING,
     )
   }
