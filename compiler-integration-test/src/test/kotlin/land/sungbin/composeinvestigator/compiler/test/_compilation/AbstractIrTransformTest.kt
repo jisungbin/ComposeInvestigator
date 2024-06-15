@@ -12,6 +12,8 @@ package land.sungbin.composeinvestigator.compiler.test._compilation
 import androidx.compose.compiler.plugins.kotlin.lower.dumpSrc
 import java.io.File
 import land.sungbin.composeinvestigator.compiler.test._compilation.compiler.SourceFile
+import land.sungbin.composeinvestigator.compiler.test.golden.GoldenTransformRule
+import land.sungbin.composeinvestigator.compiler.test.golden.GoldenTransformTestInfo
 import org.intellij.lang.annotations.Language
 import org.intellij.lang.annotations.MagicConstant
 import org.jetbrains.kotlin.ir.IrElement
