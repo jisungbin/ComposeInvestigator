@@ -10,6 +10,7 @@ import com.adarshr.gradle.testlogger.theme.ThemeType
 import com.android.build.api.variant.AndroidComponentsExtension
 import com.android.build.api.variant.HasUnitTestBuilder
 import com.diffplug.gradle.spotless.SpotlessExtension
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -26,16 +27,6 @@ idea {
 }
 
 buildscript {
-  repositories {
-    google {
-      content {
-        includeGroupByRegex(".*google.*")
-        includeGroupByRegex(".*android.*")
-      }
-    }
-    mavenCentral()
-  }
-
   dependencies {
     classpath(libs.kotlin.gradle.core)
     classpath(libs.gradle.android)
@@ -45,16 +36,6 @@ buildscript {
 subprojects {
   group = project.property("GROUP") as String
   version = project.property("VERSION_NAME") as String
-
-  repositories {
-    google {
-      content {
-        includeGroupByRegex(".*google.*")
-        includeGroupByRegex(".*android.*")
-      }
-    }
-    mavenCentral()
-  }
 
   apply {
     plugin(rootProject.libs.plugins.spotless.get().pluginId)
@@ -113,12 +94,9 @@ subprojects {
   }
 
   tasks.withType<KotlinCompile> {
-    kotlinOptions {
-      jvmTarget = "17"
-      freeCompilerArgs = freeCompilerArgs + listOf(
-        "-opt-in=kotlin.OptIn",
-        "-opt-in=kotlin.RequiresOptIn",
-      )
+    compilerOptions {
+      jvmTarget = JvmTarget.JVM_17
+      optIn.addAll("-opt-in=kotlin.OptIn", "-opt-in=kotlin.RequiresOptIn")
 
       // https://github.com/ZacSweers/redacted-compiler-plugin/blob/c866a8ae7b2ab039fee9709c990a5478ac0dc0c7/redacted-compiler-plugin-gradle/build.gradle.kts#L91-L94
       if (project.hasProperty("POM_ARTIFACT_ID")) {

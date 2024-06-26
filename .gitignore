@@ -8,6 +8,7 @@
 !/.idea/inspectionProfiles
 *.iml
 .gradle
+.kotlin
 build
 release
 local.properties

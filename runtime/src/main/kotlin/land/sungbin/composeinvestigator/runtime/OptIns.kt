@@ -16,7 +16,7 @@ package land.sungbin.composeinvestigator.runtime
 public annotation class ComposeInvestigatorCompilerApi
 
 @RequiresOptIn(
-  "This is an experimental API for ComposeInvestigator and is likely to change" +
+  "This is an experimental API for ComposeInvestigator and is likely to change " +
     "before becoming stable.",
 )
 @Retention(AnnotationRetention.BINARY)
