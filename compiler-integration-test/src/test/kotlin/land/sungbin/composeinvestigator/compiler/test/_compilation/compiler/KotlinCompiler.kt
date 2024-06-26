@@ -64,7 +64,7 @@ abstract class KotlinCompiler(val environment: KotlinCoreEnvironment) {
 
       environment.project.registerExtensions(configuration)
 
-      return K2CompilerProvider(environment)
+      return K2Compilation(environment)
     }
   }
 }

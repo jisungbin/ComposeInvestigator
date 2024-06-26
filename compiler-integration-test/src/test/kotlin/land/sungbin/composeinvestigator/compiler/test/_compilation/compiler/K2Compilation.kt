@@ -49,7 +49,7 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.platform.CommonPlatforms
 import org.jetbrains.kotlin.platform.jvm.JvmPlatforms
 
-class K2CompilerProvider(environment: KotlinCoreEnvironment) : KotlinCompiler(environment) {
+class K2Compilation(environment: KotlinCoreEnvironment) : KotlinCompiler(environment) {
   private val project: Project get() = environment.project
   private val configuration: CompilerConfiguration get() = environment.configuration
 

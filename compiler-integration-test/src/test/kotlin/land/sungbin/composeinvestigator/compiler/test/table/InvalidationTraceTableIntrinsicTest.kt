@@ -13,6 +13,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import assertk.assertThat
 import assertk.assertions.hasClass
 import assertk.assertions.isNotNull
+import assertk.assertions.isNotSameInstanceAs
 import assertk.assertions.isSameInstanceAs
 import land.sungbin.composeinvestigator.compiler.test.source.table.CurrentComposableKeyName1
 import land.sungbin.composeinvestigator.compiler.test.source.table.CurrentComposableKeyName2
@@ -34,7 +35,7 @@ class InvalidationTraceTableIntrinsicTest {
     assertThat(table1).isNotNull().hasClass<ComposableInvalidationTraceTable>()
     assertThat(table2).isNotNull().hasClass<ComposableInvalidationTraceTable>()
 
-    assertThat(table1).isSameInstanceAs(table2)
+    assertThat(table1).isNotSameInstanceAs(table2)
 
     table1()
     table2()

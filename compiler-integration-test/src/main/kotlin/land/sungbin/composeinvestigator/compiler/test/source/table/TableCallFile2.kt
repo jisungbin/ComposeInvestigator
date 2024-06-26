@@ -32,5 +32,5 @@ fun CurrentComposableName2() {
 
 @Composable
 fun CurrentComposableKeyName2() {
-  assertThat(table2.currentComposableKeyName).isEqualTo("fun-CurrentComposableKeyName2(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.table.invalidationtracetablecall/file-TableCallFile2.kt")
+  assertThat(table2.currentComposableKeyName).isEqualTo("fun-CurrentComposableKeyName2(Composer,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler.test.source.table/file-TableCallFile2.kt")
 }
