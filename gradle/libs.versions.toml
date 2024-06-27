@@ -1,5 +1,5 @@
 [versions]
-gradle-android = "8.4.1"
+gradle-android = "8.5.0"
 gradle-publish-maven = "0.29.0"
 gradle-test-logging = "4.0.0"
 gradle-shadow = "8.1.1"
