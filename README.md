@@ -15,6 +15,8 @@ However, it can perform the following tasks:
 
 [*(Read the Medium's introductory post)*](https://jisungbin.medium.com/tracing-recompositions-without-boilerplate-code-e9800db1419e)
 
+*Work is currently underway to adapt K2 and rewrite core logic: [#172](https://github.com/jisungbin/ComposeInvestigator/pull/172)*
+
 ---
 
 ### Getting Started ![gradle-plugin-version](https://img.shields.io/maven-central/v/land.sungbin.composeinvestigator/composeinvestigator-gradle-plugin?style=flat-square)
