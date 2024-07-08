@@ -25,7 +25,7 @@ test-mockk = "1.13.11"
 test-kotest = "5.9.0"
 test-junit-core = "4.13.2"
 test-junit-engine = "5.10.2"
-test-robolectric = "4.12.2"
+test-robolectric = "4.13"
 test-kotlin-compilation = "0.4.1"
 
 [plugins]
