@@ -19,8 +19,9 @@ val updateVersion = tasks.register<UpdatePluginVersionTask>("updateVersion") {
   destination.set(projectDir.walk().first { path -> path.endsWith("VERSION.kt") })
 }
 
-tasks
-  .matching { task -> task.name == "sourcesJar" || task.name == "spotlessKotlin" || task.name == "dokkaHtml" }
+tasks.matching { task ->
+  task.name == "sourcesJar" || task.name == "spotlessKotlin" || task.name == "dokkaHtml"
+}
   .configureEach { dependsOn(updateVersion) }
 
 tasks.withType<KotlinCompile>().configureEach {
@@ -51,7 +52,15 @@ abstract class UpdatePluginVersionTask : DefaultTask() {
   @get:InputFile abstract val destination: RegularFileProperty
 
   @TaskAction fun run() {
-    val packageLine = destination.get().asFile.useLines { it.first { line -> line.startsWith("package") } }
+    var packageLine: String? = null
+    var currentVersion: String? = null
+
+    destination.get().asFile.forEachLine { line ->
+      if (line.startsWith("package")) packageLine = line
+      if (line.contains("const val VERSION")) currentVersion = line.split("\"")[1]
+    }
+    if (currentVersion == version.get()) return
+
     destination.get().asFile.writeText(
       """
       $packageLine
