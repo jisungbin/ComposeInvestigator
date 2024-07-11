@@ -63,6 +63,7 @@ subprojects {
           "ktlint_standard_function-naming" to "disabled",
           "ktlint_standard_property-naming" to "disabled",
           "ktlint_standard_backing-property-naming" to "disabled",
+          "ktlint_standard_class-signature" to "disabled",
           "ktlint_standard_import-ordering" to "disabled",
           "ktlint_standard_max-line-length" to "disabled",
           "ktlint_standard_annotation" to "disabled",
@@ -70,7 +71,7 @@ subprojects {
           "ktlint_standard_value-argument-comment" to "disabled",
           "ktlint_standard_value-parameter-comment" to "disabled",
           "ktlint_standard_comment-wrapping" to "disabled",
-        )
+        ),
       )
       licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
     }
