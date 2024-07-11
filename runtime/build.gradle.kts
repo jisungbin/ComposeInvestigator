@@ -30,7 +30,7 @@ tasks.dokkaHtml {
     mapOf(
       "org.jetbrains.dokka.base.DokkaBase" to
         """{ "footerMessage": "ComposeInvestigator ⓒ 2024 Ji Sungbin" }""",
-    )
+    ),
   )
 }
 

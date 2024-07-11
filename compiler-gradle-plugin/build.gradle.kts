@@ -14,26 +14,18 @@ plugins {
   id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 
-// Thanks for https://github.com/ZacSweers/redacted-compiler-plugin/blob/c866a8ae7b2ab039fee9709c990a5478ac0dc0c7/redacted-compiler-plugin-gradle/build.gradle.kts#L21-L34
-sourceSets.main {
-  java.srcDir(layout.buildDirectory.dir("generated/sources/version-template/kotlin/main"))
+val updateVersion = tasks.register<UpdatePluginVersionTask>("updateVersion") {
+  version.set(project.property("VERSION_NAME") as String)
+  destination.set(projectDir.walk().first { path -> path.endsWith("VERSION.kt") })
 }
 
-val copyVersionTemplateProvider =
-  tasks.register<Copy>("copyVersionTemplate") {
-    inputs.property("version", project.property("VERSION_NAME"))
-    from(project.layout.projectDirectory.dir("version-template"))
-    into(project.layout.buildDirectory.dir("generated/sources/version-template/kotlin/main"))
-    expand(mapOf("projectVersion" to "${project.property("VERSION_NAME")}"))
-    filteringCharset = "UTF-8"
-  }
-
-tasks
-  .matching { task -> task.name == "sourcesJar" || task.name == "dokkaHtml" }
-  .configureEach { dependsOn(copyVersionTemplateProvider) }
+tasks.matching { task ->
+  task.name == "sourcesJar" || task.name == "spotlessKotlin" || task.name == "dokkaHtml"
+}
+  .configureEach { dependsOn(updateVersion) }
 
 tasks.withType<KotlinCompile>().configureEach {
-  dependsOn(copyVersionTemplateProvider)
+  dependsOn(updateVersion)
 }
 
 gradlePlugin {
@@ -52,4 +44,29 @@ kotlin {
 dependencies {
   compileOnly(libs.kotlin.gradle.core)
   compileOnly(libs.kotlin.gradle.api)
+}
+
+abstract class UpdatePluginVersionTask : DefaultTask() {
+  @get:Input abstract val version: Property<String>
+
+  @get:InputFile abstract val destination: RegularFileProperty
+
+  @TaskAction fun run() {
+    var packageLine: String? = null
+    var currentVersion: String? = null
+
+    destination.get().asFile.forEachLine { line ->
+      if (line.startsWith("package")) packageLine = line
+      if (line.contains("const val VERSION")) currentVersion = line.split("\"")[1]
+    }
+    if (currentVersion == version.get()) return
+
+    destination.get().asFile.writeText(
+      """
+      $packageLine
+
+      internal const val VERSION = "${version.get()}"
+      """.trimIndent(),
+    )
+  }
 }

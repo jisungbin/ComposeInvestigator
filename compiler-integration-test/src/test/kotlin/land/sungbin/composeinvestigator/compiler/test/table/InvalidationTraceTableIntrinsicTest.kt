@@ -14,7 +14,6 @@ import assertk.assertThat
 import assertk.assertions.hasClass
 import assertk.assertions.isNotNull
 import assertk.assertions.isNotSameInstanceAs
-import assertk.assertions.isSameInstanceAs
 import land.sungbin.composeinvestigator.compiler.test.source.table.CurrentComposableKeyName1
 import land.sungbin.composeinvestigator.compiler.test.source.table.CurrentComposableKeyName2
 import land.sungbin.composeinvestigator.compiler.test.source.table.CurrentComposableName1
