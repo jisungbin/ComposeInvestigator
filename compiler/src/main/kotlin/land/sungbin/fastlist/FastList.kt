@@ -349,10 +349,8 @@ public fun <T> List<T>.fastJoinToString(
   limit: Int = -1,
   truncated: CharSequence = "...",
   transform: ((T) -> CharSequence)? = null,
-): String {
-  return fastJoinTo(StringBuilder(), separator, prefix, postfix, limit, truncated, transform)
-    .toString()
-}
+): String = fastJoinTo(StringBuilder(), separator, prefix, postfix, limit, truncated, transform)
+  .toString()
 
 /**
  * Returns a list containing only elements from the given collection
