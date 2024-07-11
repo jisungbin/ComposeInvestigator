@@ -12,9 +12,9 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.currentRecomposeScope
 import land.sungbin.composeinvestigator.runtime.ComposableName
-import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracker
+import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
 
-val invalidationSkippedFileTable = currentComposableInvalidationTracker
+val invalidationSkippedFileTable = currentComposableInvalidationTracer
 
 @Composable
 fun InvalidationSkippedRoot() {
@@ -31,7 +31,7 @@ private fun InvalidationSkippedChild() {
 
 @Composable
 fun InvalidationSkippedRoot_CustomName() {
-  currentComposableInvalidationTracker.currentComposableName = ComposableName("InvalidationSkippedRoot_custom_name")
+  currentComposableInvalidationTracer.currentComposableName = ComposableName("InvalidationSkippedRoot_custom_name")
   val recomposeScope = currentRecomposeScope
 
   Button(onClick = recomposeScope::invalidate) {}
@@ -40,6 +40,6 @@ fun InvalidationSkippedRoot_CustomName() {
 
 @Composable
 private fun InvalidationSkippedChild_CustomName() {
-  currentComposableInvalidationTracker.currentComposableName = ComposableName("InvalidationSkippedChild_custom_name")
+  currentComposableInvalidationTracer.currentComposableName = ComposableName("InvalidationSkippedChild_custom_name")
   Text(text = "Child")
 }

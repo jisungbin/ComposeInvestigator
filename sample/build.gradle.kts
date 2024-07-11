@@ -5,12 +5,11 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
   id("com.android.application")
   kotlin("android")
   id("com.github.takahirom.decomposer")
+  alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -29,19 +28,11 @@ android {
   sourceSets {
     getByName("main").java.srcDir("src/main/kotlin")
   }
-
-  buildFeatures {
-    compose = true
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
-  }
 }
 
-tasks.withType<KotlinCompile> {
-  kotlinOptions {
-    freeCompilerArgs = freeCompilerArgs + listOf("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=true")
+kotlin {
+  compilerOptions {
+    freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=true")
   }
 }
 

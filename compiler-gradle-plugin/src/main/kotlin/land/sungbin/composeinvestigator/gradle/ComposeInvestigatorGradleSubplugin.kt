@@ -26,7 +26,7 @@ public class ComposeInvestigatorGradleSubplugin : KotlinCompilerPluginSupportPlu
   override fun getPluginArtifact(): SubpluginArtifact =
     SubpluginArtifact(
       groupId = "land.sungbin.composeinvestigator",
-      artifactId = "composeinvestigator-compiler",
+      artifactId = "composeinvestigator-compiler-embeddable",
       version = VERSION,
     )
 

@@ -1,0 +1,3 @@
+- https://github.com/JetBrains/kotlin/tree/master/plugins/compose/compiler-hosted/integration-tests
+- https://github.com/JetBrains/kotlin/tree/master/compiler/test-infrastructure-utils
+- https://github.com/JetBrains/kotlin/tree/master/compiler/tests-compiler-utils

@@ -14,30 +14,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracker
+import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
 
-val invalidationProcessedFileTable = currentComposableInvalidationTracker
+val invalidationProcessedFileTable = currentComposableInvalidationTracer
 
 @Composable
-fun InvalidationProcessedRoot_StateDelegateReference() {
-  var delegateState by remember { mutableIntStateOf(0) }
-  Button(onClick = { delegateState++ }) {}
-  InvalidationProcessedChild_StateDelegateReference(delegateState)
+fun InvalidationProcessedRoot() {
+  var state by remember { mutableIntStateOf(0) }
+  Button(onClick = { state++ }) {}
+  InvalidationProcessedChild(state)
 }
 
 @Composable
-private fun InvalidationProcessedChild_StateDelegateReference(delegateCount: Int) {
-  Text(text = "$delegateCount")
-}
-
-@Composable
-fun InvalidationProcessedRoot_StateDirectReference() {
-  val directState = remember { mutableIntStateOf(0) }
-  Button(onClick = { directState.intValue++ }) {}
-  InvalidationProcessedChild_StateDirectReference(directState.intValue)
-}
-
-@Composable
-private fun InvalidationProcessedChild_StateDirectReference(directCount: Int) {
-  Text(text = "$directCount")
+private fun InvalidationProcessedChild(count: Int) {
+  Text(text = "$count")
 }
