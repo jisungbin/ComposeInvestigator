@@ -7,7 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler.struct
 
-import land.sungbin.composeinvestigator.compiler.AFFECTED_COMPOSABLE_FQN
+import land.sungbin.composeinvestigator.compiler.VALUE_PARAMETER_FQN
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 public class IrAffectedComposable(context: IrPluginContext) {
-  private val irAffectedComposable = context.referenceClass(ClassId.topLevel(AFFECTED_COMPOSABLE_FQN))!!
+  private val irAffectedComposable = context.referenceClass(ClassId.topLevel(VALUE_PARAMETER_FQN))!!
 
   public fun irAffectedComposable(
     name: IrConst<String>,

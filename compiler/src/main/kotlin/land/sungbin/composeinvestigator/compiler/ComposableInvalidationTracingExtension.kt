@@ -15,10 +15,11 @@ import land.sungbin.composeinvestigator.compiler.struct.IrAffectedField
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationLogger
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
-public class ComposableInvalidationTracingExtension(private val logger: VerboseLogger) : IrGenerationExtension {
+public class ComposableInvalidationTracingExtension(private val logger: MessageCollector) : IrGenerationExtension {
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
     val invalidationLogger = IrInvalidationLogger(pluginContext)
     val affectedField = IrAffectedField(pluginContext)

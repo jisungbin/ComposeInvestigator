@@ -20,7 +20,7 @@ import org.jetbrains.kotlin.config.CompilerConfigurationKey
 
 public object ComposeInvestigatorConfiguration {
   public val KEY_ENABLED: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey<Boolean>("Whether to enable compiler plugin")
-  public val KEY_VERBOSE: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey<Boolean>("Whether to enable verbose log")
+  public val KEY_VERBOSE: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey<Boolean>("Whether to enable verbose logging")
 }
 
 public class ComposeInvestigatorCommandLineProcessor : CommandLineProcessor {
@@ -29,8 +29,8 @@ public class ComposeInvestigatorCommandLineProcessor : CommandLineProcessor {
 
   override fun processOption(option: AbstractCliOption, value: String, configuration: CompilerConfiguration) {
     when (val optionName = option.optionName) {
-      OPTION_ENABLED.optionName -> configuration.put(KEY_ENABLED, value.toBooleanStrictOrNull() ?: true)
-      OPTION_VERBOSE.optionName -> configuration.put(KEY_VERBOSE, value.toBooleanStrictOrNull() ?: false)
+      OPTION_ENABLED.optionName -> configuration.put(KEY_ENABLED, value.toBoolean())
+      OPTION_VERBOSE.optionName -> configuration.put(KEY_VERBOSE, value.toBoolean())
       else -> throw CliOptionProcessingException("Unknown plugin option: $optionName")
     }
   }

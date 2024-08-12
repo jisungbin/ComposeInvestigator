@@ -19,7 +19,7 @@ import land.sungbin.composeinvestigator.compiler.HASH_CODE_FQN
 import land.sungbin.composeinvestigator.compiler.NO_INVESTIGATION_FQN
 import land.sungbin.composeinvestigator.compiler.SCOPE_UPDATE_SCOPE_FQN
 import land.sungbin.composeinvestigator.compiler.ScopeUpdateScope_UPDATE_SCOPE
-import land.sungbin.composeinvestigator.compiler.VerboseLogger
+import land.sungbin.composeinvestigator.compiler.VerboseMessageCollector
 import land.sungbin.composeinvestigator.compiler.fromFqName
 import land.sungbin.composeinvestigator.compiler.origin.ComposableInvalidationTracerOrigin
 import land.sungbin.composeinvestigator.compiler.struct.IrAffectedComposable
@@ -66,7 +66,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 public abstract class AbstractComposableInvalidationTraceLower(
   private val context: IrPluginContext,
-  private val logger: VerboseLogger,
+  private val logger: VerboseMessageCollector,
   private val stabilityInferencer: StabilityInferencer,
   private val affectedComposable: IrAffectedComposable,
 ) : IrElementTransformerVoidWithContext() {

@@ -7,7 +7,6 @@
 
 package land.sungbin.composeinvestigator.compiler
 
-import land.sungbin.fastlist.fastJoinToString
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -17,12 +16,10 @@ import org.jetbrains.kotlin.name.SpecialNames
 
 public const val AndroidxComposeRuntime: String = "androidx.compose.runtime"
 public const val ComposeInvestigatorRuntime: String = "land.sungbin.composeinvestigator.runtime"
-public const val ComposeInvestigatorRuntimeAffect: String = "land.sungbin.composeinvestigator.runtime.affect"
 
 // ===== FULLY-QUALIFIED NAME ===== //
 
 // START Kotlin/Java Standard Library
-public val ITERABLE_TO_LIST_FQN: FqName = FqName("kotlin.collections.toList")
 public val EMPTY_LIST_FQN: FqName = FqName("kotlin.collections.emptyList")
 
 public val MUTABLE_LIST_OF_FQN: FqName = FqName("kotlin.collections.mutableListOf")
@@ -33,9 +30,6 @@ public val HASH_CODE_FQN: FqName = FqName("kotlin.hashCode")
 
 // START Compose Runtime
 public val COMPOSER_FQN: FqName = FqName("$AndroidxComposeRuntime.Composer")
-
-public val Composer_START_RESTART_GROUP: Name = Name.identifier("startRestartGroup")
-public val Composer_SKIPPING: Name = Name.identifier("skipping")
 public val Composer_SKIP_TO_GROUP_END: Name = Name.identifier("skipToGroupEnd")
 
 public val SCOPE_UPDATE_SCOPE_FQN: FqName = FqName("$AndroidxComposeRuntime.ScopeUpdateScope")
@@ -48,19 +42,19 @@ public val NO_INVESTIGATION_FQN: FqName = FqName("$ComposeInvestigatorRuntime.No
 
 // START ComposeInvestigatorConfig
 public val COMPOSE_INVESTIGATOR_CONFIG_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposeInvestigatorConfig")
-public val ComposeInvestigatorConfig_INVALIDATION_LOGGER: Name = Name.identifier("invalidationLogger")
+public val ComposeInvestigatorConfig_LOGGER: Name = Name.identifier("logger")
 // END ComposeInvestigatorConfig
 
 // START ComposableInvalidationLogger
 public val COMPOSABLE_INVALIDATION_LOGGER_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationLogger")
 public val ComposableInvalidationLogger_LOG: Name = Name.identifier("log")
 
+public val INVALIDATION_TYPE_FQN: FqName = FqName("$ComposeInvestigatorRuntime.InvalidationType")
+public val InvalidationType_PROCESSED: Name = Name.identifier("Processed")
+public val InvalidationType_SKIPPED: Name = Name.identifier("Skipped")
+
 public val INVALIDATION_REASON_FQN: FqName = FqName("$ComposeInvestigatorRuntime.InvalidationReason")
 public val InvalidationReason_Invalidate: Name = Name.identifier("Invalidate")
-
-public val COMPOSABLE_INVALIDATION_TYPE_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationType")
-public val ComposableInvalidationType_PROCESSED: Name = Name.identifier("Processed")
-public val ComposableInvalidationType_SKIPPED: Name = Name.identifier("Skipped")
 // END ComposableInvalidationLogger
 
 // START ComposableInvalidationTraceTable
@@ -71,36 +65,38 @@ public val COMPOSABLE_NAME_FQN: FqName = FqName("$ComposeInvestigatorRuntime.Com
 public val COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationTraceTable")
 public val ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_NAME: Name = Name.identifier("currentComposableName")
 public val ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_KEY_NAME: Name = Name.identifier("currentComposableKeyName")
+public val ComposableInvalidationTraceTable_REGISTER_STATE_OBJECT: Name = Name.identifier("registerStateObject")
 public val ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON: Name = Name.identifier("computeInvalidationReason")
 // END ComposableInvalidationTraceTable
 
-// START DeclarationStability
+// START Stability
 public val STABILITY_FQN: FqName = FqName("$ComposeInvestigatorRuntime.Stability")
 public val Stability_CERTAIN: Name = Name.identifier("Certain")
 public val Stability_RUNTIME: Name = Name.identifier("Runtime")
 public val Stability_UNKNOWN: Name = Name.identifier("Unknown")
 public val Stability_PARAMETER: Name = Name.identifier("Parameter")
 public val Stability_COMBINED: Name = Name.identifier("Combined")
-// END DeclarationStability
+// END Stability
 
-// START affect/AffectedField
-public val AFFECTED_FIELD_FQN: FqName = FqName("$ComposeInvestigatorRuntimeAffect.AffectedField")
-public val AffectedField_VALUE_PARAMETER: Name = Name.identifier("ValueParameter")
-// END affect/AffectableField
+// START ChangedFields
+public val COMPOSABLE_INFORMATION_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInformation")
+public val CHANGED_ARGUMENT_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ChangedArgument")
+// END ChangedFields
 
-// START affect/AffectedComposable
-public val AFFECTED_COMPOSABLE_FQN: FqName = FqName("$ComposeInvestigatorRuntimeAffect.AffectedComposable")
-// END affect/AffectedComposable
+// START ValueFields
+public val VALUE_PARAMETER_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ValueParameter")
+public val VALUE_ARGUMENT_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ValueArgument")
+// END affect/ValueFields
 
 // TODO testing
 public fun CallableId.Companion.fromFqName(fqName: FqName): CallableId {
-  val paths = fqName.pathSegments() as List<Name>
+  val paths = fqName.pathSegments()
   val lastUppercaseIndex = paths.indexOfLast { path -> path.asString().first().isUpperCase() }
 
   if (lastUppercaseIndex == paths.lastIndex) {
     // a.b.c.D -> packageName, callableName
     return CallableId(
-      packageName = FqName(paths.subList(0, /* exclusive */ lastUppercaseIndex).fastJoinToString(".", transform = Name::asString)),
+      packageName = FqName(paths.subList(0, /* exclusive */ lastUppercaseIndex).joinToString(".", transform = Name::asString)),
       callableName = paths.last(),
     )
   }
@@ -111,26 +107,24 @@ public fun CallableId.Companion.fromFqName(fqName: FqName): CallableId {
     return if (firstUppercaseIndex == lastUppercaseIndex) {
       // a.b.c.D.e -> packageName, className, callableName
       CallableId(
-        packageName = FqName(paths.subList(0, /* exclusive */ lastUppercaseIndex).fastJoinToString(".", transform = Name::asString)),
+        packageName = FqName(paths.subList(0, /* exclusive */ lastUppercaseIndex).joinToString(".", transform = Name::asString)),
         className = FqName(paths[lastUppercaseIndex].asString()),
         callableName = paths.last(),
       )
     } else {
       // a.b.c.D.E.f -> packageName, classNames callableName
       CallableId(
-        packageName = FqName(paths.subList(0, /* exclusive */ firstUppercaseIndex).fastJoinToString(".", transform = Name::asString)),
-        className = FqName(paths.subList(firstUppercaseIndex, /* exclusive */ lastUppercaseIndex + 1).fastJoinToString(".", transform = Name::asString)),
+        packageName = FqName(paths.subList(0, /* exclusive */ firstUppercaseIndex).joinToString(".", transform = Name::asString)),
+        className = FqName(paths.subList(firstUppercaseIndex, /* exclusive */ lastUppercaseIndex + 1).joinToString(".", transform = Name::asString)),
         callableName = paths.last(),
       )
     }
   }
 
   // a.b.c.d -> packageName, callableName
-  check(lastUppercaseIndex == -1) {
-    "The CallableId parsing logic for the given FqName is invalid. (fqName=${fqName.asString()})"
-  }
+  check(lastUppercaseIndex == -1) { "The CallableId parsing logic for the given FqName is invalid. (fqName=${fqName.asString()})" }
   return CallableId(
-    packageName = FqName(paths.subList(0, /* exclusive */ paths.lastIndex).fastJoinToString(".", transform = Name::asString)),
+    packageName = FqName(paths.subList(0, /* exclusive */ paths.lastIndex).joinToString(".", transform = Name::asString)),
     callableName = paths.last(),
   )
 }

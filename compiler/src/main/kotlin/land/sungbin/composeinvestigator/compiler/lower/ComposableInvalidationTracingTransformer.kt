@@ -12,7 +12,7 @@ import androidx.compose.compiler.plugins.kotlin.irTrace
 import land.sungbin.composeinvestigator.compiler.HandledMap
 import land.sungbin.composeinvestigator.compiler.MUTABLE_LIST_ADD_FQN
 import land.sungbin.composeinvestigator.compiler.MUTABLE_LIST_OF_FQN
-import land.sungbin.composeinvestigator.compiler.VerboseLogger
+import land.sungbin.composeinvestigator.compiler.VerboseMessageCollector
 import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.fromFqName
 import land.sungbin.composeinvestigator.compiler.struct.IrAffectedComposable
@@ -32,7 +32,7 @@ import org.jetbrains.kotlin.name.CallableId
 
 internal class ComposableInvalidationTracingTransformer(
   private val context: IrPluginContext,
-  private val logger: VerboseLogger,
+  private val logger: VerboseMessageCollector,
   private val stabilityInferencer: StabilityInferencer,
   private val affectedField: IrAffectedField,
   affectedComposable: IrAffectedComposable,

@@ -17,7 +17,7 @@ import land.sungbin.composeinvestigator.compiler.CURRENT_COMPOSABLE_INVALIDATION
 import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_KEY_NAME
 import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_NAME
 import land.sungbin.composeinvestigator.compiler.UNKNOWN_STRING
-import land.sungbin.composeinvestigator.compiler.VerboseLogger
+import land.sungbin.composeinvestigator.compiler.VerboseMessageCollector
 import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.analysis.set
 import land.sungbin.composeinvestigator.compiler.fromFqName
@@ -52,7 +52,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 public class InvalidationTraceTableIntrinsicTransformer(
   private val context: IrPluginContext,
   private val table: IrInvalidationTraceTable,
-  @Suppress("unused") private val logger: VerboseLogger,
+  @Suppress("unused") private val logger: VerboseMessageCollector,
   private val affectedComposable: IrAffectedComposable,
 ) : IrElementTransformerVoidWithContext(), IrPluginContext by context {
   private val currentTableGetterSymbol =

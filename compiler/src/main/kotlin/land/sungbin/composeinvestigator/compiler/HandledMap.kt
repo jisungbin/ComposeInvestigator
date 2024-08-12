@@ -8,11 +8,32 @@
 package land.sungbin.composeinvestigator.compiler
 
 // TODO is this really the best approach?
-public class HandledMap {
+internal class HandledMap {
+  // TODO is this operation really O(1)?
   private val map = mutableMapOf<Int, Unit>()
 
-  public fun handle(vararg key: Any): Boolean {
-    val finalKey = key.contentHashCode()
+  fun handle(key: Any): Boolean {
+    val finalKey = key.hashCode()
+    return if (map.containsKey(finalKey)) {
+      false
+    } else {
+      map[finalKey] = Unit
+      true
+    }
+  }
+
+  fun handle(key: Any, key2: Any): Boolean {
+    val finalKey = key.hashCode() + key2.hashCode()
+    return if (map.containsKey(finalKey)) {
+      false
+    } else {
+      map[finalKey] = Unit
+      true
+    }
+  }
+
+  fun handle(key: Any, key2: Any, key3: Any): Boolean {
+    val finalKey = key.hashCode() + key2.hashCode() + key3.hashCode()
     return if (map.containsKey(finalKey)) {
       false
     } else {

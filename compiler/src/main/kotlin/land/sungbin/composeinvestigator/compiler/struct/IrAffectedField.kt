@@ -7,8 +7,8 @@
 
 package land.sungbin.composeinvestigator.compiler.struct
 
-import land.sungbin.composeinvestigator.compiler.AFFECTED_FIELD_FQN
-import land.sungbin.composeinvestigator.compiler.AffectedField_VALUE_PARAMETER
+import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INFORMATION_FQN
+import land.sungbin.composeinvestigator.compiler.CHANGED_ARGUMENT_FQN
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -19,9 +19,9 @@ import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.name.ClassId
 
 public class IrAffectedField(context: IrPluginContext) {
-  public val irAffectedField: IrClassSymbol = context.referenceClass(ClassId.topLevel(AFFECTED_FIELD_FQN))!!
+  public val irAffectedField: IrClassSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INFORMATION_FQN))!!
   private val valueParameterSymbol = irAffectedField.owner.sealedSubclasses.single { clz ->
-    clz.owner.name == AffectedField_VALUE_PARAMETER
+    clz.owner.name == CHANGED_ARGUMENT_FQN
   }
 
   public fun irValueParameter(

@@ -14,6 +14,7 @@ import com.intellij.openapi.extensions.LoadingOrder
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.messageCollector
 
 public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
   override val supportsK2: Boolean = true
@@ -21,11 +22,11 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
   // This deprecated override is safe to use up to Kotlin 2.1.0 by KT-55300.
   // Also see: https://youtrack.jetbrains.com/issue/KT-52665/Deprecate-ComponentRegistrar#focus=Change-27-7999959.0-0
   override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
-    val enabled = configuration[ComposeInvestigatorConfiguration.KEY_ENABLED] ?: true
+    val enabled = configuration[ComposeInvestigatorConfiguration.KEY_ENABLED] != false
     if (!enabled) return
 
-    val verbose = configuration[ComposeInvestigatorConfiguration.KEY_VERBOSE] ?: false
-    val logger = VerboseLogger(configuration).apply { if (verbose) verbose() }
+    val verbose = configuration[ComposeInvestigatorConfiguration.KEY_VERBOSE] == true
+    val logger = VerboseMessageCollector(configuration.messageCollector).apply { if (verbose) verbose() }
 
     // We need to explicitly define the LAST order because ComposeInvestigator should
     // run after the Compose compiler is applied.
