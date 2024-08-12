@@ -42,13 +42,11 @@ kotlin {
 }
 
 dependencies {
-  compileOnly(libs.kotlin.gradle.core)
-  compileOnly(libs.kotlin.gradle.api)
+  compileOnly(gradleKotlinDsl())
 }
 
 abstract class UpdatePluginVersionTask : DefaultTask() {
   @get:Input abstract val version: Property<String>
-
   @get:InputFile abstract val destination: RegularFileProperty
 
   @TaskAction fun run() {

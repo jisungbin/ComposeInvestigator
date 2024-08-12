@@ -27,10 +27,7 @@ val shadowJar = tasks.register<ShadowJar>("embeddedPlugin") {
     project.configurations.implementation.get(),
     project.configurations.compileClasspath.get(),
   )
-  relocate(
-    /* pattern = */ "com.intellij",
-    /* destination = */ "org.jetbrains.kotlin.com.intellij",
-  )
+  relocate("com.intellij", /* destination = */ "org.jetbrains.kotlin.com.intellij")
   archiveBaseName.set("embedded")
   archiveVersion.set("")
   destinationDirectory.set(File(layout.buildDirectory.asFile.get(), "repackaged"))

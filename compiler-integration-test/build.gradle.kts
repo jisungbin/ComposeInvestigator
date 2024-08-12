@@ -31,10 +31,6 @@ android {
     targetCompatibility = JavaVersion.VERSION_17
   }
 
-  lint {
-    disable.add("MissingClass")
-  }
-
   testOptions {
     unitTests {
       isIncludeAndroidResources = true
@@ -56,7 +52,7 @@ kotlin {
       "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
       "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
     )
-    freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=false")
+    freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=true")
   }
 }
 
@@ -73,8 +69,8 @@ dependencies {
   implementation(libs.test.assertk)
 
   testImplementation(projects.compiler)
-  testImplementation(libs.kotlin.compiler.core)
-  testImplementation(libs.kotlin.compiler.compose)
+  testImplementation(kotlin("compiler", version = libs.versions.kotlin.core.get()))
+  testImplementation(kotlin("compose-compiler-plugin", version = libs.versions.kotlin.core.get()))
 
   testImplementation(libs.test.kotlin.coroutines) {
     because("https://github.com/Kotlin/kotlinx.coroutines/issues/3673")
