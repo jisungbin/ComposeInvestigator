@@ -18,14 +18,14 @@ class ComposableInvalidationTraceTableTest {
   fun computeInvalidationReasonWhenNoPreviousInfo() {
     val table = ComposableInvalidationTraceTable()
 
-    val param = AffectedField.ValueParameter(
+    val param = AffectedField.ValueArgument(
       name = "name",
-      typeName = "kotlin.String",
+      type = "kotlin.String",
       stability = Stability.Stable,
       valueString = "value",
       valueHashCode = 0,
     )
-    val reason = table.computeInvalidationReason(keyName = "keyName", fields = listOf(param))
+    val reason = table.computeInvalidationReason(keyName = "keyName", arguments = listOf(param))
 
     assertThat(table.affectFields).containsOnly("keyName" to listOf(param))
     assertThat(reason).isEqualTo(InvalidationReason.Initial)
@@ -35,59 +35,59 @@ class ComposableInvalidationTraceTableTest {
   fun computeInvalidationReasonWhenPreviousInfoExists() {
     val table = ComposableInvalidationTraceTable()
 
-    val oldParam = AffectedField.ValueParameter(
+    val oldParam = AffectedField.ValueArgument(
       name = "name",
-      typeName = "kotlin.String",
+      type = "kotlin.String",
       stability = Stability.Stable,
       valueString = "value",
       valueHashCode = 0,
     )
-    val newParam = AffectedField.ValueParameter(
+    val newParam = AffectedField.ValueArgument(
       name = "name",
-      typeName = "kotlin.String",
+      type = "kotlin.String",
       stability = Stability.Unstable,
       valueString = "new value",
       valueHashCode = 1,
     )
 
-    table.computeInvalidationReason(keyName = "keyName", fields = listOf(oldParam))
-    val reason = table.computeInvalidationReason(keyName = "keyName", fields = listOf(newParam))
+    table.computeInvalidationReason(keyName = "keyName", arguments = listOf(oldParam))
+    val reason = table.computeInvalidationReason(keyName = "keyName", arguments = listOf(newParam))
 
     assertThat(table.affectFields).containsOnly("keyName" to listOf(newParam))
-    assertThat(reason).isEqualTo(InvalidationReason.FieldChanged(listOf(oldParam changedTo newParam)))
+    assertThat(reason).isEqualTo(InvalidationReason.ArgumentChanged(listOf(oldParam changedTo newParam)))
   }
 
   @Test
   fun fieldChangedDisplayAsParamsOnlyString() {
-    val changedParam = InvalidationReason.FieldChanged(
+    val changedParam = InvalidationReason.ArgumentChanged(
       listOf(
-        FieldChanged(
-          old = AffectedField.ValueParameter(
+        ChangedArgument(
+          previous = AffectedField.ValueArgument(
             name = "name",
-            typeName = "kotlin.String",
+            type = "kotlin.String",
             stability = Stability.Stable,
             valueString = "value",
             valueHashCode = 0,
           ),
-          new = AffectedField.ValueParameter(
+          new = AffectedField.ValueArgument(
             name = "name",
-            typeName = "kotlin.String",
+            type = "kotlin.String",
             stability = Stability.Stable,
             valueString = "new value",
             valueHashCode = 1,
           ),
         ),
-        FieldChanged(
-          old = AffectedField.ValueParameter(
+        ChangedArgument(
+          previous = AffectedField.ValueArgument(
             name = "name2",
-            typeName = "kotlin.String",
+            type = "kotlin.String",
             stability = Stability.Unstable,
             valueString = "value2",
             valueHashCode = 10,
           ),
-          new = AffectedField.ValueParameter(
+          new = AffectedField.ValueArgument(
             name = "name2",
-            typeName = "kotlin.String",
+            type = "kotlin.String",
             stability = Stability.Unstable,
             valueString = "new value2",
             valueHashCode = 11,

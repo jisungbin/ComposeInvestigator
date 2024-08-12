@@ -6,13 +6,15 @@
  */
 @file:Suppress("UnstableApiUsage")
 
-import org.jetbrains.dokka.DokkaConfiguration.Visibility
+import org.gradle.kotlin.dsl.compileOnly
+import org.gradle.kotlin.dsl.dokkaHtml
+import org.gradle.kotlin.dsl.libs
+import org.gradle.kotlin.dsl.testImplementation
+
 
 plugins {
-  id("com.android.library")
-  kotlin("android")
+  kotlin("jvm")
   alias(libs.plugins.kotlin.dokka)
-  alias(libs.plugins.kotlin.compose)
   id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 
@@ -22,8 +24,7 @@ tasks.dokkaHtml {
   outputDirectory.set(rootDir.resolve("documentation/site/runtime/api"))
 
   dokkaSourceSets.configureEach {
-    jdkVersion.set(17)
-    documentedVisibilities.set(setOf(Visibility.PUBLIC, Visibility.PROTECTED))
+    jdkVersion.set(JavaVersion.VERSION_17.majorVersion.toInt())
   }
 
   pluginsMapConfiguration.set(
@@ -32,30 +33,6 @@ tasks.dokkaHtml {
         """{ "footerMessage": "ComposeInvestigator ⓒ 2024 Ji Sungbin" }""",
     ),
   )
-}
-
-android {
-  namespace = "land.sungbin.composeinvestigator.runtime"
-  compileSdk = 34
-
-  defaultConfig {
-    minSdk = 21
-  }
-
-  sourceSets {
-    getByName("main").java.srcDir("src/main/kotlin")
-    getByName("test").java.srcDir("src/main/kotlin")
-  }
-
-  compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-  }
-
-  testOptions.unitTests {
-    isReturnDefaultValues = true
-    isIncludeAndroidResources = true
-  }
 }
 
 kotlin {
@@ -70,8 +47,7 @@ kotlin {
 }
 
 dependencies {
-  implementation(libs.compose.runtime)
-  implementation(libs.compose.animation)
+  compileOnly(libs.compose.stableMarker)
 
   testImplementation(kotlin("test-junit5"))
   testImplementation(libs.test.assertk)
