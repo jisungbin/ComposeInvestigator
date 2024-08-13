@@ -17,9 +17,11 @@ import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyVisitor
 import land.sungbin.composeinvestigator.compiler.analysis.ComposableKeyInfo
 import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.analysis.set
-import land.sungbin.composeinvestigator.compiler.struct.IrAffectedComposable
-import land.sungbin.composeinvestigator.compiler.util.irString
+import land.sungbin.composeinvestigator.compiler.error
+import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
@@ -30,17 +32,18 @@ import org.jetbrains.kotlin.name.FqName
 
 public class DurableComposableKeyTransformer(
   context: IrPluginContext,
+  private val irComposableInformation: IrComposableInformation,
+  private val messageCollector: MessageCollector,
   stabilityInferencer: StabilityInferencer,
-  private val affectedComposable: IrAffectedComposable,
+  featureFlags: FeatureFlags = FeatureFlags(), // TODO supports this feature
 ) : DurableKeyTransformer(
-  keyVisitor = DurableKeyVisitor(),
   context = context,
+  keyVisitor = DurableKeyVisitor(),
   symbolRemapper = ComposableSymbolRemapper(),
   stabilityInferencer = stabilityInferencer,
   metrics = EmptyModuleMetrics,
-  featureFlags = FeatureFlags(),
-),
-  IrPluginContext by context {
+  featureFlags = featureFlags,
+) {
   private var currentKeys = mutableListOf<ComposableKeyInfo>()
 
   override fun visitFile(declaration: IrFile): IrFile {
@@ -58,17 +61,18 @@ public class DurableComposableKeyTransformer(
   }
 
   override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
-    val (keyName) = buildKey("fun-${declaration.signatureString()}")
+    val (keyName, success) = buildKey("fun-${declaration.signatureString()}")
+    if (!success) messageCollector.error("Duplicate key: $keyName", declaration.getCompilerMessageLocation(declaration.file))
 
-    val affectedComposable = affectedComposable.irAffectedComposable(
-      name = irString(declaration.name.asString()),
-      pkg = irString((declaration.fqNameWhenAvailable?.parent() ?: FqName.ROOT).asString()),
-      filename = irString(declaration.file.name),
+    val composable = irComposableInformation(
+      name = context.irString(declaration.name.asString()),
+      packageName = context.irString((declaration.fqNameWhenAvailable?.parent() ?: FqName.ROOT).asString()),
+      fileName = context.irString(declaration.file.name),
     )
 
-    val keyInfo = ComposableKeyInfo(keyName = keyName, affectedComposable = affectedComposable)
+    val keyInfo = ComposableKeyInfo(keyName = keyName, composable = composable)
     currentKeys += keyInfo
-    irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, declaration] = keyInfo
+    context.irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, declaration] = keyInfo
 
     return super.visitSimpleFunction(declaration)
   }

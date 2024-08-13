@@ -17,33 +17,32 @@ import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
-public class IrAffectedComposable(context: IrPluginContext) {
-  private val irAffectedComposable = context.referenceClass(ClassId.topLevel(VALUE_PARAMETER_FQN))!!
+public class IrComposableInformation(context: IrPluginContext) {
+  private val symbol = context.referenceClass(ClassId.topLevel(VALUE_PARAMETER_FQN))!!
 
-  public fun irAffectedComposable(
+  public operator fun invoke(
     name: IrConst<String>,
-    pkg: IrConst<String>,
-    filename: IrConst<String>,
+    packageName: IrConst<String>,
+    fileName: IrConst<String>,
   ): IrConstructorCallImpl = IrConstructorCallImpl.fromSymbolOwner(
-    type = irAffectedComposable.defaultType,
-    constructorSymbol = irAffectedComposable.constructors.single(),
+    type = symbol.defaultType,
+    constructorSymbol = symbol.constructors.single(),
   ).apply {
     putValueArgument(0, name)
-    putValueArgument(1, pkg)
-    putValueArgument(2, filename)
+    putValueArgument(1, packageName)
+    putValueArgument(2, fileName)
   }
 
-  public fun getName(target: IrConstructorCall): IrConst<String> = target.getValueArgument(0)!!.cast()
-
-  public fun copyWith(
+  public fun copyFrom(
     target: IrConstructorCall,
     name: IrConst<String>,
-  ): IrConstructorCallImpl = IrConstructorCallImpl.fromSymbolOwner(
-    type = irAffectedComposable.defaultType,
-    constructorSymbol = irAffectedComposable.constructors.single(),
-  ).apply {
-    putValueArgument(0, name)
-    putValueArgument(1, target.getValueArgument(1)!!)
-    putValueArgument(2, target.getValueArgument(2)!!)
+  ): IrConstructorCallImpl = invoke(
+    name = name,
+    packageName = target.getValueArgument(1)!!.cast(),
+    fileName = target.getValueArgument(2)!!.cast(),
+  )
+
+  public companion object {
+    public fun getName(target: IrConstructorCall): IrConst<String> = target.getValueArgument(0)!!.cast()
   }
 }

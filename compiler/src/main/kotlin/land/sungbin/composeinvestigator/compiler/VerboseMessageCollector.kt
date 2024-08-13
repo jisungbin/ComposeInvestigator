@@ -5,8 +5,6 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-@file:Suppress("MemberVisibilityCanBePrivate")
-
 package land.sungbin.composeinvestigator.compiler
 
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity

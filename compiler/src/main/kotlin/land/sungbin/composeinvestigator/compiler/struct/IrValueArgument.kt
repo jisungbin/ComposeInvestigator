@@ -8,34 +8,29 @@
 package land.sungbin.composeinvestigator.compiler.struct
 
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INFORMATION_FQN
-import land.sungbin.composeinvestigator.compiler.CHANGED_ARGUMENT_FQN
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
-import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.name.ClassId
 
-public class IrAffectedField(context: IrPluginContext) {
-  public val irAffectedField: IrClassSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INFORMATION_FQN))!!
-  private val valueParameterSymbol = irAffectedField.owner.sealedSubclasses.single { clz ->
-    clz.owner.name == CHANGED_ARGUMENT_FQN
-  }
+public class IrValueArgument(context: IrPluginContext) {
+  private val symbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INFORMATION_FQN))!!
 
-  public fun irValueParameter(
+  public operator fun invoke(
     name: IrExpression,
-    typeName: IrExpression,
+    type: IrExpression,
     valueString: IrExpression,
     valueHashCode: IrExpression,
     stability: IrExpression,
   ): IrConstructorCall = IrConstructorCallImpl.fromSymbolOwner(
-    type = valueParameterSymbol.defaultType,
-    constructorSymbol = valueParameterSymbol.constructors.single(),
+    type = symbol.defaultType,
+    constructorSymbol = symbol.constructors.single(),
   ).apply {
     putValueArgument(0, name)
-    putValueArgument(1, typeName)
+    putValueArgument(1, type)
     putValueArgument(2, valueString)
     putValueArgument(3, valueHashCode)
     putValueArgument(4, stability)

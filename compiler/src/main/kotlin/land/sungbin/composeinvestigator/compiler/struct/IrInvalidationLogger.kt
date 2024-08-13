@@ -38,10 +38,6 @@ public class IrInvalidationLogger(context: IrPluginContext) {
   private var loggerGetterSymbol = loggerContainerSymbol.getPropertyGetter(ComposeInvestigatorConfig_LOGGER.asString())!!
   private var loggerLogSymbol = loggerGetterSymbol.owner.returnType.classOrFail.getSimpleFunction(ComposableInvalidationLogger_LOG.asString())!!
 
-  public val irInvalidateReasonSymbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(INVALIDATION_REASON_FQN))!!
-  public val irInvalidateReasonInvalidateSymbol: IrClassSymbol =
-    irInvalidateReasonSymbol.owner.sealedSubclasses.single { clz -> clz.owner.name == InvalidationReason_Invalidate }
-
   public val irInvalidationTypeSymbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(INVALIDATION_TYPE_FQN))!!
 
   private var invalidationTypeProcessedSymbol =
@@ -50,9 +46,13 @@ public class IrInvalidationLogger(context: IrPluginContext) {
   private var invalidationTypeSkippedSymbol =
     irInvalidationTypeSymbol.owner.sealedSubclasses.single { clz -> clz.owner.name == InvalidationType_SKIPPED }
 
+  public val irInvalidateReasonSymbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(INVALIDATION_REASON_FQN))!!
+  public val irInvalidateReasonInvalidateSymbol: IrClassSymbol =
+    irInvalidateReasonSymbol.owner.sealedSubclasses.single { clz -> clz.owner.name == InvalidationReason_Invalidate }
+
   public fun irLog(
-    affectedComposable: IrDeclarationReference,
-    invalidationType: IrDeclarationReference,
+    composable: IrDeclarationReference,
+    type: IrDeclarationReference,
   ): IrCall = IrCallImpl.fromSymbolOwner(
     startOffset = UNDEFINED_OFFSET,
     endOffset = UNDEFINED_OFFSET,
@@ -71,8 +71,8 @@ public class IrInvalidationLogger(context: IrPluginContext) {
       )
     }
   }.apply {
-    putValueArgument(0, affectedComposable)
-    putValueArgument(1, invalidationType)
+    putValueArgument(0, composable)
+    putValueArgument(1, type)
   }
 
   public fun irInvalidationTypeProcessed(reason: IrExpression): IrConstructorCall =

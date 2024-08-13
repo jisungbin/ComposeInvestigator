@@ -7,26 +7,29 @@
 
 package land.sungbin.composeinvestigator.compiler.lower
 
-import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
+import androidx.compose.compiler.plugins.kotlin.analysis.Stability
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
 import androidx.compose.compiler.plugins.kotlin.lower.includeFileNameInExceptionTrace
+import com.intellij.ide.plugins.PluginManagerCore.logger
 import land.sungbin.composeinvestigator.compiler.COMPOSER_FQN
-import land.sungbin.composeinvestigator.compiler.Composer_SKIPPING
 import land.sungbin.composeinvestigator.compiler.Composer_SKIP_TO_GROUP_END
-import land.sungbin.composeinvestigator.compiler.Composer_START_RESTART_GROUP
 import land.sungbin.composeinvestigator.compiler.EMPTY_LIST_FQN
 import land.sungbin.composeinvestigator.compiler.HASH_CODE_FQN
 import land.sungbin.composeinvestigator.compiler.NO_INVESTIGATION_FQN
 import land.sungbin.composeinvestigator.compiler.SCOPE_UPDATE_SCOPE_FQN
+import land.sungbin.composeinvestigator.compiler.STABILITY_FQN
 import land.sungbin.composeinvestigator.compiler.ScopeUpdateScope_UPDATE_SCOPE
-import land.sungbin.composeinvestigator.compiler.VerboseMessageCollector
+import land.sungbin.composeinvestigator.compiler.Stability_CERTAIN
+import land.sungbin.composeinvestigator.compiler.Stability_COMBINED
+import land.sungbin.composeinvestigator.compiler.Stability_PARAMETER
+import land.sungbin.composeinvestigator.compiler.Stability_RUNTIME
+import land.sungbin.composeinvestigator.compiler.Stability_UNKNOWN
 import land.sungbin.composeinvestigator.compiler.fromFqName
-import land.sungbin.composeinvestigator.compiler.origin.ComposableInvalidationTracerOrigin
-import land.sungbin.composeinvestigator.compiler.struct.IrAffectedComposable
+import land.sungbin.composeinvestigator.compiler.origin.ComposableInvalidationTracerStatementOrigin
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
-import land.sungbin.fastlist.fastLastOrNull
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrFile
@@ -37,6 +40,8 @@ import org.jetbrains.kotlin.ir.declarations.IrVariable
 import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.expressions.IrCall
+import org.jetbrains.kotlin.ir.expressions.IrConst
+import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrElseBranch
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
@@ -46,13 +51,19 @@ import org.jetbrains.kotlin.ir.expressions.IrStatementContainer
 import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.defaultType
+import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
 import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isNullableAny
 import org.jetbrains.kotlin.ir.types.makeNullable
 import org.jetbrains.kotlin.ir.types.typeWith
-import org.jetbrains.kotlin.ir.util.getPropertyGetter
+import org.jetbrains.kotlin.ir.types.typeWithArguments
+import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.getSimpleFunction
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.kotlinFqName
@@ -61,28 +72,31 @@ import org.jetbrains.kotlin.ir.util.setDeclarationsParent
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
+import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 public abstract class AbstractComposableInvalidationTraceLower(
   private val context: IrPluginContext,
-  private val logger: VerboseMessageCollector,
-  private val stabilityInferencer: StabilityInferencer,
-  private val affectedComposable: IrAffectedComposable,
+  private val messageCollector: MessageCollector,
 ) : IrElementTransformerVoidWithContext() {
   private class IrSymbolOwnerWithData<D>(private val owner: IrSymbolOwner, val data: D) : IrSymbolOwner by owner
 
+  private var ownStabilitySymbol: IrClassSymbol? = null
+  private var ownStabilityCertainSymbol: IrClassSymbol? = null
+  private var ownStabilityRuntimeSymbol: IrClassSymbol? = null
+  private var ownStabilityUnknownSymbol: IrClassSymbol? = null
+  private var ownStabilityParameterSymbol: IrClassSymbol? = null
+  private var ownStabilityCombinedSymbol: IrClassSymbol? = null
+
   private val composerSymbol = context.referenceClass(ClassId.topLevel(COMPOSER_FQN))!!
-  private val nullableComposerType = composerSymbol.defaultType.makeNullable()
-  private val composerStartRestartGroupSymbol = composerSymbol.getSimpleFunction(Composer_START_RESTART_GROUP.asString())!!
-  private val composerSkippingGetterSymbol = composerSymbol.getPropertyGetter(Composer_SKIPPING.asString())!!
   private val composerSkipToGroupEndSymbol = composerSymbol.getSimpleFunction(Composer_SKIP_TO_GROUP_END.asString())!!
 
   private val scopeUpdateScopeSymbol = context.referenceClass(ClassId.topLevel(SCOPE_UPDATE_SCOPE_FQN))!!
   private val scopeUpdateScopeUpdateScopeSymbol = scopeUpdateScopeSymbol.getSimpleFunction(ScopeUpdateScope_UPDATE_SCOPE.asString())!!
   private val scopeUpdateScopeUpdateScopeBlockType =
     context.irBuiltIns.functionN(2).typeWith(
-      nullableComposerType,
+      composerSymbol.defaultType,
       context.irBuiltIns.intType,
       context.irBuiltIns.unitType,
     )
@@ -91,7 +105,8 @@ public abstract class AbstractComposableInvalidationTraceLower(
     context
       .referenceFunctions(CallableId.fromFqName(EMPTY_LIST_FQN))
       .single { symbol -> symbol.owner.valueParameters.isEmpty() && symbol.owner.typeParameters.size == 1 }
-  private val stringEmptyListCall =
+
+  protected val emptyStringListCall: IrCall =
     IrCallImpl.fromSymbolOwner(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,
@@ -114,17 +129,16 @@ public abstract class AbstractComposableInvalidationTraceLower(
 
   private fun lastReachedComposable(): IrSimpleFunction? =
     allScopes
-      .fastLastOrNull { scope -> scope.irElement.safeAs<IrSimpleFunction>()?.hasComposableAnnotation() == true }
+      .lastOrNull { scope -> scope.irElement.safeAs<IrSimpleFunction>()?.hasComposableAnnotation() == true }
       ?.irElement?.safeAs<IrSimpleFunction>()
 
   protected val currentInvalidationTraceTable: IrInvalidationTraceTable?
-    get() =
-      allScopes
-        .fastLastOrNull { scope ->
-          val element = scope.irElement
-          element is IrSymbolOwnerWithData<*> && element.data is IrInvalidationTraceTable
-        }
-        ?.irElement?.cast<IrSymbolOwnerWithData<IrInvalidationTraceTable>>()?.data
+    get() = allScopes
+      .lastOrNull { scope ->
+        val element = scope.irElement
+        element is IrSymbolOwnerWithData<*> && element.data is IrInvalidationTraceTable
+      }
+      ?.irElement?.cast<IrSymbolOwnerWithData<IrInvalidationTraceTable>>()?.data
 
   final override fun visitFileNew(declaration: IrFile): IrFile =
     includeFileNameInExceptionTrace(declaration) {
@@ -136,9 +150,8 @@ public abstract class AbstractComposableInvalidationTraceLower(
         context = context,
         table = table,
         logger = logger,
-        affectedComposable = affectedComposable,
       )
-      declaration.declarations.add(0, table.prop.also { prop -> prop.setDeclarationsParent(declaration) })
+      declaration.declarations.add(0, table.rawProp.also { prop -> prop.setDeclarationsParent(declaration) })
       declaration.transformChildrenVoid(tableCallTransformer)
 
       withinScope(IrSymbolOwnerWithData(owner = declaration, data = table)) {
@@ -211,7 +224,7 @@ public abstract class AbstractComposableInvalidationTraceLower(
       startOffset = transformed.startOffset,
       endOffset = transformed.endOffset,
       type = context.irBuiltIns.unitType,
-      origin = ComposableInvalidationTracerOrigin,
+      origin = ComposableInvalidationTracerStatementOrigin,
       statements = transformed.statements,
     )
 
@@ -220,6 +233,24 @@ public abstract class AbstractComposableInvalidationTraceLower(
 
   protected abstract fun transformUpdateScopeBlock(target: IrSimpleFunction, initializer: IrReturn): IrStatementContainer
   protected abstract fun transformSkipToGroupEndCall(composable: IrSimpleFunction, initializer: IrCall): IrStatementContainer
+
+  protected fun Stability.toIrOwnStability(): IrConstructorCall {
+    if (ownStabilitySymbol == null) ownStabilitySymbol = context.referenceClass(ClassId.topLevel(STABILITY_FQN))!!
+
+    return when (this) {
+      is Stability.Certain -> irOwnStabilityCertain(irBoolean(stable))
+      is Stability.Runtime -> irOwnStabilityRuntime(irString(declaration.name.asString()))
+      is Stability.Unknown -> irOwnStabilityUnknown(irString(declaration.name.asString()))
+      is Stability.Parameter -> irOwnStabilityParameter(irString(parameter.name.asString()))
+      is Stability.Combined -> irOwnStabilityCombined(elements.map { stability -> stability.toIrOwnStability() })
+    }
+  }
+
+  protected fun irString(
+    value: String,
+    startOffset: Int = UNDEFINED_OFFSET,
+    endOffset: Int = UNDEFINED_OFFSET,
+  ): IrConst<String> = context.irString(value, startOffset, endOffset)
 
   protected fun irGetValue(value: IrValueDeclaration): IrGetValue =
     IrGetValueImpl(
@@ -248,4 +279,101 @@ public abstract class AbstractComposableInvalidationTraceLower(
 
   protected fun irTmpVariableInCurrentFun(expression: IrExpression, nameHint: String? = null): IrVariable =
     currentFunction!!.scope.createTemporaryVariable(expression, nameHint = nameHint)
+
+  private fun irBoolean(
+    value: Boolean,
+    startOffset: Int = UNDEFINED_OFFSET,
+    endOffset: Int = UNDEFINED_OFFSET,
+  ): IrConst<Boolean> = IrConstImpl.boolean(
+    startOffset = startOffset,
+    endOffset = endOffset,
+    type = context.irBuiltIns.booleanType,
+    value = value,
+  )
+
+  private fun irOwnStabilityCertain(stable: IrConst<Boolean>): IrConstructorCall {
+    val symbol = ownStabilityCertainSymbol ?: (
+      ownStabilitySymbol!!.owner.sealedSubclasses
+        .single { clz -> clz.owner.name == Stability_CERTAIN }
+        .also { symbol -> ownStabilityCertainSymbol = symbol }
+      )
+
+    return IrConstructorCallImpl.fromSymbolOwner(
+      type = symbol.defaultType,
+      constructorSymbol = symbol.constructors.single(),
+    ).apply {
+      putValueArgument(0, stable)
+    }
+  }
+
+  private fun irOwnStabilityRuntime(declarationName: IrConst<String>): IrConstructorCall {
+    val symbol = ownStabilityRuntimeSymbol ?: (
+      ownStabilitySymbol!!.owner.sealedSubclasses
+        .single { clz -> clz.owner.name == Stability_RUNTIME }
+        .also { symbol -> ownStabilityRuntimeSymbol = symbol }
+      )
+
+    return IrConstructorCallImpl.fromSymbolOwner(
+      type = symbol.defaultType,
+      constructorSymbol = symbol.constructors.single(),
+    ).apply {
+      putValueArgument(0, declarationName)
+    }
+  }
+
+  private fun irOwnStabilityUnknown(declarationName: IrConst<String>): IrConstructorCall {
+    val symbol = ownStabilityUnknownSymbol ?: (
+      ownStabilitySymbol!!.owner.sealedSubclasses
+        .single { clz -> clz.owner.name == Stability_UNKNOWN }
+        .also { symbol -> ownStabilityUnknownSymbol = symbol }
+      )
+
+    return IrConstructorCallImpl.fromSymbolOwner(
+      type = symbol.defaultType,
+      constructorSymbol = symbol.constructors.single(),
+    ).apply {
+      putValueArgument(0, declarationName)
+    }
+  }
+
+  private fun irOwnStabilityParameter(parameterName: IrConst<String>): IrConstructorCall {
+    val symbol = ownStabilityParameterSymbol ?: (
+      ownStabilitySymbol!!.owner.sealedSubclasses
+        .single { clz -> clz.owner.name == Stability_PARAMETER }
+        .also { symbol -> ownStabilityParameterSymbol = symbol }
+      )
+
+    return IrConstructorCallImpl.fromSymbolOwner(
+      type = symbol.defaultType,
+      constructorSymbol = symbol.constructors.single(),
+    ).apply {
+      putValueArgument(0, parameterName)
+    }
+  }
+
+  private fun irOwnStabilityCombined(elements: List<IrConstructorCall>): IrConstructorCall {
+    val symbol = ownStabilityCombinedSymbol ?: (
+      ownStabilitySymbol!!.owner.sealedSubclasses
+        .single { clz -> clz.owner.name == Stability_COMBINED }
+        .also { symbol -> ownStabilityCombinedSymbol = symbol }
+      )
+
+    return IrConstructorCallImpl.fromSymbolOwner(
+      type = symbol.defaultType,
+      constructorSymbol = symbol.constructors.single(),
+    ).apply {
+      val varargElementType = ownStabilitySymbol!!.defaultType
+      val genericTypeProjection = makeTypeProjection(type = varargElementType, variance = Variance.OUT_VARIANCE)
+      val genericType = context.irBuiltIns.arrayClass.typeWithArguments(listOf(genericTypeProjection))
+      val vararg = IrVarargImpl(
+        startOffset = UNDEFINED_OFFSET,
+        endOffset = UNDEFINED_OFFSET,
+        type = genericType,
+        varargElementType = varargElementType,
+        elements = elements,
+      )
+
+      putValueArgument(0, vararg)
+    }
+  }
 }

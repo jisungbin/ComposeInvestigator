@@ -9,14 +9,15 @@ package land.sungbin.composeinvestigator.compiler.lower
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.irTrace
+import com.intellij.ide.plugins.PluginManagerCore.logger
 import land.sungbin.composeinvestigator.compiler.HandledMap
 import land.sungbin.composeinvestigator.compiler.MUTABLE_LIST_ADD_FQN
 import land.sungbin.composeinvestigator.compiler.MUTABLE_LIST_OF_FQN
 import land.sungbin.composeinvestigator.compiler.VerboseMessageCollector
 import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.fromFqName
-import land.sungbin.composeinvestigator.compiler.struct.IrAffectedComposable
-import land.sungbin.composeinvestigator.compiler.struct.IrAffectedField
+import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
+import land.sungbin.composeinvestigator.compiler.struct.IrValueArgument
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationLogger
 import land.sungbin.composeinvestigator.compiler.util.IrStatementContainerSimpleImpl
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -34,8 +35,8 @@ internal class ComposableInvalidationTracingTransformer(
   private val context: IrPluginContext,
   private val logger: VerboseMessageCollector,
   private val stabilityInferencer: StabilityInferencer,
-  private val affectedField: IrAffectedField,
-  affectedComposable: IrAffectedComposable,
+  private val affectedField: IrValueArgument,
+  affectedComposable: IrComposableInformation,
   private val invalidationLogger: IrInvalidationLogger,
 ) : AbstractComposableInvalidationTraceLower(
   context = context,
@@ -168,8 +169,8 @@ internal class ComposableInvalidationTracingTransformer(
     }
 
     val logger = invalidationLogger.irLog(
-      affectedComposable = currentKey.affectedComposable,
-      invalidationType = invalidationTypeProcessed,
+      composable = currentKey.composable,
+      type = invalidationTypeProcessed,
     )
     newStatements += logger
 
@@ -193,8 +194,8 @@ internal class ComposableInvalidationTracingTransformer(
       .apply { type = invalidationTypeSymbol.defaultType }
 
     val logger = invalidationLogger.irLog(
-      affectedComposable = currentKey.affectedComposable,
-      invalidationType = invalidationTypeSkipped,
+      composable = currentKey.composable,
+      type = invalidationTypeSkipped,
     )
 
     return IrStatementContainerSimpleImpl(statements = listOf(logger, initializer)).also { transformed ->

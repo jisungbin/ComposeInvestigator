@@ -78,15 +78,15 @@ public val Stability_PARAMETER: Name = Name.identifier("Parameter")
 public val Stability_COMBINED: Name = Name.identifier("Combined")
 // END Stability
 
-// START ChangedFields
+// START ComposableInformation
 public val COMPOSABLE_INFORMATION_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInformation")
-public val CHANGED_ARGUMENT_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ChangedArgument")
-// END ChangedFields
+// END ComposableInformation
 
 // START ValueFields
 public val VALUE_PARAMETER_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ValueParameter")
 public val VALUE_ARGUMENT_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ValueArgument")
-// END affect/ValueFields
+public val CHANGED_ARGUMENT_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ChangedArgument")
+// END ValueFields
 
 // TODO testing
 public fun CallableId.Companion.fromFqName(fqName: FqName): CallableId {
