@@ -13,8 +13,10 @@ import com.intellij.mock.MockProject
 import com.intellij.openapi.extensions.LoadingOrder
 import land.sungbin.composeinvestigator.compiler.frontend.ComposeInvestigatorFirExtensionRegistrar
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
+import org.jetbrains.kotlin.cli.jvm.compiler.CompileEnvironmentException
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.config.messageCollector
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
@@ -28,7 +30,14 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
     if (!enabled) return
 
     val verbose = configuration[ComposeInvestigatorConfiguration.KEY_VERBOSE] == true
-    val messageCollector = VerboseMessageCollector(configuration.messageCollector).apply { if (verbose) verbose() }
+    val messageCollector = VerboseMessageCollector(configuration.messageCollector).also { collector ->
+      if (verbose) collector.verbose()
+      configuration.messageCollector = collector
+    }
+
+    if (!configuration.languageVersionSettings.languageVersion.usesK2) {
+      throw CompileEnvironmentException(ErrorMessages.SUPPORTS_K2_ONLY)
+    }
 
     FirExtensionRegistrarAdapter.registerExtension(project, ComposeInvestigatorFirExtensionRegistrar(messageCollector))
 

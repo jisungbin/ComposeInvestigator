@@ -53,7 +53,7 @@ public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): Stri
  */
 @Immutable
 public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi public constructor() {
-  private val stateObjectMap: MutableMap<Any, String> = mutableMapOf()
+  internal val stateObjectMap: MutableMap<Any, String> = mutableMapOf()
   private val affectedArgumentMap: MutableMap<String, List<ValueArgument>> = mutableMapOf()
 
   /**
@@ -128,12 +128,6 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
 
   /** @suppress ComposeInvestigator compiler-only API */
   @ComposeInvestigatorCompilerApi
-  public fun registerStateObject(value: Any, name: String) {
-    stateObjectMap[value] = name
-  }
-
-  /** @suppress ComposeInvestigator compiler-only API */
-  @ComposeInvestigatorCompilerApi
   public fun computeInvalidationReason(keyName: String, arguments: List<ValueArgument>): InvalidationReason {
     val previousArguments = affectedArgumentMap[keyName]
     val changed = ArrayList<ChangedArgument>(arguments.size)
@@ -153,17 +147,18 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
 
     affectedArgumentMap[keyName] = arguments
 
-    @Suppress("UsePropertyAccessSyntax")
-    return if (changed.isEmpty()) {
-      InvalidationReason.Unknown(parameters = arguments.map(ValueArgument::asParameter))
+    return if (@Suppress("UsePropertyAccessSyntax") changed.isEmpty()) {
+      InvalidationReason.Invalidate
     } else {
       InvalidationReason.ArgumentChanged(changed = changed)
     }
   }
 }
 
-private fun ValueArgument.asParameter(): ValueParameter =
-  ValueParameter(name = name, type = type, stability = stability)
+/** @suppress ComposeInvestigator compiler-only API */
+@ComposeInvestigatorCompilerApi
+public fun <T : Any> T.registerStateObject(name: String, table: ComposableInvalidationTraceTable): T =
+  apply { table.stateObjectMap[this] = name }
 
 @Suppress("FunctionName", "NOTHING_TO_INLINE")
 private inline fun IntrinsicImplementedError() = NotImplementedError("Implemented as an intrinsic")

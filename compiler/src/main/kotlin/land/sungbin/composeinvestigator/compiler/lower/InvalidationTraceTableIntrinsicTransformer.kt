@@ -18,15 +18,19 @@ import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTraceTabl
 import land.sungbin.composeinvestigator.compiler.UNKNOWN_STRING
 import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.analysis.set
+import land.sungbin.composeinvestigator.compiler.error
 import land.sungbin.composeinvestigator.compiler.fromFqName
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
+import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTableHolder
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.nameWithPackage
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
@@ -50,8 +54,10 @@ public class InvalidationTraceTableIntrinsicTransformer(
   private val context: IrPluginContext,
   @Suppress("unused") private val messageCollector: MessageCollector,
   private val irComposableInformation: IrComposableInformation,
-) : IrElementTransformerVoidWithContext() {
+) : IrElementTransformerVoidWithContext(), IrInvalidationTraceTableHolder {
   private val tables = mutableMapOf<IrFile, IrInvalidationTraceTable>()
+  override fun getByFile(file: IrFile): IrInvalidationTraceTable =
+    tables[file] ?: error("Table not found for ${file.nameWithPackage}")
 
   private val tableSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN))!!
   private val composableNameSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_NAME_FQN))!!.owner
@@ -84,7 +90,13 @@ public class InvalidationTraceTableIntrinsicTransformer(
   }
 
   override fun visitCall(expression: IrCall): IrExpression {
-    val table = checkNotNull(tables[expression.symbol.owner.file]) { "Table not found for ${expression.symbol.owner.file}" }
+    val table = tables[expression.symbol.owner.file] ?: run {
+      messageCollector.error(
+        "Table not found for ${expression.symbol.owner.file.nameWithPackage}",
+        expression.getCompilerMessageLocation(currentFile),
+      )
+      return super.visitCall(expression)
+    }
     return when (expression.symbol.owner.kotlinFqName) {
       currentTableGetterSymbol.kotlinFqName -> table.propGetter(startOffset = expression.startOffset, endOffset = expression.endOffset)
       currentComposableNameGetterSymbol.kotlinFqName -> {

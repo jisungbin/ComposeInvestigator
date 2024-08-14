@@ -22,10 +22,10 @@ internal class VerboseMessageCollector(private val delegate: MessageCollector) :
   }
 }
 
-internal fun MessageCollector.log(message: String, location: CompilerMessageSourceLocation?) {
+internal fun MessageCollector.log(message: String, location: CompilerMessageSourceLocation? = null) {
   report(CompilerMessageSeverity.LOGGING, message, location)
 }
 
-internal fun MessageCollector.error(message: String, location: CompilerMessageSourceLocation?) {
+internal fun MessageCollector.error(message: String, location: CompilerMessageSourceLocation? = null) {
   report(CompilerMessageSeverity.ERROR, message, location)
 }

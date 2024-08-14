@@ -80,13 +80,4 @@ public sealed class InvalidationReason {
   public data object Force /*: InvalidationReason()*/ {
     override fun toString(): String = "[Force] A forced recomposition has been requested for the current Composable scope."
   }
-
-  /** The Composable was recomposed, but no changes were detected by ComposeInvestigator. */
-  public data class Unknown(public val parameters: List<ValueParameter>) : InvalidationReason() {
-    override fun toString(): String =
-      "[Unknown] No parameters have changed. Perhaps the state value being referenced in the Composable function body has " +
-        "changed. If no state has changed, then some function parameter may be unstable, or a forced recomposition may have " +
-        "been requested."
-          .plus(if (parameters.isNotEmpty()) "\n(parameters: ${parameters.joinToString()})" else "")
-  }
 }

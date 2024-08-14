@@ -21,6 +21,7 @@ import land.sungbin.composeinvestigator.compiler.struct.IrValueArgument
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationLogger
 import land.sungbin.composeinvestigator.compiler.util.IrStatementContainerSimpleImpl
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
@@ -32,13 +33,13 @@ import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.name.CallableId
 
 internal class ComposableInvalidationTracingTransformer(
-  private val context: IrPluginContext,
-  private val logger: VerboseMessageCollector,
+  context: IrPluginContext,
+  messageCollector: MessageCollector,
   private val stabilityInferencer: StabilityInferencer,
   private val affectedField: IrValueArgument,
   affectedComposable: IrComposableInformation,
   private val invalidationLogger: IrInvalidationLogger,
-) : AbstractComposableInvalidationTraceLower(
+) : ComposeInvestigatorBaseLower(
   context = context,
   logger = logger,
   stabilityInferencer = stabilityInferencer,

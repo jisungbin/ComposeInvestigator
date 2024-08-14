@@ -7,10 +7,14 @@
 
 package land.sungbin.composeinvestigator.compiler
 
-import org.jetbrains.kotlin.builtins.StandardNames
+import org.jetbrains.kotlin.builtins.StandardNames.BUILT_INS_PACKAGE_FQ_NAME
+import org.jetbrains.kotlin.builtins.StandardNames.COLLECTIONS_PACKAGE_FQ_NAME
+import org.jetbrains.kotlin.builtins.StandardNames.FqNames
+import org.jetbrains.kotlin.builtins.StandardNames.HASHCODE_NAME
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.name.Name.identifier
 import org.jetbrains.kotlin.name.SpecialNames
 
 // ===== PACKAGE ===== //
@@ -21,20 +25,19 @@ public const val ComposeInvestigatorRuntime: String = "land.sungbin.composeinves
 // ===== FULLY-QUALIFIED NAME ===== //
 
 // START Kotlin/Java Standard Library
-public val EMPTY_LIST_FQN: FqName = StandardNames.COLLECTIONS_PACKAGE_FQ_NAME.child(Name.identifier("emptyList"))
+public val EMPTY_LIST_FQN: FqName = COLLECTIONS_PACKAGE_FQ_NAME.child(identifier("emptyList"))
 
-public val MUTABLE_LIST_OF_FQN: FqName = StandardNames.COLLECTIONS_PACKAGE_FQ_NAME.child(Name.identifier("mutableListOf"))
-public val MUTABLE_LIST_ADD_FQN: FqName = StandardNames.FqNames.mutableList.child(Name.identifier("add"))
+public val MUTABLE_LIST_OF_FQN: FqName = COLLECTIONS_PACKAGE_FQ_NAME.child(identifier("mutableListOf"))
+public val MUTABLE_LIST_ADD_FQN: FqName = FqNames.mutableList.child(identifier("add"))
 
-public val HASH_CODE_FQN: FqName = StandardNames.BUILT_INS_PACKAGE_FQ_NAME.child(StandardNames.HASHCODE_NAME)
+public val HASH_CODE_FQN: FqName = BUILT_INS_PACKAGE_FQ_NAME.child(HASHCODE_NAME)
 // END Kotlin/Java Standard Library
 
 // START Compose Runtime
 public val COMPOSER_FQN: FqName = FqName("$AndroidxComposeRuntime.Composer")
-public val Composer_SKIP_TO_GROUP_END: Name = Name.identifier("skipToGroupEnd")
+public val Composer_SKIP_TO_GROUP_END: Name = identifier("skipToGroupEnd")
 
-public val SCOPE_UPDATE_SCOPE_FQN: FqName = FqName("$AndroidxComposeRuntime.ScopeUpdateScope")
-public val ScopeUpdateScope_UPDATE_SCOPE: Name = Name.identifier("updateScope")
+public val STATE_FQN: FqName = FqName("$AndroidxComposeRuntime.State")
 // END Compose Runtime
 
 // START NoInvestigation
@@ -43,19 +46,16 @@ public val NO_INVESTIGATION_FQN: FqName = FqName("$ComposeInvestigatorRuntime.No
 
 // START ComposeInvestigatorConfig
 public val COMPOSE_INVESTIGATOR_CONFIG_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposeInvestigatorConfig")
-public val ComposeInvestigatorConfig_LOGGER: Name = Name.identifier("logger")
+public val ComposeInvestigatorConfig_LOGGER: Name = identifier("logger")
 // END ComposeInvestigatorConfig
 
 // START ComposableInvalidationLogger
 public val COMPOSABLE_INVALIDATION_LOGGER_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationLogger")
-public val ComposableInvalidationLogger_LOG: Name = Name.identifier("log")
+public val ComposableInvalidationLogger_LOG: Name = identifier("log")
 
 public val INVALIDATION_TYPE_FQN: FqName = FqName("$ComposeInvestigatorRuntime.InvalidationType")
-public val InvalidationType_PROCESSED: Name = Name.identifier("Processed")
-public val InvalidationType_SKIPPED: Name = Name.identifier("Skipped")
-
-public val INVALIDATION_REASON_FQN: FqName = FqName("$ComposeInvestigatorRuntime.InvalidationReason")
-public val InvalidationReason_Invalidate: Name = Name.identifier("Invalidate")
+public val InvalidationType_PROCESSED: Name = identifier("Processed")
+public val InvalidationType_SKIPPED: Name = identifier("Skipped")
 // END ComposableInvalidationLogger
 
 // START ComposableInvalidationTraceTable
@@ -64,30 +64,30 @@ public val CURRENT_COMPOSABLE_INVALIDATION_TRACER_FQN: FqName = FqName("$Compose
 public val COMPOSABLE_NAME_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableName")
 
 public val COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationTraceTable")
-public val ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_NAME: Name = Name.identifier("currentComposableName")
-public val ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_KEY_NAME: Name = Name.identifier("currentComposableKeyName")
-public val ComposableInvalidationTraceTable_REGISTER_STATE_OBJECT: Name = Name.identifier("registerStateObject")
-public val ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON: Name = Name.identifier("computeInvalidationReason")
+public val ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_NAME: Name = identifier("currentComposableName")
+public val ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_KEY_NAME: Name = identifier("currentComposableKeyName")
+public val ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON: Name = identifier("computeInvalidationReason")
+
+public val REGISTER_STATE_OBJECT_FQN: Name = identifier("registerStateObject")
 // END ComposableInvalidationTraceTable
 
 // START Stability
 public val STABILITY_FQN: FqName = FqName("$ComposeInvestigatorRuntime.Stability")
-public val Stability_CERTAIN: Name = Name.identifier("Certain")
-public val Stability_RUNTIME: Name = Name.identifier("Runtime")
-public val Stability_UNKNOWN: Name = Name.identifier("Unknown")
-public val Stability_PARAMETER: Name = Name.identifier("Parameter")
-public val Stability_COMBINED: Name = Name.identifier("Combined")
+public val Stability_CERTAIN: Name = identifier("Certain")
+public val Stability_RUNTIME: Name = identifier("Runtime")
+public val Stability_UNKNOWN: Name = identifier("Unknown")
+public val Stability_PARAMETER: Name = identifier("Parameter")
+public val Stability_COMBINED: Name = identifier("Combined")
 // END Stability
 
 // START ComposableInformation
 public val COMPOSABLE_INFORMATION_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInformation")
 // END ComposableInformation
 
-// START ValueFields
-public val VALUE_PARAMETER_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ValueParameter")
+// START ValueArguments
 public val VALUE_ARGUMENT_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ValueArgument")
 public val CHANGED_ARGUMENT_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ChangedArgument")
-// END ValueFields
+// END ValueArguments
 
 // TODO testing
 public fun CallableId.Companion.fromFqName(fqName: FqName): CallableId {

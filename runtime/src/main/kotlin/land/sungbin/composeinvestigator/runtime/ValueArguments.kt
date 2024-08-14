@@ -10,20 +10,6 @@ package land.sungbin.composeinvestigator.runtime
 import androidx.compose.runtime.Immutable
 
 /**
- * Represents information about the Composable function's value parameter.
- *
- * @param name Parameter name
- * @param type Fully-qualified name of the parameter type
- * @param stability [Stability] information for the parameter type
- */
-@Immutable
-public data class ValueParameter(
-  public val name: String,
-  public val type: String,
-  public val stability: Stability,
-)
-
-/**
  * Represents information about the Composable function's value argument.
  *
  * @param name Argument name
