@@ -11,10 +11,12 @@ package land.sungbin.composeinvestigator.compiler
 
 import com.intellij.mock.MockProject
 import com.intellij.openapi.extensions.LoadingOrder
+import land.sungbin.composeinvestigator.compiler.frontend.ComposeInvestigatorFirExtensionRegistrar
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.messageCollector
+import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
 public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
   override val supportsK2: Boolean = true
@@ -26,14 +28,16 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
     if (!enabled) return
 
     val verbose = configuration[ComposeInvestigatorConfiguration.KEY_VERBOSE] == true
-    val logger = VerboseMessageCollector(configuration.messageCollector).apply { if (verbose) verbose() }
+    val messageCollector = VerboseMessageCollector(configuration.messageCollector).apply { if (verbose) verbose() }
+
+    FirExtensionRegistrarAdapter.registerExtension(project, ComposeInvestigatorFirExtensionRegistrar(messageCollector))
 
     // We need to explicitly define the LAST order because ComposeInvestigator should
     // run after the Compose compiler is applied.
     project.extensionArea
       .getExtensionPoint(IrGenerationExtension.extensionPointName)
       .registerExtension(
-        ComposableInvalidationTracingExtension(logger = logger),
+        ComposableInvalidationTracingExtension(messageCollector),
         LoadingOrder.LAST,
         project,
       )

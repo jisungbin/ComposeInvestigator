@@ -36,7 +36,6 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
-import org.jetbrains.kotlin.ir.util.dumpKotlinLike
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.getPropertySetter
@@ -109,9 +108,7 @@ public class InvalidationTraceTableIntrinsicTransformer(
         lastReachedComposable()?.let { composable ->
           val userProvideName = expression
             .getValueArgument(0).cast<IrConstructorCall>()
-            .getValueArgument(0).safeAs<IrConst<String>>()?.value
-          // TODO throwing diagnostics message
-            ?: error("Currently, only string hardcodes are supported as arguments to ComposableName. (${expression.dumpKotlinLike()})")
+            .getValueArgument(0).cast<IrConst<String>>().value
 
           val originalKey = context.irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable]!!
           val newComposable = irComposableInformation.copyFrom(originalKey.composable, name = context.irString(userProvideName))
