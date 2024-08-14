@@ -24,7 +24,6 @@ public sealed class InvalidationType {
   public data object Skipped : InvalidationType()
 }
 
-
 /** Explains why the Composable was recomposed. */
 @Immutable
 public sealed class InvalidationReason {

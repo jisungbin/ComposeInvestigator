@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler
 
+import org.jetbrains.kotlin.builtins.StandardNames
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.FqName
 import org.jetbrains.kotlin.name.Name
@@ -20,12 +21,12 @@ public const val ComposeInvestigatorRuntime: String = "land.sungbin.composeinves
 // ===== FULLY-QUALIFIED NAME ===== //
 
 // START Kotlin/Java Standard Library
-public val EMPTY_LIST_FQN: FqName = FqName("kotlin.collections.emptyList")
+public val EMPTY_LIST_FQN: FqName = StandardNames.COLLECTIONS_PACKAGE_FQ_NAME.child(Name.identifier("emptyList"))
 
-public val MUTABLE_LIST_OF_FQN: FqName = FqName("kotlin.collections.mutableListOf")
-public val MUTABLE_LIST_ADD_FQN: FqName = FqName("kotlin.collections.MutableList.add")
+public val MUTABLE_LIST_OF_FQN: FqName = StandardNames.COLLECTIONS_PACKAGE_FQ_NAME.child(Name.identifier("mutableListOf"))
+public val MUTABLE_LIST_ADD_FQN: FqName = StandardNames.FqNames.mutableList.child(Name.identifier("add"))
 
-public val HASH_CODE_FQN: FqName = FqName("kotlin.hashCode")
+public val HASH_CODE_FQN: FqName = StandardNames.BUILT_INS_PACKAGE_FQ_NAME.child(StandardNames.HASHCODE_NAME)
 // END Kotlin/Java Standard Library
 
 // START Compose Runtime
