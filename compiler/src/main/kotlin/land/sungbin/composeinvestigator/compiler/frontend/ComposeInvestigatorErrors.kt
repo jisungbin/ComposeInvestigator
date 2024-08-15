@@ -14,12 +14,12 @@ import org.jetbrains.kotlin.diagnostics.SourceElementPositioningStrategies
 import org.jetbrains.kotlin.diagnostics.error0
 import org.jetbrains.kotlin.diagnostics.rendering.BaseDiagnosticRendererFactory
 import org.jetbrains.kotlin.diagnostics.rendering.RootDiagnosticRendererFactory
-import org.jetbrains.kotlin.psi.KtAnnotationEntry
+import org.jetbrains.kotlin.psi.KtCallExpression
 
 // Make this public so that this can be suppressed by the outside world.
 public object ComposeInvestigatorErrors {
   public val COMPOSABLE_NAME_ONLY_HARDCODED: KtDiagnosticFactory0
-    by error0<KtAnnotationEntry>(SourceElementPositioningStrategies.VALUE_ARGUMENTS)
+    by error0<KtCallExpression>(SourceElementPositioningStrategies.VALUE_ARGUMENTS)
 
   private class DiagnosticRendererFactory : BaseDiagnosticRendererFactory() {
     override val MAP = KtDiagnosticFactoryToRendererMap("ComposeInvestigator").apply {

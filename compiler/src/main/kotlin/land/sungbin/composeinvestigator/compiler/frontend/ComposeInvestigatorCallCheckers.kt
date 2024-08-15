@@ -14,13 +14,12 @@ import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
 import org.jetbrains.kotlin.fir.analysis.checkers.expression.ExpressionCheckers
-import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirAnnotationCallChecker
+import org.jetbrains.kotlin.fir.analysis.checkers.expression.FirFunctionCallChecker
 import org.jetbrains.kotlin.fir.analysis.extensions.FirAdditionalCheckersExtension
-import org.jetbrains.kotlin.fir.expressions.FirAnnotationCall
+import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.FirLiteralExpression
 import org.jetbrains.kotlin.fir.expressions.argument
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar
-import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrar.ExtensionRegistrarContext
 import org.jetbrains.kotlin.fir.types.classId
 import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.types.ConstantValueKind
@@ -34,12 +33,12 @@ public class ComposeInvestigatorFirExtensionRegistrar : FirExtensionRegistrar() 
 
 private class ComposeInvestigatorCallCheckers(session: FirSession) : FirAdditionalCheckersExtension(session) {
   override val expressionCheckers = object : ExpressionCheckers() {
-    override val annotationCallCheckers = setOf(ComposableNameCallChecker)
+    override val functionCallCheckers = setOf(ComposableNameCallChecker)
   }
 }
 
-private object ComposableNameCallChecker : FirAnnotationCallChecker(MppCheckerKind.Common) {
-  override fun check(expression: FirAnnotationCall, context: CheckerContext, reporter: DiagnosticReporter) {
+private object ComposableNameCallChecker : FirFunctionCallChecker(MppCheckerKind.Common) {
+  override fun check(expression: FirFunctionCall, context: CheckerContext, reporter: DiagnosticReporter) {
     if (expression.resolvedType.classId?.asSingleFqName() != COMPOSABLE_NAME_FQN) return
     if (expression.argument.safeAs<FirLiteralExpression>()?.kind != ConstantValueKind.String) {
       reporter.reportOn(
