@@ -31,4 +31,10 @@ dependencies {
   compileOnly(kotlin("compiler", version = libs.versions.kotlin.core.get()))
   compileOnly(kotlin("compose-compiler-plugin", version = libs.versions.kotlin.core.get()))
   compileOnly(libs.jetbrains.annotation)
+
+  testImplementation(projects.runtime)
+  testImplementation(libs.compose.runtime)
+  testImplementation(kotlin("compiler", version = libs.versions.kotlin.core.get()))
+  testImplementation(kotlin("compose-compiler-plugin", version = libs.versions.kotlin.core.get()))
+  testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
 }

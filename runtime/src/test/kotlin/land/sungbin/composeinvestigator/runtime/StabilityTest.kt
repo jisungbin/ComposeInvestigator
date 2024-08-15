@@ -12,8 +12,7 @@ import assertk.assertions.isEqualTo
 import kotlin.test.Test
 
 class StabilityTest {
-  @Test
-  fun printAsString() {
+  @Test fun printAsString() {
     assertThat(Stability.Certain(true).toString()).isEqualTo("Stable")
     assertThat(Stability.Certain(false).toString()).isEqualTo("Unstable")
     assertThat(Stability.Runtime("name").toString()).isEqualTo("Runtime(name)")

@@ -1,0 +1,43 @@
+//
+// Source
+// ------------------------------------------
+
+package land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer
+
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
+
+fun delegateStateVariable() {
+  val state by mutableStateOf(Unit)
+  var state2 by run { mutableStateOf(Unit) }
+}
+
+//
+// Transformed IR
+// ------------------------------------------
+
+val ComposableInvalidationTraceTableImpl%DelegateStateVariableKt: ComposableInvalidationTraceTable = ComposableInvalidationTraceTable()
+fun delegateStateVariable() {
+  val state by {
+    val state%delegate = mutableStateOf(
+      value = Unit
+    )
+    get() {
+      return state%delegate.getValue(null, ::state%delegate)
+    }
+  }
+  var state2 by {
+    val state2%delegate = run {
+      mutableStateOf(
+        value = Unit
+      )
+    }
+    get() {
+      return state2%delegate.getValue(null, ::state2%delegate)
+    }
+    set(<set-?>: Unit) {
+      return state2%delegate.setValue(null, ::state2%delegate, <set-?>)
+    }
+  }
+}

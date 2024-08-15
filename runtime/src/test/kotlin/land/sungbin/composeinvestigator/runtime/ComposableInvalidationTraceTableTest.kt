@@ -11,65 +11,61 @@ import assertk.assertThat
 import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
 import kotlin.test.Test
-import land.sungbin.composeinvestigator.runtime.affect.AffectedField
 
 class ComposableInvalidationTraceTableTest {
-  @Test
-  fun computeInvalidationReasonWhenNoPreviousInfo() {
+  @Test fun computeInvalidationReasonWhenNoPreviousInfo() {
     val table = ComposableInvalidationTraceTable()
 
-    val param = AffectedField.ValueArgument(
+    val argument = ValueArgument(
       name = "name",
       type = "kotlin.String",
       stability = Stability.Stable,
       valueString = "value",
       valueHashCode = 0,
     )
-    val reason = table.computeInvalidationReason(keyName = "keyName", arguments = listOf(param))
+    val reason = table.computeInvalidationReason(keyName = "keyName", arguments = listOf(argument))
 
-    assertThat(table.affectFields).containsOnly("keyName" to listOf(param))
+    assertThat(table.affectedArguments).containsOnly("keyName" to listOf(argument))
     assertThat(reason).isEqualTo(InvalidationReason.Initial)
   }
 
-  @Test
-  fun computeInvalidationReasonWhenPreviousInfoExists() {
+  @Test fun computeInvalidationReasonWhenPreviousInfoExists() {
     val table = ComposableInvalidationTraceTable()
 
-    val oldParam = AffectedField.ValueArgument(
+    val oldArgument = ValueArgument(
       name = "name",
       type = "kotlin.String",
       stability = Stability.Stable,
       valueString = "value",
       valueHashCode = 0,
     )
-    val newParam = AffectedField.ValueArgument(
+    val newArgument = ValueArgument(
       name = "name",
       type = "kotlin.String",
-      stability = Stability.Unstable,
+      stability = Stability.Stable,
       valueString = "new value",
       valueHashCode = 1,
     )
 
-    table.computeInvalidationReason(keyName = "keyName", arguments = listOf(oldParam))
-    val reason = table.computeInvalidationReason(keyName = "keyName", arguments = listOf(newParam))
+    table.computeInvalidationReason(keyName = "keyName", arguments = listOf(oldArgument))
+    val reason = table.computeInvalidationReason(keyName = "keyName", arguments = listOf(newArgument))
 
-    assertThat(table.affectFields).containsOnly("keyName" to listOf(newParam))
-    assertThat(reason).isEqualTo(InvalidationReason.ArgumentChanged(listOf(oldParam changedTo newParam)))
+    assertThat(table.affectedArguments).containsOnly("keyName" to listOf(newArgument))
+    assertThat(reason).isEqualTo(InvalidationReason.ArgumentChanged(listOf(oldArgument changedTo newArgument)))
   }
 
-  @Test
-  fun fieldChangedDisplayAsParamsOnlyString() {
-    val changedParam = InvalidationReason.ArgumentChanged(
+  @Test fun argumentChangedDisplayAsString() {
+    val reason = InvalidationReason.ArgumentChanged(
       listOf(
         ChangedArgument(
-          previous = AffectedField.ValueArgument(
+          previous = ValueArgument(
             name = "name",
             type = "kotlin.String",
             stability = Stability.Stable,
             valueString = "value",
             valueHashCode = 0,
           ),
-          new = AffectedField.ValueArgument(
+          new = ValueArgument(
             name = "name",
             type = "kotlin.String",
             stability = Stability.Stable,
@@ -78,14 +74,14 @@ class ComposableInvalidationTraceTableTest {
           ),
         ),
         ChangedArgument(
-          previous = AffectedField.ValueArgument(
+          previous = ValueArgument(
             name = "name2",
             type = "kotlin.String",
             stability = Stability.Unstable,
             valueString = "value2",
             valueHashCode = 10,
           ),
-          new = AffectedField.ValueArgument(
+          new = ValueArgument(
             name = "name2",
             type = "kotlin.String",
             stability = Stability.Unstable,
@@ -96,16 +92,16 @@ class ComposableInvalidationTraceTableTest {
       ),
     )
 
-    assertThat(changedParam.toString()).isEqualTo(
+    assertThat(reason.toString()).isEqualTo(
       """
-          |[FieldChanged]
-          |  1. name <Stable>
-          |    Old: value (0)
-          |    New: new value (1)
-          |  2. name2 <Unstable>
-          |    Old: value2 (10)
-          |    New: new value2 (11)
-          |
+      |[ArgumentChanged]
+      |1. name <Stable>
+      |  Old: value (0)
+      |  New: new value (1)
+      |2. name2 <Unstable>
+      |  Old: value2 (10)
+      |  New: new value2 (11)
+      |
       """.trimMargin(),
     )
   }
