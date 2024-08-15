@@ -12,13 +12,17 @@ import land.sungbin.composeinvestigator.compiler.log
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.name.Name
 
-internal class StateInitializerFirstTransformer(context: IrPluginContext) : ComposeInvestigatorBaseLower(context) {
+internal class StateInitializerFirstTransformer(
+  context: IrPluginContext,
+  messageCollector: MessageCollector,
+) : ComposeInvestigatorBaseLower(context, messageCollector) {
   override fun firstTransformStateInitializer(
     name: Name,
     initializer: IrExpression,

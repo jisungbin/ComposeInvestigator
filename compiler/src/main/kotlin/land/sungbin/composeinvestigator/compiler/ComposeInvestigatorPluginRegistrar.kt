@@ -30,20 +30,20 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
     if (!enabled) return
 
     val verbose = configuration[ComposeInvestigatorConfiguration.KEY_VERBOSE] == true
-    val collector = VerboseMessageCollector(configuration.messageCollector).apply { if (verbose) verbose() }
+    val messageCollector = VerboseMessageCollector(configuration.messageCollector).apply { if (verbose) verbose() }
 
     if (!configuration.languageVersionSettings.languageVersion.usesK2) {
       throw CompileEnvironmentException(ErrorMessages.SUPPORTS_K2_ONLY)
     }
 
-    configuration.messageCollector = collector
+    configuration.messageCollector = messageCollector
 
     FirExtensionRegistrarAdapter.registerExtension(project, ComposeInvestigatorFirExtensionRegistrar())
     project.extensionArea
       .getExtensionPoint(IrGenerationExtension.extensionPointName)
       .run {
-        registerExtension(ComposeInvestigatorFirstPhaseExtension(), LoadingOrder.FIRST, project)
-        registerExtension(ComposeInvestigatorLastPhaseExtension(), LoadingOrder.LAST, project)
+        registerExtension(ComposeInvestigatorFirstPhaseExtension(messageCollector), LoadingOrder.FIRST, project)
+        registerExtension(ComposeInvestigatorLastPhaseExtension(messageCollector), LoadingOrder.LAST, project)
       }
   }
 }

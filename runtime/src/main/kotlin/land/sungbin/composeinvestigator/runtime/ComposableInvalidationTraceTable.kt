@@ -157,8 +157,8 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
 
 /** @suppress ComposeInvestigator compiler-only API */
 @ComposeInvestigatorCompilerApi
-public fun <T : Any> T.registerStateObject(name: String, table: ComposableInvalidationTraceTable): T =
-  apply { table.stateObjectMap[this] = name }
+public fun <T : Any> ComposableInvalidationTraceTable.registerStateObject(value: T, name: String): T =
+  value.apply { stateObjectMap[this] = name }
 
 @Suppress("FunctionName", "NOTHING_TO_INLINE")
 private inline fun IntrinsicImplementedError() = NotImplementedError("Implemented as an intrinsic")

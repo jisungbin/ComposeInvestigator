@@ -13,6 +13,7 @@ import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.log
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
@@ -25,7 +26,10 @@ import org.jetbrains.kotlin.ir.types.IrType
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.file
 
-internal class InvalidationSkipTracingLastTransformer(context: IrPluginContext) : ComposeInvestigatorBaseLower(context) {
+internal class InvalidationSkipTracingLastTransformer(
+  context: IrPluginContext,
+  messageCollector: MessageCollector,
+) : ComposeInvestigatorBaseLower(context, messageCollector) {
   private val handled = HandledMap()
 
   override fun lastTransformSkipToGroupEndCall(composable: IrSimpleFunction, expression: IrCall): IrExpression {

@@ -37,7 +37,6 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
-import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.getPropertySetter
 import org.jetbrains.kotlin.ir.util.kotlinFqName
@@ -53,6 +52,7 @@ public class InvalidationTraceTableIntrinsicTransformer(
   private val irComposableInformation: IrComposableInformation,
   private val tables: IrInvalidationTraceTableHolder,
 ) : IrElementTransformerVoid(), FileLoweringPass {
+  private val fileStack = Stack<IrFile>()
   private val composableStack = Stack<IrSimpleFunction>()
 
   private val tableSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN))!!
@@ -72,7 +72,12 @@ public class InvalidationTraceTableIntrinsicTransformer(
 
   override fun lower(irFile: IrFile) {
     includeFileNameInExceptionTrace(irFile) {
-      irFile.transformChildrenVoid()
+      try {
+        fileStack.push(irFile)
+        irFile.transformChildrenVoid()
+      } finally {
+        check(fileStack.pop() == irFile) { "fileStack is not balanced." }
+      }
     }
   }
 
@@ -80,14 +85,16 @@ public class InvalidationTraceTableIntrinsicTransformer(
     if (declaration.hasComposableAnnotation()) composableStack.push(declaration)
 
     declaration.body?.transformChildrenVoid()
-    return super.visitSimpleFunction(declaration).also {
+    return try {
+      super.visitSimpleFunction(declaration)
+    } finally {
       if (declaration.hasComposableAnnotation())
         check(composableStack.pop() == declaration) { "composableStack is not balanced." }
     }
   }
 
   override fun visitCall(expression: IrCall): IrExpression {
-    val table = tables[expression.symbol.owner.file]
+    val table = tables[fileStack.peek()]
     return when (expression.symbol.owner.kotlinFqName) {
       currentTableGetterSymbol.kotlinFqName -> table.propGetter(startOffset = expression.startOffset, endOffset = expression.endOffset)
       currentComposableNameGetterSymbol.kotlinFqName -> {

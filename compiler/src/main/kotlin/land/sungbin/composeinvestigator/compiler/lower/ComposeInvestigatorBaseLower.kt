@@ -11,8 +11,8 @@ import androidx.compose.compiler.plugins.kotlin.analysis.Stability
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
 import androidx.compose.compiler.plugins.kotlin.lower.includeFileNameInExceptionTrace
 import java.util.Stack
+import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN
 import land.sungbin.composeinvestigator.compiler.COMPOSER_FQN
-import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorCommandLineProcessor.Companion.PLUGIN_ID
 import land.sungbin.composeinvestigator.compiler.Composer_SKIP_TO_GROUP_END
 import land.sungbin.composeinvestigator.compiler.HASH_CODE_FQN
 import land.sungbin.composeinvestigator.compiler.MUTABLE_LIST_ADD_FQN
@@ -32,12 +32,14 @@ import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTableHolder
 import land.sungbin.composeinvestigator.compiler.struct.IrValueArgument
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.jvm.ir.hasChild
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrLocalDelegatedProperty
+import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrValueDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrVariable
@@ -55,6 +57,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
+import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.classOrFail
 import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.defaultType
@@ -77,10 +80,11 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
-public open class ComposeInvestigatorBaseLower(protected val context: IrPluginContext) :
-  IrElementTransformerVoid(), IrInvalidationTraceTableHolder {
-  protected val messageCollector: MessageCollector = context.createDiagnosticReporter(PLUGIN_ID)
-
+public open class ComposeInvestigatorBaseLower(
+  protected val context: IrPluginContext,
+  // TODO context.createDiagnosticReporter()
+  protected val messageCollector: MessageCollector,
+) : IrElementTransformerVoid(), IrInvalidationTraceTableHolder {
   private val tables = mutableMapOf<IrFile, IrInvalidationTraceTable>()
   private val composableStack = Stack<IrSimpleFunction>()
 
@@ -136,6 +140,13 @@ public open class ComposeInvestigatorBaseLower(protected val context: IrPluginCo
   final override fun visitFile(declaration: IrFile): IrFile =
     includeFileNameInExceptionTrace(declaration) {
       if (declaration.hasAnnotation(NO_INVESTIGATION_FQN)) return declaration
+      if (
+        declaration.hasChild { element ->
+          element is IrProperty &&
+            element.backingField?.type?.classFqName == COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN
+        }
+      )
+        return declaration
 
       val table = IrInvalidationTraceTable.create(context, declaration)
       declaration.declarations.add(0, table.rawProp.also { prop -> prop.setDeclarationsParent(declaration) })

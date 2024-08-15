@@ -15,6 +15,7 @@ import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.log
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.Scope
@@ -29,8 +30,9 @@ import org.jetbrains.kotlin.name.SpecialNames
 
 internal class InvalidationProcessTracingFirstTransformer(
   context: IrPluginContext,
+  messageCollector: MessageCollector,
   private val stabilityInferencer: StabilityInferencer,
-) : ComposeInvestigatorBaseLower(context) {
+) : ComposeInvestigatorBaseLower(context, messageCollector) {
   private val handled = HandledMap()
 
   override fun firstTransformComposableBody(composable: IrSimpleFunction, body: IrBlockBody): IrBody {

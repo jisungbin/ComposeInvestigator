@@ -13,10 +13,11 @@ import land.sungbin.composeinvestigator.compiler.lower.InvalidationProcessTracin
 import land.sungbin.composeinvestigator.compiler.lower.StateInitializerFirstTransformer
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
-public class ComposeInvestigatorFirstPhaseExtension : IrGenerationExtension {
+public class ComposeInvestigatorFirstPhaseExtension(private val messageCollector: MessageCollector) : IrGenerationExtension {
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
     val stabilityInferencer = StabilityInferencer(
       currentModule = moduleFragment.descriptor,
@@ -24,7 +25,7 @@ public class ComposeInvestigatorFirstPhaseExtension : IrGenerationExtension {
     )
 
     moduleFragment.transformChildrenVoid(DurableComposableKeyTransformer(pluginContext, stabilityInferencer))
-    moduleFragment.transformChildrenVoid(InvalidationProcessTracingFirstTransformer(pluginContext, stabilityInferencer))
-    moduleFragment.transformChildrenVoid(StateInitializerFirstTransformer(pluginContext))
+    moduleFragment.transformChildrenVoid(InvalidationProcessTracingFirstTransformer(pluginContext, messageCollector, stabilityInferencer))
+    moduleFragment.transformChildrenVoid(StateInitializerFirstTransformer(pluginContext, messageCollector))
   }
 }
