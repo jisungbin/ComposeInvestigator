@@ -10,6 +10,7 @@ package land.sungbin.composeinvestigator.compiler.lower
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
 import androidx.compose.compiler.plugins.kotlin.irTrace
 import androidx.compose.compiler.plugins.kotlin.lower.includeFileNameInExceptionTrace
+import java.util.Stack
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_NAME_FQN
 import land.sungbin.composeinvestigator.compiler.CURRENT_COMPOSABLE_INVALIDATION_TRACER_FQN
@@ -18,19 +19,15 @@ import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTraceTabl
 import land.sungbin.composeinvestigator.compiler.UNKNOWN_STRING
 import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.analysis.set
-import land.sungbin.composeinvestigator.compiler.error
 import land.sungbin.composeinvestigator.compiler.fromFqName
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTableHolder
-import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
+import land.sungbin.composeinvestigator.compiler.struct.get
+import org.jetbrains.kotlin.backend.common.FileLoweringPass
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.declarations.nameWithPackage
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
@@ -44,20 +41,19 @@ import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.getPropertySetter
 import org.jetbrains.kotlin.ir.util.kotlinFqName
+import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.utils.addToStdlib.cast
-import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
+// ComposeInvestigatorBaseLower will automatically lower this for each file.
 public class InvalidationTraceTableIntrinsicTransformer(
   private val context: IrPluginContext,
-  @Suppress("unused") private val messageCollector: MessageCollector,
   private val irComposableInformation: IrComposableInformation,
-) : IrElementTransformerVoidWithContext(), IrInvalidationTraceTableHolder {
-  private val tables = mutableMapOf<IrFile, IrInvalidationTraceTable>()
-  override fun getByFile(file: IrFile): IrInvalidationTraceTable =
-    tables[file] ?: error("Table not found for ${file.nameWithPackage}")
+  private val tables: IrInvalidationTraceTableHolder,
+) : IrElementTransformerVoid(), FileLoweringPass {
+  private val composableStack = Stack<IrSimpleFunction>()
 
   private val tableSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN))!!
   private val composableNameSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_NAME_FQN))!!.owner
@@ -74,29 +70,24 @@ public class InvalidationTraceTableIntrinsicTransformer(
   private val currentComposableKeyNameGetterSymbol =
     tableSymbol.getPropertyGetter(ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_KEY_NAME.asString())!!.owner
 
-  public fun lower(file: IrFile, table: IrInvalidationTraceTable): IrFile {
-    tables[file] = table
-    return visitFileNew(file)
+  override fun lower(irFile: IrFile) {
+    includeFileNameInExceptionTrace(irFile) {
+      irFile.transformChildrenVoid()
+    }
   }
 
-  override fun visitFileNew(declaration: IrFile): IrFile =
-    includeFileNameInExceptionTrace(declaration) {
-      super.visitFile(declaration)
-    }
-
   override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
-    withinScope(declaration) { declaration.body?.transformChildrenVoid() }
-    return super.visitSimpleFunction(declaration)
+    if (declaration.hasComposableAnnotation()) composableStack.push(declaration)
+
+    declaration.body?.transformChildrenVoid()
+    return super.visitSimpleFunction(declaration).also {
+      if (declaration.hasComposableAnnotation())
+        check(composableStack.pop() == declaration) { "composableStack is not balanced." }
+    }
   }
 
   override fun visitCall(expression: IrCall): IrExpression {
-    val table = tables[expression.symbol.owner.file] ?: run {
-      messageCollector.error(
-        "Table not found for ${expression.symbol.owner.file.nameWithPackage}",
-        expression.getCompilerMessageLocation(currentFile),
-      )
-      return super.visitCall(expression)
-    }
+    val table = tables[expression.symbol.owner.file]
     return when (expression.symbol.owner.kotlinFqName) {
       currentTableGetterSymbol.kotlinFqName -> table.propGetter(startOffset = expression.startOffset, endOffset = expression.endOffset)
       currentComposableNameGetterSymbol.kotlinFqName -> {
@@ -108,7 +99,7 @@ public class InvalidationTraceTableIntrinsicTransformer(
         ).apply {
           putValueArgument(
             0,
-            lastReachedComposable()
+            composableStack.peek()
               ?.let { composable ->
                 IrComposableInformation.getName(context.irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.composable)
               }
@@ -117,7 +108,7 @@ public class InvalidationTraceTableIntrinsicTransformer(
         }
       }
       currentComposableNameSetterSymbol.kotlinFqName -> {
-        lastReachedComposable()?.let { composable ->
+        composableStack.peek()?.let { composable ->
           val userProvideName = expression
             .getValueArgument(0).cast<IrConstructorCall>()
             .getValueArgument(0).cast<IrConst<String>>().value
@@ -136,7 +127,7 @@ public class InvalidationTraceTableIntrinsicTransformer(
         )
       }
       currentComposableKeyNameGetterSymbol.kotlinFqName -> {
-        lastReachedComposable()?.let { composable ->
+        composableStack.peek()?.let { composable ->
           context.irString(
             context.irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.keyName,
             startOffset = expression.startOffset,
@@ -147,9 +138,4 @@ public class InvalidationTraceTableIntrinsicTransformer(
       else -> super.visitCall(expression)
     }
   }
-
-  private fun lastReachedComposable(): IrSimpleFunction? =
-    allScopes
-      .lastOrNull { scope -> scope.irElement.safeAs<IrSimpleFunction>()?.hasComposableAnnotation() == true }
-      ?.irElement?.safeAs<IrSimpleFunction>()
 }

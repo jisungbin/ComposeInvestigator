@@ -14,6 +14,7 @@ import androidx.compose.compiler.plugins.kotlin.irTrace
 import androidx.compose.compiler.plugins.kotlin.lower.ComposableSymbolRemapper
 import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyVisitor
+import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorCommandLineProcessor.Companion.PLUGIN_ID
 import land.sungbin.composeinvestigator.compiler.analysis.ComposableKeyInfo
 import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.analysis.set
@@ -21,7 +22,6 @@ import land.sungbin.composeinvestigator.compiler.error
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
@@ -32,8 +32,6 @@ import org.jetbrains.kotlin.name.FqName
 
 public class DurableComposableKeyTransformer(
   context: IrPluginContext,
-  private val irComposableInformation: IrComposableInformation,
-  private val messageCollector: MessageCollector,
   stabilityInferencer: StabilityInferencer,
   featureFlags: FeatureFlags = FeatureFlags(), // TODO supports this feature
 ) : DurableKeyTransformer(
@@ -44,7 +42,10 @@ public class DurableComposableKeyTransformer(
   metrics = EmptyModuleMetrics,
   featureFlags = featureFlags,
 ) {
+  private val messageCollector by unsafeLazy { context.createDiagnosticReporter(PLUGIN_ID) }
+
   private var currentKeys = mutableListOf<ComposableKeyInfo>()
+  private val irComposableInformation = IrComposableInformation(context)
 
   override fun visitFile(declaration: IrFile): IrFile {
     val stringKeys = mutableSetOf<String>()

@@ -7,7 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler.struct
 
-import land.sungbin.composeinvestigator.compiler.VALUE_PARAMETER_FQN
+import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INFORMATION_FQN
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
@@ -18,7 +18,7 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 public class IrComposableInformation(context: IrPluginContext) {
-  private val symbol = context.referenceClass(ClassId.topLevel(VALUE_PARAMETER_FQN))!!
+  private val symbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INFORMATION_FQN))!!
 
   public operator fun invoke(
     name: IrConst<String>,

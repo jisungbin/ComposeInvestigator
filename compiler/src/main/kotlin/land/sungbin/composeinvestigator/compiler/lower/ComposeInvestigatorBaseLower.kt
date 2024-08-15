@@ -10,10 +10,13 @@ package land.sungbin.composeinvestigator.compiler.lower
 import androidx.compose.compiler.plugins.kotlin.analysis.Stability
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
 import androidx.compose.compiler.plugins.kotlin.lower.includeFileNameInExceptionTrace
+import java.util.Stack
 import land.sungbin.composeinvestigator.compiler.COMPOSER_FQN
+import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorCommandLineProcessor.Companion.PLUGIN_ID
 import land.sungbin.composeinvestigator.compiler.Composer_SKIP_TO_GROUP_END
-import land.sungbin.composeinvestigator.compiler.EMPTY_LIST_FQN
 import land.sungbin.composeinvestigator.compiler.HASH_CODE_FQN
+import land.sungbin.composeinvestigator.compiler.MUTABLE_LIST_ADD_FQN
+import land.sungbin.composeinvestigator.compiler.MUTABLE_LIST_OF_FQN
 import land.sungbin.composeinvestigator.compiler.NO_INVESTIGATION_FQN
 import land.sungbin.composeinvestigator.compiler.STABILITY_FQN
 import land.sungbin.composeinvestigator.compiler.STATE_FQN
@@ -24,8 +27,10 @@ import land.sungbin.composeinvestigator.compiler.Stability_RUNTIME
 import land.sungbin.composeinvestigator.compiler.Stability_UNKNOWN
 import land.sungbin.composeinvestigator.compiler.fromFqName
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
+import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationLogger
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTableHolder
+import land.sungbin.composeinvestigator.compiler.struct.IrValueArgument
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
@@ -49,6 +54,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.classOrFail
 import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.defaultType
@@ -59,6 +65,7 @@ import org.jetbrains.kotlin.ir.types.isNullableAny
 import org.jetbrains.kotlin.ir.types.isSubtypeOfClass
 import org.jetbrains.kotlin.ir.types.typeWithArguments
 import org.jetbrains.kotlin.ir.util.constructors
+import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.getSimpleFunction
 import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.kotlinFqName
@@ -70,11 +77,13 @@ import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
-public open class ComposeInvestigatorBaseLower(
-  protected val context: IrPluginContext,
-  protected val messageCollector: MessageCollector,
-  protected val irComposableInformation: IrComposableInformation,
-) : IrElementTransformerVoid() {
+public open class ComposeInvestigatorBaseLower(protected val context: IrPluginContext) :
+  IrElementTransformerVoid(), IrInvalidationTraceTableHolder {
+  protected val messageCollector: MessageCollector = context.createDiagnosticReporter(PLUGIN_ID)
+
+  private val tables = mutableMapOf<IrFile, IrInvalidationTraceTable>()
+  private val composableStack = Stack<IrSimpleFunction>()
+
   private var ownStabilitySymbol: IrClassSymbol? = null
   private var ownStabilityCertainSymbol: IrClassSymbol? = null
   private var ownStabilityRuntimeSymbol: IrClassSymbol? = null
@@ -87,24 +96,22 @@ public open class ComposeInvestigatorBaseLower(
 
   private val stateSymbol = context.referenceClass(ClassId.topLevel(STATE_FQN))!!
 
-  private val emptyListSymbol =
+  protected val mutableListOfSymbol: IrSimpleFunctionSymbol by unsafeLazy {
     context
-      .referenceFunctions(CallableId.fromFqName(EMPTY_LIST_FQN))
-      .single { symbol -> symbol.owner.valueParameters.isEmpty() && symbol.owner.typeParameters.size == 1 }
+      .referenceFunctions(CallableId.fromFqName(MUTABLE_LIST_OF_FQN))
+      .first { fn -> fn.owner.valueParameters.isEmpty() }
+  }
 
-  protected val emptyStringListCall: IrCall =
-    IrCallImpl.fromSymbolOwner(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      symbol = emptyListSymbol,
-    ).apply {
-      putTypeArgument(0, context.irBuiltIns.stringType)
-    }
+  protected val mutableListAddSymbol: IrSimpleFunctionSymbol by unsafeLazy {
+    context
+      .referenceFunctions(CallableId.fromFqName(MUTABLE_LIST_ADD_FQN))
+      .first { fn -> fn.owner.valueParameters.size == 1 }
+  }
 
-  private val hashCodeSymbol =
+  private val hashCodeSymbol: IrSimpleFunctionSymbol by unsafeLazy {
     context
       .referenceFunctions(CallableId.fromFqName(HASH_CODE_FQN))
-      .single { symbol ->
+      .first { symbol ->
         val isNullableAnyExtension = with(symbol.owner.extensionReceiverParameter) {
           this != null && type.isNullableAny()
         }
@@ -112,15 +119,19 @@ public open class ComposeInvestigatorBaseLower(
 
         isNullableAnyExtension && isIntReturn
       }
+  }
 
-  private val tableCallTransformer: InvalidationTraceTableIntrinsicTransformer = InvalidationTraceTableIntrinsicTransformer(
+  protected val invalidationLogger: IrInvalidationLogger by unsafeLazy { IrInvalidationLogger(context) }
+  protected val composableInformation: IrComposableInformation by unsafeLazy { IrComposableInformation(context) }
+  protected val valueArgument: IrValueArgument by unsafeLazy { IrValueArgument(context) }
+
+  public override fun tableByFile(file: IrFile): IrInvalidationTraceTable = tables.getValue(file)
+
+  private val tableCallTransformer = InvalidationTraceTableIntrinsicTransformer(
     context = context,
-    messageCollector = messageCollector,
-    irComposableInformation = irComposableInformation,
+    irComposableInformation = composableInformation,
+    tables = this,
   )
-
-  // TODO make protected
-  internal val invalidationTraceTableHolder: IrInvalidationTraceTableHolder get() = tableCallTransformer
 
   final override fun visitFile(declaration: IrFile): IrFile =
     includeFileNameInExceptionTrace(declaration) {
@@ -128,7 +139,9 @@ public open class ComposeInvestigatorBaseLower(
 
       val table = IrInvalidationTraceTable.create(context, declaration)
       declaration.declarations.add(0, table.rawProp.also { prop -> prop.setDeclarationsParent(declaration) })
-      tableCallTransformer.lower(declaration, table)
+
+      tables[declaration] = table
+      tableCallTransformer.lower(declaration)
 
       super.visitFile(declaration)
     }
@@ -147,8 +160,11 @@ public open class ComposeInvestigatorBaseLower(
     // Since some of the elements inside the function may be composable, we continue inspection.
     if (!declaration.hasComposableAnnotation()) return super.visitSimpleFunction(declaration)
 
+    composableStack.push(declaration)
     declaration.body = firstTransformComposableBody(declaration, declaration.body.cast()).apply { transformChildrenVoid() }
-    return super.visitSimpleFunction(declaration)
+    return super.visitSimpleFunction(declaration).also {
+      check(composableStack.pop() == declaration) { "composableStack is not balanced." }
+    }
   }
 
   // if (%dirty and 0b0011 != 0b0010 || !%composer.skipping) {
@@ -159,7 +175,7 @@ public open class ComposeInvestigatorBaseLower(
   // }
   final override fun visitCall(expression: IrCall): IrExpression =
     if (expression.symbol.owner.kotlinFqName == composerSkipToGroupEndSymbol.owner.kotlinFqName)
-      lastTransformSkipToGroupEndCall(expression)
+      lastTransformSkipToGroupEndCall(composableStack.peek(), expression)
     else
       super.visitCall(expression)
 
@@ -170,6 +186,7 @@ public open class ComposeInvestigatorBaseLower(
       declaration.initializer = firstTransformStateInitializer(
         name = declaration.name,
         initializer = declaration.initializer!!,
+        table = tableByFile(declaration.file),
       )
     }
     return super.visitVariable(declaration)
@@ -181,6 +198,7 @@ public open class ComposeInvestigatorBaseLower(
       declaration.delegate.initializer = firstTransformStateInitializer(
         name = declaration.name,
         initializer = declaration.delegate.initializer!!,
+        table = tableByFile(declaration.file),
       )
     }
     return super.visitLocalDelegatedProperty(declaration)
@@ -190,10 +208,14 @@ public open class ComposeInvestigatorBaseLower(
   protected open fun firstTransformComposableBody(composable: IrSimpleFunction, body: IrBlockBody): IrBody = body
 
   // (MUST) LoadingOrder.FIRST
-  protected open fun firstTransformStateInitializer(name: Name, initializer: IrExpression): IrExpression = initializer
+  protected open fun firstTransformStateInitializer(
+    name: Name,
+    initializer: IrExpression,
+    table: IrInvalidationTraceTable,
+  ): IrExpression = initializer
 
   // (MUST) LoadingOrder.LAST
-  protected open fun lastTransformSkipToGroupEndCall(expression: IrCall): IrExpression = expression
+  protected open fun lastTransformSkipToGroupEndCall(composable: IrSimpleFunction, expression: IrCall): IrExpression = expression
 
   private fun IrVariable.isValidStateDeclaration(): Boolean {
     val isState = type.classOrNull?.isSubtypeOfClass(stateSymbol.defaultType.classOrFail) == true
@@ -202,7 +224,7 @@ public open class ComposeInvestigatorBaseLower(
     return !type.isNullable() && isState && !isTempVariable && hasInitializer
   }
 
-  protected fun Stability.toIrOwnStability(): IrConstructorCall {
+  protected fun Stability.asOwnStability(): IrConstructorCall {
     if (ownStabilitySymbol == null) ownStabilitySymbol = context.referenceClass(ClassId.topLevel(STABILITY_FQN))!!
 
     return when (this) {
@@ -210,7 +232,7 @@ public open class ComposeInvestigatorBaseLower(
       is Stability.Runtime -> irOwnStabilityRuntime(irString(declaration.name.asString()))
       is Stability.Unknown -> irOwnStabilityUnknown(irString(declaration.name.asString()))
       is Stability.Parameter -> irOwnStabilityParameter(irString(parameter.name.asString()))
-      is Stability.Combined -> irOwnStabilityCombined(elements.map { stability -> stability.toIrOwnStability() })
+      is Stability.Combined -> irOwnStabilityCombined(elements.map { stability -> stability.asOwnStability() })
     }
   }
 

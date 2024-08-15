@@ -25,8 +25,6 @@ public const val ComposeInvestigatorRuntime: String = "land.sungbin.composeinves
 // ===== FULLY-QUALIFIED NAME ===== //
 
 // START Kotlin/Java Standard Library
-public val EMPTY_LIST_FQN: FqName = COLLECTIONS_PACKAGE_FQ_NAME.child(identifier("emptyList"))
-
 public val MUTABLE_LIST_OF_FQN: FqName = COLLECTIONS_PACKAGE_FQ_NAME.child(identifier("mutableListOf"))
 public val MUTABLE_LIST_ADD_FQN: FqName = FqNames.mutableList.child(identifier("add"))
 
@@ -68,7 +66,7 @@ public val ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_NAME: Name = iden
 public val ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_KEY_NAME: Name = identifier("currentComposableKeyName")
 public val ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON: Name = identifier("computeInvalidationReason")
 
-public val REGISTER_STATE_OBJECT_FQN: Name = identifier("registerStateObject")
+public val REGISTER_STATE_OBJECT_FQN: FqName = FqName("$ComposeInvestigatorRuntime.registerStateObject")
 // END ComposableInvalidationTraceTable
 
 // START Stability
@@ -86,7 +84,6 @@ public val COMPOSABLE_INFORMATION_FQN: FqName = FqName("$ComposeInvestigatorRunt
 
 // START ValueArguments
 public val VALUE_ARGUMENT_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ValueArgument")
-public val CHANGED_ARGUMENT_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ChangedArgument")
 // END ValueArguments
 
 // TODO testing

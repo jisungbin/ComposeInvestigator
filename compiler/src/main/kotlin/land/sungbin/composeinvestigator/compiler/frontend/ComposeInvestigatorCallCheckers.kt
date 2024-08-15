@@ -8,7 +8,6 @@
 package land.sungbin.composeinvestigator.compiler.frontend
 
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_NAME_FQN
-import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.FirSession
@@ -27,28 +26,19 @@ import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.types.ConstantValueKind
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
-public class ComposeInvestigatorFirExtensionRegistrar(
-  private val messageCollector: MessageCollector,
-) : FirExtensionRegistrar() {
+public class ComposeInvestigatorFirExtensionRegistrar : FirExtensionRegistrar() {
   override fun ExtensionRegistrarContext.configurePlugin() {
-    +(FirAdditionalCheckersExtension.Factory { session ->
-      ComposeInvestigatorCallCheckers(session, messageCollector)
-    })
+    +::ComposeInvestigatorCallCheckers
   }
 }
 
-private class ComposeInvestigatorCallCheckers(
-  session: FirSession,
-  private val messageCollector: MessageCollector,
-) : FirAdditionalCheckersExtension(session) {
+private class ComposeInvestigatorCallCheckers(session: FirSession) : FirAdditionalCheckersExtension(session) {
   override val expressionCheckers = object : ExpressionCheckers() {
-    override val annotationCallCheckers = setOf(ComposableNameCallChecker(messageCollector))
+    override val annotationCallCheckers = setOf(ComposableNameCallChecker)
   }
 }
 
-private class ComposableNameCallChecker(
-  @Suppress("unused") private val messageCollector: MessageCollector,
-) : FirAnnotationCallChecker(MppCheckerKind.Common) {
+private object ComposableNameCallChecker : FirAnnotationCallChecker(MppCheckerKind.Common) {
   override fun check(expression: FirAnnotationCall, context: CheckerContext, reporter: DiagnosticReporter) {
     if (expression.resolvedType.classId?.asSingleFqName() != COMPOSABLE_NAME_FQN) return
     if (expression.argument.safeAs<FirLiteralExpression>()?.kind != ConstantValueKind.String) {

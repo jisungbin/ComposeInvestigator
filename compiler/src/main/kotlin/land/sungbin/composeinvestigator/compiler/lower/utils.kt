@@ -22,3 +22,7 @@ internal fun IrPluginContext.irString(
   type = irBuiltIns.stringType,
   value = value,
 )
+
+@Suppress("NOTHING_TO_INLINE")
+internal inline fun <T> unsafeLazy(noinline initializer: () -> T): Lazy<T> =
+  lazy(LazyThreadSafetyMode.NONE, initializer)

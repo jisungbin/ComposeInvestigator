@@ -10,9 +10,7 @@ package land.sungbin.composeinvestigator.compiler.struct
 import land.sungbin.composeinvestigator.compiler.COMPOSE_INVESTIGATOR_CONFIG_FQN
 import land.sungbin.composeinvestigator.compiler.ComposableInvalidationLogger_LOG
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorConfig_LOGGER
-import land.sungbin.composeinvestigator.compiler.INVALIDATION_REASON_FQN
 import land.sungbin.composeinvestigator.compiler.INVALIDATION_TYPE_FQN
-import land.sungbin.composeinvestigator.compiler.InvalidationReason_Invalidate
 import land.sungbin.composeinvestigator.compiler.InvalidationType_PROCESSED
 import land.sungbin.composeinvestigator.compiler.InvalidationType_SKIPPED
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -41,14 +39,10 @@ public class IrInvalidationLogger(context: IrPluginContext) {
   public val irInvalidationTypeSymbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(INVALIDATION_TYPE_FQN))!!
 
   private var invalidationTypeProcessedSymbol =
-    irInvalidationTypeSymbol.owner.sealedSubclasses.single { clz -> clz.owner.name == InvalidationType_PROCESSED }
+    irInvalidationTypeSymbol.owner.sealedSubclasses.first { clz -> clz.owner.name == InvalidationType_PROCESSED }
 
   private var invalidationTypeSkippedSymbol =
-    irInvalidationTypeSymbol.owner.sealedSubclasses.single { clz -> clz.owner.name == InvalidationType_SKIPPED }
-
-  public val irInvalidateReasonSymbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(INVALIDATION_REASON_FQN))!!
-  public val irInvalidateReasonInvalidateSymbol: IrClassSymbol =
-    irInvalidateReasonSymbol.owner.sealedSubclasses.single { clz -> clz.owner.name == InvalidationReason_Invalidate }
+    irInvalidationTypeSymbol.owner.sealedSubclasses.first { clz -> clz.owner.name == InvalidationType_SKIPPED }
 
   public fun irLog(
     composable: IrDeclarationReference,

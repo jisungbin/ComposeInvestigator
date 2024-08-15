@@ -30,25 +30,20 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
     if (!enabled) return
 
     val verbose = configuration[ComposeInvestigatorConfiguration.KEY_VERBOSE] == true
-    val messageCollector = VerboseMessageCollector(configuration.messageCollector).also { collector ->
-      if (verbose) collector.verbose()
-      configuration.messageCollector = collector
-    }
+    val collector = VerboseMessageCollector(configuration.messageCollector).apply { if (verbose) verbose() }
 
     if (!configuration.languageVersionSettings.languageVersion.usesK2) {
       throw CompileEnvironmentException(ErrorMessages.SUPPORTS_K2_ONLY)
     }
 
-    FirExtensionRegistrarAdapter.registerExtension(project, ComposeInvestigatorFirExtensionRegistrar(messageCollector))
+    configuration.messageCollector = collector
 
-    // We need to explicitly define the LAST order because ComposeInvestigator should
-    // run after the Compose compiler is applied.
+    FirExtensionRegistrarAdapter.registerExtension(project, ComposeInvestigatorFirExtensionRegistrar())
     project.extensionArea
       .getExtensionPoint(IrGenerationExtension.extensionPointName)
-      .registerExtension(
-        ComposableInvalidationTracingExtension(messageCollector),
-        LoadingOrder.LAST,
-        project,
-      )
+      .run {
+        registerExtension(ComposeInvestigatorFirstPhaseExtension(), LoadingOrder.FIRST, project)
+        registerExtension(ComposeInvestigatorLastPhaseExtension(), LoadingOrder.LAST, project)
+      }
   }
 }
