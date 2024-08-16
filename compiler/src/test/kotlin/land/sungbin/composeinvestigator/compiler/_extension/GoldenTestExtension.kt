@@ -1,3 +1,10 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
+ */
+
 package land.sungbin.composeinvestigator.compiler._extension
 
 import java.io.File
@@ -83,12 +90,12 @@ private data class GoldenTransformTestInfo(
             //
             // Source
             // ------------------------------------------
-        """.trimIndent()
+    """.trimIndent()
     val TRANSFORM_HEADER = """
             //
             // Transformed IR
             // ------------------------------------------
-        """.trimIndent()
+    """.trimIndent()
 
     const val PATH_TO_GOLDENS = "src/test/resources/golden"
 

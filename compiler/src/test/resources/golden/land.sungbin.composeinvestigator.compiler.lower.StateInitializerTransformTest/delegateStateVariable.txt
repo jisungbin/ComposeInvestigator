@@ -2,42 +2,80 @@
 // Source
 // ------------------------------------------
 
+@file:Suppress("unused", "UnusedVariable")
+
 package land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 
-fun delegateStateVariable() {
-  val state by mutableStateOf(Unit)
-  var state2 by run { mutableStateOf(Unit) }
+@Composable fun delegateStateVariable() {
+  val state by remember { mutableStateOf(Unit) }
+  var state2 by remember { run { mutableStateOf(Unit) } }
 }
+
 
 //
 // Transformed IR
 // ------------------------------------------
 
 val ComposableInvalidationTraceTableImpl%DelegateStateVariableKt: ComposableInvalidationTraceTable = ComposableInvalidationTraceTable()
-fun delegateStateVariable() {
-  val state by {
-    val state%delegate = mutableStateOf(
-      value = Unit
-    )
-    get() {
-      return state%delegate.getValue(null, ::state%delegate)
+@Composable
+fun delegateStateVariable(%composer: Composer?, %changed: Int) {
+  %composer = %composer.startRestartGroup(<>)
+  if (%changed != 0 || !%composer.skipping) {
+    if (isTraceInProgress()) {
+      traceEventStart(<>, %changed, -1, <>)
     }
+    val tmp0_currentValueArguments = mutableListOf()
+    val tmp1_invalidationReason = ComposableInvalidationTraceTableImpl%DelegateStateVariableKt.computeInvalidationReason("fun-delegateStateVariable()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer/file-delegateStateVariable.kt", tmp0_currentValueArguments)
+    ComposeInvestigatorConfig.logger.log(ComposableInformation("delegateStateVariable", "land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer", "delegateStateVariable.kt"), Processed(tmp1_invalidationReason))
+    val state by {
+      val state%delegate = ComposableInvalidationTraceTableImpl%DelegateStateVariableKt.registerStateObject(<block>{
+        %composer.startReplaceGroup(<>)
+        val tmp0_group = %composer.cache(false) {
+          mutableStateOf(
+            value = Unit
+          )
+        }
+        %composer.endReplaceGroup()
+        tmp0_group
+      }, "state")
+      get() {
+        return state%delegate.getValue(null, ::state%delegate)
+      }
+    }
+    var state2 by {
+      val state2%delegate = ComposableInvalidationTraceTableImpl%DelegateStateVariableKt.registerStateObject(<block>{
+        %composer.startReplaceGroup(<>)
+        val tmp1_group = %composer.cache(false) {
+          run {
+            mutableStateOf(
+              value = Unit
+            )
+          }
+        }
+        %composer.endReplaceGroup()
+        tmp1_group
+      }, "state2")
+      get() {
+        return state2%delegate.getValue(null, ::state2%delegate)
+      }
+      set(<set-?>: Unit) {
+        return state2%delegate.setValue(null, ::state2%delegate, <set-?>)
+      }
+    }
+    if (isTraceInProgress()) {
+      traceEventEnd()
+    }
+  } else {
+    ComposeInvestigatorConfig.logger.log(ComposableInformation("delegateStateVariable", "land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer", "delegateStateVariable.kt"), Skipped)
+    %composer.skipToGroupEnd()
   }
-  var state2 by {
-    val state2%delegate = run {
-      mutableStateOf(
-        value = Unit
-      )
-    }
-    get() {
-      return state2%delegate.getValue(null, ::state2%delegate)
-    }
-    set(<set-?>: Unit) {
-      return state2%delegate.setValue(null, ::state2%delegate, <set-?>)
-    }
+  %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
+    delegateStateVariable(%composer, updateChangedFlags(%changed or 0b0001))
   }
 }

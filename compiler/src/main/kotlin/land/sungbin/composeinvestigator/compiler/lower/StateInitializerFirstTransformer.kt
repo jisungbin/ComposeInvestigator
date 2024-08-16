@@ -7,22 +7,21 @@
 
 package land.sungbin.composeinvestigator.compiler.lower
 
-import land.sungbin.composeinvestigator.compiler.REGISTER_STATE_OBJECT_FQN
 import land.sungbin.composeinvestigator.compiler.log
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
+import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTableHolder
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
-import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.util.file
-import org.jetbrains.kotlin.ir.util.kotlinFqName
 import org.jetbrains.kotlin.name.Name
 
 internal class StateInitializerFirstTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
-) : ComposeInvestigatorBaseLower(context, messageCollector) {
+  tables: IrInvalidationTraceTableHolder,
+) : ComposeInvestigatorBaseLower(context, messageCollector, tables) {
   override fun firstTransformStateInitializer(
     name: Name,
     initializer: IrExpression,
@@ -33,7 +32,6 @@ internal class StateInitializerFirstTransformer(
       initializer.getCompilerMessageLocation(table.rawProp.file),
     )
 
-    if (initializer.ishandled()) return initializer
     return table.irRegisterStateObject(initializer, irString(name.asString())).also {
       messageCollector.log(
         "Transform state initializer succeed: ${name.asString()}",
@@ -41,7 +39,4 @@ internal class StateInitializerFirstTransformer(
       )
     }
   }
-
-  private fun IrExpression.ishandled() =
-    this is IrCall && this.symbol.owner.kotlinFqName == REGISTER_STATE_OBJECT_FQN
 }

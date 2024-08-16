@@ -10,8 +10,7 @@ package land.sungbin.composeinvestigator.compiler.struct
 import java.lang.ref.WeakReference
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN
 import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON
-import land.sungbin.composeinvestigator.compiler.REGISTER_STATE_OBJECT_FQN
-import land.sungbin.composeinvestigator.compiler.fromFqName
+import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTraceTable_REGISTER_STATE_OBJECT
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
@@ -39,12 +38,11 @@ import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.getSimpleFunction
 import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
-import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 
 public class IrInvalidationTraceTable private constructor(private val prop: IrProperty) {
-  private lateinit var registerStateObject: IrSimpleFunctionSymbol
+  private lateinit var registerStateObjectSymbol: IrSimpleFunctionSymbol
   private lateinit var computeInvalidationReasonSymbol: IrSimpleFunctionSymbol
 
   internal val rawProp get() = prop
@@ -64,7 +62,7 @@ public class IrInvalidationTraceTable private constructor(private val prop: IrPr
   ): IrCall = IrCallImpl.fromSymbolOwner(
     startOffset = UNDEFINED_OFFSET,
     endOffset = UNDEFINED_OFFSET,
-    symbol = registerStateObject,
+    symbol = registerStateObjectSymbol,
   ).also { fn ->
     fn.dispatchReceiver = propGetter()
     fn.type = value.type
@@ -88,12 +86,17 @@ public class IrInvalidationTraceTable private constructor(private val prop: IrPr
   }
 
   public companion object {
+    private fun IrInvalidationTraceTable.makeTable() {
+      val symbol = prop.backingField!!.type.classOrFail
+      registerStateObjectSymbol = symbol.getSimpleFunction(ComposableInvalidationTraceTable_REGISTER_STATE_OBJECT.asString())!!
+      computeInvalidationReasonSymbol = symbol.getSimpleFunction(ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON.asString())!!
+    }
+
     public fun create(context: IrPluginContext, currentFile: IrFile): IrInvalidationTraceTable =
-      IrInvalidationTraceTable(irInvalidationTraceTableProp(context, currentFile)).also { table ->
-        val symbol = table.prop.backingField!!.type.classOrFail
-        table.registerStateObject = context.referenceFunctions(CallableId.fromFqName(REGISTER_STATE_OBJECT_FQN)).single()
-        table.computeInvalidationReasonSymbol = symbol.getSimpleFunction(ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON.asString())!!
-      }
+      IrInvalidationTraceTable(irInvalidationTraceTableProp(context, currentFile)).apply { makeTable() }
+
+    public fun from(element: IrProperty): IrInvalidationTraceTable =
+      IrInvalidationTraceTable(element).apply { makeTable() }
   }
 }
 

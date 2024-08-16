@@ -10,9 +10,10 @@ package land.sungbin.composeinvestigator.compiler.lower
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.normalize
 import androidx.compose.compiler.plugins.kotlin.irTrace
-import land.sungbin.composeinvestigator.compiler.HandledMap
 import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.log
+import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
+import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTableHolder
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -31,22 +32,21 @@ import org.jetbrains.kotlin.name.SpecialNames
 internal class InvalidationProcessTracingFirstTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
+  tables: IrInvalidationTraceTableHolder,
   private val stabilityInferencer: StabilityInferencer,
-) : ComposeInvestigatorBaseLower(context, messageCollector) {
-  private val handled = HandledMap()
-
-  override fun firstTransformComposableBody(composable: IrSimpleFunction, body: IrBlockBody): IrBody {
+) : ComposeInvestigatorBaseLower(context, messageCollector, tables) {
+  override fun firstTransformComposableBody(
+    composable: IrSimpleFunction,
+    body: IrBlockBody,
+    table: IrInvalidationTraceTable,
+  ): IrBody {
     messageCollector.log(
       "Visit composable body: ${composable.name}",
       body.getCompilerMessageLocation(composable.file),
     )
 
-    val table = tableByFile(composable.file)
     val scope = Scope(composable.symbol)
-
     val currentKey = context.irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return body
-    if (!handled.handle(currentKey.keyName)) return body
-
     val newStatements = mutableListOf<IrStatement>()
 
     val currentValueArguments = scope.createTemporaryVariable(
@@ -67,10 +67,9 @@ internal class InvalidationProcessTracingFirstTransformer(
 
       val name = irString(param.name.asString())
       val type = irString(param.type.classFqName?.asString() ?: SpecialNames.ANONYMOUS_STRING)
-      val value = irGetValue(param)
-      val valueString = irToString(value)
-      val valueHashCode = irHashCode(value)
-      val stability = stabilityInferencer.stabilityOf(value).normalize().asOwnStability()
+      val valueString = irToString(irGetValue(param))
+      val valueHashCode = irHashCode(irGetValue(param))
+      val stability = stabilityInferencer.stabilityOf(irGetValue(param)).normalize().asOwnStability()
 
       val valueArgumentVariable = scope.createTemporaryVariable(
         valueArgument(
@@ -100,7 +99,7 @@ internal class InvalidationProcessTracingFirstTransformer(
         keyName = irString(currentKey.keyName),
         arguments = irGetValue(currentValueArguments),
       ),
-      nameHint = "${composable.name.asString()}\$validationReason",
+      nameHint = "invalidationReason",
     )
     newStatements += invalidationReasonVariable
 

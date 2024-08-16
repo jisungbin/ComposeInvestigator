@@ -1,3 +1,10 @@
+/*
+ * Developed by Ji Sungbin 2024.
+ *
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
+ */
+
 package land.sungbin.composeinvestigator.compiler.frontend
 
 import com.intellij.openapi.util.TextRange
@@ -18,10 +25,15 @@ class ComposableNameCallCheckerTest : AbstractCompilerTest() {
   @Test fun expressionComposableName() {
     val diagnostics = analyze(source("frontend/composableNameCall/expressionComposableName.kt"))
       .diagnostics
-
-    assertEquals(
-      mapOf("COMPOSABLE_NAME_ONLY_HARDCODED" to listOf(Diagnostic(TextRange(236, 268)))),
-      diagnostics,
+    val expect = Diagnostic(
+      message = """
+|/expressionComposableName.kt:17:18: error: currently, only string hardcodes are supported as arguments to ComposableName.
+|  ComposableName(Random.nextBoolean().toString())
+|                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      """.trimMargin(),
+      ranges = listOf(TextRange(476, 508)),
     )
+
+    assertEquals(mapOf("COMPOSABLE_NAME_ONLY_HARDCODED" to listOf(expect)), diagnostics)
   }
 }

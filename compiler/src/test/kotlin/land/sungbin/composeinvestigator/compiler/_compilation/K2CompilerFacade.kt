@@ -1,18 +1,10 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Developed by Ji Sungbin 2024.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
+
 package land.sungbin.composeinvestigator.compiler._compilation
 
 import com.intellij.openapi.project.Project
@@ -22,6 +14,7 @@ import com.intellij.psi.search.ProjectScope
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.jvm.JvmIrDeserializerImpl
 import org.jetbrains.kotlin.cli.common.fir.FirDiagnosticsCompilerResultsReporter
+import org.jetbrains.kotlin.cli.common.messages.AnalyzerWithCompilerReport
 import org.jetbrains.kotlin.cli.common.messages.MessageRenderer
 import org.jetbrains.kotlin.cli.jvm.compiler.KotlinCoreEnvironment
 import org.jetbrains.kotlin.cli.jvm.compiler.PsiBasedProjectFileSearchScope
@@ -34,6 +27,7 @@ import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporterFactory
 import org.jetbrains.kotlin.diagnostics.impl.BaseDiagnosticsCollector
+import org.jetbrains.kotlin.diagnostics.rendering.RootDiagnosticRendererFactory
 import org.jetbrains.kotlin.fir.BinaryModuleData
 import org.jetbrains.kotlin.fir.DependencyListForCliModule
 import org.jetbrains.kotlin.fir.FirModuleData
@@ -56,15 +50,29 @@ class FirAnalysisResult(
   val result: FirResult,
   val reporter: BaseDiagnosticsCollector,
 ) : AnalysisResult {
-  override val diagnostics = reporter.diagnostics.groupBy(
-    keySelector = { diagnostics -> diagnostics.factoryName },
-    valueTransform = { diagnostics ->
-      AnalysisResult.Diagnostic(
-        message = diagnostics.factory.ktRenderer.message,
-        ranges = diagnostics.textRanges,
-      )
-    },
-  )
+  private val sourceLocationMap by lazy { reporter.withCompilerMessageSourceLocation() }
+
+  override val diagnostics by lazy {
+    reporter.diagnostics.groupBy(
+      keySelector = { diagnostics -> diagnostics.factoryName },
+      valueTransform = { diagnostic ->
+        AnalysisResult.Diagnostic(
+          message = run {
+            val severity = AnalyzerWithCompilerReport.convertSeverity(diagnostic.severity)
+            val renderer = RootDiagnosticRendererFactory(diagnostic)
+            val location = sourceLocationMap[diagnostic]
+
+            MessageRenderer.PLAIN_FULL_PATHS.render(
+              severity,
+              renderer.render(diagnostic),
+              location,
+            )
+          },
+          ranges = diagnostic.textRanges,
+        )
+      },
+    )
+  }
 }
 
 class K2CompilerFacade(environment: KotlinCoreEnvironment) : KotlinCompilerFacade(environment) {

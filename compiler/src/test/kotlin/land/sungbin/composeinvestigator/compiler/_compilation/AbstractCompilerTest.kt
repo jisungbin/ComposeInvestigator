@@ -1,22 +1,13 @@
 /*
- * Copyright 2019 The Android Open Source Project
+ * Developed by Ji Sungbin 2024.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * Licensed under the MIT.
+ * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
+
 package land.sungbin.composeinvestigator.compiler._compilation
 
 import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
-import androidx.compose.runtime.Composable
 import com.intellij.openapi.extensions.LoadingOrder
 import com.intellij.openapi.util.Disposer
 import com.intellij.openapi.util.io.FileUtil
@@ -59,11 +50,21 @@ abstract class AbstractCompilerTest {
       File(path).applyExistenceCheck().absolutePath
     }
 
+    // https://github.com/JetBrains/kotlin/blob/bb25d2f8aa74406ff0af254b2388fd601525386a/plugins/compose/compiler-hosted/integration-tests/src/jvmTest/kotlin/androidx/compose/compiler/plugins/kotlin/AbstractCompilerTest.kt#L212-L228
     val defaultClassPath by lazy {
       listOf(
-        Classpath.kotlinStdlibJar(),
-        Classpath.composeRuntimeJar(),
-        Classpath.composeInvestigatorRumtimeJar(),
+        jarFor<Unit>(),
+        jarFor<kotlinx.coroutines.CoroutineScope>(),
+        jarFor<androidx.compose.runtime.Composable>(),
+        jarFor<androidx.compose.animation.EnterTransition>(),
+        jarFor<androidx.compose.ui.Modifier>(),
+        jarFor<androidx.compose.ui.graphics.ColorProducer>(),
+        jarFor<androidx.compose.ui.unit.Dp>(),
+        jarFor<androidx.compose.ui.text.input.TextFieldValue>(),
+        jarFor<androidx.compose.foundation.Indication>(),
+        jarFor<androidx.compose.foundation.text.KeyboardActions>(),
+        jarFor<androidx.compose.foundation.layout.RowScope>(),
+        jarFor<ComposeInvestigatorConfig>(),
       )
     }
   }
@@ -80,14 +81,15 @@ abstract class AbstractCompilerTest {
     Disposer.dispose(disposable)
   }
 
-  private fun createCompilerFacade(additionalPaths: List<File> = emptyList()) =
+  @Suppress("UnstableApiUsage")
+  private fun createCompilerFacade() =
     KotlinCompilerFacade.create(
       disposable = disposable,
       updateConfiguration = {
         val languageVersion = LanguageVersion.fromFullVersionString(KotlinVersion.CURRENT.toString())!!.also { version ->
           check(version.usesK2) { "Kotlin version $version is not a K2 version" }
         }
-        val analysisFlags: Map<AnalysisFlag<*>, Any> = mapOf(
+        val analysisFlags = mapOf<AnalysisFlag<*>, Any>(
           AnalysisFlags.allowUnstableDependencies to true,
           AnalysisFlags.skipPrereleaseCheck to true,
           AnalysisFlags.optIn to listOf(
@@ -102,13 +104,12 @@ abstract class AbstractCompilerTest {
           analysisFlags = analysisFlags,
         )
 
-        addJvmClasspathRoots(additionalPaths)
+        configureJdkClasspathRoots()
         addJvmClasspathRoots(defaultClassPath)
 
         if (!getBoolean(JVMConfigurationKeys.NO_JDK) && get(JVMConfigurationKeys.JDK_HOME) == null) {
           put(JVMConfigurationKeys.JDK_HOME, File(System.getProperty("java.home")!!))
         }
-        configureJdkClasspathRoots()
       },
       registerExtensions = { configuration ->
         registerExtensionsForTest(this, configuration) {
@@ -133,10 +134,4 @@ abstract class AbstractCompilerTest {
     createCompilerFacade().compile(file)
 }
 
-private object Classpath {
-  fun kotlinStdlibJar() = jarFor<Unit>()
-  fun composeRuntimeJar() = jarFor<Composable>()
-  fun composeInvestigatorRumtimeJar() = jarFor<ComposeInvestigatorConfig>()
-
-  private inline fun <reified T> jarFor() = File(PathUtil.getJarPathForClass(T::class.java))
-}
+private inline fun <reified T> jarFor() = File(PathUtil.getJarPathForClass(T::class.java))

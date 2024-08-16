@@ -2,13 +2,17 @@
 // Source
 // ------------------------------------------
 
+@file:Suppress("unused", "UnusedVariable")
+
 package land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer
 
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 
-fun directStateVariable() {
-  val state = mutableStateOf(Unit)
-  val state2 = run { mutableStateOf(Unit) }
+@Composable fun directStateVariable() {
+  val state = remember { mutableStateOf(Unit) }
+  val state2 = remember { run { mutableStateOf(Unit) } }
 }
 
 
@@ -17,13 +21,46 @@ fun directStateVariable() {
 // ------------------------------------------
 
 val ComposableInvalidationTraceTableImpl%DirectStateVariableKt: ComposableInvalidationTraceTable = ComposableInvalidationTraceTable()
-fun directStateVariable() {
-  val state = mutableStateOf(
-    value = Unit
-  )
-  val state2 = run {
-    mutableStateOf(
-      value = Unit
-    )
+@Composable
+fun directStateVariable(%composer: Composer?, %changed: Int) {
+  %composer = %composer.startRestartGroup(<>)
+  if (%changed != 0 || !%composer.skipping) {
+    if (isTraceInProgress()) {
+      traceEventStart(<>, %changed, -1, <>)
+    }
+    val tmp0_currentValueArguments = mutableListOf()
+    val tmp1_invalidationReason = ComposableInvalidationTraceTableImpl%DirectStateVariableKt.computeInvalidationReason("fun-directStateVariable()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer/file-directStateVariable.kt", tmp0_currentValueArguments)
+    ComposeInvestigatorConfig.logger.log(ComposableInformation("directStateVariable", "land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer", "directStateVariable.kt"), Processed(tmp1_invalidationReason))
+    val state = ComposableInvalidationTraceTableImpl%DirectStateVariableKt.registerStateObject(<block>{
+      %composer.startReplaceGroup(<>)
+      val tmp0_group = %composer.cache(false) {
+        mutableStateOf(
+          value = Unit
+        )
+      }
+      %composer.endReplaceGroup()
+      tmp0_group
+    }, "state")
+    val state2 = ComposableInvalidationTraceTableImpl%DirectStateVariableKt.registerStateObject(<block>{
+      %composer.startReplaceGroup(<>)
+      val tmp1_group = %composer.cache(false) {
+        run {
+          mutableStateOf(
+            value = Unit
+          )
+        }
+      }
+      %composer.endReplaceGroup()
+      tmp1_group
+    }, "state2")
+    if (isTraceInProgress()) {
+      traceEventEnd()
+    }
+  } else {
+    ComposeInvestigatorConfig.logger.log(ComposableInformation("directStateVariable", "land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer", "directStateVariable.kt"), Skipped)
+    %composer.skipToGroupEnd()
+  }
+  %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
+    directStateVariable(%composer, updateChangedFlags(%changed or 0b0001))
   }
 }

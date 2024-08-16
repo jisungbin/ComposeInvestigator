@@ -65,8 +65,7 @@ public val COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN: FqName = FqName("$ComposeInv
 public val ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_NAME: Name = identifier("currentComposableName")
 public val ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_KEY_NAME: Name = identifier("currentComposableKeyName")
 public val ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON: Name = identifier("computeInvalidationReason")
-
-public val REGISTER_STATE_OBJECT_FQN: FqName = FqName("$ComposeInvestigatorRuntime.registerStateObject")
+public val ComposableInvalidationTraceTable_REGISTER_STATE_OBJECT: Name = identifier("registerStateObject")
 // END ComposableInvalidationTraceTable
 
 // START Stability

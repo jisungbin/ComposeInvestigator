@@ -50,7 +50,7 @@ androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "
 #  https://github.com/jisungbin/ComposeInvestigator/issues/184
 compose-stableMarker = { module = "com.github.skydoves:compose-stable-marker", version.ref = "compose-stableMarker" }
 compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose-runtime" }
-compose-material = { module = "androidx.compose.material:material", version.ref = "compose-runtime" } # for sample project
+compose-material = { module = "androidx.compose.material:material", version.ref = "compose-runtime" }
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
 
 test-mockk = { module = "io.mockk:mockk", version.ref = "test-mockk" }

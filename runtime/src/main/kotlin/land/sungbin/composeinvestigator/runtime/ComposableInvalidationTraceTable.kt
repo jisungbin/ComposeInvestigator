@@ -128,6 +128,11 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
 
   /** @suppress ComposeInvestigator compiler-only API */
   @ComposeInvestigatorCompilerApi
+  public fun <T : Any> registerStateObject(value: T, name: String): T =
+    value.apply { stateObjectMap[this] = name }
+
+  /** @suppress ComposeInvestigator compiler-only API */
+  @ComposeInvestigatorCompilerApi
   public fun computeInvalidationReason(keyName: String, arguments: List<ValueArgument>): InvalidationReason {
     val previousArguments = affectedArgumentMap[keyName]
     val changed = ArrayList<ChangedArgument>(arguments.size)
@@ -154,11 +159,6 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
     }
   }
 }
-
-/** @suppress ComposeInvestigator compiler-only API */
-@ComposeInvestigatorCompilerApi
-public fun <T : Any> ComposableInvalidationTraceTable.registerStateObject(value: T, name: String): T =
-  value.apply { stateObjectMap[this] = name }
 
 @Suppress("FunctionName", "NOTHING_TO_INLINE")
 private inline fun IntrinsicImplementedError() = NotImplementedError("Implemented as an intrinsic")

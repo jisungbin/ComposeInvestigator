@@ -7,7 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler.struct
 
-import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INFORMATION_FQN
+import land.sungbin.composeinvestigator.compiler.VALUE_ARGUMENT_FQN
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -18,8 +18,7 @@ import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.name.ClassId
 
 public class IrValueArgument(context: IrPluginContext) {
-  public val symbol: IrClassSymbol =
-    context.referenceClass(ClassId.topLevel(COMPOSABLE_INFORMATION_FQN))!!
+  public val symbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(VALUE_ARGUMENT_FQN))!!
 
   public operator fun invoke(
     name: IrExpression,
