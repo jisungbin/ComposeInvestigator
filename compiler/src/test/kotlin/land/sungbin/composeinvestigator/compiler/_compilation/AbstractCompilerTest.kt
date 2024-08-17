@@ -26,13 +26,14 @@ import org.jetbrains.kotlin.compiler.plugin.registerExtensionsForTest
 import org.jetbrains.kotlin.config.AnalysisFlag
 import org.jetbrains.kotlin.config.AnalysisFlags
 import org.jetbrains.kotlin.config.ApiVersion
+import org.jetbrains.kotlin.config.IrVerificationMode
 import org.jetbrains.kotlin.config.JVMConfigurationKeys
 import org.jetbrains.kotlin.config.LanguageVersion
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
 import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.config.messageCollector
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
+import org.jetbrains.kotlin.fir.pipeline.Fir2IrActualizedResult
 import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode
 
@@ -82,8 +83,8 @@ abstract class AbstractCompilerTest {
   }
 
   @Suppress("UnstableApiUsage")
-  private fun createCompilerFacade() =
-    KotlinCompilerFacade.create(
+  private fun createK2Compiler() =
+    KotlinK2Compiler.create(
       disposable = disposable,
       updateConfiguration = {
         val languageVersion = LanguageVersion.fromFullVersionString(KotlinVersion.CURRENT.toString())!!.also { version ->
@@ -117,8 +118,8 @@ abstract class AbstractCompilerTest {
           ComposePluginRegistrar.registerCommonExtensions(this@create, null)
         }
         extensionArea.getExtensionPoint(IrGenerationExtension.extensionPointName).run {
-          registerExtension(ComposeInvestigatorFirstPhaseExtension(configuration.messageCollector), LoadingOrder.FIRST, this@create)
-          registerExtension(ComposeInvestigatorLastPhaseExtension(configuration.messageCollector), LoadingOrder.LAST, this@create)
+          registerExtension(ComposeInvestigatorFirstPhaseExtension(configuration.messageCollector, IrVerificationMode.ERROR), LoadingOrder.FIRST, this@create)
+          registerExtension(ComposeInvestigatorLastPhaseExtension(configuration.messageCollector, IrVerificationMode.ERROR), LoadingOrder.LAST, this@create)
         }
         IrGenerationExtension.registerExtension(
           this,
@@ -127,11 +128,11 @@ abstract class AbstractCompilerTest {
       },
     )
 
-  protected fun analyze(file: SourceFile): AnalysisResult =
-    createCompilerFacade().analyze(file)
+  protected fun analyze(file: SourceFile): FirAnalysisResult =
+    createK2Compiler().analyze(file)
 
-  protected fun compile(file: SourceFile): IrModuleFragment =
-    createCompilerFacade().compile(file)
+  protected fun compile(file: SourceFile): Fir2IrActualizedResult =
+    createK2Compiler().compile(file)
 }
 
 private inline fun <reified T> jarFor() = File(PathUtil.getJarPathForClass(T::class.java))
