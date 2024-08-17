@@ -18,12 +18,16 @@ import org.jetbrains.kotlin.psi.KtCallExpression
 
 // Make this public so that this can be suppressed by the outside world.
 public object ComposeInvestigatorErrors {
-  public val COMPOSABLE_NAME_ONLY_HARDCODED: KtDiagnosticFactory0
+  public val UNSUPPORTED_COMPOSABLE_NAME: KtDiagnosticFactory0
     by error0<KtCallExpression>(SourceElementPositioningStrategies.VALUE_ARGUMENTS)
+
+  public val ILLEGAL_COMPOSABLE_NAME: KtDiagnosticFactory0
+    by error0<KtCallExpression>(SourceElementPositioningStrategies.NAME_IDENTIFIER)
 
   private class DiagnosticRendererFactory : BaseDiagnosticRendererFactory() {
     override val MAP = KtDiagnosticFactoryToRendererMap("ComposeInvestigator").apply {
-      put(COMPOSABLE_NAME_ONLY_HARDCODED, ErrorMessages.COMPOSABLE_NAME_ONLY_HARDCODED)
+      put(UNSUPPORTED_COMPOSABLE_NAME, ErrorMessages.COMPOSABLE_NAME_EXPRESSION_ONLY_HARDCODED)
+      put(ILLEGAL_COMPOSABLE_NAME, ErrorMessages.COMPOSABLE_NAME_MUST_CALL_WITHIN_COMPOSABLE)
     }
   }
 

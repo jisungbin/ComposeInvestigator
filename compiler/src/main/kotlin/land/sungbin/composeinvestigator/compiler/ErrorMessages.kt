@@ -8,8 +8,11 @@
 package land.sungbin.composeinvestigator.compiler
 
 internal object ErrorMessages {
-  const val COMPOSABLE_NAME_ONLY_HARDCODED =
+  const val COMPOSABLE_NAME_EXPRESSION_ONLY_HARDCODED =
     "Currently, only string hardcodes are supported as arguments to ComposableName."
+
+  const val COMPOSABLE_NAME_MUST_CALL_WITHIN_COMPOSABLE =
+    "A ComposableName can only be used in a Composable function."
 
   const val SUPPORTS_K2_ONLY = "ComposeInvestigator plugin supports only Kotlin 2.0.0 or higher."
 }
