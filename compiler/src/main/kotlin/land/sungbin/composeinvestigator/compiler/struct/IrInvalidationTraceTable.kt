@@ -10,6 +10,7 @@ package land.sungbin.composeinvestigator.compiler.struct
 import java.lang.ref.WeakReference
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN
 import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON
+import land.sungbin.composeinvestigator.compiler.ComposableInvalidationTraceTable_REGISTER_STATE_OBJECT
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
@@ -25,6 +26,7 @@ import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
+import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrValueAccessExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
@@ -39,50 +41,74 @@ import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 
-public class IrInvalidationTraceTable private constructor(public val prop: IrProperty) {
-  private var computeInvalidationReasonSymbol: IrSimpleFunctionSymbol? = null
+public class IrInvalidationTraceTable private constructor(private val prop: IrProperty) {
+  private lateinit var registerStateObjectSymbol: IrSimpleFunctionSymbol
+  private lateinit var computeInvalidationReasonSymbol: IrSimpleFunctionSymbol
 
-  public fun irComputeInvalidationReason(
-    composableKeyName: IrConst<String>,
-    fields: IrValueAccessExpression,
+  internal val rawProp get() = prop
+
+  public fun propGetter(
+    startOffset: Int = UNDEFINED_OFFSET,
+    endOffset: Int = UNDEFINED_OFFSET,
+  ): IrCall = IrCallImpl.fromSymbolOwner(
+    startOffset = startOffset,
+    endOffset = endOffset,
+    symbol = prop.getter!!.symbol,
+  )
+
+  public fun irRegisterStateObject(
+    value: IrExpression,
+    name: IrConst<String>,
   ): IrCall = IrCallImpl.fromSymbolOwner(
     startOffset = UNDEFINED_OFFSET,
     endOffset = UNDEFINED_OFFSET,
-    symbol = computeInvalidationReasonSymbol!!,
+    symbol = registerStateObjectSymbol,
+  ).also { fn ->
+    fn.dispatchReceiver = propGetter()
+    fn.type = value.type
+  }.apply {
+    putTypeArgument(0, value.type)
+    putValueArgument(0, value)
+    putValueArgument(1, name)
+  }
+
+  public fun irComputeInvalidationReason(
+    keyName: IrConst<String>,
+    arguments: IrValueAccessExpression,
+  ): IrCall = IrCallImpl.fromSymbolOwner(
+    startOffset = UNDEFINED_OFFSET,
+    endOffset = UNDEFINED_OFFSET,
+    symbol = computeInvalidationReasonSymbol,
   ).also { fn ->
     fn.dispatchReceiver = propGetter()
   }.apply {
-    putValueArgument(0, composableKeyName)
-    putValueArgument(1, fields)
+    putValueArgument(0, keyName)
+    putValueArgument(1, arguments)
   }
 
   public companion object {
+    private fun IrInvalidationTraceTable.makeTable() {
+      val symbol = prop.backingField!!.type.classOrFail
+      registerStateObjectSymbol = symbol.getSimpleFunction(ComposableInvalidationTraceTable_REGISTER_STATE_OBJECT.asString())!!
+      computeInvalidationReasonSymbol = symbol.getSimpleFunction(ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON.asString())!!
+    }
+
     public fun create(context: IrPluginContext, currentFile: IrFile): IrInvalidationTraceTable =
-      IrInvalidationTraceTable(irInvalidationTraceTableProp(context, currentFile))
-        .also { clz ->
-          val clzOwner = clz.prop.backingField!!.type.classOrFail
-          clz.computeInvalidationReasonSymbol = clzOwner.getSimpleFunction(ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON.asString())!!
-        }
+      IrInvalidationTraceTable(irInvalidationTraceTableProp(context, currentFile)).apply { makeTable() }
+
+    public fun from(element: IrProperty): IrInvalidationTraceTable =
+      IrInvalidationTraceTable(element).apply { makeTable() }
   }
 }
 
-public fun IrInvalidationTraceTable.propGetter(
-  startOffset: Int = UNDEFINED_OFFSET,
-  endOffset: Int = UNDEFINED_OFFSET,
-): IrCall = IrCallImpl.fromSymbolOwner(
-  startOffset = startOffset,
-  endOffset = endOffset,
-  symbol = prop.getter!!.symbol,
-)
-
-private var invalidationTraceTableClassSymbol: WeakReference<IrClassSymbol>? = null
+@Volatile private var invalidationTraceTableClassSymbol: WeakReference<IrClassSymbol>? = null
 
 private fun irInvalidationTraceTableProp(context: IrPluginContext, currentFile: IrFile): IrProperty {
-  val fileName = currentFile.fileEntry.name.split('/').last()
+  val fileName = currentFile.fileEntry.name.substringAfterLast('/')
   val shortName = PackagePartClassUtils.getFilePartShortName(fileName)
   val propName = Name.identifier("ComposableInvalidationTraceTableImpl\$$shortName")
 
-  val superSymbol = invalidationTraceTableClassSymbol?.get() ?: (
+  val tableSymbol = invalidationTraceTableClassSymbol?.get() ?: (
     context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN))!!
       .also { symbol -> invalidationTraceTableClassSymbol = WeakReference(symbol) }
     )
@@ -96,7 +122,7 @@ private fun irInvalidationTraceTableProp(context: IrPluginContext, currentFile: 
       name = propName
       isStatic = true
       isFinal = true
-      type = superSymbol.defaultType
+      type = tableSymbol.defaultType
       visibility = DescriptorVisibilities.PRIVATE
     }.also { field ->
       field.parent = currentFile
@@ -105,18 +131,18 @@ private fun irInvalidationTraceTableProp(context: IrPluginContext, currentFile: 
         startOffset = SYNTHETIC_OFFSET,
         endOffset = SYNTHETIC_OFFSET,
         expression = IrConstructorCallImpl.fromSymbolOwner(
-          type = superSymbol.defaultType,
-          constructorSymbol = superSymbol.constructors.single(),
+          type = tableSymbol.defaultType,
+          constructorSymbol = tableSymbol.constructors.single(),
         ),
       )
     }
     prop.addGetter {
-      returnType = superSymbol.defaultType
+      returnType = tableSymbol.defaultType
       visibility = DescriptorVisibilities.PRIVATE
       origin = IrDeclarationOrigin.DEFAULT_PROPERTY_ACCESSOR
     }.also { getter ->
       getter.body = DeclarationIrBuilder(context, getter.symbol).irBlockBody {
-        +irReturn(irGetField(null, prop.backingField!!))
+        +irReturn(irGetField(receiver = null, field = prop.backingField!!))
       }
     }
   }

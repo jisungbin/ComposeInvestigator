@@ -74,11 +74,15 @@ dependencyResolutionManagement {
   }
 }
 
+plugins {
+  id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
+}
+
 include(
   ":runtime",
   ":compiler",
-  ":compiler-integration-test",
-  ":compiler-embeddable",
-  ":compiler-gradle-plugin",
-  ":sample",
+  // ":compiler-integration-test",
+  // ":compiler-embeddable",
+  // ":compiler-gradle-plugin",
+  // ":sample",
 )

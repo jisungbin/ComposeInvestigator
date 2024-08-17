@@ -11,5 +11,5 @@ import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 
 public data class ComposableKeyInfo(
   public val keyName: String,
-  public val affectedComposable: IrConstructorCall,
+  public val composable: IrConstructorCall,
 )

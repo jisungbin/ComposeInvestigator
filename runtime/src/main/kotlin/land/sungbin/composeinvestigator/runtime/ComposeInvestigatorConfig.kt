@@ -7,21 +7,23 @@
 
 package land.sungbin.composeinvestigator.runtime
 
-import android.util.Log
+import java.util.logging.Level
+import java.util.logging.Logger
 
 /**
- * Customize how ComposeInvestigator reports. Used globally for
- * ComposeInvestigator in the current module.
+ * Customize how ComposeInvestigator reports. Used globally for ComposeInvestigator in the
+ * current module.
  */
 public object ComposeInvestigatorConfig {
-  @Suppress("MemberVisibilityCanBePrivate")
+  private val realLogger by lazy { Logger.getLogger(LOGGER_DEFAULT_TAG).apply { level = Level.FINE } }
+
   public const val LOGGER_DEFAULT_TAG: String = "ComposeInvestigator"
 
   /**
-   * This logger is called whenever an recomposition is processed.
-   * This field is variable, so you can easily change this.
+   * This logger is called whenever an recomposition is processed. This field is variable,
+   * so you can easily change this.
    */
-  public var invalidationLogger: ComposableInvalidationLogger = ComposableInvalidationLogger { composable, type ->
-    Log.d(LOGGER_DEFAULT_TAG, "The '${composable.name}' composable has been recomposed.\n$type")
+  public var logger: ComposableInvalidationLogger = ComposableInvalidationLogger { composable, type ->
+    realLogger.log(Level.FINE, "The '{}' composable has been recomposed.\n$type", composable.name)
   }
 }
