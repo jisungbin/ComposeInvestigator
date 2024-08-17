@@ -67,6 +67,7 @@ public class IrInvalidationTraceTable private constructor(private val prop: IrPr
     fn.dispatchReceiver = propGetter()
     fn.type = value.type
   }.apply {
+    putTypeArgument(0, value.type)
     putValueArgument(0, value)
     putValueArgument(1, name)
   }

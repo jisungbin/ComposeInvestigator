@@ -17,13 +17,16 @@ import org.jetbrains.kotlin.config.IrVerificationMode
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
-public class ComposeInvestigatorLastPhaseExtension(private val messageCollector: MessageCollector) : IrGenerationExtension {
+public class ComposeInvestigatorLastPhaseExtension(
+  private val messageCollector: MessageCollector,
+  private val verificationMode: IrVerificationMode,
+) : IrGenerationExtension {
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
     val tables = InvalidationTraceTableInstanceTransformer(pluginContext, messageCollector)
 
     // Input check. This should always pass, else something is horribly wrong upstream.
     // Necessary because oftentimes the issue is upstream. (compiler bug, prior plugin, etc)
-    validateIr(messageCollector, IrVerificationMode.ERROR) {
+    validateIr(messageCollector, verificationMode) {
       performBasicIrValidation(
         moduleFragment,
         pluginContext.irBuiltIns,
@@ -37,7 +40,7 @@ public class ComposeInvestigatorLastPhaseExtension(private val messageCollector:
     moduleFragment.transformChildrenVoid(InvalidationSkipTracingLastTransformer(pluginContext, messageCollector, tables))
 
     // Verify that our transformations didn't break something
-    validateIr(messageCollector, IrVerificationMode.ERROR) {
+    validateIr(messageCollector, verificationMode) {
       performBasicIrValidation(
         moduleFragment,
         pluginContext.irBuiltIns,

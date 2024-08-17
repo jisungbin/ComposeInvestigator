@@ -15,7 +15,9 @@ import land.sungbin.composeinvestigator.compiler.frontend.ComposeInvestigatorFir
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.cli.jvm.compiler.CompileEnvironmentException
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
+import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
+import org.jetbrains.kotlin.config.IrVerificationMode
 import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.config.messageCollector
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
@@ -37,13 +39,14 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
     }
 
     configuration.messageCollector = messageCollector
+    val verificationMode = configuration.get(CommonConfigurationKeys.VERIFY_IR, IrVerificationMode.ERROR)
 
     FirExtensionRegistrarAdapter.registerExtension(project, ComposeInvestigatorFirExtensionRegistrar())
     project.extensionArea
       .getExtensionPoint(IrGenerationExtension.extensionPointName)
       .run {
-        registerExtension(ComposeInvestigatorFirstPhaseExtension(messageCollector), LoadingOrder.FIRST, project)
-        registerExtension(ComposeInvestigatorLastPhaseExtension(messageCollector), LoadingOrder.LAST, project)
+        registerExtension(ComposeInvestigatorFirstPhaseExtension(messageCollector, verificationMode), LoadingOrder.FIRST, project)
+        registerExtension(ComposeInvestigatorLastPhaseExtension(messageCollector, verificationMode), LoadingOrder.LAST, project)
       }
   }
 }

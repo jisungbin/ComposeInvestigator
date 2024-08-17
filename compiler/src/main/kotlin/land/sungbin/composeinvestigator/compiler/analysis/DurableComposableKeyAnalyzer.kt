@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler.lower
+package land.sungbin.composeinvestigator.compiler.analysis
 
 import androidx.compose.compiler.plugins.kotlin.EmptyModuleMetrics
 import androidx.compose.compiler.plugins.kotlin.FeatureFlags
@@ -15,10 +15,9 @@ import androidx.compose.compiler.plugins.kotlin.lower.ComposableSymbolRemapper
 import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyVisitor
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorCommandLineProcessor.Companion.PLUGIN_ID
-import land.sungbin.composeinvestigator.compiler.analysis.ComposableKeyInfo
-import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
-import land.sungbin.composeinvestigator.compiler.analysis.set
 import land.sungbin.composeinvestigator.compiler.error
+import land.sungbin.composeinvestigator.compiler.lower.irString
+import land.sungbin.composeinvestigator.compiler.lower.unsafeLazy
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
@@ -30,7 +29,7 @@ import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.name.FqName
 
-public class DurableComposableKeyTransformer(
+public class DurableComposableKeyAnalyzer(
   context: IrPluginContext,
   stabilityInferencer: StabilityInferencer,
   featureFlags: FeatureFlags = FeatureFlags(), // TODO supports this feature
