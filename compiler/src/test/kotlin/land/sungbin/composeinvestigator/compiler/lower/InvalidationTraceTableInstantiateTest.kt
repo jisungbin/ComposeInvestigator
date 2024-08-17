@@ -7,19 +7,10 @@
 
 package land.sungbin.composeinvestigator.compiler.lower
 
-import kotlin.test.Test
 import land.sungbin.composeinvestigator.compiler.FeatureFlag
 import land.sungbin.composeinvestigator.compiler._extension.AbstractGoldenTest
-import land.sungbin.composeinvestigator.compiler._source.source
+import land.sungbin.composeinvestigator.compiler._extension.GoldenVerification
 import org.jetbrains.kotlin.utils.addToStdlib.enumSetOf
 
-class InvalidationTraceTableInstantiateTest : AbstractGoldenTest(enumSetOf(FeatureFlag.StateInitializerTracking)) {
-  @Test fun normalFile() =
-    verifyIrGolden(source("lower/invalidationTraceTableInstantiate/normalFile.kt"))
-
-  @Test fun file_name_with_dash() =
-    verifyIrGolden(source("lower/invalidationTraceTableInstantiate/file-name-with-dash.kt"))
-
-  @Test fun file_name_with_whitespace() =
-    verifyIrGolden(source("lower/invalidationTraceTableInstantiate/file name with whitespace.kt"))
-}
+@GoldenVerification("lower", "invalidationTraceTableInstantiate")
+class InvalidationTraceTableInstantiateTest : AbstractGoldenTest(enumSetOf(FeatureFlag.StateInitializerTracking))

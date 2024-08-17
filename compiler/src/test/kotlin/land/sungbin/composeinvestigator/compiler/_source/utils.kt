@@ -13,5 +13,10 @@ import land.sungbin.composeinvestigator.compiler._compilation.SourceFile
 fun source(filename: String): SourceFile =
   SourceFile(name = filename, source = sourceString(filename))
 
+fun sourcePath(filename: String): String =
+  "src/test/kotlin/land/sungbin/composeinvestigator/compiler/_source/$filename"
+
 fun sourceString(filename: String): String =
-  File("src/test/kotlin/land/sungbin/composeinvestigator/compiler/_source/$filename").readText()
+  File(sourcePath(filename)).readText()
+
+fun File.toSourceFile() = SourceFile(name, source = readText())

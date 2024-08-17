@@ -12,5 +12,5 @@ import land.sungbin.composeinvestigator.compiler._extension.AbstractGoldenTest
 import land.sungbin.composeinvestigator.compiler._extension.GoldenVerification
 import org.jetbrains.kotlin.utils.addToStdlib.enumSetOf
 
-@GoldenVerification("lower", "stateInitializer")
-class StateInitializerTransformTest : AbstractGoldenTest(enumSetOf(FeatureFlag.StateInitializerTracking))
+@GoldenVerification("lower", "invalidationTraceTableCall")
+class InvalidationTraceTableCallTest : AbstractGoldenTest(enumSetOf(FeatureFlag.InvalidationTraceTableIntrinsicCall))

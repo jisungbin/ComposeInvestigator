@@ -1,0 +1,111 @@
+//
+// IR
+// ------------------------------------------
+
+FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip fileName:noGroupComposable.kt
+  annotations:
+    Suppress(names = ["unused"])
+  PROPERTY name:ComposableInvalidationTraceTableImpl$NoGroupComposableKt visibility:private modality:FINAL [val]
+    FIELD name:ComposableInvalidationTraceTableImpl$NoGroupComposableKt type:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable visibility:private [final,static]
+      EXPRESSION_BODY
+        CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-ComposableInvalidationTraceTableImpl$NoGroupComposableKt> visibility:private modality:FINAL <> () returnType:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable
+      correspondingProperty: PROPERTY name:ComposableInvalidationTraceTableImpl$NoGroupComposableKt visibility:private modality:FINAL [val]
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='private final fun <get-ComposableInvalidationTraceTableImpl$NoGroupComposableKt> (): land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip'
+          GET_FIELD 'FIELD name:ComposableInvalidationTraceTableImpl$NoGroupComposableKt type:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable visibility:private [final,static] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+  FUN name:use visibility:private modality:FINAL <> (any:kotlin.Any) returnType:kotlin.Int
+    VALUE_PARAMETER name:any index:0 type:kotlin.Any
+    BLOCK_BODY
+      RETURN type=kotlin.Nothing from='private final fun use (any: kotlin.Any): kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip'
+        CALL 'public open fun hashCode (): kotlin.Int declared in kotlin.Any' type=kotlin.Int origin=null
+          $this: GET_VAR 'any: kotlin.Any declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.use' type=kotlin.Any origin=null
+  FUN name:blockComposable visibility:private modality:FINAL <> (any:kotlin.Any, any2:kotlin.Any, $composer:androidx.compose.runtime.Composer?, $changed:kotlin.Int) returnType:kotlin.Unit
+    annotations:
+      Composable
+      ExplicitGroupsComposable
+    VALUE_PARAMETER name:any index:0 type:kotlin.Any
+    VALUE_PARAMETER name:any2 index:1 type:kotlin.Any
+    VALUE_PARAMETER name:$composer index:2 type:androidx.compose.runtime.Composer? [assignable]
+    VALUE_PARAMETER name:$changed index:3 type:kotlin.Int
+    BLOCK_BODY
+      WHEN type=kotlin.Unit origin=IF
+        BRANCH
+          if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime' type=kotlin.Boolean origin=null
+          then: CALL 'public final fun traceEventStart (key: kotlin.Int, dirty1: kotlin.Int, dirty2: kotlin.Int, info: kotlin.String): kotlin.Unit declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+            key: CONST Int type=kotlin.Int value=1786370270
+            dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.blockComposable' type=kotlin.Int origin=null
+            dirty2: CONST Int type=kotlin.Int value=-1
+            info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.blockComposable (noGroupComposable.kt:10)"
+      TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
+        CALL 'private final fun use (any: kotlin.Any): kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip' type=kotlin.Int origin=null
+          any: GET_VAR 'any: kotlin.Any declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.blockComposable' type=kotlin.Any origin=null
+      TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
+        CALL 'private final fun use (any: kotlin.Any): kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip' type=kotlin.Int origin=null
+          any: GET_VAR 'any2: kotlin.Any declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.blockComposable' type=kotlin.Any origin=null
+      WHEN type=kotlin.Unit origin=IF
+        BRANCH
+          if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime' type=kotlin.Boolean origin=null
+          then: CALL 'public final fun traceEventEnd (): kotlin.Unit declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+  FUN name:expressionComposable visibility:private modality:FINAL <> (any:kotlin.Any, any2:kotlin.Any, $composer:androidx.compose.runtime.Composer?, $changed:kotlin.Int) returnType:kotlin.Int
+    annotations:
+      Composable
+      ExplicitGroupsComposable
+    VALUE_PARAMETER name:any index:0 type:kotlin.Any
+    VALUE_PARAMETER name:any2 index:1 type:kotlin.Any
+    VALUE_PARAMETER name:$composer index:2 type:androidx.compose.runtime.Composer? [assignable]
+    VALUE_PARAMETER name:$changed index:3 type:kotlin.Int
+    BLOCK_BODY
+      WHEN type=kotlin.Unit origin=IF
+        BRANCH
+          if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime' type=kotlin.Boolean origin=null
+          then: CALL 'public final fun traceEventStart (key: kotlin.Int, dirty1: kotlin.Int, dirty2: kotlin.Int, info: kotlin.String): kotlin.Unit declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+            key: CONST Int type=kotlin.Int value=1487486878
+            dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.expressionComposable' type=kotlin.Int origin=null
+            dirty2: CONST Int type=kotlin.Int value=-1
+            info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.expressionComposable (noGroupComposable.kt:17)"
+      VAR IR_TEMPORARY_VARIABLE name:tmp0 type:kotlin.Int [val]
+        CALL 'public final fun plus (other: kotlin.Int): kotlin.Int [operator] declared in kotlin.Int' type=kotlin.Int origin=PLUS
+          $this: CALL 'private final fun use (any: kotlin.Any): kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip' type=kotlin.Int origin=null
+            any: GET_VAR 'any: kotlin.Any declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.expressionComposable' type=kotlin.Any origin=null
+          other: CALL 'private final fun use (any: kotlin.Any): kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip' type=kotlin.Int origin=null
+            any: GET_VAR 'any2: kotlin.Any declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.expressionComposable' type=kotlin.Any origin=null
+      WHEN type=kotlin.Unit origin=IF
+        BRANCH
+          if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime' type=kotlin.Boolean origin=null
+          then: CALL 'public final fun traceEventEnd (): kotlin.Unit declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+      RETURN type=kotlin.Int from='private final fun expressionComposable (any: kotlin.Any, any2: kotlin.Any, $composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int): kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip'
+        GET_VAR 'val tmp0: kotlin.Int [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.expressionComposable' type=kotlin.Int origin=null
+
+//
+// SOURCE
+// ------------------------------------------
+
+val ComposableInvalidationTraceTableImpl%NoGroupComposableKt: ComposableInvalidationTraceTable = ComposableInvalidationTraceTable()
+private fun use(any: Any): Int {
+  return any.hashCode()
+}
+@Composable
+@ExplicitGroupsComposable
+private fun blockComposable(any: Any, any2: Any, %composer: Composer?, %changed: Int) {
+  if (isTraceInProgress()) {
+    traceEventStart(<>, %changed, -1, <>)
+  }
+  use(any)
+  use(any2)
+  if (isTraceInProgress()) {
+    traceEventEnd()
+  }
+}
+@Composable
+@ExplicitGroupsComposable
+private fun expressionComposable(any: Any, any2: Any, %composer: Composer?, %changed: Int): Int {
+  if (isTraceInProgress()) {
+    traceEventStart(<>, %changed, -1, <>)
+  }
+  val tmp0 = use(any) + use(any2)
+  if (isTraceInProgress()) {
+    traceEventEnd()
+  }
+  return tmp0
+}
