@@ -8,10 +8,10 @@
 package land.sungbin.composeinvestigator.compiler.lower
 
 import kotlin.test.Test
-import land.sungbin.composeinvestigator.compiler._compilation.AbstractIrGoldenTest
+import land.sungbin.composeinvestigator.compiler._extension.AbstractGoldenTest
 import land.sungbin.composeinvestigator.compiler._source.source
 
-class StateInitializerTransformTest : AbstractIrGoldenTest() {
+class StateInitializerTransformTest : AbstractGoldenTest() {
   @Test fun directStateVariable() =
     verifyIrGolden(source("lower/stateInitializer/directStateVariable.kt"))
 

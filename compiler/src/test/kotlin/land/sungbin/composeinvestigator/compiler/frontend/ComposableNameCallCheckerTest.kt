@@ -11,7 +11,7 @@ import com.intellij.openapi.util.TextRange
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
-import land.sungbin.composeinvestigator.compiler._compilation.AnalysisResult.Diagnostic
+import land.sungbin.composeinvestigator.compiler._compilation.DiagnosticsResult.Diagnostic
 import land.sungbin.composeinvestigator.compiler._source.source
 
 class ComposableNameCallCheckerTest : AbstractCompilerTest() {

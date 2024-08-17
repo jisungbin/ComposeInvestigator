@@ -5,29 +5,33 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-package land.sungbin.composeinvestigator.compiler._compilation
+package land.sungbin.composeinvestigator.compiler._extension
 
 import androidx.compose.compiler.plugins.kotlin.lower.dumpSrc
 import kotlin.test.BeforeTest
-import land.sungbin.composeinvestigator.compiler._extension.GoldenTestExtension
-import land.sungbin.composeinvestigator.compiler._extension.VerifyGolden
+import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
+import land.sungbin.composeinvestigator.compiler._compilation.SourceFile
+import land.sungbin.composeinvestigator.compiler._extension.GoldenTestExtension.Companion.DEFAULT_GOLDEN_DIRECTORY
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(GoldenTestExtension::class)
-abstract class AbstractIrGoldenTest : AbstractCompilerTest() {
-  private lateinit var verifyGolden: VerifyGolden
+abstract class AbstractGoldenTest : AbstractCompilerTest() {
+  private lateinit var verifyGoldenImpl: VerifyGolden
 
   @BeforeTest fun prepare(verifyGolden: VerifyGolden) {
-    this.verifyGolden = verifyGolden
+    this.verifyGoldenImpl = verifyGolden
   }
 
-  fun verifyIrGolden(file: SourceFile) {
-    verifyGolden(file.source, transform(file).trimIndent())
+  fun verifyGolden(source: String, expect: String, directory: String = DEFAULT_GOLDEN_DIRECTORY) =
+    verifyGoldenImpl(source, expect, directory)
+
+  fun verifyIrGolden(file: SourceFile, directory: String = DEFAULT_GOLDEN_DIRECTORY) {
+    verifyGoldenImpl(file.source, transform(file).trimIndent(), directory)
   }
 
   @Suppress("RegExpSimplifiable")
   private fun transform(file: SourceFile): String {
-    val irModule = compile(file)
+    val irModule = compile(file).irModuleFragment
     val keySet = mutableListOf<Int>()
     val actualTransformed = irModule
       .files.first()
