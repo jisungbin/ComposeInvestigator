@@ -22,8 +22,6 @@ import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
 import land.sungbin.composeinvestigator.compiler.struct.get
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
@@ -50,7 +48,7 @@ public class InvalidationTraceTableIntrinsicTransformer(
   private val composableNameSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_NAME_FQN))!!.owner
 
   private val currentTableGetterSymbol =
-    context.referenceProperties(CallableId.fromFqName(CURRENT_COMPOSABLE_INVALIDATION_TRACER_FQN)).single().owner.getter!!
+    context.referenceProperties(CallableId.fromFqName(CURRENT_COMPOSABLE_INVALIDATION_TRACER_FQN)).first().owner.getter!!
 
   private val currentComposableNameGetterSymbol =
     tableSymbol.getPropertyGetter(ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_NAME.asString())!!.owner
@@ -61,44 +59,49 @@ public class InvalidationTraceTableIntrinsicTransformer(
   private val currentComposableKeyNameGetterSymbol =
     tableSymbol.getPropertyGetter(ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_KEY_NAME.asString())!!.owner
 
-  override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
-    declaration.body?.transformChildrenVoid()
-    return super.visitSimpleFunction(declaration)
-  }
-
   override fun visitCall(expression: IrCall): IrExpression {
     val table = tables[currentFile]
     return when (expression.symbol.owner.kotlinFqName) {
-      currentTableGetterSymbol.kotlinFqName -> table.propGetter(startOffset = expression.startOffset, endOffset = expression.endOffset)
+      currentTableGetterSymbol.kotlinFqName -> {
+        table.propGetter(
+          startOffset = expression.startOffset,
+          endOffset = expression.endOffset,
+        )
+      }
       currentComposableNameGetterSymbol.kotlinFqName -> {
         IrConstructorCallImpl.fromSymbolOwner(
           startOffset = expression.startOffset,
           endOffset = expression.endOffset,
           type = composableNameSymbol.defaultType,
-          constructorSymbol = composableNameSymbol.symbol.constructors.single(),
+          constructorSymbol = composableNameSymbol.symbol.constructors.first(),
         ).apply {
           putValueArgument(
             0,
             allScopes.lastComposable()
               ?.let { composable ->
-                IrComposableInformation.getName(context.irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable]!!.composable)
+                IrComposableInformation.getName(
+                  context
+                    .irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable]!!
+                    .composable,
+                )
               }
-              ?: context.irString(SpecialNames.UNKNOWN_STRING),
+              ?: context.irString(SpecialNames.UNKNOWN_STRING), // TODO return 'null'
           )
         }
       }
       currentComposableNameSetterSymbol.kotlinFqName -> {
         allScopes.lastComposable()?.let { composable ->
-          val userProvideName = expression
+          val newName = expression
             .getValueArgument(0).cast<IrConstructorCall>()
             .getValueArgument(0).cast<IrConst<String>>().value
 
           val originalKey = context.irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable]!!
-          val newComposable = irComposableInformation.copyFrom(originalKey.composable, name = context.irString(userProvideName))
+          val newComposable = irComposableInformation.copyFrom(originalKey.composable, name = context.irString(newName))
 
           context.irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable] = originalKey.copy(composable = newComposable)
         }
 
+        // TODO log warning if current composable is null
         IrGetObjectValueImpl(
           startOffset = expression.startOffset,
           endOffset = expression.endOffset,
@@ -113,7 +116,14 @@ public class InvalidationTraceTableIntrinsicTransformer(
             startOffset = expression.startOffset,
             endOffset = expression.endOffset,
           )
-        } ?: context.irString(SpecialNames.UNKNOWN_STRING, startOffset = expression.startOffset, endOffset = expression.endOffset)
+        } ?: run {
+          // TODO return 'null'
+          context.irString(
+            SpecialNames.UNKNOWN_STRING,
+            startOffset = expression.startOffset,
+            endOffset = expression.endOffset,
+          )
+        }
       }
       else -> super.visitCall(expression)
     }

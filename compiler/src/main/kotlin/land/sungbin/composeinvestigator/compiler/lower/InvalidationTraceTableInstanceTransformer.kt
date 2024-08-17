@@ -53,7 +53,7 @@ public class InvalidationTraceTableInstanceTransformer(
       }
 
       tables[declaration] = table
-      messageCollector.log("Created InvalidationTraceTable for ${declaration.name}")
+      messageCollector.log("Instantiated InvalidationTraceTable for ${declaration.name}")
 
       super.visitFile(declaration)
     }
