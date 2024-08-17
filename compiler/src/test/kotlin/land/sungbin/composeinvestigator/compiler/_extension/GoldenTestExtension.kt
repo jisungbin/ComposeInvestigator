@@ -30,7 +30,8 @@ class GoldenTestExtension : BeforeEachCallback, ParameterResolver {
   private lateinit var goldenName: String
 
   override fun beforeEach(context: ExtensionContext) {
-    goldenName = "${context.requiredTestClass.name}/${context.requiredTestMethod.name}.txt"
+    val fqn = context.requiredTestClass.canonicalName.removePrefix("land.sungbin.composeinvestigator.compiler.")
+    goldenName = "${fqn.replace(".", "/")}/${context.requiredTestMethod.name}.txt"
   }
 
   override fun supportsParameter(parameterContext: ParameterContext, extensionContext: ExtensionContext): Boolean =
