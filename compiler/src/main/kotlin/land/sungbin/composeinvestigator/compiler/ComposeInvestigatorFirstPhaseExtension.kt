@@ -8,6 +8,7 @@
 package land.sungbin.composeinvestigator.compiler
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
+import java.util.EnumSet
 import land.sungbin.composeinvestigator.compiler.analysis.DurableComposableKeyAnalyzer
 import land.sungbin.composeinvestigator.compiler.lower.InvalidationProcessTracingFirstTransformer
 import land.sungbin.composeinvestigator.compiler.lower.InvalidationTraceTableInstanceTransformer
@@ -25,6 +26,7 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 public class ComposeInvestigatorFirstPhaseExtension(
   private val messageCollector: MessageCollector,
   private val verificationMode: IrVerificationMode,
+  private val features: EnumSet<FeatureFlag> = EnumSet.allOf(FeatureFlag::class.java),
 ) : IrGenerationExtension {
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
     val stabilityInferencer = StabilityInferencer(
@@ -32,6 +34,10 @@ public class ComposeInvestigatorFirstPhaseExtension(
       externalStableTypeMatchers = emptySet(), // TODO supports this feature
     )
     val tables = InvalidationTraceTableInstanceTransformer(pluginContext, messageCollector)
+
+    messageCollector.log("[ComposeInvestigator] enabled first-phase features: ${features.filter { it.phase == 0 }.joinToString()}")
+
+    if (features.count { it.phase == 0 } == 0) return
 
     // Input check. This should always pass, else something is horribly wrong upstream.
     // Necessary because oftentimes the issue is upstream. (compiler bug, prior plugin, etc)
@@ -41,15 +47,21 @@ public class ComposeInvestigatorFirstPhaseExtension(
         pluginContext.irBuiltIns,
         phaseName = "Before ComposeInvestigator First Phase",
         checkProperties = true,
-        checkTypes = false, // TODO re-enable checking types (KT-68663)
+        checkTypes = false, // TODO KT-68663
       )
     }
 
     moduleFragment.transformChildrenVoid(DurableComposableKeyAnalyzer(pluginContext, stabilityInferencer))
     moduleFragment.transformChildrenVoid(tables)
-    moduleFragment.transformChildrenVoid(InvalidationProcessTracingFirstTransformer(pluginContext, messageCollector, tables, stabilityInferencer))
-    moduleFragment.transformChildrenVoid(StateInitializerFirstTransformer(pluginContext, messageCollector, tables))
-    moduleFragment.transformChildrenVoid(InvalidationTraceTableIntrinsicTransformer(pluginContext, IrComposableInformation(pluginContext), tables))
+
+    if (FeatureFlag.InvalidationPrcessTracing in features)
+      moduleFragment.transformChildrenVoid(InvalidationProcessTracingFirstTransformer(pluginContext, messageCollector, tables, stabilityInferencer))
+
+    if (FeatureFlag.StateInitializerTracking in features)
+      moduleFragment.transformChildrenVoid(StateInitializerFirstTransformer(pluginContext, messageCollector, tables))
+
+    if (FeatureFlag.InvalidationTraceTableIntrinsicCall in features)
+      moduleFragment.transformChildrenVoid(InvalidationTraceTableIntrinsicTransformer(pluginContext, IrComposableInformation(pluginContext), tables))
 
     // Verify that our transformations didn't break something
     validateIr(messageCollector, verificationMode) {
