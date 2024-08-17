@@ -54,7 +54,7 @@ public class ComposeInvestigatorFirstPhaseExtension(
     moduleFragment.transformChildrenVoid(DurableComposableKeyAnalyzer(pluginContext, stabilityInferencer))
     moduleFragment.transformChildrenVoid(tables)
 
-    if (FeatureFlag.InvalidationPrcessTracing in features)
+    if (FeatureFlag.InvalidationProcessTracing in features)
       moduleFragment.transformChildrenVoid(InvalidationProcessTracingFirstTransformer(pluginContext, messageCollector, tables, stabilityInferencer))
 
     if (FeatureFlag.StateInitializerTracking in features)
@@ -63,14 +63,14 @@ public class ComposeInvestigatorFirstPhaseExtension(
     if (FeatureFlag.InvalidationTraceTableIntrinsicCall in features)
       moduleFragment.transformChildrenVoid(InvalidationTraceTableIntrinsicTransformer(pluginContext, IrComposableInformation(pluginContext), tables))
 
-    // Verify that our transformations didn't break something
+    // Verify that our transformations didn't break something.
     validateIr(messageCollector, verificationMode) {
       performBasicIrValidation(
         moduleFragment,
         pluginContext.irBuiltIns,
         phaseName = "After ComposeInvestigator First Phase",
         checkProperties = true,
-        checkTypes = true,
+        checkTypes = false, // TODO KT-68663
       )
     }
   }

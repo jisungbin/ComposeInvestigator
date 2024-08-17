@@ -19,7 +19,7 @@ import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.utils.addToStdlib.enumSetOf
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
-class DurableComposableKeyAnalyzerTest : AbstractCompilerTest(enumSetOf(FeatureFlag.InvalidationPrcessTracing)) {
+class DurableComposableKeyAnalyzerTest : AbstractCompilerTest(enumSetOf(FeatureFlag.InvalidationProcessTracing)) {
   @Test fun generates_a_unique_key_for_the_same_function_name() {
     val result = compile(source("analysis/durableComposableKey/sameFunctionNames.kt"))
     val trace = result.pluginContext.irTrace

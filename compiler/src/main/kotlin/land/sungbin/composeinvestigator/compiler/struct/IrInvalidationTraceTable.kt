@@ -104,7 +104,7 @@ public class IrInvalidationTraceTable private constructor(private val prop: IrPr
 @Volatile private var invalidationTraceTableClassSymbol: WeakReference<IrClassSymbol>? = null
 
 private fun irInvalidationTraceTableProp(context: IrPluginContext, currentFile: IrFile): IrProperty {
-  val fileName = currentFile.fileEntry.name.split('/').last()
+  val fileName = currentFile.fileEntry.name.substringAfterLast('/')
   val shortName = PackagePartClassUtils.getFilePartShortName(fileName)
   val propName = Name.identifier("ComposableInvalidationTraceTableImpl\$$shortName")
 

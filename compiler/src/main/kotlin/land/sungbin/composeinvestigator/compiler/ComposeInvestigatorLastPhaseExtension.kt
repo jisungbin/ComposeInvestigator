@@ -47,7 +47,7 @@ public class ComposeInvestigatorLastPhaseExtension(
     if (FeatureFlag.InvalidationSkipTracing in features)
       moduleFragment.transformChildrenVoid(InvalidationSkipTracingLastTransformer(pluginContext, messageCollector, tables))
 
-    // Verify that our transformations didn't break something
+    // Verify that our transformations didn't break something.
     validateIr(messageCollector, verificationMode) {
       performBasicIrValidation(
         moduleFragment,

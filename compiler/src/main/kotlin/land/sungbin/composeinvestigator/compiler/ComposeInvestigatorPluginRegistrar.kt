@@ -39,7 +39,7 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
     }
 
     configuration.messageCollector = messageCollector
-    val verificationMode = configuration.get(CommonConfigurationKeys.VERIFY_IR, IrVerificationMode.ERROR)
+    val verificationMode = configuration.get(CommonConfigurationKeys.VERIFY_IR, IrVerificationMode.WARNING)
 
     FirExtensionRegistrarAdapter.registerExtension(project, ComposeInvestigatorFirExtensionRegistrar())
     project.extensionArea

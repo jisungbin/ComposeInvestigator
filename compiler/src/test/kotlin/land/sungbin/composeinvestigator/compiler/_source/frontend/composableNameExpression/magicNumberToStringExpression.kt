@@ -12,6 +12,6 @@ package land.sungbin.composeinvestigator.compiler._source.frontend.composableNam
 import androidx.compose.runtime.Composable
 import land.sungbin.composeinvestigator.runtime.ComposableName
 
-@Composable fun magicNumberToStringExpression() {
+@Composable private fun magicNumberToStringExpression() {
   ComposableName(42.toString())
 }

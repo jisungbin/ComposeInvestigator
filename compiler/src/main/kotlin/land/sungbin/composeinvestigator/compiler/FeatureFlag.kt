@@ -9,7 +9,7 @@ package land.sungbin.composeinvestigator.compiler
 
 /** @param phase 0: [ComposeInvestigatorFirstPhaseExtension], 1: [ComposeInvestigatorLastPhaseExtension] */
 public enum class FeatureFlag(@Suppress("RedundantVisibilityModifier") public val phase: Int) {
-  InvalidationPrcessTracing(0),
+  InvalidationProcessTracing(0),
   InvalidationSkipTracing(1),
   InvalidationTraceTableIntrinsicCall(0),
   StateInitializerTracking(0),

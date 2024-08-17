@@ -12,6 +12,6 @@ package land.sungbin.composeinvestigator.compiler._source.frontend.composableNam
 import androidx.compose.runtime.Composable
 import land.sungbin.composeinvestigator.runtime.ComposableName
 
-@Composable fun stringHardcodeExpression() {
+@Composable private fun stringHardcodeExpression() {
   ComposableName("MyComposable")
 }
