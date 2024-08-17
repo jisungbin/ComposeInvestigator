@@ -35,7 +35,10 @@ public class ComposeInvestigatorFirstPhaseExtension(
     )
     val tables = InvalidationTraceTableInstanceTransformer(pluginContext, messageCollector)
 
-    messageCollector.log("[ComposeInvestigator] enabled first-phase features: ${features.filter { it.phase == 0 }.joinToString()}")
+    messageCollector.log("Enabled first-phase features: ${features.filter { it.phase == 0 }.joinToString()}")
+
+    moduleFragment.transformChildrenVoid(DurableComposableKeyAnalyzer(pluginContext, stabilityInferencer))
+    moduleFragment.transformChildrenVoid(tables)
 
     if (features.count { it.phase == 0 } == 0) return
 
@@ -50,9 +53,6 @@ public class ComposeInvestigatorFirstPhaseExtension(
         checkTypes = false, // TODO KT-68663
       )
     }
-
-    moduleFragment.transformChildrenVoid(DurableComposableKeyAnalyzer(pluginContext, stabilityInferencer))
-    moduleFragment.transformChildrenVoid(tables)
 
     if (FeatureFlag.InvalidationProcessTracing in features)
       moduleFragment.transformChildrenVoid(InvalidationProcessTracingFirstTransformer(pluginContext, messageCollector, tables, stabilityInferencer))

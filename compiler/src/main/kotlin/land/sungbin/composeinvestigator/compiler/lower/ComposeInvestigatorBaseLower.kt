@@ -39,13 +39,13 @@ import org.jetbrains.kotlin.ir.declarations.IrLocalDelegatedProperty
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrValueDeclaration
 import org.jetbrains.kotlin.ir.declarations.IrVariable
-import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
+import org.jetbrains.kotlin.ir.expressions.IrSyntheticBody
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
@@ -71,7 +71,6 @@ import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
-import org.jetbrains.kotlin.utils.addToStdlib.cast
 
 public open class ComposeInvestigatorBaseLower(
   protected val context: IrPluginContext,
@@ -131,7 +130,11 @@ public open class ComposeInvestigatorBaseLower(
   //   $composer.skipToGroupEnd()
   // }
   final override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
-    if (declaration.hasAnnotation(NO_INVESTIGATION_FQN) || declaration.body == null)
+    if (
+      declaration.hasAnnotation(NO_INVESTIGATION_FQN) ||
+      declaration.body == null ||
+      declaration.body is IrSyntheticBody
+    )
       return declaration
 
     // Since some of the elements inside the function may be composable, we continue inspection.
@@ -139,7 +142,7 @@ public open class ComposeInvestigatorBaseLower(
 
     declaration.body = firstTransformComposableBody(
       composable = declaration,
-      body = declaration.body.cast(),
+      body = declaration.body!!,
       table = tables[declaration.file],
     )
 
@@ -190,7 +193,7 @@ public open class ComposeInvestigatorBaseLower(
   // (MUST) LoadingOrder.FIRST
   protected open fun firstTransformComposableBody(
     composable: IrSimpleFunction,
-    body: IrBlockBody,
+    body: IrBody,
     table: IrInvalidationTraceTable,
   ): IrBody = body
 
