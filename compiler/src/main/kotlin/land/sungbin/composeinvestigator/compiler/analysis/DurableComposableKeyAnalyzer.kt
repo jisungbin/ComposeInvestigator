@@ -29,6 +29,7 @@ import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.name.FqName
 
+// TODO complete our own implementation using FIR.
 public class DurableComposableKeyAnalyzer(
   context: IrPluginContext,
   stabilityInferencer: StabilityInferencer,
