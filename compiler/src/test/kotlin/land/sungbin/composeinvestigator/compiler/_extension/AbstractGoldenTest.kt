@@ -14,6 +14,9 @@ import land.sungbin.composeinvestigator.compiler.FeatureFlag
 import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
 import land.sungbin.composeinvestigator.compiler._compilation.SourceFile
 import land.sungbin.composeinvestigator.compiler._extension.GoldenTestExtension.Companion.DEFAULT_GOLDEN_DIRECTORY
+import org.jetbrains.kotlin.ir.declarations.IrFile
+import org.jetbrains.kotlin.ir.util.DumpIrTreeOptions
+import org.jetbrains.kotlin.ir.util.dump
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(GoldenTestExtension::class)
@@ -21,22 +24,25 @@ abstract class AbstractGoldenTest(features: EnumSet<FeatureFlag> = EnumSet.noneO
   private lateinit var verifyGoldenImpl: VerifyGolden
 
   @BeforeTest fun prepare(verifyGolden: VerifyGolden) {
-    this.verifyGoldenImpl = verifyGolden
+    verifyGoldenImpl = verifyGolden
   }
 
-  fun verifyGolden(source: String, expect: String, directory: String = DEFAULT_GOLDEN_DIRECTORY) =
-    verifyGoldenImpl(source, expect, directory)
+  fun verifyGolden(ir: String, source: String, directory: String = DEFAULT_GOLDEN_DIRECTORY) =
+    verifyGoldenImpl(ir, source, directory)
 
   fun verifyIrGolden(file: SourceFile, directory: String = DEFAULT_GOLDEN_DIRECTORY) {
-    verifyGoldenImpl(file.source, transform(file).trimIndent(), directory)
+    val module = compile(file).irModuleFragment.files.single()
+    verifyGoldenImpl(
+      module.dump(IR_DUMP_OPTIONS).trimIndent().trimTrailingWhitespaces(),
+      module.dumpKotlinLikeForGolden(file.source),
+      directory,
+    )
   }
 
   @Suppress("RegExpSimplifiable")
-  private fun transform(file: SourceFile): String {
-    val irModule = compile(file).irModuleFragment
+  private fun IrFile.dumpKotlinLikeForGolden(code: String): String {
     val keySet = mutableListOf<Int>()
-    val actualTransformed = irModule
-      .files.first()
+    val actualTransformed = this
       .dumpSrc(useFir = true)
       .replace('$', '%')
       // replace source keys for start group calls
@@ -59,13 +65,13 @@ abstract class AbstractGoldenTest(features: EnumSet<FeatureFlag> = EnumSet.noneO
       }
       // replace source information with source it references
       .replace(Regex("(%composer\\.start(Restart|Movable|Replaceable|Replace)Group\\([^\"\\n]*)\"(.*)\"\\)")) { match ->
-        "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[4], file.source)}\")"
+        "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[4], code)}\")"
       }
       .replace(Regex("(sourceInformation(MarkerStart)?\\(.*)\"(.*)\"\\)")) { match ->
-        "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[3], file.source)}\")"
+        "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[3], code)}\")"
       }
       .replace(Regex("(composableLambda[N]?\\([^\"\\n]*)\"(.*)\"\\)")) { match ->
-        "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[2], file.source)}\")"
+        "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[2], code)}\")"
       }
       .replace(Regex("(rememberComposableLambda[N]?)\\((-?\\d+)")) { match ->
         "${match.groupValues[1]}(<>"
@@ -83,7 +89,7 @@ abstract class AbstractGoldenTest(features: EnumSet<FeatureFlag> = EnumSet.noneO
         "${match.groupValues[1]}<>"
       }
       .trimIndent()
-      .trimTrailingWhitespacesAndAddNewlineAtEOF()
+      .trimTrailingWhitespaces()
 
     return actualTransformed
   }
@@ -176,10 +182,15 @@ abstract class AbstractGoldenTest(features: EnumSet<FeatureFlag> = EnumSet.noneO
 
     return result
   }
-}
 
-private fun String.trimTrailingWhitespacesAndAddNewlineAtEOF(): String =
-  trimTrailingWhitespaces().let { result -> if (result.endsWith("\n")) result else result + "\n" }
+  private companion object {
+    val IR_DUMP_OPTIONS = DumpIrTreeOptions(
+      printSignatures = true,
+      printModuleName = false,
+      printFilePath = false,
+    )
+  }
+}
 
 private fun String.trimTrailingWhitespaces(): String =
   split('\n').joinToString("\n", transform = String::trimEnd)

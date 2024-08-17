@@ -1,37 +1,521 @@
 //
-// Source
+// IR
 // ------------------------------------------
 
-/*
- * Developed by Ji Sungbin 2024.
- *
- * Licensed under the MIT.
- * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
- */
-
-@file:Suppress("unused", "UnusedVariable")
-
-package land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer
-
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-
-@Composable fun delegateStateVariable() {
-  val state by remember { mutableStateOf(Unit) }
-  var state2 by remember { run { mutableStateOf(Unit) } }
-}
-
+FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer fileName:delegateStateVariable.kt
+  annotations:
+    Suppress(names = ["unused", "UnusedVariable"])
+  PROPERTY name:ComposableInvalidationTraceTableImpl$DelegateStateVariableKt visibility:private modality:FINAL [val]
+    FIELD name:ComposableInvalidationTraceTableImpl$DelegateStateVariableKt type:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable visibility:private [final,static]
+      EXPRESSION_BODY
+        CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-ComposableInvalidationTraceTableImpl$DelegateStateVariableKt> visibility:private modality:FINAL <> () returnType:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable
+      correspondingProperty: PROPERTY name:ComposableInvalidationTraceTableImpl$DelegateStateVariableKt visibility:private modality:FINAL [val]
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='private final fun <get-ComposableInvalidationTraceTableImpl$DelegateStateVariableKt> (): land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer'
+          GET_FIELD 'FIELD name:ComposableInvalidationTraceTableImpl$DelegateStateVariableKt type:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable visibility:private [final,static] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+  FUN name:getValue visibility:private modality:FINAL <T> ($receiver:androidx.compose.runtime.State<T of land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.getValue>?, thisObj:kotlin.Any?, property:kotlin.reflect.KProperty<*>) returnType:kotlin.Unit [operator]
+    TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any?] reified:false
+    $receiver: VALUE_PARAMETER name:<this> type:androidx.compose.runtime.State<T of land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.getValue>?
+    VALUE_PARAMETER name:thisObj index:0 type:kotlin.Any?
+    VALUE_PARAMETER name:property index:1 type:kotlin.reflect.KProperty<*>
+    BLOCK_BODY
+      RETURN type=kotlin.Nothing from='private final fun getValue <T> (thisObj: kotlin.Any?, property: kotlin.reflect.KProperty<*>): kotlin.Unit [operator] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer'
+        GET_OBJECT 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.Unit
+  FUN name:setValue visibility:private modality:FINAL <T> ($receiver:androidx.compose.runtime.State<T of land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.setValue>?, thisObj:kotlin.Any?, property:kotlin.reflect.KProperty<*>, value:T of land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.setValue) returnType:kotlin.Unit [operator]
+    TYPE_PARAMETER name:T index:0 variance: superTypes:[kotlin.Any?] reified:false
+    $receiver: VALUE_PARAMETER name:<this> type:androidx.compose.runtime.State<T of land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.setValue>?
+    VALUE_PARAMETER name:thisObj index:0 type:kotlin.Any?
+    VALUE_PARAMETER name:property index:1 type:kotlin.reflect.KProperty<*>
+    VALUE_PARAMETER name:value index:2 type:T of land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.setValue
+    BLOCK_BODY
+  CLASS OBJECT name:CustomState modality:FINAL visibility:private superTypes:[androidx.compose.runtime.State<kotlin.Unit>]
+    $this: VALUE_PARAMETER INSTANCE_RECEIVER name:<this> type:land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState
+    CONSTRUCTOR visibility:private <> () returnType:land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState [primary]
+      BLOCK_BODY
+        DELEGATING_CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in kotlin.Any'
+        INSTANCE_INITIALIZER_CALL classDescriptor='CLASS OBJECT name:CustomState modality:FINAL visibility:private superTypes:[androidx.compose.runtime.State<kotlin.Unit>]'
+    PROPERTY name:value visibility:public modality:OPEN [val]
+      overridden:
+        public abstract value: T of androidx.compose.runtime.State [val] declared in androidx.compose.runtime.State
+      FUN name:<get-value> visibility:public modality:OPEN <> ($this:land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState) returnType:kotlin.Unit
+        correspondingProperty: PROPERTY name:value visibility:public modality:OPEN [val]
+        overridden:
+          public abstract fun <get-value> (): T of androidx.compose.runtime.State declared in androidx.compose.runtime.State
+        $this: VALUE_PARAMETER name:<this> type:land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState
+        BLOCK_BODY
+          RETURN type=kotlin.Nothing from='public open fun <get-value> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState'
+            GET_OBJECT 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.Unit
+    FUN FAKE_OVERRIDE name:equals visibility:public modality:OPEN <> ($this:kotlin.Any, other:kotlin.Any?) returnType:kotlin.Boolean [fake_override,operator]
+      overridden:
+        public open fun equals (other: kotlin.Any?): kotlin.Boolean [fake_override,operator] declared in androidx.compose.runtime.State
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+      VALUE_PARAMETER name:other index:0 type:kotlin.Any?
+    FUN FAKE_OVERRIDE name:hashCode visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.Int [fake_override]
+      overridden:
+        public open fun hashCode (): kotlin.Int [fake_override] declared in androidx.compose.runtime.State
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+    FUN FAKE_OVERRIDE name:toString visibility:public modality:OPEN <> ($this:kotlin.Any) returnType:kotlin.String [fake_override]
+      overridden:
+        public open fun toString (): kotlin.String [fake_override] declared in androidx.compose.runtime.State
+      $this: VALUE_PARAMETER name:<this> type:kotlin.Any
+  FUN name:delegateStateVariable visibility:private modality:FINAL <> () returnType:kotlin.Unit
+    BLOCK_BODY
+      LOCAL_DELEGATED_PROPERTY name:state type:kotlin.Unit flags:val
+        VAR PROPERTY_DELEGATE name:state$delegate type:androidx.compose.runtime.MutableState<kotlin.Unit> [val]
+          CALL 'public final fun registerStateObject <T> (value: T of land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable.registerStateObject, name: kotlin.String): T of land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable.registerStateObject declared in land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable' type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+            <T>: androidx.compose.runtime.MutableState<kotlin.Unit>
+            $this: CALL 'private final fun <get-ComposableInvalidationTraceTableImpl$DelegateStateVariableKt> (): land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+            value: CALL 'public final fun mutableStateOf <T> (value: T of androidx.compose.runtime.mutableStateOf, policy: androidx.compose.runtime.SnapshotMutationPolicy<T of androidx.compose.runtime.mutableStateOf>): androidx.compose.runtime.MutableState<T of androidx.compose.runtime.mutableStateOf> declared in androidx.compose.runtime' type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+              <T>: kotlin.Unit
+              value: GET_OBJECT 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.Unit
+            name: CONST String type=kotlin.String value="state"
+        FUN DELEGATED_PROPERTY_ACCESSOR name:<get-state> visibility:local modality:FINAL <> () returnType:kotlin.Unit
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='local final fun <get-state> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable'
+              CALL 'public final fun getValue <T> (thisObj: kotlin.Any?, property: kotlin.reflect.KProperty<*>): T of androidx.compose.runtime.getValue [inline,operator] declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+                <T>: kotlin.Unit
+                $receiver: GET_VAR 'val state$delegate: androidx.compose.runtime.MutableState<kotlin.Unit> [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable' type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+                thisObj: CONST Null type=kotlin.Nothing? value=null
+                property: LOCAL_DELEGATED_PROPERTY_REFERENCE 'val state: kotlin.Unit by (...)' delegate='val state$delegate: androidx.compose.runtime.MutableState<kotlin.Unit> [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable' getter='local final fun <get-state> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable' setter=null type=kotlin.reflect.KProperty0<kotlin.Unit> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+      LOCAL_DELEGATED_PROPERTY name:state2 type:kotlin.Unit flags:var
+        VAR PROPERTY_DELEGATE name:state2$delegate type:land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState [val]
+          CALL 'public final fun registerStateObject <T> (value: T of land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable.registerStateObject, name: kotlin.String): T of land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable.registerStateObject declared in land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable' type=land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState origin=null
+            <T>: land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState
+            $this: CALL 'private final fun <get-ComposableInvalidationTraceTableImpl$DelegateStateVariableKt> (): land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+            value: CALL 'public final fun run <R> (block: kotlin.Function0<R of kotlin.run>): R of kotlin.run [inline] declared in kotlin' type=land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState origin=null
+              <R>: land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState
+              block: FUN_EXPR type=kotlin.Function0<land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState> origin=LAMBDA
+                FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState
+                  BLOCK_BODY
+                    RETURN type=kotlin.Nothing from='local final fun <anonymous> (): land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable'
+                      GET_OBJECT 'CLASS OBJECT name:CustomState modality:FINAL visibility:private superTypes:[androidx.compose.runtime.State<kotlin.Unit>]' type=land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState
+            name: CONST String type=kotlin.String value="state2"
+        FUN DELEGATED_PROPERTY_ACCESSOR name:<get-state2> visibility:local modality:FINAL <> () returnType:kotlin.Unit
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='local final fun <get-state2> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable'
+              CALL 'public final fun getValue <T> (thisObj: kotlin.Any?, property: kotlin.reflect.KProperty<*>): T of androidx.compose.runtime.getValue [inline,operator] declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+                <T>: kotlin.Unit
+                $receiver: GET_VAR 'val state2$delegate: land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable' type=land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState origin=null
+                thisObj: CONST Null type=kotlin.Nothing? value=null
+                property: LOCAL_DELEGATED_PROPERTY_REFERENCE 'var state2: kotlin.Unit by (...)' delegate='val state2$delegate: land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable' getter='local final fun <get-state2> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable' setter='local final fun <set-state2> (<set-?>: kotlin.Unit): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable' type=kotlin.reflect.KMutableProperty0<kotlin.Unit> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+        FUN DELEGATED_PROPERTY_ACCESSOR name:<set-state2> visibility:local modality:FINAL <> (<set-?>:kotlin.Unit) returnType:kotlin.Unit
+          VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Unit
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='local final fun <set-state2> (<set-?>: kotlin.Unit): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable'
+              CALL 'private final fun setValue <T> (thisObj: kotlin.Any?, property: kotlin.reflect.KProperty<*>, value: T of land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.setValue): kotlin.Unit [operator] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer' type=kotlin.Unit origin=null
+                <T>: kotlin.Unit
+                $receiver: GET_VAR 'val state2$delegate: land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable' type=land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState origin=null
+                thisObj: CONST Null type=kotlin.Nothing? value=null
+                property: LOCAL_DELEGATED_PROPERTY_REFERENCE 'var state2: kotlin.Unit by (...)' delegate='val state2$delegate: land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable' getter='local final fun <get-state2> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable' setter='local final fun <set-state2> (<set-?>: kotlin.Unit): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable' type=kotlin.reflect.KMutableProperty0<kotlin.Unit> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+                value: GET_VAR '<set-?>: kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariable.<set-state2>' type=kotlin.Unit origin=null
+  FUN name:delegateNullableStateVariable visibility:private modality:FINAL <> () returnType:kotlin.Unit
+    BLOCK_BODY
+      VAR name:nullableState type:androidx.compose.runtime.State<kotlin.Unit>? [val]
+        GET_OBJECT 'CLASS OBJECT name:CustomState modality:FINAL visibility:private superTypes:[androidx.compose.runtime.State<kotlin.Unit>]' type=land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState
+      LOCAL_DELEGATED_PROPERTY name:state type:kotlin.Unit flags:val
+        VAR PROPERTY_DELEGATE name:state$delegate type:androidx.compose.runtime.State<kotlin.Unit>? [val]
+          GET_VAR 'val nullableState: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+        FUN DELEGATED_PROPERTY_ACCESSOR name:<get-state> visibility:local modality:FINAL <> () returnType:kotlin.Unit
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='local final fun <get-state> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable'
+              CALL 'private final fun getValue <T> (thisObj: kotlin.Any?, property: kotlin.reflect.KProperty<*>): kotlin.Unit [operator] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer' type=kotlin.Unit origin=null
+                <T>: kotlin.Unit
+                $receiver: GET_VAR 'val state$delegate: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+                thisObj: CONST Null type=kotlin.Nothing? value=null
+                property: LOCAL_DELEGATED_PROPERTY_REFERENCE 'val state: kotlin.Unit by (...)' delegate='val state$delegate: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable' getter='local final fun <get-state> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable' setter=null type=kotlin.reflect.KProperty0<kotlin.Unit> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+      LOCAL_DELEGATED_PROPERTY name:state2 type:kotlin.Unit flags:var
+        VAR PROPERTY_DELEGATE name:state2$delegate type:androidx.compose.runtime.State<kotlin.Unit>? [val]
+          CALL 'public final fun run <R> (block: kotlin.Function0<R of kotlin.run>): R of kotlin.run [inline] declared in kotlin' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+            <R>: androidx.compose.runtime.State<kotlin.Unit>?
+            block: FUN_EXPR type=kotlin.Function0<androidx.compose.runtime.State<kotlin.Unit>?> origin=LAMBDA
+              FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:androidx.compose.runtime.State<kotlin.Unit>?
+                BLOCK_BODY
+                  RETURN type=kotlin.Nothing from='local final fun <anonymous> (): androidx.compose.runtime.State<kotlin.Unit>? declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable'
+                    GET_VAR 'val nullableState: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+        FUN DELEGATED_PROPERTY_ACCESSOR name:<get-state2> visibility:local modality:FINAL <> () returnType:kotlin.Unit
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='local final fun <get-state2> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable'
+              CALL 'private final fun getValue <T> (thisObj: kotlin.Any?, property: kotlin.reflect.KProperty<*>): kotlin.Unit [operator] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer' type=kotlin.Unit origin=null
+                <T>: kotlin.Unit
+                $receiver: GET_VAR 'val state2$delegate: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+                thisObj: CONST Null type=kotlin.Nothing? value=null
+                property: LOCAL_DELEGATED_PROPERTY_REFERENCE 'var state2: kotlin.Unit by (...)' delegate='val state2$delegate: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable' getter='local final fun <get-state2> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable' setter='local final fun <set-state2> (<set-?>: kotlin.Unit): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable' type=kotlin.reflect.KMutableProperty0<kotlin.Unit> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+        FUN DELEGATED_PROPERTY_ACCESSOR name:<set-state2> visibility:local modality:FINAL <> (<set-?>:kotlin.Unit) returnType:kotlin.Unit
+          VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Unit
+          BLOCK_BODY
+            RETURN type=kotlin.Nothing from='local final fun <set-state2> (<set-?>: kotlin.Unit): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable'
+              CALL 'private final fun setValue <T> (thisObj: kotlin.Any?, property: kotlin.reflect.KProperty<*>, value: T of land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.setValue): kotlin.Unit [operator] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer' type=kotlin.Unit origin=null
+                <T>: kotlin.Unit
+                $receiver: GET_VAR 'val state2$delegate: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+                thisObj: CONST Null type=kotlin.Nothing? value=null
+                property: LOCAL_DELEGATED_PROPERTY_REFERENCE 'var state2: kotlin.Unit by (...)' delegate='val state2$delegate: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable' getter='local final fun <get-state2> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable' setter='local final fun <set-state2> (<set-?>: kotlin.Unit): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable' type=kotlin.reflect.KMutableProperty0<kotlin.Unit> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+                value: GET_VAR '<set-?>: kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariable.<set-state2>' type=kotlin.Unit origin=null
+  FUN name:delegateStateVariableComposable visibility:private modality:FINAL <> ($composer:androidx.compose.runtime.Composer?, $changed:kotlin.Int) returnType:kotlin.Unit
+    annotations:
+      Composable
+    VALUE_PARAMETER name:$composer index:0 type:androidx.compose.runtime.Composer? [assignable]
+    VALUE_PARAMETER name:$changed index:1 type:kotlin.Int
+    BLOCK_BODY
+      SET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=kotlin.Unit origin=null
+        CALL 'public abstract fun startRestartGroup (key: kotlin.Int): androidx.compose.runtime.Composer declared in androidx.compose.runtime.Composer' type=androidx.compose.runtime.Composer origin=null
+          $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+          key: CONST Int type=kotlin.Int value=-741165730
+      WHEN type=kotlin.Unit origin=IF
+        BRANCH
+          if: WHEN type=kotlin.Boolean origin=OROR
+            BRANCH
+              if: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
+                $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
+                  arg0: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=kotlin.Int origin=null
+                  arg1: CONST Int type=kotlin.Int value=0
+              then: CONST Boolean type=kotlin.Boolean value=true
+            BRANCH
+              if: CONST Boolean type=kotlin.Boolean value=true
+              then: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
+                $this: CALL 'public abstract fun <get-skipping> (): kotlin.Boolean declared in androidx.compose.runtime.Composer' type=kotlin.Boolean origin=null
+                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+          then: BLOCK type=kotlin.Unit origin=null
+            WHEN type=kotlin.Unit origin=IF
+              BRANCH
+                if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime' type=kotlin.Boolean origin=null
+                then: CALL 'public final fun traceEventStart (key: kotlin.Int, dirty1: kotlin.Int, dirty2: kotlin.Int, info: kotlin.String): kotlin.Unit declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+                  key: CONST Int type=kotlin.Int value=-741165730
+                  dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=kotlin.Int origin=null
+                  dirty2: CONST Int type=kotlin.Int value=-1
+                  info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable (delegateStateVariable.kt:37)"
+            LOCAL_DELEGATED_PROPERTY name:state type:kotlin.Unit flags:val
+              VAR PROPERTY_DELEGATE name:state$delegate type:land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState [val]
+                CALL 'public final fun registerStateObject <T> (value: T of land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable.registerStateObject, name: kotlin.String): T of land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable.registerStateObject declared in land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable' type=land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState origin=null
+                  <T>: land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState
+                  $this: CALL 'private final fun <get-ComposableInvalidationTraceTableImpl$DelegateStateVariableKt> (): land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+                  value: BLOCK type=land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState origin=null
+                    CALL 'public abstract fun startReplaceGroup (key: kotlin.Int): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+                      $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                      key: CONST Int type=kotlin.Int value=-1015654392
+                    VAR IR_TEMPORARY_VARIABLE name:tmp0_group type:land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState [val]
+                      CALL 'public final fun cache <T> (invalid: kotlin.Boolean, block: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.cache>): T of androidx.compose.runtime.cache [inline] declared in androidx.compose.runtime' type=land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState origin=null
+                        <T>: land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState
+                        $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                        invalid: CONST Boolean type=kotlin.Boolean value=false
+                        block: FUN_EXPR type=kotlin.Function0<land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState> origin=LAMBDA
+                          FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState
+                            BLOCK_BODY
+                              RETURN type=kotlin.Nothing from='local final fun <anonymous> (): land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable'
+                                GET_OBJECT 'CLASS OBJECT name:CustomState modality:FINAL visibility:private superTypes:[androidx.compose.runtime.State<kotlin.Unit>]' type=land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState
+                    CALL 'public abstract fun endReplaceGroup (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+                      $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                    GET_VAR 'val tmp0_group: land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState origin=null
+                  name: CONST String type=kotlin.String value="state"
+              FUN DELEGATED_PROPERTY_ACCESSOR name:<get-state> visibility:local modality:FINAL <> () returnType:kotlin.Unit
+                BLOCK_BODY
+                  RETURN type=kotlin.Nothing from='local final fun <get-state> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable'
+                    CALL 'public final fun getValue <T> (thisObj: kotlin.Any?, property: kotlin.reflect.KProperty<*>): T of androidx.compose.runtime.getValue [inline,operator] declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+                      <T>: kotlin.Unit
+                      $receiver: GET_VAR 'val state$delegate: land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState origin=null
+                      thisObj: CONST Null type=kotlin.Nothing? value=null
+                      property: LOCAL_DELEGATED_PROPERTY_REFERENCE 'val state: kotlin.Unit by (...)' delegate='val state$delegate: land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.CustomState [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' getter='local final fun <get-state> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' setter=null type=kotlin.reflect.KProperty0<kotlin.Unit> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+            LOCAL_DELEGATED_PROPERTY name:state2 type:kotlin.Unit flags:var
+              VAR PROPERTY_DELEGATE name:state2$delegate type:androidx.compose.runtime.MutableState<kotlin.Unit> [val]
+                CALL 'public final fun registerStateObject <T> (value: T of land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable.registerStateObject, name: kotlin.String): T of land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable.registerStateObject declared in land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable' type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+                  <T>: androidx.compose.runtime.MutableState<kotlin.Unit>
+                  $this: CALL 'private final fun <get-ComposableInvalidationTraceTableImpl$DelegateStateVariableKt> (): land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+                  value: BLOCK type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+                    CALL 'public abstract fun startReplaceGroup (key: kotlin.Int): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+                      $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                      key: CONST Int type=kotlin.Int value=-1015653063
+                    VAR IR_TEMPORARY_VARIABLE name:tmp1_group type:androidx.compose.runtime.MutableState<kotlin.Unit> [val]
+                      CALL 'public final fun cache <T> (invalid: kotlin.Boolean, block: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.cache>): T of androidx.compose.runtime.cache [inline] declared in androidx.compose.runtime' type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+                        <T>: androidx.compose.runtime.MutableState<kotlin.Unit>
+                        $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                        invalid: CONST Boolean type=kotlin.Boolean value=false
+                        block: FUN_EXPR type=kotlin.Function0<androidx.compose.runtime.MutableState<kotlin.Unit>> origin=LAMBDA
+                          FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:androidx.compose.runtime.MutableState<kotlin.Unit>
+                            BLOCK_BODY
+                              RETURN type=kotlin.Nothing from='local final fun <anonymous> (): androidx.compose.runtime.MutableState<kotlin.Unit> declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable'
+                                CALL 'public final fun run <R> (block: kotlin.Function0<R of kotlin.run>): R of kotlin.run [inline] declared in kotlin' type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+                                  <R>: androidx.compose.runtime.MutableState<kotlin.Unit>
+                                  block: FUN_EXPR type=kotlin.Function0<androidx.compose.runtime.MutableState<kotlin.Unit>> origin=LAMBDA
+                                    FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:androidx.compose.runtime.MutableState<kotlin.Unit>
+                                      BLOCK_BODY
+                                        RETURN type=kotlin.Nothing from='local final fun <anonymous> (): androidx.compose.runtime.MutableState<kotlin.Unit> declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable.<anonymous>'
+                                          CALL 'public final fun mutableStateOf <T> (value: T of androidx.compose.runtime.mutableStateOf, policy: androidx.compose.runtime.SnapshotMutationPolicy<T of androidx.compose.runtime.mutableStateOf>): androidx.compose.runtime.MutableState<T of androidx.compose.runtime.mutableStateOf> declared in androidx.compose.runtime' type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+                                            <T>: kotlin.Unit
+                                            value: GET_OBJECT 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.Unit
+                    CALL 'public abstract fun endReplaceGroup (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+                      $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                    GET_VAR 'val tmp1_group: androidx.compose.runtime.MutableState<kotlin.Unit> [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+                  name: CONST String type=kotlin.String value="state2"
+              FUN DELEGATED_PROPERTY_ACCESSOR name:<get-state2> visibility:local modality:FINAL <> () returnType:kotlin.Unit
+                BLOCK_BODY
+                  RETURN type=kotlin.Nothing from='local final fun <get-state2> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable'
+                    CALL 'public final fun getValue <T> (thisObj: kotlin.Any?, property: kotlin.reflect.KProperty<*>): T of androidx.compose.runtime.getValue [inline,operator] declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+                      <T>: kotlin.Unit
+                      $receiver: GET_VAR 'val state2$delegate: androidx.compose.runtime.MutableState<kotlin.Unit> [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+                      thisObj: CONST Null type=kotlin.Nothing? value=null
+                      property: LOCAL_DELEGATED_PROPERTY_REFERENCE 'var state2: kotlin.Unit by (...)' delegate='val state2$delegate: androidx.compose.runtime.MutableState<kotlin.Unit> [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' getter='local final fun <get-state2> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' setter='local final fun <set-state2> (<set-?>: kotlin.Unit): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=kotlin.reflect.KMutableProperty0<kotlin.Unit> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+              FUN DELEGATED_PROPERTY_ACCESSOR name:<set-state2> visibility:local modality:FINAL <> (<set-?>:kotlin.Unit) returnType:kotlin.Unit
+                VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Unit
+                BLOCK_BODY
+                  RETURN type=kotlin.Nothing from='local final fun <set-state2> (<set-?>: kotlin.Unit): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable'
+                    CALL 'public final fun setValue <T> (thisObj: kotlin.Any?, property: kotlin.reflect.KProperty<*>, value: T of androidx.compose.runtime.setValue): kotlin.Unit [inline,operator] declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+                      <T>: kotlin.Unit
+                      $receiver: GET_VAR 'val state2$delegate: androidx.compose.runtime.MutableState<kotlin.Unit> [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+                      thisObj: CONST Null type=kotlin.Nothing? value=null
+                      property: LOCAL_DELEGATED_PROPERTY_REFERENCE 'var state2: kotlin.Unit by (...)' delegate='val state2$delegate: androidx.compose.runtime.MutableState<kotlin.Unit> [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' getter='local final fun <get-state2> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' setter='local final fun <set-state2> (<set-?>: kotlin.Unit): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=kotlin.reflect.KMutableProperty0<kotlin.Unit> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+                      value: GET_VAR '<set-?>: kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable.<set-state2>' type=kotlin.Unit origin=null
+            WHEN type=kotlin.Unit origin=IF
+              BRANCH
+                if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime' type=kotlin.Boolean origin=null
+                then: CALL 'public final fun traceEventEnd (): kotlin.Unit declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+        BRANCH
+          if: CONST Boolean type=kotlin.Boolean value=true
+          then: CALL 'public abstract fun skipToGroupEnd (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+            $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+      BLOCK type=kotlin.Unit origin=null
+        BLOCK type=kotlin.Unit origin=SAFE_CALL
+          VAR IR_TEMPORARY_VARIABLE name:tmp2_safe_receiver type:androidx.compose.runtime.ScopeUpdateScope? [val]
+            CALL 'public abstract fun endRestartGroup (): androidx.compose.runtime.ScopeUpdateScope? declared in androidx.compose.runtime.Composer' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
+              $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+          WHEN type=kotlin.Unit origin=IF
+            BRANCH
+              if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
+                arg0: GET_VAR 'val tmp2_safe_receiver: androidx.compose.runtime.ScopeUpdateScope? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
+                arg1: CONST Null type=kotlin.Any? value=null
+              then: CONST Null type=kotlin.Any? value=null
+            BRANCH
+              if: CONST Boolean type=kotlin.Boolean value=true
+              then: CALL 'public abstract fun updateScope (block: kotlin.Function2<androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit>): kotlin.Unit declared in androidx.compose.runtime.ScopeUpdateScope' type=kotlin.Unit origin=null
+                $this: GET_VAR 'val tmp2_safe_receiver: androidx.compose.runtime.ScopeUpdateScope? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
+                block: FUN_EXPR type=kotlin.Function2<androidx.compose.runtime.Composer?, kotlin.Int, kotlin.Unit> origin=LAMBDA
+                  FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> ($composer:androidx.compose.runtime.Composer?, $force:kotlin.Int) returnType:kotlin.Unit
+                    VALUE_PARAMETER name:$composer index:0 type:androidx.compose.runtime.Composer?
+                    VALUE_PARAMETER name:$force index:1 type:kotlin.Int
+                    BLOCK_BODY
+                      RETURN type=kotlin.Nothing from='local final fun <anonymous> ($composer: androidx.compose.runtime.Composer?, $force: kotlin.Int): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable'
+                        CALL 'private final fun delegateStateVariableComposable ($composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer' type=kotlin.Unit origin=null
+                          $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable.<anonymous>' type=androidx.compose.runtime.Composer? origin=null
+                          $changed: CALL 'internal final fun updateChangedFlags (flags: kotlin.Int): kotlin.Int declared in androidx.compose.runtime' type=kotlin.Int origin=null
+                            flags: CALL 'public final fun or (other: kotlin.Int): kotlin.Int [infix] declared in kotlin.Int' type=kotlin.Int origin=null
+                              $this: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateStateVariableComposable' type=kotlin.Int origin=null
+                              other: CONST Int type=kotlin.Int value=1
+  FUN name:delegateNullableStateVariableComposable visibility:private modality:FINAL <> ($composer:androidx.compose.runtime.Composer?, $changed:kotlin.Int) returnType:kotlin.Unit
+    annotations:
+      Composable
+    VALUE_PARAMETER name:$composer index:0 type:androidx.compose.runtime.Composer? [assignable]
+    VALUE_PARAMETER name:$changed index:1 type:kotlin.Int
+    BLOCK_BODY
+      SET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=kotlin.Unit origin=null
+        CALL 'public abstract fun startRestartGroup (key: kotlin.Int): androidx.compose.runtime.Composer declared in androidx.compose.runtime.Composer' type=androidx.compose.runtime.Composer origin=null
+          $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+          key: CONST Int type=kotlin.Int value=1666675935
+      WHEN type=kotlin.Unit origin=IF
+        BRANCH
+          if: WHEN type=kotlin.Boolean origin=OROR
+            BRANCH
+              if: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
+                $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
+                  arg0: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=kotlin.Int origin=null
+                  arg1: CONST Int type=kotlin.Int value=0
+              then: CONST Boolean type=kotlin.Boolean value=true
+            BRANCH
+              if: CONST Boolean type=kotlin.Boolean value=true
+              then: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
+                $this: CALL 'public abstract fun <get-skipping> (): kotlin.Boolean declared in androidx.compose.runtime.Composer' type=kotlin.Boolean origin=null
+                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+          then: BLOCK type=kotlin.Unit origin=null
+            WHEN type=kotlin.Unit origin=IF
+              BRANCH
+                if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime' type=kotlin.Boolean origin=null
+                then: CALL 'public final fun traceEventStart (key: kotlin.Int, dirty1: kotlin.Int, dirty2: kotlin.Int, info: kotlin.String): kotlin.Unit declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+                  key: CONST Int type=kotlin.Int value=1666675935
+                  dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=kotlin.Int origin=null
+                  dirty2: CONST Int type=kotlin.Int value=-1
+                  info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable (delegateStateVariable.kt:42)"
+            VAR name:nullableState type:androidx.compose.runtime.State<kotlin.Unit>? [val]
+              BLOCK type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+                CALL 'public abstract fun startReplaceGroup (key: kotlin.Int): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                  key: CONST Int type=kotlin.Int value=-1344104080
+                VAR IR_TEMPORARY_VARIABLE name:tmp0_group type:androidx.compose.runtime.MutableState<kotlin.Unit> [val]
+                  CALL 'public final fun cache <T> (invalid: kotlin.Boolean, block: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.cache>): T of androidx.compose.runtime.cache [inline] declared in androidx.compose.runtime' type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+                    <T>: androidx.compose.runtime.MutableState<kotlin.Unit>
+                    $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                    invalid: CONST Boolean type=kotlin.Boolean value=false
+                    block: FUN_EXPR type=kotlin.Function0<androidx.compose.runtime.MutableState<kotlin.Unit>> origin=LAMBDA
+                      FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:androidx.compose.runtime.MutableState<kotlin.Unit>
+                        BLOCK_BODY
+                          RETURN type=kotlin.Nothing from='local final fun <anonymous> (): androidx.compose.runtime.MutableState<kotlin.Unit> declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable'
+                            CALL 'public final fun mutableStateOf <T> (value: T of androidx.compose.runtime.mutableStateOf, policy: androidx.compose.runtime.SnapshotMutationPolicy<T of androidx.compose.runtime.mutableStateOf>): androidx.compose.runtime.MutableState<T of androidx.compose.runtime.mutableStateOf> declared in androidx.compose.runtime' type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+                              <T>: kotlin.Unit
+                              value: GET_OBJECT 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.Unit
+                CALL 'public abstract fun endReplaceGroup (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                GET_VAR 'val tmp0_group: androidx.compose.runtime.MutableState<kotlin.Unit> [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.MutableState<kotlin.Unit> origin=null
+            LOCAL_DELEGATED_PROPERTY name:state type:kotlin.Unit flags:val
+              VAR PROPERTY_DELEGATE name:state$delegate type:androidx.compose.runtime.State<kotlin.Unit>? [val]
+                BLOCK type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+                  CALL 'public abstract fun startReplaceGroup (key: kotlin.Int): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+                    $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                    key: CONST Int type=kotlin.Int value=-1344102519
+                  VAR IR_TEMPORARY_VARIABLE name:tmp1_group type:androidx.compose.runtime.State<kotlin.Unit>? [val]
+                    CALL 'public final fun cache <T> (invalid: kotlin.Boolean, block: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.cache>): T of androidx.compose.runtime.cache [inline] declared in androidx.compose.runtime' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+                      <T>: androidx.compose.runtime.State<kotlin.Unit>?
+                      $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                      invalid: CONST Boolean type=kotlin.Boolean value=false
+                      block: FUN_EXPR type=kotlin.Function0<androidx.compose.runtime.State<kotlin.Unit>?> origin=LAMBDA
+                        FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:androidx.compose.runtime.State<kotlin.Unit>?
+                          BLOCK_BODY
+                            RETURN type=kotlin.Nothing from='local final fun <anonymous> (): androidx.compose.runtime.State<kotlin.Unit>? declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable'
+                              GET_VAR 'val nullableState: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+                  CALL 'public abstract fun endReplaceGroup (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+                    $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                  GET_VAR 'val tmp1_group: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+              FUN DELEGATED_PROPERTY_ACCESSOR name:<get-state> visibility:local modality:FINAL <> () returnType:kotlin.Unit
+                BLOCK_BODY
+                  RETURN type=kotlin.Nothing from='local final fun <get-state> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable'
+                    CALL 'private final fun getValue <T> (thisObj: kotlin.Any?, property: kotlin.reflect.KProperty<*>): kotlin.Unit [operator] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer' type=kotlin.Unit origin=null
+                      <T>: kotlin.Unit
+                      $receiver: GET_VAR 'val state$delegate: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+                      thisObj: CONST Null type=kotlin.Nothing? value=null
+                      property: LOCAL_DELEGATED_PROPERTY_REFERENCE 'val state: kotlin.Unit by (...)' delegate='val state$delegate: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' getter='local final fun <get-state> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' setter=null type=kotlin.reflect.KProperty0<kotlin.Unit> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+            LOCAL_DELEGATED_PROPERTY name:state2 type:kotlin.Unit flags:var
+              VAR PROPERTY_DELEGATE name:state2$delegate type:androidx.compose.runtime.State<kotlin.Unit>? [val]
+                BLOCK type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+                  CALL 'public abstract fun startReplaceGroup (key: kotlin.Int): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+                    $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                    key: CONST Int type=kotlin.Int value=-1344101135
+                  VAR IR_TEMPORARY_VARIABLE name:tmp2_group type:androidx.compose.runtime.State<kotlin.Unit>? [val]
+                    CALL 'public final fun cache <T> (invalid: kotlin.Boolean, block: @[DisallowComposableCalls] kotlin.Function0<T of androidx.compose.runtime.cache>): T of androidx.compose.runtime.cache [inline] declared in androidx.compose.runtime' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+                      <T>: androidx.compose.runtime.State<kotlin.Unit>?
+                      $receiver: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                      invalid: CONST Boolean type=kotlin.Boolean value=false
+                      block: FUN_EXPR type=kotlin.Function0<androidx.compose.runtime.State<kotlin.Unit>?> origin=LAMBDA
+                        FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:androidx.compose.runtime.State<kotlin.Unit>?
+                          BLOCK_BODY
+                            RETURN type=kotlin.Nothing from='local final fun <anonymous> (): androidx.compose.runtime.State<kotlin.Unit>? declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable'
+                              CALL 'public final fun run <R> (block: kotlin.Function0<R of kotlin.run>): R of kotlin.run [inline] declared in kotlin' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+                                <R>: androidx.compose.runtime.State<kotlin.Unit>?
+                                block: FUN_EXPR type=kotlin.Function0<androidx.compose.runtime.State<kotlin.Unit>?> origin=LAMBDA
+                                  FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> () returnType:androidx.compose.runtime.State<kotlin.Unit>?
+                                    BLOCK_BODY
+                                      RETURN type=kotlin.Nothing from='local final fun <anonymous> (): androidx.compose.runtime.State<kotlin.Unit>? declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable.<anonymous>'
+                                        GET_VAR 'val nullableState: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+                  CALL 'public abstract fun endReplaceGroup (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+                    $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+                  GET_VAR 'val tmp2_group: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+              FUN DELEGATED_PROPERTY_ACCESSOR name:<get-state2> visibility:local modality:FINAL <> () returnType:kotlin.Unit
+                BLOCK_BODY
+                  RETURN type=kotlin.Nothing from='local final fun <get-state2> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable'
+                    CALL 'private final fun getValue <T> (thisObj: kotlin.Any?, property: kotlin.reflect.KProperty<*>): kotlin.Unit [operator] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer' type=kotlin.Unit origin=null
+                      <T>: kotlin.Unit
+                      $receiver: GET_VAR 'val state2$delegate: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+                      thisObj: CONST Null type=kotlin.Nothing? value=null
+                      property: LOCAL_DELEGATED_PROPERTY_REFERENCE 'var state2: kotlin.Unit by (...)' delegate='val state2$delegate: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' getter='local final fun <get-state2> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' setter='local final fun <set-state2> (<set-?>: kotlin.Unit): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=kotlin.reflect.KMutableProperty0<kotlin.Unit> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+              FUN DELEGATED_PROPERTY_ACCESSOR name:<set-state2> visibility:local modality:FINAL <> (<set-?>:kotlin.Unit) returnType:kotlin.Unit
+                VALUE_PARAMETER name:<set-?> index:0 type:kotlin.Unit
+                BLOCK_BODY
+                  RETURN type=kotlin.Nothing from='local final fun <set-state2> (<set-?>: kotlin.Unit): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable'
+                    CALL 'private final fun setValue <T> (thisObj: kotlin.Any?, property: kotlin.reflect.KProperty<*>, value: T of land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.setValue): kotlin.Unit [operator] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer' type=kotlin.Unit origin=null
+                      <T>: kotlin.Unit
+                      $receiver: GET_VAR 'val state2$delegate: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.State<kotlin.Unit>? origin=null
+                      thisObj: CONST Null type=kotlin.Nothing? value=null
+                      property: LOCAL_DELEGATED_PROPERTY_REFERENCE 'var state2: kotlin.Unit by (...)' delegate='val state2$delegate: androidx.compose.runtime.State<kotlin.Unit>? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' getter='local final fun <get-state2> (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' setter='local final fun <set-state2> (<set-?>: kotlin.Unit): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=kotlin.reflect.KMutableProperty0<kotlin.Unit> origin=PROPERTY_REFERENCE_FOR_DELEGATE
+                      value: GET_VAR '<set-?>: kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable.<set-state2>' type=kotlin.Unit origin=null
+            WHEN type=kotlin.Unit origin=IF
+              BRANCH
+                if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime' type=kotlin.Boolean origin=null
+                then: CALL 'public final fun traceEventEnd (): kotlin.Unit declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+        BRANCH
+          if: CONST Boolean type=kotlin.Boolean value=true
+          then: CALL 'public abstract fun skipToGroupEnd (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+            $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+      BLOCK type=kotlin.Unit origin=null
+        BLOCK type=kotlin.Unit origin=SAFE_CALL
+          VAR IR_TEMPORARY_VARIABLE name:tmp3_safe_receiver type:androidx.compose.runtime.ScopeUpdateScope? [val]
+            CALL 'public abstract fun endRestartGroup (): androidx.compose.runtime.ScopeUpdateScope? declared in androidx.compose.runtime.Composer' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
+              $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.Composer? origin=null
+          WHEN type=kotlin.Unit origin=IF
+            BRANCH
+              if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
+                arg0: GET_VAR 'val tmp3_safe_receiver: androidx.compose.runtime.ScopeUpdateScope? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
+                arg1: CONST Null type=kotlin.Any? value=null
+              then: CONST Null type=kotlin.Any? value=null
+            BRANCH
+              if: CONST Boolean type=kotlin.Boolean value=true
+              then: CALL 'public abstract fun updateScope (block: kotlin.Function2<androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit>): kotlin.Unit declared in androidx.compose.runtime.ScopeUpdateScope' type=kotlin.Unit origin=null
+                $this: GET_VAR 'val tmp3_safe_receiver: androidx.compose.runtime.ScopeUpdateScope? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
+                block: FUN_EXPR type=kotlin.Function2<androidx.compose.runtime.Composer?, kotlin.Int, kotlin.Unit> origin=LAMBDA
+                  FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> ($composer:androidx.compose.runtime.Composer?, $force:kotlin.Int) returnType:kotlin.Unit
+                    VALUE_PARAMETER name:$composer index:0 type:androidx.compose.runtime.Composer?
+                    VALUE_PARAMETER name:$force index:1 type:kotlin.Int
+                    BLOCK_BODY
+                      RETURN type=kotlin.Nothing from='local final fun <anonymous> ($composer: androidx.compose.runtime.Composer?, $force: kotlin.Int): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable'
+                        CALL 'private final fun delegateNullableStateVariableComposable ($composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer' type=kotlin.Unit origin=null
+                          $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable.<anonymous>' type=androidx.compose.runtime.Composer? origin=null
+                          $changed: CALL 'internal final fun updateChangedFlags (flags: kotlin.Int): kotlin.Int declared in androidx.compose.runtime' type=kotlin.Int origin=null
+                            flags: CALL 'public final fun or (other: kotlin.Int): kotlin.Int [infix] declared in kotlin.Int' type=kotlin.Int origin=null
+                              $this: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer.delegateNullableStateVariableComposable' type=kotlin.Int origin=null
+                              other: CONST Int type=kotlin.Int value=1
 
 //
-// Transformed IR
+// SOURCE
 // ------------------------------------------
 
 val ComposableInvalidationTraceTableImpl%DelegateStateVariableKt: ComposableInvalidationTraceTable = ComposableInvalidationTraceTable()
+private fun <T> State<T>?.getValue(thisObj: Any?, property: KProperty<*>) {
+  return
+}
+private fun <T> State<T>?.setValue(thisObj: Any?, property: KProperty<*>, value: T) { }
+private object CustomState : State<Unit> {
+  val value: Unit
+    get() {
+      return
+    }
+}
+private fun delegateStateVariable() {
+  val state by {
+    val state%delegate = ComposableInvalidationTraceTableImpl%DelegateStateVariableKt.registerStateObject(mutableStateOf(
+      value = Unit
+    ), "state")
+    get() {
+      return state%delegate.getValue(null, ::state%delegate)
+    }
+  }
+  var state2 by {
+    val state2%delegate = ComposableInvalidationTraceTableImpl%DelegateStateVariableKt.registerStateObject(run {
+      CustomState
+    }, "state2")
+    get() {
+      return state2%delegate.getValue(null, ::state2%delegate)
+    }
+    set(<set-?>: Unit) {
+      return state2%delegate.setValue(null, ::state2%delegate, <set-?>)
+    }
+  }
+}
+private fun delegateNullableStateVariable() {
+  val nullableState = CustomState
+  val state by {
+    val state%delegate = nullableState
+    get() {
+      return state%delegate.getValue(null, ::state%delegate)
+    }
+  }
+  var state2 by {
+    val state2%delegate = run {
+      nullableState
+    }
+    get() {
+      return state2%delegate.getValue(null, ::state2%delegate)
+    }
+    set(<set-?>: Unit) {
+      return state2%delegate.setValue(null, ::state2%delegate, <set-?>)
+    }
+  }
+}
 @Composable
-fun delegateStateVariable(%composer: Composer?, %changed: Int) {
+private fun delegateStateVariableComposable(%composer: Composer?, %changed: Int) {
   %composer = %composer.startRestartGroup(<>)
   if (%changed != 0 || !%composer.skipping) {
     if (isTraceInProgress()) {
@@ -41,9 +525,7 @@ fun delegateStateVariable(%composer: Composer?, %changed: Int) {
       val state%delegate = ComposableInvalidationTraceTableImpl%DelegateStateVariableKt.registerStateObject(<block>{
         %composer.startReplaceGroup(<>)
         val tmp0_group = %composer.cache(false) {
-          mutableStateOf(
-            value = Unit
-          )
+          CustomState
         }
         %composer.endReplaceGroup()
         tmp0_group
@@ -79,6 +561,64 @@ fun delegateStateVariable(%composer: Composer?, %changed: Int) {
     %composer.skipToGroupEnd()
   }
   %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-    delegateStateVariable(%composer, updateChangedFlags(%changed or 0b0001))
+    delegateStateVariableComposable(%composer, updateChangedFlags(%changed or 0b0001))
+  }
+}
+@Composable
+private fun delegateNullableStateVariableComposable(%composer: Composer?, %changed: Int) {
+  %composer = %composer.startRestartGroup(<>)
+  if (%changed != 0 || !%composer.skipping) {
+    if (isTraceInProgress()) {
+      traceEventStart(<>, %changed, -1, <>)
+    }
+    val nullableState = <block>{
+      %composer.startReplaceGroup(<>)
+      val tmp0_group = %composer.cache(false) {
+        mutableStateOf(
+          value = Unit
+        )
+      }
+      %composer.endReplaceGroup()
+      tmp0_group
+    }
+    val state by {
+      val state%delegate = <block>{
+        %composer.startReplaceGroup(<>)
+        val tmp1_group = %composer.cache(false) {
+          nullableState
+        }
+        %composer.endReplaceGroup()
+        tmp1_group
+      }
+      get() {
+        return state%delegate.getValue(null, ::state%delegate)
+      }
+    }
+    var state2 by {
+      val state2%delegate = <block>{
+        %composer.startReplaceGroup(<>)
+        val tmp2_group = %composer.cache(false) {
+          run {
+            nullableState
+          }
+        }
+        %composer.endReplaceGroup()
+        tmp2_group
+      }
+      get() {
+        return state2%delegate.getValue(null, ::state2%delegate)
+      }
+      set(<set-?>: Unit) {
+        return state2%delegate.setValue(null, ::state2%delegate, <set-?>)
+      }
+    }
+    if (isTraceInProgress()) {
+      traceEventEnd()
+    }
+  } else {
+    %composer.skipToGroupEnd()
+  }
+  %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
+    delegateNullableStateVariableComposable(%composer, updateChangedFlags(%changed or 0b0001))
   }
 }

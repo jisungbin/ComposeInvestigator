@@ -15,7 +15,7 @@ import org.junit.jupiter.api.extension.ExtensionContext
 import org.junit.jupiter.api.extension.ParameterContext
 import org.junit.jupiter.api.extension.ParameterResolver
 
-typealias VerifyGolden = (source: String, expect: String, directory: String) -> GoldenVerificationResult
+typealias VerifyGolden = (ir: String, source: String, directory: String) -> GoldenVerificationResult
 
 enum class GoldenVerificationResult {
   SAVED,
@@ -44,10 +44,10 @@ class GoldenTestExtension : BeforeEachCallback, ParameterResolver {
    * Verify the current test against the matching golden file. If the golden does not exist,
    * create a new golden file.
    */
-  fun verifyGolden(source: String, expect: String, directory: String): GoldenVerificationResult {
+  fun verifyGolden(expectIr: String, expectSource: String, directory: String): GoldenVerificationResult {
     val golden = File(directory, goldenName)
     if (!golden.exists()) {
-      saveGolden(golden, GoldenTransformTestInfo(source, expect))
+      saveGolden(golden, GoldenTransformTestInfo(expectIr, expectSource))
       return GoldenVerificationResult.SAVED
     }
 
@@ -58,10 +58,16 @@ class GoldenTestExtension : BeforeEachCallback, ParameterResolver {
     }
 
     assertEquals(
-      loadedGolden.transformed,
-      expect,
+      loadedGolden.ir,
+      expectIr,
+      "Transformed IR does not match golden file: \n${golden.absolutePath}",
+    )
+    assertEquals(
+      loadedGolden.source,
+      expectSource,
       "Transformed source does not match golden file: \n${golden.absolutePath}",
     )
+
     return GoldenVerificationResult.PASS
   }
 
@@ -76,43 +82,43 @@ class GoldenTestExtension : BeforeEachCallback, ParameterResolver {
 }
 
 /**
- * @param source The pre-transformed source code.
- * @param transformed Post transformed IR tree source.
+ * @param ir The transformed IR tree dump.
+ * @param source The transformed IR tree Kotlin-like dump.
  */
 private data class GoldenTransformTestInfo(
+  val ir: String,
   val source: String,
-  val transformed: String,
 ) {
   fun encodeToString() = buildString {
+    append(IR_HEADER)
+    appendLine()
+    appendLine()
+    append(ir)
+    appendLine()
+    appendLine()
     append(SOURCE_HEADER)
     appendLine()
     appendLine()
     append(source)
     appendLine()
-    appendLine()
-    append(TRANSFORM_HEADER)
-    appendLine()
-    appendLine()
-    append(transformed)
-    appendLine()
   }
 
   companion object {
-    val SOURCE_HEADER = """
+    val IR_HEADER = """
             //
-            // Source
+            // IR
             // ------------------------------------------
     """.trimIndent()
-    val TRANSFORM_HEADER = """
+    val SOURCE_HEADER = """
             //
-            // Transformed IR
+            // SOURCE
             // ------------------------------------------
     """.trimIndent()
 
     fun fromEncodedString(encoded: String): GoldenTransformTestInfo {
-      val split = encoded.removePrefix(SOURCE_HEADER).split(TRANSFORM_HEADER)
+      val split = encoded.removePrefix(IR_HEADER).split(SOURCE_HEADER)
       if (split.size != 2) error("Could not parse encoded golden string. Expected 2 sections but was ${split.size}.")
-      return GoldenTransformTestInfo(source = split[0].trim(), transformed = split[1].trim())
+      return GoldenTransformTestInfo(ir = split[0].trim(), source = split[1].trim())
     }
   }
 }

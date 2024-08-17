@@ -1,0 +1,29 @@
+//
+// IR
+// ------------------------------------------
+
+FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableInstantiate fileName:normalFile.kt
+  annotations:
+    Suppress(names = ["unused"])
+  PROPERTY name:ComposableInvalidationTraceTableImpl$NormalFileKt visibility:private modality:FINAL [val]
+    FIELD name:ComposableInvalidationTraceTableImpl$NormalFileKt type:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable visibility:private [final,static]
+      EXPRESSION_BODY
+        CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-ComposableInvalidationTraceTableImpl$NormalFileKt> visibility:private modality:FINAL <> () returnType:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable
+      correspondingProperty: PROPERTY name:ComposableInvalidationTraceTableImpl$NormalFileKt visibility:private modality:FINAL [val]
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='private final fun <get-ComposableInvalidationTraceTableImpl$NormalFileKt> (): land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableInstantiate'
+          GET_FIELD 'FIELD name:ComposableInvalidationTraceTableImpl$NormalFileKt type:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable visibility:private [final,static] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableInstantiate' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+  FUN name:helloWorld! visibility:private modality:FINAL <> () returnType:kotlin.Unit
+    BLOCK_BODY
+      RETURN type=kotlin.Nothing from='private final fun helloWorld! (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableInstantiate'
+        GET_OBJECT 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.Unit
+
+//
+// SOURCE
+// ------------------------------------------
+
+val ComposableInvalidationTraceTableImpl%NormalFileKt: ComposableInvalidationTraceTable = ComposableInvalidationTraceTable()
+private fun helloWorld!() {
+  return
+}
