@@ -7,14 +7,14 @@
 
 package land.sungbin.composeinvestigator.compiler.test
 
-import land.sungbin.composeinvestigator.compiler.test._compilation.AbstractCompilerTest
-import land.sungbin.composeinvestigator.compiler.test._compilation.dumpSrc
+import androidx.compose.compiler.plugins.kotlin.lower.dumpSrc
+import land.sungbin.composeinvestigator.compiler.test._compilation.AbstractK2CompilerTest
 import land.sungbin.composeinvestigator.compiler.test._source.source
 import org.junit.Test
 
-class IrDumpingTest : AbstractCompilerTest(useFir = false) {
+class IrDumpingTest : AbstractK2CompilerTest() {
   @Test fun dump() {
-    val ir = compileToIr(sourceFiles = listOf(source("SourceForIrDump.kt")))
-    println(ir.dumpSrc(useFir = useFir))
+    val ir = compileToIr(listOf(source("SourceForIrDump.kt")))
+    println(ir.dumpSrc(useFir = true))
   }
 }

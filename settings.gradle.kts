@@ -16,14 +16,23 @@ pluginManagement {
   repositories {
     gradlePluginPortal()
     google {
-      content {
+      mavenContent {
         includeGroupByRegex(".*google.*")
         includeGroupByRegex(".*android.*")
       }
     }
-    mavenCentral()
+    mavenCentral {
+      mavenContent {
+        releasesOnly()
+      }
+    }
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") {
+      mavenContent {
+        includeGroupByRegex("org\\.jetbrains\\.kotlin.*")
+      }
+    }
     maven("https://jitpack.io") {
-      content {
+      mavenContent {
         includeGroup("com.github.takahirom")
       }
     }
@@ -36,17 +45,44 @@ pluginManagement {
   }
 }
 
-buildCache {
-  local {
-    removeUnusedEntriesAfterDays = 7
+dependencyResolutionManagement {
+  repositoriesMode = RepositoriesMode.FAIL_ON_PROJECT_REPOS
+  repositories {
+    google {
+      mavenContent {
+        includeGroupByRegex(".*google.*")
+        includeGroupByRegex(".*android.*")
+        releasesOnly()
+      }
+    }
+    mavenCentral {
+      mavenContent {
+        releasesOnly()
+      }
+    }
+    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") {
+      mavenContent {
+        includeGroupByRegex("org\\.jetbrains\\.kotlin.*")
+      }
+    }
+    maven("https://androidx.dev/snapshots/builds/11964836/artifacts/repository") {
+      mavenContent {
+        includeModuleByRegex("androidx\\.compose\\.runtime", "runtime-test-utils.*")
+        snapshotsOnly()
+      }
+    }
   }
+}
+
+plugins {
+  id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
 include(
   ":runtime",
   ":compiler",
-  ":compiler-hosted",
-  ":compiler-gradle-plugin",
-  ":compiler-integration-test",
-  ":sample",
+  // ":compiler-integration-test",
+  // ":compiler-embeddable",
+  // ":compiler-gradle-plugin",
+  // ":sample",
 )

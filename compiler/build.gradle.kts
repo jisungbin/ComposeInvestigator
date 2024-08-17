@@ -5,41 +5,34 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-@file:Suppress("UnstableApiUsage")
-
-import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
-
 plugins {
-  java
+  kotlin("jvm")
   id(libs.plugins.gradle.publish.maven.get().pluginId)
-  alias(libs.plugins.gradle.shadow)
+}
+
+kotlin {
+  explicitApi()
+  compilerOptions {
+    optIn.addAll(
+      "org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi",
+      "org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction",
+      // Only works with IR phase, not FIR.
+      // See https://slack-chats.kotlinlang.org/t/16073880/is-there-a-doc-writeup-somewhere-about-unsafeduringirconstru.
+      "org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI",
+    )
+  }
 }
 
 dependencies {
-  compileOnly(projects.compilerHosted)
-}
+  compileOnly(kotlin("compiler", version = libs.versions.kotlin.core.get()))
+  compileOnly(kotlin("compose-compiler-plugin", version = libs.versions.kotlin.core.get()))
+  compileOnly(libs.jetbrains.annotation)
 
-// https://github.com/johnrengelman/shadow/issues/448#issuecomment-562939439
-project.configurations.implementation.get().isCanBeResolved = true
+  testImplementation(projects.runtime)
+  testImplementation(libs.compose.material)
+  testImplementation(kotlin("compiler", version = libs.versions.kotlin.core.get()))
+  testImplementation(kotlin("compose-compiler-plugin", version = libs.versions.kotlin.core.get()))
+  testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
 
-val shadowJar = tasks.register<ShadowJar>("embeddedPlugin") {
-  configurations = listOf(
-    project.configurations.implementation.get(),
-    project.configurations.compileClasspath.get(),
-  )
-  relocate(
-    /* pattern = */ "com.intellij",
-    /* destination = */ "org.jetbrains.kotlin.com.intellij",
-  )
-  archiveBaseName.set("embedded")
-  archiveVersion.set("")
-  destinationDirectory.set(File(layout.buildDirectory.asFile.get(), "repackaged"))
-}
-
-// replace the standard jar with the one built by 'shadowJar' in both api and runtime variants
-configurations {
-  apiElements.get().outgoing.artifacts.clear()
-  apiElements.get().outgoing.artifact(shadowJar.flatMap(AbstractArchiveTask::getArchiveFile))
-  runtimeElements.get().outgoing.artifacts.clear()
-  runtimeElements.get().outgoing.artifact(shadowJar.flatMap(AbstractArchiveTask::getArchiveFile))
+  kotlinCompilerPluginClasspathTest(kotlin("compose-compiler-plugin-embeddable", version = libs.versions.kotlin.core.get()))
 }
