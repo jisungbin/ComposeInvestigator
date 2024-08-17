@@ -1,39 +1,73 @@
-/*
- * Developed by Ji Sungbin 2024.
- *
- * Licensed under the MIT.
- * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
- */
-
 package land.sungbin.composeinvestigator.compiler.frontend
 
-import com.intellij.openapi.util.TextRange
 import kotlin.test.Test
-import kotlin.test.assertEquals
+import land.sungbin.composeinvestigator.compiler._assert.assertDiagnostics
 import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
-import land.sungbin.composeinvestigator.compiler._compilation.DiagnosticsResult.Diagnostic
 import land.sungbin.composeinvestigator.compiler._source.source
+import land.sungbin.composeinvestigator.compiler.frontend.ComposeInvestigatorErrors.ILLEGAL_COMPOSABLE_NAME
 
 class ComposableNameCallCheckerTest : AbstractCompilerTest() {
-  @Test fun hardcodeComposableName() {
-    val diagnostics = analyze(source("frontend/composableNameCall/hardcodeComposableName.kt"))
-      .diagnostics
-
-    assertEquals(emptyMap(), diagnostics)
+  @Test fun composableFunction() {
+    val analyze = analyze(source("frontend/composableNameCall/composableFunction.kt"))
+    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_NAME)
   }
 
-  @Test fun expressionComposableName() {
-    val diagnostics = analyze(source("frontend/composableNameCall/expressionComposableName.kt"))
-      .diagnostics
-    val expect = Diagnostic(
-      message = """
-|/expressionComposableName.kt:17:18: error: currently, only string hardcodes are supported as arguments to ComposableName.
-|  ComposableName(Random.nextBoolean().toString())
-|                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-      """.trimMargin(),
-      ranges = listOf(TextRange(476, 508)),
-    )
+  @Test fun composableLambda() {
+    val analyze = analyze(source("frontend/composableNameCall/composableLambda.kt"))
+    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_NAME)
+  }
 
-    assertEquals(mapOf("COMPOSABLE_NAME_ONLY_HARDCODED" to listOf(expect)), diagnostics)
+  @Test fun inlineComposableFunction() {
+    val analyze = analyze(source("frontend/composableNameCall/inlineComposableFunction.kt"))
+    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_NAME)
+  }
+
+  @Test fun inlineComposableLambda() {
+    val analyze = analyze(source("frontend/composableNameCall/inlineComposableLambda.kt"))
+    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_NAME)
+  }
+
+  @Test fun inlineNormalFunction() {
+    val analyze = analyze(source("frontend/composableNameCall/inlineNormalFunction.kt"))
+    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_NAME) {
+      """
+error: a ComposableName can only be used in a Composable function.
+  ComposableName("")
+  ^^^^^^^^^^^^^^^^^^
+      """.trim()
+    }
+  }
+
+  @Test fun inlineNormalLambda() {
+    val analyze = analyze(source("frontend/composableNameCall/inlineNormalLambda.kt"))
+    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_NAME) {
+      """
+error: a ComposableName can only be used in a Composable function.
+  l { ComposableName("") }
+      ^^^^^^^^^^^^^^^^^^
+      """.trim()
+    }
+  }
+
+  @Test fun normalFunction() {
+    val analyze = analyze(source("frontend/composableNameCall/normalFunction.kt"))
+    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_NAME) {
+      """
+error: a ComposableName can only be used in a Composable function.
+  ComposableName("")
+  ^^^^^^^^^^^^^^^^^^
+      """.trim()
+    }
+  }
+
+  @Test fun normalLambda() {
+    val analyze = analyze(source("frontend/composableNameCall/normalLambda.kt"))
+    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_NAME) {
+      """
+error: a ComposableName can only be used in a Composable function.
+  l { ComposableName("") }
+      ^^^^^^^^^^^^^^^^^^
+      """.trim()
+    }
   }
 }

@@ -35,9 +35,6 @@ fun directStateVariable(%composer: Composer?, %changed: Int) {
     if (isTraceInProgress()) {
       traceEventStart(<>, %changed, -1, <>)
     }
-    val tmp0_currentValueArguments = mutableListOf()
-    val tmp1_invalidationReason = ComposableInvalidationTraceTableImpl%DirectStateVariableKt.computeInvalidationReason("fun-directStateVariable()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer/file-directStateVariable.kt", tmp0_currentValueArguments)
-    ComposeInvestigatorConfig.logger.log(ComposableInformation("directStateVariable", "land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer", "directStateVariable.kt"), Processed(tmp1_invalidationReason))
     val state = ComposableInvalidationTraceTableImpl%DirectStateVariableKt.registerStateObject(<block>{
       %composer.startReplaceGroup(<>)
       val tmp0_group = %composer.cache(false) {
@@ -64,7 +61,6 @@ fun directStateVariable(%composer: Composer?, %changed: Int) {
       traceEventEnd()
     }
   } else {
-    ComposeInvestigatorConfig.logger.log(ComposableInformation("directStateVariable", "land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer", "directStateVariable.kt"), Skipped)
     %composer.skipToGroupEnd()
   }
   %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->

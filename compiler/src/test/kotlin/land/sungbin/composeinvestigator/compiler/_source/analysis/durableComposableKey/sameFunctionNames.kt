@@ -9,7 +9,7 @@
 
 package land.sungbin.composeinvestigator.compiler._source.analysis.durableComposableKey
 
-fun one() {}
-fun one(a: Any) {}
-fun one(a: Any, b: Any) {}
-fun one(a: Any, b: Any, c: Any) {}
+private fun one() {}
+private fun one(a: Any) {}
+private fun one(a: Any, b: Any) {}
+private fun one(a: Any, b: Any, c: Any) {}

@@ -7,11 +7,11 @@
 
 @file:Suppress("unused")
 
-package land.sungbin.composeinvestigator.compiler._source.frontend.composableNameCall
+package land.sungbin.composeinvestigator.compiler._source.frontend.composableNameExpression
 
 import androidx.compose.runtime.Composable
 import land.sungbin.composeinvestigator.runtime.ComposableName
 
-@Composable fun hardcodeComposableName() {
-  ComposableName("MyName")
+@Composable fun magicNumberToStringExpression() {
+  ComposableName(42.toString())
 }

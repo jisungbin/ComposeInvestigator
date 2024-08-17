@@ -33,7 +33,7 @@ class GoldenTestExtensionTest : AbstractGoldenTest() {
     assertEquals(
       """
 Transformed source does not match golden file: 
-${tempDir.path}/land.sungbin.composeinvestigator.compiler.GoldenTestExtensionTest/throwsWhenGoldenChanged.txt ==> expected: <$golden1> but was: <$golden2>
+${tempDir.path}/GoldenTestExtensionTest/throwsWhenGoldenChanged.txt ==> expected: <$golden1> but was: <$golden2>
       """.trim(),
       result.message,
     )

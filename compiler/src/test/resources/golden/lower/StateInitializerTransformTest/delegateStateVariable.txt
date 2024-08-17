@@ -37,9 +37,6 @@ fun delegateStateVariable(%composer: Composer?, %changed: Int) {
     if (isTraceInProgress()) {
       traceEventStart(<>, %changed, -1, <>)
     }
-    val tmp0_currentValueArguments = mutableListOf()
-    val tmp1_invalidationReason = ComposableInvalidationTraceTableImpl%DelegateStateVariableKt.computeInvalidationReason("fun-delegateStateVariable()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer/file-delegateStateVariable.kt", tmp0_currentValueArguments)
-    ComposeInvestigatorConfig.logger.log(ComposableInformation("delegateStateVariable", "land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer", "delegateStateVariable.kt"), Processed(tmp1_invalidationReason))
     val state by {
       val state%delegate = ComposableInvalidationTraceTableImpl%DelegateStateVariableKt.registerStateObject(<block>{
         %composer.startReplaceGroup(<>)
@@ -79,7 +76,6 @@ fun delegateStateVariable(%composer: Composer?, %changed: Int) {
       traceEventEnd()
     }
   } else {
-    ComposeInvestigatorConfig.logger.log(ComposableInformation("delegateStateVariable", "land.sungbin.composeinvestigator.compiler._source.lower.stateInitializer", "delegateStateVariable.kt"), Skipped)
     %composer.skipToGroupEnd()
   }
   %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->

@@ -10,9 +10,8 @@
 package land.sungbin.composeinvestigator.compiler._source.frontend.composableNameCall
 
 import androidx.compose.runtime.Composable
-import kotlin.random.Random
 import land.sungbin.composeinvestigator.runtime.ComposableName
 
-@Composable fun expressionComposableName() {
-  ComposableName(Random.nextBoolean().toString())
+@Composable private fun composableFunction() {
+  ComposableName("")
 }

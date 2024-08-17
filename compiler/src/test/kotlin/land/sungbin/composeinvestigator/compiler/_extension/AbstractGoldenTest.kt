@@ -8,14 +8,16 @@
 package land.sungbin.composeinvestigator.compiler._extension
 
 import androidx.compose.compiler.plugins.kotlin.lower.dumpSrc
+import java.util.EnumSet
 import kotlin.test.BeforeTest
+import land.sungbin.composeinvestigator.compiler.FeatureFlag
 import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
 import land.sungbin.composeinvestigator.compiler._compilation.SourceFile
 import land.sungbin.composeinvestigator.compiler._extension.GoldenTestExtension.Companion.DEFAULT_GOLDEN_DIRECTORY
 import org.junit.jupiter.api.extension.ExtendWith
 
 @ExtendWith(GoldenTestExtension::class)
-abstract class AbstractGoldenTest : AbstractCompilerTest() {
+abstract class AbstractGoldenTest(features: EnumSet<FeatureFlag> = EnumSet.noneOf(FeatureFlag::class.java)) : AbstractCompilerTest(features) {
   private lateinit var verifyGoldenImpl: VerifyGolden
 
   @BeforeTest fun prepare(verifyGolden: VerifyGolden) {

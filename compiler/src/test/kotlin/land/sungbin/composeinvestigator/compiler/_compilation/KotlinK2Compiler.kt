@@ -116,7 +116,7 @@ class FirAnalysisResult(
             val renderer = RootDiagnosticRendererFactory(diagnostic)
             val location = sourceLocationMap[diagnostic]
 
-            MessageRenderer.PLAIN_FULL_PATHS.render(
+            MessageRenderer.WITHOUT_PATHS.render(
               severity,
               renderer.render(diagnostic),
               location,
@@ -189,7 +189,6 @@ class KotlinK2Compiler private constructor(private val environment: KotlinCoreEn
       diagnosticsReporter = analysis.reporter,
       irGeneratorExtensions = IrGenerationExtension.getInstances(project),
     )
-
     return fir2IrResult
   }
 
@@ -235,6 +234,7 @@ class KotlinK2Compiler private constructor(private val environment: KotlinCoreEn
         updateConfiguration()
       }
 
+      // KotlinCoreEnvironment.createForParallelTests
       val environment = KotlinCoreEnvironment.createForTests(
         parentDisposable = disposable,
         initialConfiguration = configuration,
