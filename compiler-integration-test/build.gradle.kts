@@ -10,6 +10,7 @@
 plugins {
   id("com.android.library")
   kotlin("android")
+  alias(libs.plugins.kotlin.compose)
 }
 
 android {
@@ -30,10 +31,6 @@ android {
     targetCompatibility = JavaVersion.VERSION_17
   }
 
-  lint {
-    disable.add("MissingClass")
-  }
-
   testOptions {
     unitTests {
       isIncludeAndroidResources = true
@@ -44,55 +41,49 @@ android {
       }
     }
   }
-
-  buildFeatures {
-    compose = true
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
-    useLiveLiterals = true
-  }
 }
 
 kotlin {
   compilerOptions {
-    optIn.add("org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi")
-    optIn.add("org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction")
-    optIn.add("land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi")
-    optIn.add("land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi")
-    freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=false")
+    optIn.addAll(
+      "org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi",
+      "org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction",
+      "org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI",
+      "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
+      "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
+    )
+    freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=true")
   }
 }
 
 afterEvaluate {
   tasks.withType<Test> {
-    dependsOn(":compiler:embeddedPlugin")
+    dependsOn(":compiler-embeddable:embeddedPlugin")
   }
 }
 
 dependencies {
   implementation(projects.runtime)
   implementation(libs.compose.material)
-  implementation(libs.test.kotest.assertion)
+  implementation(libs.jetbrains.annotation)
+  implementation(libs.test.assertk)
 
-  testImplementation(projects.compilerHosted)
-  testImplementation(libs.compose.compiler)
-  testImplementation(libs.kotlin.compiler) // must be 'implementation' (not 'compileOnly')
+  testImplementation(projects.compiler)
+  testImplementation(kotlin("compiler", version = libs.versions.kotlin.core.get()))
+  testImplementation(kotlin("compose-compiler-plugin", version = libs.versions.kotlin.core.get()))
 
   testImplementation(libs.test.kotlin.coroutines) {
     because("https://github.com/Kotlin/kotlinx.coroutines/issues/3673")
   }
 
   testImplementation(libs.test.mockk)
-  testImplementation(libs.test.kotest.junit5)
   testImplementation(libs.test.robolectric) {
     because("https://stackoverflow.com/a/64287388/14299073")
   }
 
   testImplementation(libs.test.junit.core)
-  testRuntimeOnly(libs.test.junit.enigne)
   testImplementation(libs.test.junit.compose)
+  testRuntimeOnly(libs.test.junit.enigne)
 
-  kotlinCompilerPluginClasspath(projects.compiler)
+  kotlinCompilerPluginClasspath(projects.compilerEmbeddable)
 }

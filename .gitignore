@@ -6,8 +6,10 @@
 !/.idea/codeStyles
 !/.idea/dictionaries
 !/.idea/inspectionProfiles
+!/.idea/README.md
 *.iml
 .gradle
+.kotlin
 build
 release
 local.properties

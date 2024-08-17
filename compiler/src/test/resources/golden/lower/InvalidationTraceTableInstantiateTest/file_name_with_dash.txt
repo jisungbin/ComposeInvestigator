@@ -1,0 +1,29 @@
+//
+// IR
+// ------------------------------------------
+
+FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableInstantiate fileName:file-name-with-dash.kt
+  annotations:
+    Suppress(names = ["unused"])
+  PROPERTY name:ComposableInvalidationTraceTableImpl$File_name_with_dashKt visibility:private modality:FINAL [val]
+    FIELD name:ComposableInvalidationTraceTableImpl$File_name_with_dashKt type:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable visibility:private [final,static]
+      EXPRESSION_BODY
+        CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-ComposableInvalidationTraceTableImpl$File_name_with_dashKt> visibility:private modality:FINAL <> () returnType:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable
+      correspondingProperty: PROPERTY name:ComposableInvalidationTraceTableImpl$File_name_with_dashKt visibility:private modality:FINAL [val]
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='private final fun <get-ComposableInvalidationTraceTableImpl$File_name_with_dashKt> (): land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableInstantiate'
+          GET_FIELD 'FIELD name:ComposableInvalidationTraceTableImpl$File_name_with_dashKt type:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable visibility:private [final,static] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableInstantiate' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+  FUN name:h visibility:private modality:FINAL <> () returnType:kotlin.reflect.KClass<kotlin.Nothing>
+    BLOCK_BODY
+      RETURN type=kotlin.Nothing from='private final fun h (): kotlin.reflect.KClass<kotlin.Nothing> declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableInstantiate'
+        CLASS_REFERENCE 'CLASS IR_EXTERNAL_DECLARATION_STUB CLASS name:Nothing modality:FINAL visibility:public superTypes:[]' type=kotlin.reflect.KClass<kotlin.Nothing>
+
+//
+// SOURCE
+// ------------------------------------------
+
+val ComposableInvalidationTraceTableImpl%File_name_with_dashKt: ComposableInvalidationTraceTable = ComposableInvalidationTraceTable()
+private fun h(): KClass<Nothing> {
+  return Nothing::class
+}

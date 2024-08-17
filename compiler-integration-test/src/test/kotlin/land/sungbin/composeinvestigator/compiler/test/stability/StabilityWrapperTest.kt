@@ -8,14 +8,21 @@
 package land.sungbin.composeinvestigator.compiler.test.stability
 
 import androidx.compose.compiler.plugins.kotlin.analysis.Stability
-import io.kotest.matchers.collections.shouldHaveSize
-import io.kotest.matchers.shouldBe
-import io.kotest.matchers.types.shouldBeInstanceOf
+import assertk.assertThat
+import assertk.assertions.hasClass
+import assertk.assertions.hasSize
+import assertk.assertions.isEqualTo
+import assertk.assertions.isFalse
+import assertk.assertions.isNotNull
+import assertk.assertions.isTrue
+import assertk.assertions.prop
+import assertk.assertions.single
 import io.mockk.every
 import io.mockk.mockk
-import land.sungbin.composeinvestigator.compiler.analysis.toIrDeclarationStability
-import land.sungbin.composeinvestigator.compiler.test._compilation.AbstractCompilerTest
+import land.sungbin.composeinvestigator.compiler.analysis.toIrOwnStability
+import land.sungbin.composeinvestigator.compiler.test._compilation.AbstractK2CompilerTest
 import land.sungbin.composeinvestigator.compiler.test._source.source
+import land.sungbin.composeinvestigator.compiler.test.cast
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.backend.js.utils.valueArguments
@@ -25,43 +32,51 @@ import org.jetbrains.kotlin.ir.declarations.IrTypeParameter
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrVararg
+import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
 import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.name.Name
-import org.jetbrains.kotlin.utils.addToStdlib.cast
 import org.junit.Test
 
-class StabilityWrapperTest : AbstractCompilerTest(useFir = false) {
-  @Test fun stability_certain_to_IrDeclarationStability() {
+class StabilityWrapperTest : AbstractK2CompilerTest() {
+  @Test fun stability_certain_to_IrStability() {
     var stableStability: IrConstructorCall? = null
     var unstableStability: IrConstructorCall? = null
 
     compileToIr(
       sourceFiles = listOf(source("EmptySource.kt")),
-      registerExtensions = {
+      additionalRegisterExtensions = {
         IrGenerationExtension.registerExtension(
           project = this,
           extension = object : IrGenerationExtension {
             override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-              stableStability = Stability.Stable.toIrDeclarationStability(pluginContext)
-              unstableStability = Stability.Unstable.toIrDeclarationStability(pluginContext)
+              stableStability = Stability.Stable.toIrOwnStability(pluginContext)
+              unstableStability = Stability.Unstable.toIrOwnStability(pluginContext)
             }
           },
         )
       },
     )
 
-    stableStability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Certain"
-    unstableStability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Certain"
+    assertThat(stableStability!!.type.classFqName?.asString()).isEqualTo("land.sungbin.composeinvestigator.runtime.Stability.Certain")
+    assertThat(unstableStability!!.type.classFqName?.asString()).isEqualTo("land.sungbin.composeinvestigator.runtime.Stability.Certain")
 
-    with(stableStability!!.valueArguments.single()) {
-      shouldBeInstanceOf<IrConst<Boolean>>().value shouldBe true
-    }
-    with(unstableStability!!.valueArguments.single()) {
-      shouldBeInstanceOf<IrConst<Boolean>>().value shouldBe false
-    }
+    assertThat(stableStability!!.valueArguments)
+      .single()
+      .isNotNull()
+      .cast<IrConstImpl<Boolean>>()
+      .prop(IrConst<Boolean>::value)
+      .isTrue()
+    assertThat(unstableStability!!.valueArguments)
+      .single()
+      .isNotNull()
+      .cast<IrConstImpl<Boolean>>()
+      .prop(IrConst<Boolean>::value)
+      .isFalse()
   }
 
-  @Test fun stability_runtime_to_IrDeclarationStability() {
+  @Test fun stability_runtime_to_IrStability() {
     var stability: IrConstructorCall? = null
     val stabilityDeclarationClass = mockk<IrClass> {
       every { name } returns Name.identifier("RuntimeDeclaration")
@@ -69,26 +84,29 @@ class StabilityWrapperTest : AbstractCompilerTest(useFir = false) {
 
     compileToIr(
       sourceFiles = listOf(source("EmptySource.kt")),
-      registerExtensions = {
+      additionalRegisterExtensions = {
         IrGenerationExtension.registerExtension(
           project = this,
           extension = object : IrGenerationExtension {
             override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-              stability = Stability.Runtime(stabilityDeclarationClass).toIrDeclarationStability(pluginContext)
+              stability = Stability.Runtime(stabilityDeclarationClass).toIrOwnStability(pluginContext)
             }
           },
         )
       },
     )
 
-    stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Runtime"
+    assertThat(stability!!.type.classFqName?.asString()).isEqualTo("land.sungbin.composeinvestigator.runtime.Stability.Runtime")
 
-    with(stability!!.valueArguments.single()) {
-      shouldBeInstanceOf<IrConst<String>>().value shouldBe "RuntimeDeclaration"
-    }
+    assertThat(stability!!.valueArguments)
+      .single()
+      .isNotNull()
+      .cast<IrConstImpl<String>>()
+      .prop(IrConst<String>::value)
+      .isEqualTo("RuntimeDeclaration")
   }
 
-  @Test fun stability_unknown_to_IrDeclarationStability() {
+  @Test fun stability_unknown_to_IrStability() {
     var stability: IrConstructorCall? = null
     val stabilityDeclarationClass = mockk<IrClass> {
       every { name } returns Name.identifier("UnknownDeclaration")
@@ -96,26 +114,29 @@ class StabilityWrapperTest : AbstractCompilerTest(useFir = false) {
 
     compileToIr(
       sourceFiles = listOf(source("EmptySource.kt")),
-      registerExtensions = {
+      additionalRegisterExtensions = {
         IrGenerationExtension.registerExtension(
           project = this,
           extension = object : IrGenerationExtension {
             override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-              stability = Stability.Unknown(stabilityDeclarationClass).toIrDeclarationStability(pluginContext)
+              stability = Stability.Unknown(stabilityDeclarationClass).toIrOwnStability(pluginContext)
             }
           },
         )
       },
     )
 
-    stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Unknown"
+    assertThat(stability!!.type.classFqName?.asString()).isEqualTo("land.sungbin.composeinvestigator.runtime.Stability.Unknown")
 
-    with(stability!!.valueArguments.single()) {
-      shouldBeInstanceOf<IrConst<String>>().value shouldBe "UnknownDeclaration"
-    }
+    assertThat(stability!!.valueArguments)
+      .single()
+      .isNotNull()
+      .cast<IrConstImpl<String>>()
+      .prop(IrConst<String>::value)
+      .isEqualTo("UnknownDeclaration")
   }
 
-  @Test fun stability_parameter_to_IrDeclarationStability() {
+  @Test fun stability_parameter_to_IrStability() {
     var stability: IrConstructorCall? = null
     val stabilityDeclarationClass = mockk<IrTypeParameter> {
       every { name } returns Name.identifier("ParameterDeclaration")
@@ -123,26 +144,29 @@ class StabilityWrapperTest : AbstractCompilerTest(useFir = false) {
 
     compileToIr(
       sourceFiles = listOf(source("EmptySource.kt")),
-      registerExtensions = {
+      additionalRegisterExtensions = {
         IrGenerationExtension.registerExtension(
           project = this,
           extension = object : IrGenerationExtension {
             override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-              stability = Stability.Parameter(stabilityDeclarationClass).toIrDeclarationStability(pluginContext)
+              stability = Stability.Parameter(stabilityDeclarationClass).toIrOwnStability(pluginContext)
             }
           },
         )
       },
     )
 
-    stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Parameter"
+    assertThat(stability!!.type.classFqName?.asString()).isEqualTo("land.sungbin.composeinvestigator.runtime.Stability.Parameter")
 
-    with(stability!!.valueArguments.single()) {
-      shouldBeInstanceOf<IrConst<String>>().value shouldBe "ParameterDeclaration"
-    }
+    assertThat(stability!!.valueArguments)
+      .single()
+      .isNotNull()
+      .cast<IrConstImpl<String>>()
+      .prop(IrConst<String>::value)
+      .isEqualTo("ParameterDeclaration")
   }
 
-  @Test fun stability_combined_to_IrDeclarationStability() {
+  @Test fun stability_combined_to_IrStability() {
     var stability: IrConstructorCall? = null
     val runtimeDeclarationClass = mockk<IrClass> {
       every { name } returns Name.identifier("RuntimeDeclaration")
@@ -156,7 +180,7 @@ class StabilityWrapperTest : AbstractCompilerTest(useFir = false) {
 
     compileToIr(
       sourceFiles = listOf(source("EmptySource.kt")),
-      registerExtensions = {
+      additionalRegisterExtensions = {
         IrGenerationExtension.registerExtension(
           project = this,
           extension = object : IrGenerationExtension {
@@ -169,39 +193,52 @@ class StabilityWrapperTest : AbstractCompilerTest(useFir = false) {
                   Stability.Unknown(unknownDeclarationClass),
                   Stability.Parameter(parameterDeclarationClass),
                 ),
-              ).toIrDeclarationStability(pluginContext)
+              ).toIrOwnStability(pluginContext)
             }
           },
         )
       },
     )
 
-    stability!!.type.classFqName?.asString() shouldBe "land.sungbin.composeinvestigator.runtime.DeclarationStability.Combined"
+    assertThat(stability!!.type.classFqName?.asString()).isEqualTo("land.sungbin.composeinvestigator.runtime.Stability.Combined")
 
-    with(stability!!.valueArguments.single()) {
-      shouldBeInstanceOf<IrVararg>().elements shouldHaveSize 5
+    assertThat(stability!!.valueArguments)
+      .single()
+      .isNotNull()
+      .cast<IrVarargImpl>()
+      .prop(IrVararg::elements)
+      .also { it.hasSize(5) }
+      .given { actual ->
+        val matchFqNames = listOf(
+          "land.sungbin.composeinvestigator.runtime.Stability.Certain", // Certain(true)
+          "land.sungbin.composeinvestigator.runtime.Stability.Certain", // Certain(false)
+          "land.sungbin.composeinvestigator.runtime.Stability.Runtime", // Runtime
+          "land.sungbin.composeinvestigator.runtime.Stability.Unknown", // Unknown
+          "land.sungbin.composeinvestigator.runtime.Stability.Parameter", // Parameter
+        )
+        val matchValues = listOf(
+          true, // Certain(true)
+          false, // Certain(false)
+          "RuntimeDeclaration", // Runtime(RuntimeDeclaration)
+          "UnknownDeclaration", // Unknown(UnknownDeclaration)
+          "ParameterDeclaration", // Parameter(ParameterDeclaration)
+        )
 
-      val matchFqNames = listOf(
-        "land.sungbin.composeinvestigator.runtime.DeclarationStability.Certain", // Certain(true)
-        "land.sungbin.composeinvestigator.runtime.DeclarationStability.Certain", // Certain(false)
-        "land.sungbin.composeinvestigator.runtime.DeclarationStability.Runtime", // Runtime
-        "land.sungbin.composeinvestigator.runtime.DeclarationStability.Unknown", // Unknown
-        "land.sungbin.composeinvestigator.runtime.DeclarationStability.Parameter", // Parameter
-      )
-      val matchValues = listOf(
-        true, // Certain(true)
-        false, // Certain(false)
-        "RuntimeDeclaration", // Runtime(RuntimeDeclaration)
-        "UnknownDeclaration", // Unknown(UnknownDeclaration)
-        "ParameterDeclaration", // Parameter(ParameterDeclaration)
-      )
+        actual.forEachIndexed { index, element ->
+          assertThat(element).hasClass<IrConstructorCallImpl>()
+          element as IrConstructorCall
 
-      cast<IrVararg>().elements.forEachIndexed { index, element ->
-        with(element) {
-          shouldBeInstanceOf<IrConstructorCall>().type.classFqName?.asString() shouldBe matchFqNames[index]
-          valueArguments.single().shouldBeInstanceOf<IrConst<*>>().value shouldBe matchValues[index]
+          assertThat(element)
+            .transform { it.type.classFqName?.asString() }
+            .isEqualTo(matchFqNames[index])
+
+          assertThat(element.valueArguments)
+            .single()
+            .isNotNull()
+            .cast<IrConstImpl<*>>()
+            .prop(IrConst<*>::value)
+            .isEqualTo(matchValues[index])
         }
       }
-    }
   }
 }

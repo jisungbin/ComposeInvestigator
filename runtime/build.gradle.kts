@@ -6,11 +6,8 @@
  */
 @file:Suppress("UnstableApiUsage")
 
-import org.jetbrains.dokka.DokkaConfiguration.Visibility
-
 plugins {
-  id("com.android.library")
-  kotlin("android")
+  kotlin("jvm")
   alias(libs.plugins.kotlin.dokka)
   id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
@@ -21,65 +18,31 @@ tasks.dokkaHtml {
   outputDirectory.set(rootDir.resolve("documentation/site/runtime/api"))
 
   dokkaSourceSets.configureEach {
-    jdkVersion.set(17)
-    documentedVisibilities.set(setOf(Visibility.PUBLIC, Visibility.PROTECTED))
+    jdkVersion.set(JavaVersion.VERSION_17.majorVersion.toInt())
   }
 
   pluginsMapConfiguration.set(
     mapOf(
       "org.jetbrains.dokka.base.DokkaBase" to
         """{ "footerMessage": "ComposeInvestigator ⓒ 2024 Ji Sungbin" }""",
-    )
+    ),
   )
-}
-
-android {
-  namespace = "land.sungbin.composeinvestigator.runtime"
-  compileSdk = 34
-
-  defaultConfig {
-    minSdk = 21
-  }
-
-  sourceSets {
-    getByName("main").java.srcDir("src/main/kotlin")
-    getByName("test").java.srcDir("src/main/kotlin")
-  }
-
-  compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-  }
-
-  buildFeatures {
-    compose = true
-  }
-
-  composeOptions {
-    kotlinCompilerExtensionVersion = libs.versions.compose.compiler.get()
-  }
-
-  testOptions.unitTests {
-    isReturnDefaultValues = true
-    isIncludeAndroidResources = true
-  }
 }
 
 kotlin {
   explicitApi()
   compilerOptions {
-    optIn.add("androidx.compose.runtime.InternalComposeApi")
-    optIn.add("land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi")
-    optIn.add("land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi")
+    optIn.addAll(
+      "androidx.compose.runtime.InternalComposeApi",
+      "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
+      "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
+    )
   }
 }
 
 dependencies {
-  implementation(libs.compose.runtime)
-  implementation(libs.compose.animation)
-  implementation(embeddedKotlin("reflect"))
+  compileOnly(libs.compose.stableMarker)
 
-  testImplementation(libs.test.mockk)
-  testImplementation(libs.test.kotest.junit5)
-  testImplementation(libs.test.kotlin.coroutines)
+  testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
+  testImplementation(libs.test.assertk)
 }
