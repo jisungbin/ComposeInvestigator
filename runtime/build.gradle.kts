@@ -6,12 +6,6 @@
  */
 @file:Suppress("UnstableApiUsage")
 
-import org.gradle.kotlin.dsl.compileOnly
-import org.gradle.kotlin.dsl.dokkaHtml
-import org.gradle.kotlin.dsl.libs
-import org.gradle.kotlin.dsl.testImplementation
-
-
 plugins {
   kotlin("jvm")
   alias(libs.plugins.kotlin.dokka)

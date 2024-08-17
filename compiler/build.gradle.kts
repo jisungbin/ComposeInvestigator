@@ -10,10 +10,6 @@ plugins {
   id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 
-sourceSets.main {
-  java.srcDir("src/main/kotlin")
-}
-
 kotlin {
   explicitApi()
   compilerOptions {
