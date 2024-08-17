@@ -38,6 +38,7 @@ public class InvalidationTraceTableInstanceTransformer(
       /* element = */ file.getKtFile(),
     )
 
+  // TODO don't instantiate the table if the current file doesn't contain any Composables.
   override fun visitFile(declaration: IrFile): IrFile =
     includeFileIRInExceptionTrace(declaration) {
       if (declaration.hasAnnotation(NO_INVESTIGATION_FQN)) return declaration

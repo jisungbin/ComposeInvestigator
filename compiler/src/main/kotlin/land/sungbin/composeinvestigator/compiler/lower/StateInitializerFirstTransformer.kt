@@ -22,6 +22,8 @@ internal class StateInitializerFirstTransformer(
   messageCollector: MessageCollector,
   tables: IrInvalidationTraceTableHolder,
 ) : ComposeInvestigatorBaseLower(context, messageCollector, tables) {
+  // TODO special behaviour of 'remember' and 'rememberSaveable':
+  //  transforms should be performed inside the 'remember(Saveable)' lambda, not outside of it.
   override fun firstTransformStateInitializer(
     name: Name,
     initializer: IrExpression,
