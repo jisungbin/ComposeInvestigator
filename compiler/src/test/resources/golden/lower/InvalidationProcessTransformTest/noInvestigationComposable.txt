@@ -97,7 +97,7 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
                   key: CONST Int type=kotlin.Int value=615838550
                   dirty1: GET_VAR 'val $dirty: kotlin.Int [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.noInvestigationBlockComposable' type=kotlin.Int origin=null
                   dirty2: CONST Int type=kotlin.Int value=-1
-                  info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.noInvestigationBlockComposable (noInvestigationComposable.kt:10)"
+                  info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.noInvestigationBlockComposable (noInvestigationComposable.kt:17)"
             TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
               CALL 'private final fun use (any: kotlin.Any): kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip' type=kotlin.Int origin=null
                 any: GET_VAR 'any: kotlin.Any declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.noInvestigationBlockComposable' type=kotlin.Any origin=null
@@ -160,7 +160,7 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
             key: CONST Int type=kotlin.Int value=472355990
             dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.noInvestigationExpressionComposable' type=kotlin.Int origin=null
             dirty2: CONST Int type=kotlin.Int value=-1
-            info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.noInvestigationExpressionComposable (noInvestigationComposable.kt:17)"
+            info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.noInvestigationExpressionComposable (noInvestigationComposable.kt:24)"
       VAR IR_TEMPORARY_VARIABLE name:tmp0 type:kotlin.Int [val]
         CALL 'public final fun plus (other: kotlin.Int): kotlin.Int [operator] declared in kotlin.Int' type=kotlin.Int origin=PLUS
           $this: CALL 'private final fun use (any: kotlin.Any): kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip' type=kotlin.Int origin=null

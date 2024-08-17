@@ -96,13 +96,13 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
                   key: CONST Int type=kotlin.Int value=-323871314
                   dirty1: GET_VAR 'val $dirty: kotlin.Int [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.blockComposable' type=kotlin.Int origin=null
                   dirty2: CONST Int type=kotlin.Int value=-1
-                  info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.blockComposable (movableComposable.kt:9)"
+                  info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.blockComposable (movableComposable.kt:16)"
             TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
               BLOCK type=kotlin.Int origin=null
                 COMPOSITE type=kotlin.Unit origin=null
                 CALL 'public abstract fun startMovableGroup (key: kotlin.Int, dataKey: kotlin.Any?): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
                   $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.blockComposable' type=androidx.compose.runtime.Composer? origin=null
-                  key: CONST Int type=kotlin.Int value=-249415560
+                  key: CONST Int type=kotlin.Int value=-249410248
                   dataKey: CALL 'public abstract fun joinKey (left: kotlin.Any?, right: kotlin.Any?): kotlin.Any declared in androidx.compose.runtime.Composer' type=kotlin.Any origin=null
                     $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.blockComposable' type=androidx.compose.runtime.Composer? origin=null
                     left: GET_VAR 'any: kotlin.Any declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.blockComposable' type=kotlin.Any origin=null
@@ -182,13 +182,13 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
             key: CONST Int type=kotlin.Int value=-622754706
             dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.expressionComposable' type=kotlin.Int origin=null
             dirty2: CONST Int type=kotlin.Int value=-1
-            info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.expressionComposable (movableComposable.kt:17)"
+            info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.expressionComposable (movableComposable.kt:24)"
       VAR IR_TEMPORARY_VARIABLE name:tmp0 type:kotlin.Int [val]
         BLOCK type=kotlin.Int origin=null
           COMPOSITE type=kotlin.Unit origin=null
           CALL 'public abstract fun startMovableGroup (key: kotlin.Int, dataKey: kotlin.Any?): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
             $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.expressionComposable' type=androidx.compose.runtime.Composer? origin=null
-            key: CONST Int type=kotlin.Int value=-149035869
+            key: CONST Int type=kotlin.Int value=-149030557
             dataKey: CALL 'public abstract fun joinKey (left: kotlin.Any?, right: kotlin.Any?): kotlin.Any declared in androidx.compose.runtime.Composer' type=kotlin.Any origin=null
               $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.expressionComposable' type=androidx.compose.runtime.Composer? origin=null
               left: GET_VAR 'any: kotlin.Any declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.expressionComposable' type=kotlin.Any origin=null

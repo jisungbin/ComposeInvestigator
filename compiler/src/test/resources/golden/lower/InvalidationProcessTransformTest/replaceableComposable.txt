@@ -39,7 +39,7 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
             key: CONST Int type=kotlin.Int value=1019456782
             dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.blockComposable' type=kotlin.Int origin=null
             dirty2: CONST Int type=kotlin.Int value=-1
-            info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.blockComposable (replaceableComposable.kt:11)"
+            info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.blockComposable (replaceableComposable.kt:18)"
       VAR IR_TEMPORARY_VARIABLE name:tmp0_currentValueArguments type:kotlin.collections.MutableList<T of kotlin.collections.mutableListOf> [val]
         CALL 'public final fun mutableListOf <T> (): kotlin.collections.MutableList<T of kotlin.collections.mutableListOf> [inline] declared in kotlin.collections' type=kotlin.collections.MutableList<T of kotlin.collections.mutableListOf> origin=null
           <T>: land.sungbin.composeinvestigator.runtime.ValueArgument
@@ -124,7 +124,7 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
             key: CONST Int type=kotlin.Int value=593605582
             dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.expressionComposable' type=kotlin.Int origin=null
             dirty2: CONST Int type=kotlin.Int value=-1
-            info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.expressionComposable (replaceableComposable.kt:20)"
+            info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip.expressionComposable (replaceableComposable.kt:27)"
       VAR IR_TEMPORARY_VARIABLE name:tmp0_currentValueArguments type:kotlin.collections.MutableList<T of kotlin.collections.mutableListOf> [val]
         CALL 'public final fun mutableListOf <T> (): kotlin.collections.MutableList<T of kotlin.collections.mutableListOf> [inline] declared in kotlin.collections' type=kotlin.collections.MutableList<T of kotlin.collections.mutableListOf> origin=null
           <T>: land.sungbin.composeinvestigator.runtime.ValueArgument

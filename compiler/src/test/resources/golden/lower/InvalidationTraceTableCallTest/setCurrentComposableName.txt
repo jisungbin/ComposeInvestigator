@@ -46,7 +46,7 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
                   key: CONST Int type=kotlin.Int value=740069243
                   dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.setCurrentComposableName' type=kotlin.Int origin=null
                   dirty2: CONST Int type=kotlin.Int value=-1
-                  info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.setCurrentComposableName (setCurrentComposableName.kt:8)"
+                  info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.setCurrentComposableName (setCurrentComposableName.kt:15)"
             GET_OBJECT 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.Unit
             FUN LOCAL_FUNCTION name:nested visibility:local modality:FINAL <> ($composer:androidx.compose.runtime.Composer?, $changed:kotlin.Int) returnType:kotlin.Unit
               annotations:
@@ -64,7 +64,7 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
                       key: CONST Int type=kotlin.Int value=-354005696
                       dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.setCurrentComposableName.nested' type=kotlin.Int origin=null
                       dirty2: CONST Int type=kotlin.Int value=-1
-                      info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.setCurrentComposableName.nested (setCurrentComposableName.kt:11)"
+                      info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.setCurrentComposableName.nested (setCurrentComposableName.kt:18)"
                 GET_OBJECT 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.Unit
                 WHEN type=kotlin.Unit origin=IF
                   BRANCH

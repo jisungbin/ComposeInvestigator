@@ -51,7 +51,7 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
                   key: CONST Int type=kotlin.Int value=1696443371
                   dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableNameWithinComposableFunction' type=kotlin.Int origin=null
                   dirty2: CONST Int type=kotlin.Int value=-1
-                  info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableNameWithinComposableFunction (getCurrentComposableName.kt:11)"
+                  info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableNameWithinComposableFunction (getCurrentComposableName.kt:18)"
             TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
               CONSTRUCTOR_CALL 'public constructor <init> (name: kotlin.String) [primary] declared in land.sungbin.composeinvestigator.runtime.ComposableName' type=land.sungbin.composeinvestigator.runtime.ComposableName origin=null
                 name: CONST String type=kotlin.String value="getCurrentComposableNameWithinComposableFunction"
@@ -71,7 +71,7 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
                       key: CONST Int type=kotlin.Int value=-85218640
                       dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableNameWithinComposableFunction.nested' type=kotlin.Int origin=null
                       dirty2: CONST Int type=kotlin.Int value=-1
-                      info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableNameWithinComposableFunction.nested (getCurrentComposableName.kt:14)"
+                      info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableNameWithinComposableFunction.nested (getCurrentComposableName.kt:21)"
                 TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
                   CONSTRUCTOR_CALL 'public constructor <init> (name: kotlin.String) [primary] declared in land.sungbin.composeinvestigator.runtime.ComposableName' type=land.sungbin.composeinvestigator.runtime.ComposableName origin=null
                     name: CONST String type=kotlin.String value="nested"

@@ -50,7 +50,7 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
                   key: CONST Int type=kotlin.Int value=-2017443445
                   dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction' type=kotlin.Int origin=null
                   dirty2: CONST Int type=kotlin.Int value=-1
-                  info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction (getCurrentComposableKeyName.kt:11)"
+                  info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction (getCurrentComposableKeyName.kt:18)"
             TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
               CONST String type=kotlin.String value="fun-getCurrentComposableKeyNameWithinComposableFunction()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall/file-getCurrentComposableKeyName.kt"
             FUN LOCAL_FUNCTION name:nested visibility:local modality:FINAL <> ($composer:androidx.compose.runtime.Composer?, $changed:kotlin.Int) returnType:kotlin.Unit
@@ -69,7 +69,7 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
                       key: CONST Int type=kotlin.Int value=-205301616
                       dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction.nested' type=kotlin.Int origin=null
                       dirty2: CONST Int type=kotlin.Int value=-1
-                      info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction.nested (getCurrentComposableKeyName.kt:14)"
+                      info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction.nested (getCurrentComposableKeyName.kt:21)"
                 TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
                   CONST String type=kotlin.String value="fun-nested()Unit/fun-getCurrentComposableKeyNameWithinComposableFunction()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall/file-getCurrentComposableKeyName.kt"
                 WHEN type=kotlin.Unit origin=IF
