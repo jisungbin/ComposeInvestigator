@@ -9,7 +9,6 @@ package land.sungbin.composeinvestigator.compiler._compilation
 
 import com.intellij.openapi.Disposable
 import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.TextRange
 import com.intellij.openapi.util.text.StringUtilRt
 import com.intellij.openapi.vfs.StandardFileSystems
 import com.intellij.openapi.vfs.VirtualFileManager
@@ -94,38 +93,21 @@ class SourceFile(
   }
 }
 
-interface DiagnosticsResult {
-  data class Diagnostic(val message: String, val ranges: List<TextRange>)
-
-  val diagnostics: Map<String, List<Diagnostic>>
-}
-
-class FirAnalysisResult(
-  val result: FirResult,
-  val reporter: BaseDiagnosticsCollector,
-) : DiagnosticsResult {
+class FirAnalysisResult(val result: FirResult, val reporter: BaseDiagnosticsCollector) {
   private val sourceLocationMap by lazy { reporter.withCompilerMessageSourceLocation() }
 
-  override val diagnostics by lazy {
-    reporter.diagnostics.groupBy(
-      keySelector = { diagnostics -> diagnostics.factoryName },
-      valueTransform = { diagnostic ->
-        DiagnosticsResult.Diagnostic(
-          message = run {
-            val severity = AnalyzerWithCompilerReport.convertSeverity(diagnostic.severity)
-            val renderer = RootDiagnosticRendererFactory(diagnostic)
-            val location = sourceLocationMap[diagnostic]
-
-            MessageRenderer.WITHOUT_PATHS.render(
-              severity,
-              renderer.render(diagnostic),
-              location,
-            )
-          },
-          ranges = diagnostic.textRanges,
-        )
-      },
-    )
+  val diagnostics: Map<String, List<String>> by lazy {
+    val map = mutableMapOf<String, MutableList<String>>()
+    reporter.diagnostics.forEach { diagnostic ->
+      val key = diagnostic.factoryName
+      val message = MessageRenderer.WITHOUT_PATHS.render(
+        /* severity = */ AnalyzerWithCompilerReport.convertSeverity(diagnostic.severity),
+        /* message = */ RootDiagnosticRendererFactory(diagnostic).render(diagnostic),
+        /* location = */ sourceLocationMap[diagnostic],
+      )
+      map.getOrPut(key, ::mutableListOf).add(message)
+    }
+    map
   }
 }
 

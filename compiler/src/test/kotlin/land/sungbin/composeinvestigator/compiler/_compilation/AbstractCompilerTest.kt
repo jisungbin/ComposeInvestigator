@@ -16,10 +16,10 @@ import java.io.File
 import java.util.EnumSet
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorFirExtensionRegistrar
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorFirstPhaseExtension
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorLastPhaseExtension
 import land.sungbin.composeinvestigator.compiler.FeatureFlag
-import land.sungbin.composeinvestigator.compiler.frontend.ComposeInvestigatorFirExtensionRegistrar
 import land.sungbin.composeinvestigator.runtime.ComposeInvestigatorConfig
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.cli.jvm.config.addJvmClasspathRoots

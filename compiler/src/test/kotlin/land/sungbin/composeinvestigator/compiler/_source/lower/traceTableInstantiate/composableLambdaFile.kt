@@ -7,6 +7,8 @@
 
 @file:Suppress("unused")
 
-package land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableInstantiate
+package land.sungbin.composeinvestigator.compiler._source.lower.traceTableInstantiate
 
-private fun `helloWorld!`() = Unit
+import androidx.compose.runtime.Composable
+
+private fun c(l: @Composable () -> Unit) = Unit

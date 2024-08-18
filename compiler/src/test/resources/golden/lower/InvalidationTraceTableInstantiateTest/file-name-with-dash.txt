@@ -2,7 +2,7 @@
 // IR
 // ------------------------------------------
 
-FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableInstantiate fileName:file-name-with-dash.kt
+FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.traceTableInstantiate fileName:file-name-with-dash.kt
   annotations:
     Suppress(names = ["unused"])
   PROPERTY name:ComposableInvalidationTraceTableImpl$File_name_with_dashKt visibility:private modality:FINAL [val]
@@ -12,18 +12,51 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-ComposableInvalidationTraceTableImpl$File_name_with_dashKt> visibility:private modality:FINAL <> () returnType:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable
       correspondingProperty: PROPERTY name:ComposableInvalidationTraceTableImpl$File_name_with_dashKt visibility:private modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='private final fun <get-ComposableInvalidationTraceTableImpl$File_name_with_dashKt> (): land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableInstantiate'
-          GET_FIELD 'FIELD name:ComposableInvalidationTraceTableImpl$File_name_with_dashKt type:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable visibility:private [final,static] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableInstantiate' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
-  FUN name:h visibility:private modality:FINAL <> () returnType:kotlin.reflect.KClass<kotlin.Nothing>
+        RETURN type=kotlin.Nothing from='private final fun <get-ComposableInvalidationTraceTableImpl$File_name_with_dashKt> (): land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableInstantiate'
+          GET_FIELD 'FIELD name:ComposableInvalidationTraceTableImpl$File_name_with_dashKt type:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable visibility:private [final,static] declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableInstantiate' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+  FUN name:h visibility:private modality:FINAL <> ($composer:androidx.compose.runtime.Composer?, $changed:kotlin.Int) returnType:kotlin.reflect.KClass<kotlin.Nothing>
+    annotations:
+      Composable
+    VALUE_PARAMETER name:$composer index:0 type:androidx.compose.runtime.Composer? [assignable]
+    VALUE_PARAMETER name:$changed index:1 type:kotlin.Int
     BLOCK_BODY
-      RETURN type=kotlin.Nothing from='private final fun h (): kotlin.reflect.KClass<kotlin.Nothing> declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableInstantiate'
+      CALL 'public abstract fun startReplaceGroup (key: kotlin.Int): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+        $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableInstantiate.h' type=androidx.compose.runtime.Composer? origin=null
+        key: CONST Int type=kotlin.Int value=-982786478
+      WHEN type=kotlin.Unit origin=IF
+        BRANCH
+          if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime' type=kotlin.Boolean origin=null
+          then: CALL 'public final fun traceEventStart (key: kotlin.Int, dirty1: kotlin.Int, dirty2: kotlin.Int, info: kotlin.String): kotlin.Unit declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+            key: CONST Int type=kotlin.Int value=-982786478
+            dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableInstantiate.h' type=kotlin.Int origin=null
+            dirty2: CONST Int type=kotlin.Int value=-1
+            info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.traceTableInstantiate.h (file-name-with-dash.kt:13)"
+      VAR IR_TEMPORARY_VARIABLE name:tmp0 type:kotlin.reflect.KClass<kotlin.Nothing> [val]
         CLASS_REFERENCE 'CLASS IR_EXTERNAL_DECLARATION_STUB CLASS name:Nothing modality:FINAL visibility:public superTypes:[]' type=kotlin.reflect.KClass<kotlin.Nothing>
+      WHEN type=kotlin.Unit origin=IF
+        BRANCH
+          if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime' type=kotlin.Boolean origin=null
+          then: CALL 'public final fun traceEventEnd (): kotlin.Unit declared in androidx.compose.runtime' type=kotlin.Unit origin=null
+      CALL 'public abstract fun endReplaceGroup (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
+        $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableInstantiate.h' type=androidx.compose.runtime.Composer? origin=null
+      RETURN type=kotlin.reflect.KClass<kotlin.Nothing> from='private final fun h ($composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int): kotlin.reflect.KClass<kotlin.Nothing> declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableInstantiate'
+        GET_VAR 'val tmp0: kotlin.reflect.KClass<kotlin.Nothing> [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableInstantiate.h' type=kotlin.reflect.KClass<kotlin.Nothing> origin=null
 
 //
 // SOURCE
 // ------------------------------------------
 
 val ComposableInvalidationTraceTableImpl%File_name_with_dashKt: ComposableInvalidationTraceTable = ComposableInvalidationTraceTable()
-private fun h(): KClass<Nothing> {
-  return Nothing::class
+@Composable
+private fun h(%composer: Composer?, %changed: Int): KClass<Nothing> {
+  %composer.startReplaceGroup(<>)
+  if (isTraceInProgress()) {
+    traceEventStart(<>, %changed, -1, <>)
+  }
+  val tmp0 = Nothing::class
+  if (isTraceInProgress()) {
+    traceEventEnd()
+  }
+  %composer.endReplaceGroup()
+  return tmp0
 }

@@ -10,8 +10,10 @@ package land.sungbin.composeinvestigator.runtime
 /**
  * ComposeInvestigator does not work on annotated files or Composable functions.
  *
- * - file: `@file:NoInvestigation`
- * - composable: `@NoInvestigation @Composable fun MyComposable()`
+ * - File: `@file:NoInvestigation`
+ * - Composable: `@NoInvestigation @Composable fun MyComposable()`
+ *
+ * If a file does not contain any Composables, it will automatically become `@file:NoInvestigation`.
  */
 @MustBeDocumented
 @Retention(AnnotationRetention.SOURCE)
