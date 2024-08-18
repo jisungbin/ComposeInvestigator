@@ -17,6 +17,10 @@ import androidx.compose.runtime.Stable
  * @param packageName Package name that the Composable function is defined
  * @param fileName File name that the Composable function is defined
  */
+// TODO when requesting an instance at the IR level, an existing instance
+//  should be reused if it has the same signature. Currently, we create a
+//  new instance for every time, which can result in numerous GCs being
+//  requested for every recomposition.
 @Immutable
 public data class ComposableInformation(
   public val name: String,

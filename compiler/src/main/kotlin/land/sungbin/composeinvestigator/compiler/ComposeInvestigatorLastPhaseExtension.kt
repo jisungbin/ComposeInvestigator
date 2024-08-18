@@ -26,7 +26,7 @@ public class ComposeInvestigatorLastPhaseExtension(
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
     val tables = InvalidationTraceTableInstanceTransformer(pluginContext, messageCollector)
 
-    messageCollector.log("[ComposeInvestigator] enabled last-phase features: ${features.filter { it.phase == 1 }.joinToString()}")
+    messageCollector.log("Enabled last-phase features: ${features.filter { it.phase == 1 }.joinToString()}")
 
     if (features.count { it.phase == 1 } == 0) return
 

@@ -21,12 +21,12 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.Scope
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.expressions.IrBlockBody
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.file
+import org.jetbrains.kotlin.ir.util.statements
 import org.jetbrains.kotlin.name.SpecialNames
 
 internal class InvalidationProcessTracingFirstTransformer(
@@ -35,9 +35,10 @@ internal class InvalidationProcessTracingFirstTransformer(
   tables: IrInvalidationTraceTableHolder,
   private val stabilityInferencer: StabilityInferencer,
 ) : ComposeInvestigatorBaseLower(context, messageCollector, tables) {
+  // TODO should I use regular variables instead of "temporary" variables?
   override fun firstTransformComposableBody(
     composable: IrSimpleFunction,
-    body: IrBlockBody,
+    body: IrBody,
     table: IrInvalidationTraceTable,
   ): IrBody {
     messageCollector.log(
@@ -61,6 +62,7 @@ internal class InvalidationProcessTracingFirstTransformer(
     )
     newStatements += currentValueArguments
 
+    // TODO only process parameters that actually used.
     for (param in composable.valueParameters) {
       // Synthetic arguments are not handled.
       if (param.name.asString().startsWith('$')) continue
@@ -109,9 +111,15 @@ internal class InvalidationProcessTracingFirstTransformer(
 
     newStatements += logger
 
-    body.statements.addAll(0, newStatements)
+    val newBody = context.irFactory.createBlockBody(
+      startOffset = body.startOffset,
+      endOffset = body.endOffset,
+    ).also { block ->
+      block.statements += newStatements
+      block.statements += body.statements
+    }
 
-    return body.also {
+    return newBody.also {
       messageCollector.log(
         "Transform composable body succeed: ${composable.name}",
         body.getCompilerMessageLocation(composable.file),

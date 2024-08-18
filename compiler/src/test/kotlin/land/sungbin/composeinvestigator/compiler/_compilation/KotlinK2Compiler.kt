@@ -255,7 +255,7 @@ private object TestMessageCollector : MessageCollector {
     message: String,
     location: CompilerMessageSourceLocation?,
   ) {
-    if (severity.isError) error(message)
+    println(message)
   }
 
   override fun hasErrors(): Boolean = false

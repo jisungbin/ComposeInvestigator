@@ -1,0 +1,29 @@
+//
+// IR
+// ------------------------------------------
+
+FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall fileName:getCurrentTable.kt
+  annotations:
+    Suppress(names = ["unused"])
+  PROPERTY name:ComposableInvalidationTraceTableImpl$GetCurrentTableKt visibility:private modality:FINAL [val]
+    FIELD name:ComposableInvalidationTraceTableImpl$GetCurrentTableKt type:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable visibility:private [final,static]
+      EXPRESSION_BODY
+        CONSTRUCTOR_CALL 'public constructor <init> () [primary] declared in land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+    FUN DEFAULT_PROPERTY_ACCESSOR name:<get-ComposableInvalidationTraceTableImpl$GetCurrentTableKt> visibility:private modality:FINAL <> () returnType:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable
+      correspondingProperty: PROPERTY name:ComposableInvalidationTraceTableImpl$GetCurrentTableKt visibility:private modality:FINAL [val]
+      BLOCK_BODY
+        RETURN type=kotlin.Nothing from='private final fun <get-ComposableInvalidationTraceTableImpl$GetCurrentTableKt> (): land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall'
+          GET_FIELD 'FIELD name:ComposableInvalidationTraceTableImpl$GetCurrentTableKt type:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable visibility:private [final,static] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+  FUN name:getCurrentTable visibility:private modality:FINAL <> () returnType:kotlin.Unit
+    BLOCK_BODY
+      TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
+        CALL 'private final fun <get-ComposableInvalidationTraceTableImpl$GetCurrentTableKt> (): land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+
+//
+// SOURCE
+// ------------------------------------------
+
+val ComposableInvalidationTraceTableImpl%GetCurrentTableKt: ComposableInvalidationTraceTable = ComposableInvalidationTraceTable()
+private fun getCurrentTable() {
+  ComposableInvalidationTraceTableImpl%GetCurrentTableKt
+}

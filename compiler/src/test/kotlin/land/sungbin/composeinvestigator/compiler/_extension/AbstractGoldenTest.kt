@@ -8,35 +8,70 @@
 package land.sungbin.composeinvestigator.compiler._extension
 
 import androidx.compose.compiler.plugins.kotlin.lower.dumpSrc
+import java.io.File
 import java.util.EnumSet
+import java.util.stream.Stream
+import kotlin.streams.asStream
 import kotlin.test.BeforeTest
 import land.sungbin.composeinvestigator.compiler.FeatureFlag
 import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
 import land.sungbin.composeinvestigator.compiler._compilation.SourceFile
 import land.sungbin.composeinvestigator.compiler._extension.GoldenTestExtension.Companion.DEFAULT_GOLDEN_DIRECTORY
+import land.sungbin.composeinvestigator.compiler._source.sourcePath
+import land.sungbin.composeinvestigator.compiler._source.toSourceFile
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.util.DumpIrTreeOptions
 import org.jetbrains.kotlin.ir.util.dump
+import org.junit.jupiter.api.DynamicTest
+import org.junit.jupiter.api.DynamicTest.dynamicTest
+import org.junit.jupiter.api.TestFactory
+import org.junit.jupiter.api.TestInfo
 import org.junit.jupiter.api.extension.ExtendWith
 
+@Suppress("unused")
 @ExtendWith(GoldenTestExtension::class)
-abstract class AbstractGoldenTest(features: EnumSet<FeatureFlag> = EnumSet.noneOf(FeatureFlag::class.java)) : AbstractCompilerTest(features) {
+abstract class AbstractGoldenTest(
+  features: EnumSet<FeatureFlag> = EnumSet.noneOf(FeatureFlag::class.java),
+) : AbstractCompilerTest(features) {
   private lateinit var verifyGoldenImpl: VerifyGolden
 
   @BeforeTest fun prepare(verifyGolden: VerifyGolden) {
     verifyGoldenImpl = verifyGolden
   }
 
-  fun verifyGolden(ir: String, source: String, directory: String = DEFAULT_GOLDEN_DIRECTORY) =
-    verifyGoldenImpl(ir, source, directory)
+  fun verifyGolden(ir: String, source: String) = verifyGoldenImpl(ir, source)
 
-  fun verifyIrGolden(file: SourceFile, directory: String = DEFAULT_GOLDEN_DIRECTORY) {
+  fun verifyIrGolden(file: SourceFile) {
     val module = compile(file).irModuleFragment.files.single()
     verifyGoldenImpl(
       module.dump(IR_DUMP_OPTIONS).trimIndent().trimTrailingWhitespaces(),
       module.dumpKotlinLikeForGolden(file.source),
-      directory,
     )
+  }
+
+  @TestFactory fun dynamicVerificationAllTestSourceGoldens(info: TestInfo): Stream<DynamicTest> {
+    val clazz = info.testClass.get()
+    val autoGolden = clazz.getAnnotation(GoldenVerification::class.java) ?: return Stream.empty()
+    val sources = File(sourcePath("${autoGolden.category}/${autoGolden.group}"))
+
+    return sources.walk()
+      .filter { file -> file.name.endsWith(".kt") }
+      .map { file ->
+        dynamicTest(file.nameWithoutExtension) {
+          val source = file.toSourceFile()
+          val module = compile(source).irModuleFragment.files.single()
+
+          GoldenTestExtension.verifyGolden(
+            goldenPath = File(
+              DEFAULT_GOLDEN_DIRECTORY,
+              "${autoGolden.category}/${clazz.simpleName}/${file.nameWithoutExtension}.txt",
+            ).path,
+            ir = module.dump(IR_DUMP_OPTIONS).trimIndent().trimTrailingWhitespaces(),
+            source = module.dumpKotlinLikeForGolden(source.source),
+          )
+        }
+      }
+      .asStream()
   }
 
   @Suppress("RegExpSimplifiable")

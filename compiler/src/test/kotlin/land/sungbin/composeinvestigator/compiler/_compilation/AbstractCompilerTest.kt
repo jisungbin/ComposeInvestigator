@@ -40,7 +40,9 @@ import org.junit.jupiter.api.parallel.Execution
 import org.junit.jupiter.api.parallel.ExecutionMode
 
 @Execution(ExecutionMode.SAME_THREAD, reason = "Cheaper than parallel execution.")
-abstract class AbstractCompilerTest(private val features: EnumSet<FeatureFlag> = EnumSet.noneOf(FeatureFlag::class.java)) {
+abstract class AbstractCompilerTest(
+  private val features: EnumSet<FeatureFlag> = EnumSet.noneOf(FeatureFlag::class.java),
+) {
   companion object {
     private fun File.applyExistenceCheck(): File = apply {
       if (!exists()) throw NoSuchFileException(this)

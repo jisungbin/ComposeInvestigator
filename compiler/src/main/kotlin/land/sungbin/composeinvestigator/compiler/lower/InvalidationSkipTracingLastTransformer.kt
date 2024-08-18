@@ -15,14 +15,10 @@ import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
-import org.jetbrains.kotlin.ir.IrStatement
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
-import org.jetbrains.kotlin.ir.expressions.IrBlock
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
+import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.file
 
@@ -48,19 +44,12 @@ internal class InvalidationSkipTracingLastTransformer(
     }
     val logger = invalidationLogger.irLog(currentKey.composable, type = invalidationTypeSkipped)
 
-    // TODO IrBlockImpl
-    return object : IrBlock() {
-      override var origin: IrStatementOrigin? = null
-      override var type = context.irBuiltIns.unitType
-
-      override val startOffset = expression.startOffset
-      override val endOffset = UNDEFINED_OFFSET // TODO
-
-      override var attributeOwnerId: IrAttributeContainer = this
-      override var originalBeforeInline: IrAttributeContainer? = null
-
-      override val statements = mutableListOf<IrStatement>(logger, expression)
-    }
+    return IrBlockImpl(
+      startOffset = expression.startOffset,
+      endOffset = expression.endOffset,
+      type = context.irBuiltIns.unitType,
+      statements = listOf(logger, expression),
+    )
       .also {
         messageCollector.log(
           "Transform skipToGroupEnd call succeed: ${composable.name}",
