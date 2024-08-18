@@ -85,7 +85,7 @@ public class InvalidationTraceTableIntrinsicTransformer(
                     .composable,
                 )
               }
-              ?: context.irString(SpecialNames.UNKNOWN_STRING), // TODO return 'null'
+              ?: context.irString(SpecialNames.UNKNOWN_STRING),
           )
         }
       }
@@ -101,7 +101,6 @@ public class InvalidationTraceTableIntrinsicTransformer(
           context.irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable] = originalKey.copy(composable = newComposable)
         }
 
-        // TODO log warning if current composable is null
         IrGetObjectValueImpl(
           startOffset = expression.startOffset,
           endOffset = expression.endOffset,
@@ -117,7 +116,6 @@ public class InvalidationTraceTableIntrinsicTransformer(
             endOffset = expression.endOffset,
           )
         } ?: run {
-          // TODO return 'null'
           context.irString(
             SpecialNames.UNKNOWN_STRING,
             startOffset = expression.startOffset,

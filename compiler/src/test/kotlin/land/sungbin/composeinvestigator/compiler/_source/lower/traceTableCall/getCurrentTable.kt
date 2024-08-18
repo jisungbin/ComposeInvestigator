@@ -7,10 +7,11 @@
 
 @file:Suppress("unused")
 
-package land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall
+package land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall
 
+import androidx.compose.runtime.Composable
 import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
 
-private fun getCurrentTable() {
+@Composable private fun getCurrentTable() {
   currentComposableInvalidationTracer
 }

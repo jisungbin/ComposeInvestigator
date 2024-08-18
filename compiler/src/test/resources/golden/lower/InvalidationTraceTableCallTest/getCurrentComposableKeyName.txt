@@ -2,7 +2,7 @@
 // IR
 // ------------------------------------------
 
-FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall fileName:getCurrentComposableKeyName.kt
+FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall fileName:getCurrentComposableKeyName.kt
   annotations:
     Suppress(names = ["unused"])
   PROPERTY name:ComposableInvalidationTraceTableImpl$GetCurrentComposableKeyNameKt visibility:private modality:FINAL [val]
@@ -12,47 +12,43 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
     FUN DEFAULT_PROPERTY_ACCESSOR name:<get-ComposableInvalidationTraceTableImpl$GetCurrentComposableKeyNameKt> visibility:private modality:FINAL <> () returnType:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable
       correspondingProperty: PROPERTY name:ComposableInvalidationTraceTableImpl$GetCurrentComposableKeyNameKt visibility:private modality:FINAL [val]
       BLOCK_BODY
-        RETURN type=kotlin.Nothing from='private final fun <get-ComposableInvalidationTraceTableImpl$GetCurrentComposableKeyNameKt> (): land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall'
-          GET_FIELD 'FIELD name:ComposableInvalidationTraceTableImpl$GetCurrentComposableKeyNameKt type:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable visibility:private [final,static] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
-  FUN name:getCurrentComposableKeyNameWithinRegularFunction visibility:private modality:FINAL <> () returnType:kotlin.Unit
-    BLOCK_BODY
-      TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
-        CONST String type=kotlin.String value="<unknown>"
-  FUN name:getCurrentComposableKeyNameWithinComposableFunction visibility:private modality:FINAL <> ($composer:androidx.compose.runtime.Composer?, $changed:kotlin.Int) returnType:kotlin.Unit
+        RETURN type=kotlin.Nothing from='private final fun <get-ComposableInvalidationTraceTableImpl$GetCurrentComposableKeyNameKt> (): land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall'
+          GET_FIELD 'FIELD name:ComposableInvalidationTraceTableImpl$GetCurrentComposableKeyNameKt type:land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable visibility:private [final,static] declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall' type=land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable origin=null
+  FUN name:getCurrentComposableKeyName visibility:private modality:FINAL <> ($composer:androidx.compose.runtime.Composer?, $changed:kotlin.Int) returnType:kotlin.Unit
     annotations:
       Composable
     VALUE_PARAMETER name:$composer index:0 type:androidx.compose.runtime.Composer? [assignable]
     VALUE_PARAMETER name:$changed index:1 type:kotlin.Int
     BLOCK_BODY
-      SET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction' type=kotlin.Unit origin=null
+      SET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName' type=kotlin.Unit origin=null
         CALL 'public abstract fun startRestartGroup (key: kotlin.Int): androidx.compose.runtime.Composer declared in androidx.compose.runtime.Composer' type=androidx.compose.runtime.Composer origin=null
-          $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction' type=androidx.compose.runtime.Composer? origin=null
-          key: CONST Int type=kotlin.Int value=-2017443445
+          $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName' type=androidx.compose.runtime.Composer? origin=null
+          key: CONST Int type=kotlin.Int value=-936248835
       WHEN type=kotlin.Unit origin=IF
         BRANCH
           if: WHEN type=kotlin.Boolean origin=OROR
             BRANCH
               if: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
                 $this: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
-                  arg0: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction' type=kotlin.Int origin=null
+                  arg0: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName' type=kotlin.Int origin=null
                   arg1: CONST Int type=kotlin.Int value=0
               then: CONST Boolean type=kotlin.Boolean value=true
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true
               then: CALL 'public final fun not (): kotlin.Boolean [operator] declared in kotlin.Boolean' type=kotlin.Boolean origin=null
                 $this: CALL 'public abstract fun <get-skipping> (): kotlin.Boolean declared in androidx.compose.runtime.Composer' type=kotlin.Boolean origin=null
-                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction' type=androidx.compose.runtime.Composer? origin=null
+                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName' type=androidx.compose.runtime.Composer? origin=null
           then: BLOCK type=kotlin.Unit origin=null
             WHEN type=kotlin.Unit origin=IF
               BRANCH
                 if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime' type=kotlin.Boolean origin=null
                 then: CALL 'public final fun traceEventStart (key: kotlin.Int, dirty1: kotlin.Int, dirty2: kotlin.Int, info: kotlin.String): kotlin.Unit declared in androidx.compose.runtime' type=kotlin.Unit origin=null
-                  key: CONST Int type=kotlin.Int value=-2017443445
-                  dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction' type=kotlin.Int origin=null
+                  key: CONST Int type=kotlin.Int value=-936248835
+                  dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName' type=kotlin.Int origin=null
                   dirty2: CONST Int type=kotlin.Int value=-1
-                  info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction (getCurrentComposableKeyName.kt:18)"
+                  info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName (getCurrentComposableKeyName.kt:14)"
             TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
-              CONST String type=kotlin.String value="fun-getCurrentComposableKeyNameWithinComposableFunction()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall/file-getCurrentComposableKeyName.kt"
+              CONST String type=kotlin.String value="fun-getCurrentComposableKeyName()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall/file-getCurrentComposableKeyName.kt"
             FUN LOCAL_FUNCTION name:nested visibility:local modality:FINAL <> ($composer:androidx.compose.runtime.Composer?, $changed:kotlin.Int) returnType:kotlin.Unit
               annotations:
                 Composable
@@ -60,24 +56,24 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
               VALUE_PARAMETER name:$changed index:1 type:kotlin.Int
               BLOCK_BODY
                 CALL 'public abstract fun startReplaceGroup (key: kotlin.Int): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
-                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction.nested' type=androidx.compose.runtime.Composer? origin=null
-                  key: CONST Int type=kotlin.Int value=-205301616
+                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName.nested' type=androidx.compose.runtime.Composer? origin=null
+                  key: CONST Int type=kotlin.Int value=1501212546
                 WHEN type=kotlin.Unit origin=IF
                   BRANCH
                     if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime' type=kotlin.Boolean origin=null
                     then: CALL 'public final fun traceEventStart (key: kotlin.Int, dirty1: kotlin.Int, dirty2: kotlin.Int, info: kotlin.String): kotlin.Unit declared in androidx.compose.runtime' type=kotlin.Unit origin=null
-                      key: CONST Int type=kotlin.Int value=-205301616
-                      dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction.nested' type=kotlin.Int origin=null
+                      key: CONST Int type=kotlin.Int value=1501212546
+                      dirty1: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName.nested' type=kotlin.Int origin=null
                       dirty2: CONST Int type=kotlin.Int value=-1
-                      info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction.nested (getCurrentComposableKeyName.kt:21)"
+                      info: CONST String type=kotlin.String value="land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName.nested (getCurrentComposableKeyName.kt:17)"
                 TYPE_OP type=kotlin.Unit origin=IMPLICIT_COERCION_TO_UNIT typeOperand=kotlin.Unit
-                  CONST String type=kotlin.String value="fun-nested()Unit/fun-getCurrentComposableKeyNameWithinComposableFunction()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall/file-getCurrentComposableKeyName.kt"
+                  CONST String type=kotlin.String value="fun-nested()Unit/fun-getCurrentComposableKeyName()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall/file-getCurrentComposableKeyName.kt"
                 WHEN type=kotlin.Unit origin=IF
                   BRANCH
                     if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime' type=kotlin.Boolean origin=null
                     then: CALL 'public final fun traceEventEnd (): kotlin.Unit declared in androidx.compose.runtime' type=kotlin.Unit origin=null
                 CALL 'public abstract fun endReplaceGroup (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
-                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction.nested' type=androidx.compose.runtime.Composer? origin=null
+                  $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName.nested' type=androidx.compose.runtime.Composer? origin=null
             WHEN type=kotlin.Unit origin=IF
               BRANCH
                 if: CALL 'public final fun isTraceInProgress (): kotlin.Boolean declared in androidx.compose.runtime' type=kotlin.Boolean origin=null
@@ -85,33 +81,33 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
         BRANCH
           if: CONST Boolean type=kotlin.Boolean value=true
           then: CALL 'public abstract fun skipToGroupEnd (): kotlin.Unit declared in androidx.compose.runtime.Composer' type=kotlin.Unit origin=null
-            $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction' type=androidx.compose.runtime.Composer? origin=null
+            $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName' type=androidx.compose.runtime.Composer? origin=null
       BLOCK type=kotlin.Unit origin=null
         BLOCK type=kotlin.Unit origin=SAFE_CALL
           VAR IR_TEMPORARY_VARIABLE name:tmp0_safe_receiver type:androidx.compose.runtime.ScopeUpdateScope? [val]
             CALL 'public abstract fun endRestartGroup (): androidx.compose.runtime.ScopeUpdateScope? declared in androidx.compose.runtime.Composer' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
-              $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction' type=androidx.compose.runtime.Composer? origin=null
+              $this: GET_VAR '$composer: androidx.compose.runtime.Composer? [assignable] declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName' type=androidx.compose.runtime.Composer? origin=null
           WHEN type=kotlin.Unit origin=IF
             BRANCH
               if: CALL 'public final fun EQEQ (arg0: kotlin.Any?, arg1: kotlin.Any?): kotlin.Boolean declared in kotlin.internal.ir' type=kotlin.Boolean origin=null
-                arg0: GET_VAR 'val tmp0_safe_receiver: androidx.compose.runtime.ScopeUpdateScope? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
+                arg0: GET_VAR 'val tmp0_safe_receiver: androidx.compose.runtime.ScopeUpdateScope? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
                 arg1: CONST Null type=kotlin.Any? value=null
               then: CONST Null type=kotlin.Any? value=null
             BRANCH
               if: CONST Boolean type=kotlin.Boolean value=true
               then: CALL 'public abstract fun updateScope (block: kotlin.Function2<androidx.compose.runtime.Composer, kotlin.Int, kotlin.Unit>): kotlin.Unit declared in androidx.compose.runtime.ScopeUpdateScope' type=kotlin.Unit origin=null
-                $this: GET_VAR 'val tmp0_safe_receiver: androidx.compose.runtime.ScopeUpdateScope? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
+                $this: GET_VAR 'val tmp0_safe_receiver: androidx.compose.runtime.ScopeUpdateScope? [val] declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName' type=androidx.compose.runtime.ScopeUpdateScope? origin=null
                 block: FUN_EXPR type=kotlin.Function2<androidx.compose.runtime.Composer?, kotlin.Int, kotlin.Unit> origin=LAMBDA
                   FUN LOCAL_FUNCTION_FOR_LAMBDA name:<anonymous> visibility:local modality:FINAL <> ($composer:androidx.compose.runtime.Composer?, $force:kotlin.Int) returnType:kotlin.Unit
                     VALUE_PARAMETER name:$composer index:0 type:androidx.compose.runtime.Composer?
                     VALUE_PARAMETER name:$force index:1 type:kotlin.Int
                     BLOCK_BODY
-                      RETURN type=kotlin.Nothing from='local final fun <anonymous> ($composer: androidx.compose.runtime.Composer?, $force: kotlin.Int): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction'
-                        CALL 'private final fun getCurrentComposableKeyNameWithinComposableFunction ($composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall' type=kotlin.Unit origin=null
-                          $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction.<anonymous>' type=androidx.compose.runtime.Composer? origin=null
+                      RETURN type=kotlin.Nothing from='local final fun <anonymous> ($composer: androidx.compose.runtime.Composer?, $force: kotlin.Int): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName'
+                        CALL 'private final fun getCurrentComposableKeyName ($composer: androidx.compose.runtime.Composer?, $changed: kotlin.Int): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall' type=kotlin.Unit origin=null
+                          $composer: GET_VAR '$composer: androidx.compose.runtime.Composer? declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName.<anonymous>' type=androidx.compose.runtime.Composer? origin=null
                           $changed: CALL 'internal final fun updateChangedFlags (flags: kotlin.Int): kotlin.Int declared in androidx.compose.runtime' type=kotlin.Int origin=null
                             flags: CALL 'public final fun or (other: kotlin.Int): kotlin.Int [infix] declared in kotlin.Int' type=kotlin.Int origin=null
-                              $this: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall.getCurrentComposableKeyNameWithinComposableFunction' type=kotlin.Int origin=null
+                              $this: GET_VAR '$changed: kotlin.Int declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall.getCurrentComposableKeyName' type=kotlin.Int origin=null
                               other: CONST Int type=kotlin.Int value=1
 
 //
@@ -119,24 +115,21 @@ FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.invalidation
 // ------------------------------------------
 
 val ComposableInvalidationTraceTableImpl%GetCurrentComposableKeyNameKt: ComposableInvalidationTraceTable = ComposableInvalidationTraceTable()
-private fun getCurrentComposableKeyNameWithinRegularFunction() {
-  "<unknown>"
-}
 @Composable
-private fun getCurrentComposableKeyNameWithinComposableFunction(%composer: Composer?, %changed: Int) {
+private fun getCurrentComposableKeyName(%composer: Composer?, %changed: Int) {
   %composer = %composer.startRestartGroup(<>)
   if (%changed != 0 || !%composer.skipping) {
     if (isTraceInProgress()) {
       traceEventStart(<>, %changed, -1, <>)
     }
-    "fun-getCurrentComposableKeyNameWithinComposableFunction()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall/file-getCurrentComposableKeyName.kt"
+    "fun-getCurrentComposableKeyName()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall/file-getCurrentComposableKeyName.kt"
     @Composable
     fun nested(%composer: Composer?, %changed: Int) {
       %composer.startReplaceGroup(<>)
       if (isTraceInProgress()) {
         traceEventStart(<>, %changed, -1, <>)
       }
-      "fun-nested()Unit/fun-getCurrentComposableKeyNameWithinComposableFunction()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableCall/file-getCurrentComposableKeyName.kt"
+      "fun-nested()Unit/fun-getCurrentComposableKeyName()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall/file-getCurrentComposableKeyName.kt"
       if (isTraceInProgress()) {
         traceEventEnd()
       }
@@ -149,6 +142,6 @@ private fun getCurrentComposableKeyNameWithinComposableFunction(%composer: Compo
     %composer.skipToGroupEnd()
   }
   %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
-    getCurrentComposableKeyNameWithinComposableFunction(%composer, updateChangedFlags(%changed or 0b0001))
+    getCurrentComposableKeyName(%composer, updateChangedFlags(%changed or 0b0001))
   }
 }

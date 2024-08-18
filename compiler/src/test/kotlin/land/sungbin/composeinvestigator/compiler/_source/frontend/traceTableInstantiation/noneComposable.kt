@@ -7,6 +7,6 @@
 
 @file:Suppress("unused")
 
-package land.sungbin.composeinvestigator.compiler._source.lower.invalidationTraceTableInstantiate
+package land.sungbin.composeinvestigator.compiler._source.frontend.traceTableInstantiation
 
-private fun h() = Nothing::class
+private fun noneComposable() {}

@@ -1,0 +1,20 @@
+//
+// IR
+// ------------------------------------------
+
+FILE fqName:land.sungbin.composeinvestigator.compiler._source.lower.traceTableInstantiate fileName:noComposableFile.kt
+  annotations:
+    NoInvestigation
+    Suppress(names = ["unused"])
+  FUN name:helloWorld visibility:private modality:FINAL <> () returnType:kotlin.Unit
+    BLOCK_BODY
+      RETURN type=kotlin.Nothing from='private final fun helloWorld (): kotlin.Unit declared in land.sungbin.composeinvestigator.compiler._source.lower.traceTableInstantiate'
+        GET_OBJECT 'CLASS IR_EXTERNAL_DECLARATION_STUB OBJECT name:Unit modality:FINAL visibility:public superTypes:[kotlin.Any]' type=kotlin.Unit
+
+//
+// SOURCE
+// ------------------------------------------
+
+private fun helloWorld() {
+  return
+}

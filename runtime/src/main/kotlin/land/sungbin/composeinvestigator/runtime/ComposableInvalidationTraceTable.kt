@@ -47,9 +47,10 @@ public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): Stri
  * To get the instance of [ComposableInvalidationTraceTable] created in the current file,
  * use [currentComposableInvalidationTracer].
  *
- * If a file is annotated with [NoInvestigation], this class will not be instantiated in
- * that file. If you use this class's APIs (including the [currentComposableInvalidationTracer])
- * without being instantiated, you will receive a runtime error.
+ * If a file is annotated with [NoInvestigation] or do not have any Composables, this class will
+ * not be instantiated in that file. If you use this class's APIs (including the
+ * [currentComposableInvalidationTracer]) without being instantiated, you will receive a
+ * unexpected behaviour.
  */
 @Immutable
 public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi public constructor() {
@@ -78,11 +79,12 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    * If you call this getter from a Composable configured as an anonymous function, it will always
    * be named 'anonymous.' Therefore, in this case, we recommend you specify your Composable name.
    */
+  @property:ComposableScope
   public var currentComposableName: ComposableName
     @Stable get() {
       throw IntrinsicImplementedError()
     }
-    set(@Suppress("UNUSED_PARAMETER") name) {
+    set(@Suppress("unused") name) {
       throw IntrinsicImplementedError()
     }
 
@@ -96,7 +98,9 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    * [Compose compiler's implementation](https://github.com/JetBrains/kotlin/blob/ede0373c4e5c0506b1491c6eb4c8bc0660ef7d21/plugins/compose/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/lower/DurableKeyTransformer.kt#L74)
    * of the AOSP.
    */
-  public val currentComposableKeyName: String @Stable get() = throw IntrinsicImplementedError()
+  @property:ComposableScope
+  public val currentComposableKeyName: String
+    @Stable get() = throw IntrinsicImplementedError()
 
   /**
    * Returns all arguments that were affected by the value change. This is useful for debugging and
@@ -105,7 +109,8 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    * Provide a [Map] consisting of a [unique key][currentComposableKeyName] for the affected Composables,
    * and a list of [ChangedArgument]s.
    */
-  public val affectedArguments: Map<String, List<ValueArgument>> @Stable get() = affectedArgumentMap
+  public val affectedArguments: Map<String, List<ValueArgument>>
+    @Stable get() = affectedArgumentMap
 
   /**
    * Removes all arguments that were affected by the value change. This means that it also resets
@@ -113,8 +118,7 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    *
    * This can be used in a test environment to clear the results of previous test functions. (`@TestOnly`)
    */
-  @TestOnly
-  public fun reset() {
+  @TestOnly public fun reset() {
     affectedArgumentMap.clear()
   }
 

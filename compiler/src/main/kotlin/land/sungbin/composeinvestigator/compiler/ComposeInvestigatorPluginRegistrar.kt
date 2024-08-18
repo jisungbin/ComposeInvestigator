@@ -11,7 +11,6 @@ package land.sungbin.composeinvestigator.compiler
 
 import com.intellij.mock.MockProject
 import com.intellij.openapi.extensions.LoadingOrder
-import land.sungbin.composeinvestigator.compiler.frontend.ComposeInvestigatorFirExtensionRegistrar
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.cli.jvm.compiler.CompileEnvironmentException
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar

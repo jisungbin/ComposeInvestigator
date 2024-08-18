@@ -38,6 +38,10 @@ public val Composer_SKIP_TO_GROUP_END: Name = identifier("skipToGroupEnd")
 public val STATE_FQN: FqName = FqName("$AndroidxComposeRuntime.State")
 // END Compose Runtime
 
+// START ComposableScope
+public val COMPOSABLE_SCOPE_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableScope")
+// END ComposableScope
+
 // START NoInvestigation
 public val NO_INVESTIGATION_FQN: FqName = FqName("$ComposeInvestigatorRuntime.NoInvestigation")
 // END NoInvestigation
