@@ -47,11 +47,13 @@ private object NoComposableFileChecker : FirFileChecker(MppCheckerKind.Common) {
   override fun check(declaration: FirFile, context: CheckerContext, reporter: DiagnosticReporter) {
     if (
       declaration.declarations.none { element ->
-        element.hasComposableAnnotation(context.session) || (
-          element is FirFunction && element.valueParameters.any { parameter ->
-            parameter.returnTypeRef.coneType.functionTypeKind(context.session) === ComposableFunction
-          }
-          )
+        element.hasComposableAnnotation(context.session) ||
+          (
+            element is FirFunction &&
+              element.valueParameters.any { parameter ->
+                parameter.returnTypeRef.coneType.functionTypeKind(context.session) === ComposableFunction
+              }
+            )
       }
     ) {
       val noInvestigationAnnotation = buildAnnotation {

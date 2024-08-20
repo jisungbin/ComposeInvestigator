@@ -81,8 +81,8 @@ plugins {
 include(
   ":runtime",
   ":compiler",
-  // ":compiler-integration-test",
-  // ":compiler-embeddable",
+  ":compiler-embeddable",
+  ":compiler-integration-test",
   // ":compiler-gradle-plugin",
   // ":sample",
 )
