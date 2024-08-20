@@ -7,4 +7,4 @@
 
 package land.sungbin.composeinvestigator.gradle
 
-internal const val VERSION = "1.5.11-0.2.1"
+internal const val VERSION = "internal-test"

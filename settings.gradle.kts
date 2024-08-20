@@ -36,6 +36,7 @@ pluginManagement {
         includeGroup("com.github.takahirom")
       }
     }
+    mavenLocal()
   }
 
   resolutionStrategy.eachPlugin {
@@ -71,6 +72,7 @@ dependencyResolutionManagement {
         snapshotsOnly()
       }
     }
+    mavenLocal()
   }
 }
 
@@ -81,8 +83,7 @@ plugins {
 include(
   ":runtime",
   ":compiler",
-  ":compiler-embeddable",
   ":compiler-integration-test",
-  // ":compiler-gradle-plugin",
+  ":compiler-gradle-plugin",
   // ":sample",
 )

@@ -5,13 +5,16 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
+@file:Suppress("unused", "NonAsciiCharacters")
+
 package land.sungbin.composeinvestigator.compiler.test
 
-import androidx.compose.runtime.Applier
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.ComposeNode
+import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
 
-@Composable fun Greet() {
-//  currentComposableInvalidationTracer
-  ComposeNode<Any, Applier<*>>(factory = {}, update = {})
+fun main() {
+  println(currentComposableInvalidationTracer)
+  println(currentComposableInvalidationTracer.currentComposableName.name)
 }
+
+@Composable fun `제발되라!`() = Unit

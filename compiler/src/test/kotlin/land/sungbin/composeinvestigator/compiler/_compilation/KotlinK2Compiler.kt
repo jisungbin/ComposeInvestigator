@@ -7,15 +7,6 @@
 
 package land.sungbin.composeinvestigator.compiler._compilation
 
-import com.intellij.openapi.Disposable
-import com.intellij.openapi.project.Project
-import com.intellij.openapi.util.text.StringUtilRt
-import com.intellij.openapi.vfs.StandardFileSystems
-import com.intellij.openapi.vfs.VirtualFileManager
-import com.intellij.psi.PsiFileFactory
-import com.intellij.psi.impl.PsiFileFactoryImpl
-import com.intellij.psi.search.ProjectScope
-import com.intellij.testFramework.LightVirtualFile
 import java.nio.charset.StandardCharsets
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.jvm.JvmIrDeserializerImpl
@@ -30,6 +21,15 @@ import org.jetbrains.kotlin.cli.jvm.compiler.PsiBasedProjectFileSearchScope
 import org.jetbrains.kotlin.cli.jvm.compiler.TopDownAnalyzerFacadeForJVM
 import org.jetbrains.kotlin.cli.jvm.compiler.VfsBasedProjectEnvironment
 import org.jetbrains.kotlin.cli.jvm.compiler.pipeline.convertToIrAndActualizeForJvm
+import org.jetbrains.kotlin.com.intellij.openapi.Disposable
+import org.jetbrains.kotlin.com.intellij.openapi.project.Project
+import org.jetbrains.kotlin.com.intellij.openapi.util.text.StringUtilRt
+import org.jetbrains.kotlin.com.intellij.openapi.vfs.StandardFileSystems
+import org.jetbrains.kotlin.com.intellij.openapi.vfs.VirtualFileManager
+import org.jetbrains.kotlin.com.intellij.psi.PsiFileFactory
+import org.jetbrains.kotlin.com.intellij.psi.impl.PsiFileFactoryImpl
+import org.jetbrains.kotlin.com.intellij.psi.search.ProjectScope
+import org.jetbrains.kotlin.com.intellij.testFramework.LightVirtualFile
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.IrVerificationMode

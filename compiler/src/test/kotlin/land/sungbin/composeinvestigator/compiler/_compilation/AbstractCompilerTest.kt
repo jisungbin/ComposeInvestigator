@@ -8,10 +8,6 @@
 package land.sungbin.composeinvestigator.compiler._compilation
 
 import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
-import com.intellij.openapi.extensions.LoadingOrder
-import com.intellij.openapi.util.Disposer
-import com.intellij.openapi.util.io.FileUtil
-import com.intellij.util.PathUtil
 import java.io.File
 import java.util.EnumSet
 import kotlin.test.AfterTest
@@ -24,6 +20,10 @@ import land.sungbin.composeinvestigator.runtime.ComposeInvestigatorConfig
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.cli.jvm.config.addJvmClasspathRoots
 import org.jetbrains.kotlin.cli.jvm.config.configureJdkClasspathRoots
+import org.jetbrains.kotlin.com.intellij.openapi.extensions.LoadingOrder
+import org.jetbrains.kotlin.com.intellij.openapi.util.Disposer
+import org.jetbrains.kotlin.com.intellij.openapi.util.io.FileUtil
+import org.jetbrains.kotlin.com.intellij.util.PathUtil
 import org.jetbrains.kotlin.compiler.plugin.registerExtensionsForTest
 import org.jetbrains.kotlin.config.AnalysisFlag
 import org.jetbrains.kotlin.config.AnalysisFlags
@@ -36,10 +36,7 @@ import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.config.messageCollector
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 import org.jetbrains.kotlin.fir.pipeline.Fir2IrActualizedResult
-import org.junit.jupiter.api.parallel.Execution
-import org.junit.jupiter.api.parallel.ExecutionMode
 
-@Execution(ExecutionMode.SAME_THREAD, reason = "Cheaper than parallel execution.")
 abstract class AbstractCompilerTest(
   private val features: EnumSet<FeatureFlag> = EnumSet.noneOf(FeatureFlag::class.java),
 ) {

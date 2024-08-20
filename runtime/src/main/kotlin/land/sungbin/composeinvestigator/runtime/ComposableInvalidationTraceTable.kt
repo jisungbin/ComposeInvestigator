@@ -13,7 +13,7 @@ import org.jetbrains.annotations.TestOnly
 
 /** Returns the [ComposableInvalidationTraceTable] assigned to the current file. */
 public val currentComposableInvalidationTracer: ComposableInvalidationTraceTable
-  @Stable get() = throw IntrinsicImplementedError()
+  @[Stable JvmSynthetic] get() = throw IntrinsicImplementedError()
 
 /**
  * Returns the name of the current Composable.
@@ -81,10 +81,10 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    */
   @property:ComposableScope
   public var currentComposableName: ComposableName
-    @Stable get() {
+    @[Stable JvmSynthetic] get() {
       throw IntrinsicImplementedError()
     }
-    set(@Suppress("unused") name) {
+    @JvmSynthetic set(@Suppress("unused") name) {
       throw IntrinsicImplementedError()
     }
 
@@ -100,7 +100,7 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    */
   @property:ComposableScope
   public val currentComposableKeyName: String
-    @Stable get() = throw IntrinsicImplementedError()
+    @[Stable JvmSynthetic] get() = throw IntrinsicImplementedError()
 
   /**
    * Returns all arguments that were affected by the value change. This is useful for debugging and
@@ -165,4 +165,5 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
 }
 
 @Suppress("FunctionName", "NOTHING_TO_INLINE")
-private inline fun IntrinsicImplementedError() = NotImplementedError("Implemented as an intrinsic")
+private inline fun IntrinsicImplementedError() =
+  NotImplementedError("Implemented as an intrinsic. Did you apply ComposeInvestigator plugin?")
