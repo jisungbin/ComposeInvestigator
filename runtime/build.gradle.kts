@@ -12,7 +12,7 @@ plugins {
   id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 
-//tasks.dokkaHtml {
+// tasks.dokkaHtml {
 //  moduleName = "ComposeInvestigator Runtime API"
 //  moduleVersion = project.property("VERSION_NAME") as String
 //  outputDirectory = rootDir.resolve("documentation/site/runtime/api")
@@ -25,7 +25,7 @@ plugins {
 //    "org.jetbrains.dokka.base.DokkaBase" to
 //      """{ "footerMessage": "ComposeInvestigator ⓒ 2024 Ji Sungbin" }""",
 //  )
-//}
+// }
 
 kotlin {
   explicitApi()

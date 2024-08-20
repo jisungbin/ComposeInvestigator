@@ -19,7 +19,6 @@ kotlin {
       "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
       "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
     )
-    // freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=true")
   }
 }
 
@@ -28,22 +27,7 @@ composeInvestigator {
   verbose = true
 }
 
-// tasks.withType<KotlinCompile>().configureEach {
-//  dependsOn(":compiler-embeddable:embeddedPlugin")
-// }
-
-//afterEvaluate {
-//  tasks.withType<Test> {
-//    dependsOn(":compiler-embeddable:embeddedPlugin")
-//  }
-//}
-
-//  tasks.withType<KotlinCompile>().configureEach {
-//    dependsOn(":compiler-embeddable:embeddedPlugin")
-//  }
-
 dependencies {
-//  implementation(projects.runtime)
   implementation(libs.compose.runtime)
 
   testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
