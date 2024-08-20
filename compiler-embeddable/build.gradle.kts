@@ -15,15 +15,14 @@ plugins {
   alias(libs.plugins.gradle.shadow)
 }
 
+tasks.register<ShadowJar>("embeddedPlugin") {
+  relocate("com.intellij", "org.jetbrains.kotlin.com.intellij")
+  configurations = listOf(project.configurations.compileClasspath.get())
+  archiveBaseName.set("composeinvestigator-compiler")
+  archiveClassifier.set("shadow")
+  destinationDirectory.set(File(layout.buildDirectory.asFile.get(), "embedded"))
+}
+
 dependencies {
   compileOnly(projects.compiler)
 }
-
-tasks.register<ShadowJar>("embeddedPlugin") {
-  configurations = listOf(project.configurations.compileClasspath.get())
-  relocate("com.intellij", "org.jetbrains.kotlin.com.intellij")
-  archiveBaseName.set("composeinvestigator-compiler")
-  archiveClassifier.set("shadow")
-  destinationDirectory.set(File(layout.buildDirectory.asFile.get(), "repackaged"))
-}
-
