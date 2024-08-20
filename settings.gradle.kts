@@ -82,7 +82,7 @@ include(
   ":runtime",
   ":compiler",
   ":compiler-embeddable",
-  // ":compiler-integration-test",
+  ":compiler-integration-test",
   // ":compiler-gradle-plugin",
   // ":sample",
 )

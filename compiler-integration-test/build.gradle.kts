@@ -7,48 +7,16 @@
 
 @file:Suppress("UnstableApiUsage")
 
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+
 plugins {
-  id("com.android.library")
-  kotlin("android")
+  kotlin("jvm")
   alias(libs.plugins.kotlin.compose)
-}
-
-android {
-  namespace = "land.sungbin.composeinvestigator.compiler.test"
-  compileSdk = 34
-
-  defaultConfig {
-    minSdk = 21
-  }
-
-  sourceSets {
-    getByName("main").java.srcDir("src/main/kotlin")
-    getByName("test").java.srcDir("src/test/kotlin")
-  }
-
-  compileOptions {
-    sourceCompatibility = JavaVersion.VERSION_17
-    targetCompatibility = JavaVersion.VERSION_17
-  }
-
-  testOptions {
-    unitTests {
-      isIncludeAndroidResources = true
-      isReturnDefaultValues = true
-
-      all { test ->
-        test.useJUnitPlatform()
-      }
-    }
-  }
 }
 
 kotlin {
   compilerOptions {
     optIn.addAll(
-      "org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi",
-      "org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction",
-      "org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI",
       "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
       "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
     )
@@ -56,34 +24,17 @@ kotlin {
   }
 }
 
-afterEvaluate {
-  tasks.withType<Test> {
-    dependsOn(":compiler-embeddable:embeddedPlugin")
-  }
+tasks.withType<KotlinCompile> {
+  dependsOn(":compiler-embeddable:embeddedPlugin")
 }
 
 dependencies {
   implementation(projects.runtime)
-  implementation(libs.compose.material)
-  implementation(libs.jetbrains.annotation)
-  implementation(libs.test.assertk)
+  implementation(libs.compose.runtime)
 
+  testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
   testImplementation(projects.compiler)
-  testImplementation(kotlin("compiler", version = libs.versions.kotlin.core.get()))
-  testImplementation(kotlin("compose-compiler-plugin", version = libs.versions.kotlin.core.get()))
-
-  testImplementation(libs.test.kotlin.coroutines) {
-    because("https://github.com/Kotlin/kotlinx.coroutines/issues/3673")
-  }
-
-  testImplementation(libs.test.mockk)
-  testImplementation(libs.test.robolectric) {
-    because("https://stackoverflow.com/a/64287388/14299073")
-  }
-
-  testImplementation(libs.test.junit.core)
-  testImplementation(libs.test.junit.compose)
-  testRuntimeOnly(libs.test.junit.enigne)
+  testImplementation(libs.test.assertk)
 
   kotlinCompilerPluginClasspath(projects.compilerEmbeddable)
 }
