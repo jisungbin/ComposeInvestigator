@@ -26,11 +26,6 @@ pluginManagement {
         releasesOnly()
       }
     }
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") {
-      mavenContent {
-        includeGroupByRegex("org\\.jetbrains\\.kotlin.*")
-      }
-    }
     maven("https://jitpack.io") {
       mavenContent {
         includeGroup("com.github.takahirom")
@@ -59,17 +54,6 @@ dependencyResolutionManagement {
     mavenCentral {
       mavenContent {
         releasesOnly()
-      }
-    }
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") {
-      mavenContent {
-        includeGroupByRegex("org\\.jetbrains\\.kotlin.*")
-      }
-    }
-    maven("https://androidx.dev/snapshots/builds/11964836/artifacts/repository") {
-      mavenContent {
-        includeModuleByRegex("androidx\\.compose\\.runtime", "runtime-test-utils.*")
-        snapshotsOnly()
       }
     }
     mavenLocal()
