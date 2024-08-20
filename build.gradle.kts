@@ -9,7 +9,6 @@ import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
 import com.diffplug.gradle.spotless.BaseKotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -87,10 +86,6 @@ allprojects {
         "kotlin.contracts.ExperimentalContracts",
       )
     }
-  }
-
-  extensions.findByType<KotlinProjectExtension>()?.run {
-    jvmToolchain(21)
   }
 }
 

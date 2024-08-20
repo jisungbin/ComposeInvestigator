@@ -7,14 +7,8 @@
 
 plugins {
   kotlin("jvm")
-  `java-gradle-plugin`
   `kotlin-dsl`
   id(libs.plugins.gradle.publish.maven.get().pluginId)
-}
-
-java {
-  sourceCompatibility = JavaVersion.VERSION_21
-  targetCompatibility = JavaVersion.VERSION_21
 }
 
 // val updateVersion = tasks.register<UpdatePluginVersionTask>("updateVersion") {
