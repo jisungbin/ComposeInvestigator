@@ -26,16 +26,12 @@ pluginManagement {
         releasesOnly()
       }
     }
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") {
-      mavenContent {
-        includeGroupByRegex("org\\.jetbrains\\.kotlin.*")
-      }
-    }
     maven("https://jitpack.io") {
       mavenContent {
         includeGroup("com.github.takahirom")
       }
     }
+    mavenLocal()
   }
 
   resolutionStrategy.eachPlugin {
@@ -60,29 +56,14 @@ dependencyResolutionManagement {
         releasesOnly()
       }
     }
-    maven("https://maven.pkg.jetbrains.space/kotlin/p/kotlin/dev") {
-      mavenContent {
-        includeGroupByRegex("org\\.jetbrains\\.kotlin.*")
-      }
-    }
-    maven("https://androidx.dev/snapshots/builds/11964836/artifacts/repository") {
-      mavenContent {
-        includeModuleByRegex("androidx\\.compose\\.runtime", "runtime-test-utils.*")
-        snapshotsOnly()
-      }
-    }
+    mavenLocal()
   }
-}
-
-plugins {
-  id("org.gradle.toolchains.foojay-resolver-convention") version "0.8.0"
 }
 
 include(
   ":runtime",
   ":compiler",
-  ":compiler-embeddable",
   ":compiler-integration-test",
-  // ":compiler-gradle-plugin",
+  ":compiler-gradle-plugin",
   // ":sample",
 )

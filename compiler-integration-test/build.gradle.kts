@@ -7,11 +7,10 @@
 
 @file:Suppress("UnstableApiUsage")
 
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
   kotlin("jvm")
   alias(libs.plugins.kotlin.compose)
+  id("land.sungbin.composeinvestigator") version "internal-test"
 }
 
 kotlin {
@@ -20,21 +19,18 @@ kotlin {
       "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
       "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
     )
-    freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=true")
   }
 }
 
-tasks.withType<KotlinCompile> {
-  dependsOn(":compiler-embeddable:embeddedPlugin")
+composeInvestigator {
+  enabled = true
+  verbose = true
 }
 
 dependencies {
-  implementation(projects.runtime)
   implementation(libs.compose.runtime)
 
   testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
   testImplementation(projects.compiler)
   testImplementation(libs.test.assertk)
-
-  kotlinCompilerPluginClasspath(projects.compilerEmbeddable)
 }

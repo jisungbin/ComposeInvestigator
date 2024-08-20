@@ -8,32 +8,29 @@
 
 plugins {
   kotlin("jvm")
-  alias(libs.plugins.kotlin.dokka)
+  // alias(libs.plugins.kotlin.dokka)
   id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 
-tasks.dokkaHtml {
-  moduleName.set("ComposeInvestigator Runtime API")
-  moduleVersion.set(project.property("VERSION_NAME") as String)
-  outputDirectory.set(rootDir.resolve("documentation/site/runtime/api"))
-
-  dokkaSourceSets.configureEach {
-    jdkVersion.set(JavaVersion.VERSION_17.majorVersion.toInt())
-  }
-
-  pluginsMapConfiguration.set(
-    mapOf(
-      "org.jetbrains.dokka.base.DokkaBase" to
-        """{ "footerMessage": "ComposeInvestigator ⓒ 2024 Ji Sungbin" }""",
-    ),
-  )
-}
+// tasks.dokkaHtml {
+//  moduleName = "ComposeInvestigator Runtime API"
+//  moduleVersion = project.property("VERSION_NAME") as String
+//  outputDirectory = rootDir.resolve("documentation/site/runtime/api")
+//
+//  dokkaSourceSets.configureEach {
+//    jdkVersion = JavaVersion.VERSION_21.majorVersion.toInt()
+//  }
+//
+//  pluginsMapConfiguration = mapOf(
+//    "org.jetbrains.dokka.base.DokkaBase" to
+//      """{ "footerMessage": "ComposeInvestigator ⓒ 2024 Ji Sungbin" }""",
+//  )
+// }
 
 kotlin {
   explicitApi()
   compilerOptions {
     optIn.addAll(
-      "androidx.compose.runtime.InternalComposeApi",
       "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
       "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
     )

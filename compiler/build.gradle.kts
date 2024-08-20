@@ -24,14 +24,14 @@ kotlin {
 }
 
 dependencies {
-  compileOnly(kotlin("compiler", version = libs.versions.kotlin.core.get()))
+  compileOnly(kotlin("compiler-embeddable", version = libs.versions.kotlin.core.get()))
   compileOnly(kotlin("compose-compiler-plugin", version = libs.versions.kotlin.core.get()))
   compileOnly(libs.jetbrains.annotation)
 
   testImplementation(projects.runtime)
   testImplementation(libs.compose.material)
-  testImplementation(kotlin("compiler", version = libs.versions.kotlin.core.get()))
-  testImplementation(kotlin("compose-compiler-plugin", version = libs.versions.kotlin.core.get()))
+  testImplementation(kotlin("compiler-embeddable", version = libs.versions.kotlin.core.get()))
+  testImplementation(kotlin("compose-compiler-plugin-embeddable", version = libs.versions.kotlin.core.get()))
   testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
 
   kotlinCompilerPluginClasspathTest(kotlin("compose-compiler-plugin-embeddable", version = libs.versions.kotlin.core.get()))

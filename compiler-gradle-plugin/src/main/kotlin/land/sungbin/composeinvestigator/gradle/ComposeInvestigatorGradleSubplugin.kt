@@ -26,18 +26,18 @@ public class ComposeInvestigatorGradleSubplugin : KotlinCompilerPluginSupportPlu
   override fun getPluginArtifact(): SubpluginArtifact =
     SubpluginArtifact(
       groupId = "land.sungbin.composeinvestigator",
-      artifactId = "composeinvestigator-compiler-embeddable",
+      artifactId = "composeinvestigator-compiler",
       version = VERSION,
     )
 
-  override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = true
+  override fun isApplicable(compilation: KotlinCompilation<*>): Boolean = true
 
-  override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
-    val project = kotlinCompilation.target.project
+  override fun applyToCompilation(compilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
+    val project = compilation.target.project
     val extension = project.extensions.getByType<ComposeInvestigatorPluginExtension>()
 
     project.dependencies.add(
-      kotlinCompilation.implementationConfigurationName,
+      compilation.implementationConfigurationName,
       "land.sungbin.composeinvestigator:composeinvestigator-runtime:$VERSION",
     )
 

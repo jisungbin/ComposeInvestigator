@@ -7,5 +7,11 @@
 
 package land.sungbin.composeinvestigator.compiler.test
 
-@Suppress("unused")
-class Test
+import kotlin.test.Test
+// import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
+
+class Test {
+  @Test fun test() {
+    // currentComposableInvalidationTracer
+  }
+}

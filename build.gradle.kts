@@ -9,7 +9,6 @@ import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
 import com.diffplug.gradle.spotless.BaseKotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinProjectExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -88,10 +87,6 @@ allprojects {
       )
     }
   }
-
-  extensions.findByType<KotlinProjectExtension>()?.run {
-    jvmToolchain(17)
-  }
 }
 
 subprojects {
@@ -109,13 +104,6 @@ subprojects {
 
   tasks.withType<Test> {
     useJUnitPlatform()
-    // https://junit.org/junit5/docs/snapshot/user-guide/#writing-tests-parallel-execution
-    systemProperties = mapOf(
-      "junit.jupiter.execution.parallel.enabled" to "true",
-      "junit.jupiter.execution.parallel.config.strategy" to "dynamic",
-      "junit.jupiter.execution.parallel.mode.default" to "concurrent",
-      "junit.jupiter.execution.parallel.mode.classes.default" to "concurrent",
-    )
     outputs.upToDateWhen { false }
   }
 }
