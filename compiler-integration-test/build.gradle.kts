@@ -10,7 +10,6 @@
 plugins {
   kotlin("jvm")
   alias(libs.plugins.kotlin.compose)
-  id("land.sungbin.composeinvestigator") version "internal-test"
 }
 
 kotlin {
@@ -19,18 +18,20 @@ kotlin {
       "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
       "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
     )
+    freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=true")
   }
 }
 
-composeInvestigator {
-  enabled = true
-  verbose = true
-}
-
 dependencies {
+  implementation(projects.runtime)
   implementation(libs.compose.runtime)
 
+  implementation("androidx.compose.runtime:runtime-test-utils:1.8.0-SNAPSHOT") {
+    because("Why SNAPSHOT? See https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/runtime/runtime-test-utils/build.gradle;l=71;drc=214c6abe4e624304956276717a0163fad3858be9")
+  }
+  kotlinCompilerPluginClasspath(projects.compiler)
+
   testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
-  testImplementation(projects.compiler)
+  testImplementation(libs.test.kotlin.coroutines)
   testImplementation(libs.test.assertk)
 }
