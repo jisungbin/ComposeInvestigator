@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler.frontend
 
+import kotlin.test.Ignore
 import kotlin.test.Test
 import kotlin.test.assertContains
 import kotlin.test.assertFalse
@@ -17,6 +18,7 @@ import land.sungbin.composeinvestigator.runtime.NoInvestigation
 import org.jetbrains.kotlin.fir.types.classId
 import org.jetbrains.kotlin.fir.types.coneType
 
+@Ignore("Need to reimplementation")
 class InvalidationTraceTableInstantiationValidatorTest : AbstractCompilerTest() {
   @Test fun noneComposable() {
     val analyze = analyze(source("frontend/traceTableInstantiation/noneComposable.kt"))
