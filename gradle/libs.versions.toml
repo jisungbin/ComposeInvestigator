@@ -15,7 +15,7 @@ kotlin-coroutines = "1.9.0-RC" # K2
 
 androidx-activity = "1.9.2"
 
-compose-runtime = "1.7.0-beta07"
+compose-runtime = "1.7.0"
 compose-stableMarker = "1.0.5"
 compose-activity = "1.9.1"
 
