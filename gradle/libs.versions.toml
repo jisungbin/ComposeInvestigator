@@ -17,7 +17,7 @@ androidx-activity = "1.9.1"
 
 compose-runtime = "1.7.0-beta07"
 compose-stableMarker = "1.0.5"
-compose-activity = "1.9.1"
+compose-activity = "1.9.2"
 
 test-assertk = "0.28.1"
 test-mockk = "1.13.12"
