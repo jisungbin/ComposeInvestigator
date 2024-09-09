@@ -8,7 +8,8 @@
 package land.sungbin.composeinvestigator.compiler
 
 /** @param phase 0: [ComposeInvestigatorFirstPhaseExtension], 1: [ComposeInvestigatorLastPhaseExtension] */
-public enum class FeatureFlag(@Suppress("RedundantVisibilityModifier") public val phase: Int) {
+@Suppress("RedundantVisibilityModifier") // FIXME false negative
+public enum class FeatureFlag(public val phase: Int) {
   InvalidationProcessTracing(0),
   InvalidationSkipTracing(1),
   InvalidationTraceTableIntrinsicCall(0),

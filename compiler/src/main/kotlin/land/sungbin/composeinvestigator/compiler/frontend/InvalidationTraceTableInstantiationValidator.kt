@@ -33,11 +33,10 @@ import org.jetbrains.kotlin.name.ClassId
 
 public class InvalidationTraceTableInstantiationValidator(session: FirSession) : FirAdditionalCheckersExtension(session) {
   override val declarationCheckers: DeclarationCheckers = object : DeclarationCheckers() {
-    override val fileCheckers: Set<FirFileChecker> = setOf(/*NoComposableFileChecker*/)
+    override val fileCheckers: Set<FirFileChecker> = setOf(NoComposableFileChecker)
   }
 }
 
-// TODO!
 private object NoComposableFileChecker : FirFileChecker(MppCheckerKind.Common) {
   private val noInvestigationType by unsafeLazy {
     buildResolvedTypeRef {
@@ -63,7 +62,7 @@ private object NoComposableFileChecker : FirFileChecker(MppCheckerKind.Common) {
         argumentMapping = FirEmptyAnnotationArgumentMapping
       }
 
-      declaration.replaceAnnotations(listOf(noInvestigationAnnotation).smartPlus(declaration.annotations))
+      declaration.replaceAnnotations(declaration.annotations.smartPlus(listOf(noInvestigationAnnotation)))
 
       // Validate that the new annotations do not break the file.
       declaration.validate()

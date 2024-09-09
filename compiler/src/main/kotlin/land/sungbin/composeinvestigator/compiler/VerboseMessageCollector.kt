@@ -14,7 +14,7 @@ import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 internal class VerboseMessageCollector(private val delegate: MessageCollector) : MessageCollector by delegate {
   private var verbose = false
 
-  fun verbose() = apply { verbose = true }
+  internal fun verbose() = apply { verbose = true }
 
   override fun report(severity: CompilerMessageSeverity, message: String, location: CompilerMessageSourceLocation?) {
     if (severity == CompilerMessageSeverity.LOGGING || !verbose) return

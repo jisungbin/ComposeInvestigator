@@ -14,7 +14,8 @@ import org.jetbrains.kotlin.util.slicedMap.RewritePolicy
 import org.jetbrains.kotlin.util.slicedMap.WritableSlice
 
 public object DurationWritableSlices {
-  public val DURABLE_FUNCTION_KEY: WritableSlice<IrAttributeContainer, ComposableKeyInfo> = BasicWritableSlice(RewritePolicy.DO_NOTHING)
+  public val DURABLE_FUNCTION_KEY: WritableSlice<IrAttributeContainer, ComposableKeyInfo> =
+    BasicWritableSlice(RewritePolicy.DO_NOTHING)
 }
 
 public operator fun <K : IrAttributeContainer, V> WeakBindingTrace.set(slice: WritableSlice<K, V>, key: K, value: V) {

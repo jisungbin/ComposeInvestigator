@@ -43,23 +43,10 @@ public class DurableComposableKeyAnalyzer(
   featureFlags = featureFlags,
 ) {
   private val messageCollector by unsafeLazy { context.createDiagnosticReporter(PLUGIN_ID) }
-
-  private var currentKeys = mutableListOf<ComposableKeyInfo>()
   private val irComposableInformation = IrComposableInformation(context)
 
-  override fun visitFile(declaration: IrFile): IrFile {
-    val stringKeys = mutableSetOf<String>()
-    return root(stringKeys) {
-      val prev = currentKeys
-      val next = mutableListOf<ComposableKeyInfo>()
-      try {
-        currentKeys = next
-        super.visitFile(declaration)
-      } finally {
-        currentKeys = prev
-      }
-    }
-  }
+  override fun visitFile(declaration: IrFile): IrFile =
+    root(keys = mutableSetOf()) { super.visitFile(declaration) }
 
   override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
     val (keyName, success) = buildKey("fun-${declaration.signatureString()}")
@@ -72,7 +59,6 @@ public class DurableComposableKeyAnalyzer(
     )
 
     val keyInfo = ComposableKeyInfo(keyName = keyName, composable = composable)
-    currentKeys += keyInfo
     context.irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, declaration] = keyInfo
 
     return super.visitSimpleFunction(declaration)

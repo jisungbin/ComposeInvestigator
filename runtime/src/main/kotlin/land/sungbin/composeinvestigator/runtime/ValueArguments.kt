@@ -36,8 +36,8 @@ public data class ValueArgument(
 @Immutable
 public data class ChangedArgument(public val previous: ValueArgument, public val new: ValueArgument) {
   init {
-    require(previous.javaClass.name == new.javaClass.name) {
-      "Affected arguments must be same type. previous=${previous.javaClass.name}, new=${new.javaClass.name}"
+    require(previous.name == new.name) {
+      "Affected arguments must be same name. (previous=${previous.name}, new=${new.name})"
     }
   }
 }
