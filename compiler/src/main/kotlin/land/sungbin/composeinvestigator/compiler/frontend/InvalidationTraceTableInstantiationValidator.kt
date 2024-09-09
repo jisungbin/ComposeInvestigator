@@ -7,12 +7,13 @@
 
 package land.sungbin.composeinvestigator.compiler.frontend
 
-import androidx.compose.compiler.plugins.kotlin.k2.ComposableFunction
 import androidx.compose.compiler.plugins.kotlin.k2.hasComposableAnnotation
+import androidx.compose.compiler.plugins.kotlin.lower.fastForEach
 import land.sungbin.composeinvestigator.compiler.NO_INVESTIGATION_FQN
 import land.sungbin.composeinvestigator.compiler.lower.unsafeLazy
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
+import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
 import org.jetbrains.kotlin.fir.analysis.checkers.context.CheckerContext
@@ -20,15 +21,15 @@ import org.jetbrains.kotlin.fir.analysis.checkers.declaration.DeclarationChecker
 import org.jetbrains.kotlin.fir.analysis.checkers.declaration.FirFileChecker
 import org.jetbrains.kotlin.fir.analysis.extensions.FirAdditionalCheckersExtension
 import org.jetbrains.kotlin.fir.declarations.FirFile
-import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.validate
+import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotation
 import org.jetbrains.kotlin.fir.expressions.impl.FirEmptyAnnotationArgumentMapping
+import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
 import org.jetbrains.kotlin.fir.smartPlus
 import org.jetbrains.kotlin.fir.types.builder.buildResolvedTypeRef
-import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.constructClassLikeType
-import org.jetbrains.kotlin.fir.types.functionTypeKind
+import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitorVoid
 import org.jetbrains.kotlin.name.ClassId
 
 public class InvalidationTraceTableInstantiationValidator(session: FirSession) : FirAdditionalCheckersExtension(session) {
@@ -45,27 +46,38 @@ private object NoComposableFileChecker : FirFileChecker(MppCheckerKind.Common) {
   }
 
   override fun check(declaration: FirFile, context: CheckerContext, reporter: DiagnosticReporter) {
-    if (
-      declaration.declarations.none { element ->
-        element.hasComposableAnnotation(context.session) ||
-          (
-            element is FirFunction &&
-              element.valueParameters.any { parameter ->
-                parameter.returnTypeRef.coneType.functionTypeKind(context.session) === ComposableFunction
-              }
-            )
-      }
-    ) {
-      val noInvestigationAnnotation = buildAnnotation {
-        useSiteTarget = AnnotationUseSiteTarget.FILE
-        annotationTypeRef = noInvestigationType
-        argumentMapping = FirEmptyAnnotationArgumentMapping
+    var hasComposable = false
+
+    val composableCallVisitor = object : FirDefaultVisitorVoid() {
+      override fun visitElement(element: FirElement) {
+        if (hasComposable) return
+        element.acceptChildren(this)
       }
 
-      declaration.replaceAnnotations(declaration.annotations.smartPlus(listOf(noInvestigationAnnotation)))
+      override fun visitFunctionCall(functionCall: FirFunctionCall) {
+        if (functionCall.calleeReference.toResolvedFunctionSymbol()!!.hasComposableAnnotation(context.session))
+          hasComposable = true
 
-      // Validate that the new annotations do not break the file.
-      declaration.validate()
+        if (hasComposable) return
+        super.visitFunctionCall(functionCall)
+      }
     }
+
+    declaration.declarations.fastForEach { element ->
+      element.acceptChildren(composableCallVisitor)
+    }
+
+    if (hasComposable) return
+
+    val noInvestigationAnnotation = buildAnnotation {
+      useSiteTarget = AnnotationUseSiteTarget.FILE
+      annotationTypeRef = noInvestigationType
+      argumentMapping = FirEmptyAnnotationArgumentMapping
+    }
+
+    declaration.replaceAnnotations(declaration.annotations.smartPlus(listOf(noInvestigationAnnotation)))
+
+    // Validate that the new annotations do not break the file.
+    declaration.validate()
   }
 }
