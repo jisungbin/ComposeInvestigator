@@ -24,7 +24,7 @@ test-robolectric = "4.13"
 
 # Some of our tests use JUnit4 because we include an Android module.
 test-junit-core = "4.13.2"
-test-junit-engine = "5.10.2"
+test-junit-engine = "5.11.0"
 
 [plugins]
 gradle-publish-maven = { id = "com.vanniktech.maven.publish", version.ref = "gradle-publish-maven" }
