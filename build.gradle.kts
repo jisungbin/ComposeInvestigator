@@ -21,12 +21,7 @@ plugins {
 
 idea {
   module {
-    excludeDirs = buildSet {
-      add(file("runtime/api"))
-      add(file("documentation"))
-      addAll(excludeDirs)
-      addAll(allprojects.map { project -> project.file(".kotlin") })
-    }
+    excludeDirs = excludeDirs + setOf(file("runtime/api"), file("documentation"))
   }
 }
 
@@ -73,7 +68,7 @@ allprojects {
     }
     format("xml") {
       target("**/*.xml")
-      targetExclude("**/build/**/*.xml", "spotless/*.xml", ".idea/*.xml")
+      targetExclude("**/build/**/*.xml", "spotless/*.xml", ".idea/**/*.xml")
       licenseHeaderFile(rootProject.file("spotless/copyright.xml"), "(<[^!?])")
     }
   }
