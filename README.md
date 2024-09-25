@@ -15,7 +15,7 @@ However, it can perform the following tasks:
 
 [*(Read the Medium's introductory post)*](https://jisungbin.medium.com/tracing-recompositions-without-boilerplate-code-e9800db1419e)
 
-*Work is currently underway to adapt K2 and rewrite core logics*
+*Work is currently underway to adapt K2 and rewrite core logics: [#191](https://github.com/jisungbin/ComposeInvestigator/issues/191)*
 
 ---
 
