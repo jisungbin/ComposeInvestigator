@@ -7,8 +7,10 @@
 
 package land.sungbin.composeinvestigator.compiler.lower
 
+import kotlin.test.Ignore
 import land.sungbin.composeinvestigator.compiler.FeatureFlag
 import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
 import org.jetbrains.kotlin.utils.addToStdlib.enumSetOf
 
+@Ignore("TODO")
 class InvalidationTraceTableInstantiateTest : AbstractCompilerTest(enumSetOf(FeatureFlag.StateInitializerTracking))

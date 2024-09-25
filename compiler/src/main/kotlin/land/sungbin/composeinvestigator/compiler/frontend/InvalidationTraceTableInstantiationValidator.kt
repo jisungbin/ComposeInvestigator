@@ -8,6 +8,7 @@
 package land.sungbin.composeinvestigator.compiler.frontend
 
 import androidx.compose.compiler.plugins.kotlin.k2.hasComposableAnnotation
+import androidx.compose.compiler.plugins.kotlin.k2.isComposable
 import androidx.compose.compiler.plugins.kotlin.lower.fastForEach
 import land.sungbin.composeinvestigator.compiler.NO_INVESTIGATION_FQN
 import land.sungbin.composeinvestigator.compiler.lower.unsafeLazy
@@ -21,11 +22,13 @@ import org.jetbrains.kotlin.fir.analysis.checkers.declaration.DeclarationChecker
 import org.jetbrains.kotlin.fir.analysis.checkers.declaration.FirFileChecker
 import org.jetbrains.kotlin.fir.analysis.extensions.FirAdditionalCheckersExtension
 import org.jetbrains.kotlin.fir.declarations.FirFile
+import org.jetbrains.kotlin.fir.declarations.FirFunction
+import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.fir.declarations.validate
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotation
 import org.jetbrains.kotlin.fir.expressions.impl.FirEmptyAnnotationArgumentMapping
-import org.jetbrains.kotlin.fir.references.toResolvedFunctionSymbol
+import org.jetbrains.kotlin.fir.references.toResolvedCallableSymbol
 import org.jetbrains.kotlin.fir.smartPlus
 import org.jetbrains.kotlin.fir.types.builder.buildResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.constructClassLikeType
@@ -39,13 +42,15 @@ public class InvalidationTraceTableInstantiationValidator(session: FirSession) :
 }
 
 private object NoComposableFileChecker : FirFileChecker(MppCheckerKind.Common) {
+  private val NO_INVESTIGATION = ClassId.topLevel(NO_INVESTIGATION_FQN)
   private val noInvestigationType by unsafeLazy {
     buildResolvedTypeRef {
-      coneType = ClassId.topLevel(NO_INVESTIGATION_FQN).constructClassLikeType()
+      coneType = NO_INVESTIGATION.constructClassLikeType()
     }
   }
 
   override fun check(declaration: FirFile, context: CheckerContext, reporter: DiagnosticReporter) {
+    if (declaration.hasAnnotation(NO_INVESTIGATION, context.session)) return
     var hasComposable = false
 
     val composableCallVisitor = object : FirDefaultVisitorVoid() {
@@ -54,17 +59,25 @@ private object NoComposableFileChecker : FirFileChecker(MppCheckerKind.Common) {
         element.acceptChildren(this)
       }
 
-      override fun visitFunctionCall(functionCall: FirFunctionCall) {
-        if (functionCall.calleeReference.toResolvedFunctionSymbol()!!.hasComposableAnnotation(context.session))
+      override fun visitFunctionCall(call: FirFunctionCall) {
+        if (call.calleeReference.toResolvedCallableSymbol()!!.isComposable(context.session))
           hasComposable = true
 
         if (hasComposable) return
-        super.visitFunctionCall(functionCall)
+
+        super.visitFunctionCall(call)
       }
     }
 
     declaration.declarations.fastForEach { element ->
-      element.acceptChildren(composableCallVisitor)
+      // fast path -- 1
+      if (element.hasComposableAnnotation(context.session))
+        return@check // early return if the file has composable functions
+
+      if (element is FirFunction) // fast path -- 2
+        element.body?.acceptChildren(composableCallVisitor)
+      else // slow path
+        element.acceptChildren(composableCallVisitor)
     }
 
     if (hasComposable) return
