@@ -141,7 +141,6 @@ class KotlinK2Compiler private constructor(private val environment: KotlinCoreEn
       packagePartProvider = projectEnvironment.getPackagePartProvider(librariesScope),
       languageVersionSettings = configuration.languageVersionSettings,
       predefinedJavaComponents = null,
-      registerExtraComponents = {},
     )
 
     val module = FirModuleDataImpl(
@@ -193,7 +192,6 @@ class KotlinK2Compiler private constructor(private val environment: KotlinCoreEn
       importTracker = configuration.get(CommonConfigurationKeys.IMPORT_TRACKER),
       predefinedJavaComponents = null,
       needRegisterJavaElementFinder = true,
-      registerExtraComponents = {},
       init = {},
     )
 

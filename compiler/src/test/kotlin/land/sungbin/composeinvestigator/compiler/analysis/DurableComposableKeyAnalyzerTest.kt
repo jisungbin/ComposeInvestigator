@@ -45,9 +45,9 @@ class DurableComposableKeyAnalyzerTest : AbstractCompilerTest(enumSetOf(FeatureF
       expectPackage: String,
       expectFilename: String,
     ) {
-      assertEquals(expectName, target.getValueArgument(0).safeAs<IrConst<String>>()?.value)
-      assertEquals(expectPackage, target.getValueArgument(1).safeAs<IrConst<String>>()?.value)
-      assertEquals(expectFilename, target.getValueArgument(2).safeAs<IrConst<String>>()?.value)
+      assertEquals(expectName, target.getValueArgument(0).safeAs<IrConst>()?.value)
+      assertEquals(expectPackage, target.getValueArgument(1).safeAs<IrConst>()?.value)
+      assertEquals(expectFilename, target.getValueArgument(2).safeAs<IrConst>()?.value)
     }
 
     assertEquals("fun-one()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.analysis.durableComposableKey/file-sameFunctionNames.kt", zeroArgFnKey.keyName)

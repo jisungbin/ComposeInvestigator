@@ -28,6 +28,7 @@ import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
+import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.defaultType
@@ -93,7 +94,7 @@ public class InvalidationTraceTableIntrinsicTransformer(
         allScopes.lastComposable()?.let { composable ->
           val newName = expression
             .getValueArgument(0).cast<IrConstructorCall>()
-            .getValueArgument(0).cast<IrConst<String>>().value
+            .getValueArgument(0).cast<IrConst>().value as String
 
           val originalKey = context.irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable]!!
           val newComposable = irComposableInformation.copyFrom(originalKey.composable, name = context.irString(newName))

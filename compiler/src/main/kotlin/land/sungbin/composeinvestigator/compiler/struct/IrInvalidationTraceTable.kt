@@ -30,6 +30,7 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrValueAccessExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
+import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.classOrFail
@@ -58,7 +59,7 @@ public class IrInvalidationTraceTable private constructor(private val prop: IrPr
 
   public fun irRegisterStateObject(
     value: IrExpression,
-    name: IrConst<String>,
+    name: IrConst,
   ): IrCall = IrCallImpl.fromSymbolOwner(
     startOffset = UNDEFINED_OFFSET,
     endOffset = UNDEFINED_OFFSET,
@@ -73,7 +74,7 @@ public class IrInvalidationTraceTable private constructor(private val prop: IrPr
   }
 
   public fun irComputeInvalidationReason(
-    keyName: IrConst<String>,
+    keyName: IrConst,
     arguments: IrValueAccessExpression,
   ): IrCall = IrCallImpl.fromSymbolOwner(
     startOffset = UNDEFINED_OFFSET,

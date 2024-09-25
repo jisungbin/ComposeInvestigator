@@ -118,7 +118,7 @@ abstract class AbstractCompilerTest(
       registerExtensions = { configuration ->
         registerExtensionsForTest(this, configuration) {
           FirExtensionRegistrarAdapter.registerExtension(ComposeInvestigatorFirExtensionRegistrar())
-          ComposePluginRegistrar.registerCommonExtensions(this@create, null)
+          with(ComposePluginRegistrar) { registerCommonExtensions() }
         }
         extensionArea.getExtensionPoint(IrGenerationExtension.extensionPointName).run {
           registerExtension(

@@ -41,7 +41,7 @@ public class InvalidationTraceTableInstantiationValidator(session: FirSession) :
 private object NoComposableFileChecker : FirFileChecker(MppCheckerKind.Common) {
   private val noInvestigationType by unsafeLazy {
     buildResolvedTypeRef {
-      type = ClassId.topLevel(NO_INVESTIGATION_FQN).constructClassLikeType()
+      coneType = ClassId.topLevel(NO_INVESTIGATION_FQN).constructClassLikeType()
     }
   }
 
