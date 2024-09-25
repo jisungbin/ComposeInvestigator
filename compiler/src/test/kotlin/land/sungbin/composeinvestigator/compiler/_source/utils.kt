@@ -18,4 +18,3 @@ fun sourcePath(filename: String): String =
 
 fun sourceString(filename: String): String =
   File(sourcePath(filename)).readText()
-
