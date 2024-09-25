@@ -98,9 +98,8 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    * [Compose compiler's implementation](https://github.com/JetBrains/kotlin/blob/ede0373c4e5c0506b1491c6eb4c8bc0660ef7d21/plugins/compose/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/lower/DurableKeyTransformer.kt#L74)
    * of the AOSP.
    */
-  @property:ComposableScope
   public val currentComposableKeyName: String
-    @[Stable JvmSynthetic] get() = throw IntrinsicImplementedError()
+    @[Stable ComposableScope JvmSynthetic] get() = throw IntrinsicImplementedError()
 
   /**
    * Returns all arguments that were affected by the value change. This is useful for debugging and
