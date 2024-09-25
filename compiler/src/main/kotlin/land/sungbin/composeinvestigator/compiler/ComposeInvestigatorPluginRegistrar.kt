@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.config.messageCollector
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
 public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
-  override val supportsK2: Boolean = true
+  override val supportsK2: Boolean get() = true
 
   // This deprecated override is safe to use up to Kotlin 2.1.0 by KT-55300.
   // Also see: https://youtrack.jetbrains.com/issue/KT-52665/Deprecate-ComponentRegistrar#focus=Change-27-7999959.0-0
