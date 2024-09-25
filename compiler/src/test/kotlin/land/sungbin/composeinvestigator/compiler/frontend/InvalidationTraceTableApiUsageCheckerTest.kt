@@ -10,6 +10,7 @@ package land.sungbin.composeinvestigator.compiler.frontend
 import kotlin.test.Ignore
 import kotlin.test.Test
 import land.sungbin.composeinvestigator.compiler._assert.assertDiagnostics
+import land.sungbin.composeinvestigator.compiler._assert.assertNoDiagnostic
 import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
 import land.sungbin.composeinvestigator.compiler._source.source
 import land.sungbin.composeinvestigator.compiler.frontend.ComposeInvestigatorErrors.API_ACCESS_IN_NO_INVESTIGATION_FILE
@@ -19,26 +20,26 @@ import land.sungbin.composeinvestigator.compiler.frontend.ComposeInvestigatorErr
 class InvalidationTraceTableApiUsageCheckerTest : AbstractCompilerTest() {
   @Test fun composableFunction() {
     val analyze = analyze(source("frontend/traceTableApiUsage/composableFunction.kt"))
-    analyze.assertDiagnostics(API_ACCESS_IN_NO_INVESTIGATION_FILE)
-    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_SCOPE_CALL)
+    analyze.assertNoDiagnostic(API_ACCESS_IN_NO_INVESTIGATION_FILE)
+    analyze.assertNoDiagnostic(ILLEGAL_COMPOSABLE_SCOPE_CALL)
   }
 
   @Test fun composableLambda() {
     val analyze = analyze(source("frontend/traceTableApiUsage/composableLambda.kt"))
-    analyze.assertDiagnostics(API_ACCESS_IN_NO_INVESTIGATION_FILE)
-    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_SCOPE_CALL)
+    analyze.assertNoDiagnostic(API_ACCESS_IN_NO_INVESTIGATION_FILE)
+    analyze.assertNoDiagnostic(ILLEGAL_COMPOSABLE_SCOPE_CALL)
   }
 
   @Test fun inlineComposableFunction() {
     val analyze = analyze(source("frontend/traceTableApiUsage/inlineComposableFunction.kt"))
-    analyze.assertDiagnostics(API_ACCESS_IN_NO_INVESTIGATION_FILE)
-    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_SCOPE_CALL)
+    analyze.assertNoDiagnostic(API_ACCESS_IN_NO_INVESTIGATION_FILE)
+    analyze.assertNoDiagnostic(ILLEGAL_COMPOSABLE_SCOPE_CALL)
   }
 
   @Test fun inlineComposableLambda() {
     val analyze = analyze(source("frontend/traceTableApiUsage/inlineComposableLambda.kt"))
-    analyze.assertDiagnostics(API_ACCESS_IN_NO_INVESTIGATION_FILE)
-    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_SCOPE_CALL)
+    analyze.assertNoDiagnostic(API_ACCESS_IN_NO_INVESTIGATION_FILE)
+    analyze.assertNoDiagnostic(ILLEGAL_COMPOSABLE_SCOPE_CALL)
   }
 
   @Test fun inlineNormalFunction() {

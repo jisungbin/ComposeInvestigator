@@ -8,7 +8,8 @@
 package land.sungbin.composeinvestigator.compiler.frontend
 
 import kotlin.test.Test
-import land.sungbin.composeinvestigator.compiler._assert.assertDiagnostic
+import land.sungbin.composeinvestigator.compiler._assert.assertDiagnostics
+import land.sungbin.composeinvestigator.compiler._assert.assertNoDiagnostic
 import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
 import land.sungbin.composeinvestigator.compiler._source.source
 import land.sungbin.composeinvestigator.compiler.frontend.ComposeInvestigatorErrors.UNSUPPORTED_COMPOSABLE_NAME
@@ -16,12 +17,12 @@ import land.sungbin.composeinvestigator.compiler.frontend.ComposeInvestigatorErr
 class ComposableNameExpressionCheckerTest : AbstractCompilerTest() {
   @Test fun stringHardcodeExpression() {
     val analyze = analyze(source("frontend/composableNameExpression/stringHardcodeExpression.kt"))
-    analyze.assertDiagnostic(UNSUPPORTED_COMPOSABLE_NAME)
+    analyze.assertNoDiagnostic(UNSUPPORTED_COMPOSABLE_NAME)
   }
 
   @Test fun magicNumberToStringExpression() {
     val analyze = analyze(source("frontend/composableNameExpression/magicNumberToStringExpression.kt"))
-    analyze.assertDiagnostic(UNSUPPORTED_COMPOSABLE_NAME) {
+    analyze.assertDiagnostics(UNSUPPORTED_COMPOSABLE_NAME) {
       """
 error: currently, only string hardcodes are supported as arguments to ComposableName.
   ComposableName(42.toString())
