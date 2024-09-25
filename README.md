@@ -15,7 +15,7 @@ However, it can perform the following tasks:
 
 [*(Read the Medium's introductory post)*](https://jisungbin.medium.com/tracing-recompositions-without-boilerplate-code-e9800db1419e)
 
-*Work is currently underway to adapt K2 and rewrite core logic: [#172](https://github.com/jisungbin/ComposeInvestigator/pull/172)*
+*Work is currently underway to adapt K2 and rewrite core logics*
 
 ---
 
@@ -56,10 +56,6 @@ consider using the runtime API.
 
 Comprehensive documentation for ComposeInvestigator is available
 on [project website](https://jisungbin.github.io/ComposeInvestigator).
-
-### Known issues
-
-- [#155](https://github.com/jisungbin/ComposeInvestigator/issues/155): Using the R8 build causes a crash.
 
 ### Preview
 
