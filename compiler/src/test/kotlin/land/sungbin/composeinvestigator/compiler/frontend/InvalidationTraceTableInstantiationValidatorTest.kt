@@ -13,27 +13,26 @@ import kotlin.test.assertContains
 import kotlin.test.assertFalse
 import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
 import land.sungbin.composeinvestigator.compiler._compilation.FirAnalysisResult
-import land.sungbin.composeinvestigator.compiler._source.source
 import land.sungbin.composeinvestigator.runtime.NoInvestigation
 import org.jetbrains.kotlin.fir.types.classId
 import org.jetbrains.kotlin.fir.types.coneType
 
 @Ignore("Need to reimplementation")
-class InvalidationTraceTableInstantiationValidatorTest : AbstractCompilerTest() {
+class InvalidationTraceTableInstantiationValidatorTest : AbstractCompilerTest(sourceRoot = "frontend/traceTableInstantiation") {
   @Test fun noneComposable() {
-    val analyze = analyze(source("frontend/traceTableInstantiation/noneComposable.kt"))
+    val analyze = analyze(source("noneComposable.kt"))
     assertContains(analyze.fileAnnotations(), NoInvestigation::class.qualifiedName!!)
   }
 
   @Test fun singleComposableFunction() {
-    val analyze = analyze(source("frontend/traceTableInstantiation/singleComposableFunction.kt"))
+    val analyze = analyze(source("singleComposableFunction.kt"))
 
     // TODO assertNotContains (KT-53336)
     assertFalse(analyze.fileAnnotations().contains(NoInvestigation::class.qualifiedName!!))
   }
 
   @Test fun singleComposableLambda() {
-    val analyze = analyze(source("frontend/traceTableInstantiation/singleComposableLambda.kt"))
+    val analyze = analyze(source("singleComposableLambda.kt"))
 
     // TODO assertNotContains (KT-53336)
     assertFalse(analyze.fileAnnotations().contains(NoInvestigation::class.qualifiedName!!))

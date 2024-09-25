@@ -12,16 +12,18 @@ import kotlin.test.Test
 import kotlin.test.assertEquals
 import land.sungbin.composeinvestigator.compiler.FeatureFlag
 import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
-import land.sungbin.composeinvestigator.compiler._source.source
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.utils.addToStdlib.enumSetOf
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
-class DurableComposableKeyAnalyzerTest : AbstractCompilerTest(enumSetOf(FeatureFlag.InvalidationProcessTracing)) {
+class DurableComposableKeyAnalyzerTest : AbstractCompilerTest(
+  enumSetOf(FeatureFlag.InvalidationProcessTracing),
+  sourceRoot = "analysis/durableComposableKey",
+) {
   @Test fun generates_a_unique_key_for_the_same_function_name() {
-    val result = compile(source("analysis/durableComposableKey/sameFunctionNames.kt"))
+    val result = compile(source("sameFunctionNames.kt"))
     val trace = result.pluginContext.irTrace
 
     val functions = result.irModuleFragment
