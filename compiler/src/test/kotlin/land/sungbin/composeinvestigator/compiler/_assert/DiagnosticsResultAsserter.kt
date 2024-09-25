@@ -8,42 +8,24 @@
 package land.sungbin.composeinvestigator.compiler._assert
 
 import kotlin.test.assertEquals
+import kotlin.test.assertTrue
 import kotlin.test.fail
 import land.sungbin.composeinvestigator.compiler._compilation.FirAnalysisResult
 import org.jetbrains.kotlin.diagnostics.AbstractKtDiagnosticFactory
 
-fun FirAnalysisResult.assertDiagnostic(
-  diagnostic: AbstractKtDiagnosticFactory,
-  expectMessage: (() -> String)? = null,
-) {
-  val diagnostics = diagnostics.getOrElse(diagnostic.name, ::emptyList)
-
-  if (diagnostics.isEmpty() && expectMessage == null) return
-  if (diagnostics.isEmpty() && expectMessage != null)
-    fail("Expected diagnostic message but no diagnostic was found.")
-
-  val actualMessage = diagnostics.single()
-
-  if (expectMessage == null)
-    fail("Expected no diagnostic message but found: \n$actualMessage")
-
-  assertEquals(expectMessage(), actualMessage)
+fun FirAnalysisResult.assertNoDiagnostic(diagnostic: AbstractKtDiagnosticFactory) {
+  val results = diagnostics.getOrElse(diagnostic.name, ::emptyList)
+  assertTrue(results.isEmpty(), "Expected no diagnostic but found diagnostic(s).")
 }
 
 fun FirAnalysisResult.assertDiagnostics(
   diagnostic: AbstractKtDiagnosticFactory,
-  expectMessages: (() -> String)? = null,
+  expectMessages: () -> String,
 ) {
-  val diagnostics = diagnostics.getOrElse(diagnostic.name, ::emptyList)
-
-  if (diagnostics.isEmpty() && expectMessages == null) return
-  if (diagnostics.isEmpty() && expectMessages != null)
+  val results = diagnostics.getOrElse(diagnostic.name, ::emptyList)
+  if (results.isEmpty())
     fail("Expected diagnostics message but no diagnostic was found.")
 
-  val actualMessages = diagnostics.joinToString("\n=====\n")
-
-  if (expectMessages == null)
-    fail("Expected no diagnostic message but found: \n$actualMessages")
-
-  assertEquals(expectMessages(), actualMessages)
+  val actualMessages = results.joinToString("\n=====\n")
+  assertEquals(expectMessages().trim(), actualMessages)
 }

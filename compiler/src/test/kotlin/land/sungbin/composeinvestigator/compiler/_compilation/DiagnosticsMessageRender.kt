@@ -94,8 +94,4 @@ private object InFileDiagnosticsComparator : Comparator<KtDiagnostic> {
 }
 
 private class SequentialFilePositionFinder(private val reader: InputStreamReader) :
-  Closeable, SequentialPositionFinder(reader) {
-  override fun close() {
-    reader.close()
-  }
-}
+  Closeable by reader, SequentialPositionFinder(reader)

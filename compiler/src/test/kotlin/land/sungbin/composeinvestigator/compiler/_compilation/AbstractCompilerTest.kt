@@ -8,10 +8,12 @@
 package land.sungbin.composeinvestigator.compiler._compilation
 
 import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
+import androidx.compose.compiler.plugins.kotlin.lower.dumpSrc
 import java.io.File
 import java.util.EnumSet
 import kotlin.test.AfterTest
 import kotlin.test.BeforeTest
+import kotlin.test.assertEquals
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorFirExtensionRegistrar
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorFirstPhaseExtension
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorLastPhaseExtension
@@ -116,7 +118,7 @@ abstract class AbstractCompilerTest(
       registerExtensions = { configuration ->
         registerExtensionsForTest(this, configuration) {
           FirExtensionRegistrarAdapter.registerExtension(ComposeInvestigatorFirExtensionRegistrar())
-          ComposePluginRegistrar.registerCommonExtensions(this@create, null)
+          with(ComposePluginRegistrar) { registerCommonExtensions() }
         }
         extensionArea.getExtensionPoint(IrGenerationExtension.extensionPointName).run {
           registerExtension(
@@ -142,6 +144,14 @@ abstract class AbstractCompilerTest(
 
   protected fun compile(file: SourceFile): Fir2IrActualizedResult =
     createK2Compiler().compile(file)
+
+  protected fun irTest(file: SourceFile, expect: () -> String) {
+    val actual = createK2Compiler().compile(file)
+      .irModuleFragment.files
+      .single()
+      .dumpSrc(useFir = true)
+    assertEquals(expect().trim(), actual)
+  }
 }
 
 private inline fun <reified T> jarFor() = File(PathUtil.getJarPathForClass(T::class.java))

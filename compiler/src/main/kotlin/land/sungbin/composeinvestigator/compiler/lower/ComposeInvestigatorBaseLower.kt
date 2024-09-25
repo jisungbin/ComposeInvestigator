@@ -51,6 +51,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
+import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.classOrFail
@@ -234,7 +235,7 @@ public open class ComposeInvestigatorBaseLower(
     value: String,
     startOffset: Int = UNDEFINED_OFFSET,
     endOffset: Int = UNDEFINED_OFFSET,
-  ): IrConst<String> = context.irString(value, startOffset, endOffset)
+  ): IrConst = context.irString(value, startOffset, endOffset)
 
   protected fun irGetValue(value: IrValueDeclaration): IrGetValue =
     IrGetValueImpl(
@@ -265,14 +266,14 @@ public open class ComposeInvestigatorBaseLower(
     value: Boolean,
     startOffset: Int = UNDEFINED_OFFSET,
     endOffset: Int = UNDEFINED_OFFSET,
-  ): IrConst<Boolean> = IrConstImpl.boolean(
+  ): IrConst = IrConstImpl.boolean(
     startOffset = startOffset,
     endOffset = endOffset,
     type = context.irBuiltIns.booleanType,
     value = value,
   )
 
-  private fun irOwnStabilityCertain(stable: IrConst<Boolean>): IrConstructorCall {
+  private fun irOwnStabilityCertain(stable: IrConst): IrConstructorCall {
     val symbol = ownStabilityCertainSymbol ?: (
       ownStabilitySymbol!!.owner.sealedSubclasses
         .single { clz -> clz.owner.name == Stability_CERTAIN }
@@ -287,7 +288,7 @@ public open class ComposeInvestigatorBaseLower(
     }
   }
 
-  private fun irOwnStabilityRuntime(declarationName: IrConst<String>): IrConstructorCall {
+  private fun irOwnStabilityRuntime(declarationName: IrConst): IrConstructorCall {
     val symbol = ownStabilityRuntimeSymbol ?: (
       ownStabilitySymbol!!.owner.sealedSubclasses
         .single { clz -> clz.owner.name == Stability_RUNTIME }
@@ -302,7 +303,7 @@ public open class ComposeInvestigatorBaseLower(
     }
   }
 
-  private fun irOwnStabilityUnknown(declarationName: IrConst<String>): IrConstructorCall {
+  private fun irOwnStabilityUnknown(declarationName: IrConst): IrConstructorCall {
     val symbol = ownStabilityUnknownSymbol ?: (
       ownStabilitySymbol!!.owner.sealedSubclasses
         .single { clz -> clz.owner.name == Stability_UNKNOWN }
@@ -317,7 +318,7 @@ public open class ComposeInvestigatorBaseLower(
     }
   }
 
-  private fun irOwnStabilityParameter(parameterName: IrConst<String>): IrConstructorCall {
+  private fun irOwnStabilityParameter(parameterName: IrConst): IrConstructorCall {
     val symbol = ownStabilityParameterSymbol ?: (
       ownStabilitySymbol!!.owner.sealedSubclasses
         .single { clz -> clz.owner.name == Stability_PARAMETER }

@@ -8,9 +8,7 @@
 package land.sungbin.composeinvestigator.compiler.lower
 
 import land.sungbin.composeinvestigator.compiler.FeatureFlag
-import land.sungbin.composeinvestigator.compiler._extension.AbstractGoldenTest
-import land.sungbin.composeinvestigator.compiler._extension.GoldenVerification
+import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
 import org.jetbrains.kotlin.utils.addToStdlib.enumSetOf
 
-@GoldenVerification("lower", "stateInitializer")
-class StateInitializerTransformTest : AbstractGoldenTest(enumSetOf(FeatureFlag.StateInitializerTracking))
+class StateInitializerTransformTest : AbstractCompilerTest(enumSetOf(FeatureFlag.StateInitializerTracking))

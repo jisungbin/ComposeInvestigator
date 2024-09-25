@@ -24,7 +24,7 @@ internal fun IrPluginContext.irString(
   value: String,
   startOffset: Int = UNDEFINED_OFFSET,
   endOffset: Int = UNDEFINED_OFFSET,
-): IrConst<String> = IrConstImpl.string(
+): IrConst = IrConstImpl.string(
   startOffset = startOffset,
   endOffset = endOffset,
   type = irBuiltIns.stringType,

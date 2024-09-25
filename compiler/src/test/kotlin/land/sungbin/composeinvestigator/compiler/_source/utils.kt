@@ -11,12 +11,17 @@ import java.io.File
 import land.sungbin.composeinvestigator.compiler._compilation.SourceFile
 
 fun source(filename: String): SourceFile =
-  SourceFile(name = filename, source = sourceString(filename))
+  SourceFile(
+    name = filename.substringAfterLast('/'),
+    source = sourceString(filename),
+    path = sourcePath(filename).substringBeforeLast('/'),
+  )
 
 fun sourcePath(filename: String): String =
   "src/test/kotlin/land/sungbin/composeinvestigator/compiler/_source/$filename"
 
 fun sourceString(filename: String): String =
-  File(sourcePath(filename)).readText()
-
-fun File.toSourceFile() = SourceFile(name, source = readText())
+  File(sourcePath(filename))
+    .also { file -> require(file.isFile) { "source file not found: $filename" } }
+    .readText()
+    .also { code -> require(code.isNotBlank()) { "source file is empty: $filename" } }

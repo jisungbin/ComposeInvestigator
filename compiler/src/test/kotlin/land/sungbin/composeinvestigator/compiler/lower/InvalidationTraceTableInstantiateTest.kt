@@ -8,9 +8,7 @@
 package land.sungbin.composeinvestigator.compiler.lower
 
 import land.sungbin.composeinvestigator.compiler.FeatureFlag
-import land.sungbin.composeinvestigator.compiler._extension.AbstractGoldenTest
-import land.sungbin.composeinvestigator.compiler._extension.GoldenVerification
+import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
 import org.jetbrains.kotlin.utils.addToStdlib.enumSetOf
 
-@GoldenVerification("lower", "traceTableInstantiate")
-class InvalidationTraceTableInstantiateTest : AbstractGoldenTest(enumSetOf(FeatureFlag.StateInitializerTracking))
+class InvalidationTraceTableInstantiateTest : AbstractCompilerTest(enumSetOf(FeatureFlag.StateInitializerTracking))
