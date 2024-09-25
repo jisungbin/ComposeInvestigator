@@ -60,7 +60,7 @@ error: files that are '@file:NoInvestigation' or does not contain any Composable
 error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
     currentComposableKeyName
     ^^^^^^^^^^^^^^^^^^^^^^^^
-      """.trim()
+      """
     }
     analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_SCOPE_CALL) {
       """
@@ -75,7 +75,7 @@ error: @ComposableScope API can only be used in a Composable function.
 error: @ComposableScope API can only be used in a Composable function.
     currentComposableKeyName
     ^^^^^^^^^^^^^^^^^^^^^^^^
-      """.trim()
+      """
     }
   }
 
@@ -98,7 +98,7 @@ error: files that are '@file:NoInvestigation' or does not contain any Composable
 error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
       currentComposableKeyName
       ^^^^^^^^^^^^^^^^^^^^^^^^
-      """.trim()
+      """
     }
     analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_SCOPE_CALL) {
       """
@@ -113,7 +113,7 @@ error: @ComposableScope API can only be used in a Composable function.
 error: @ComposableScope API can only be used in a Composable function.
       currentComposableKeyName
       ^^^^^^^^^^^^^^^^^^^^^^^^
-      """.trim()
+      """
     }
   }
 
@@ -136,7 +136,7 @@ error: files that are '@file:NoInvestigation' or does not contain any Composable
 error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
     currentComposableKeyName
     ^^^^^^^^^^^^^^^^^^^^^^^^
-      """.trim()
+      """
     }
     analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_SCOPE_CALL) {
       """
@@ -151,7 +151,7 @@ error: @ComposableScope API can only be used in a Composable function.
 error: @ComposableScope API can only be used in a Composable function.
     currentComposableKeyName
     ^^^^^^^^^^^^^^^^^^^^^^^^
-      """.trim()
+      """
     }
   }
 
@@ -174,7 +174,7 @@ error: files that are '@file:NoInvestigation' or does not contain any Composable
 error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
       currentComposableKeyName
       ^^^^^^^^^^^^^^^^^^^^^^^^
-      """.trim()
+      """
     }
     analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_SCOPE_CALL) {
       """
@@ -189,7 +189,7 @@ error: @ComposableScope API can only be used in a Composable function.
 error: @ComposableScope API can only be used in a Composable function.
       currentComposableKeyName
       ^^^^^^^^^^^^^^^^^^^^^^^^
-      """.trim()
+      """
     }
   }
 }

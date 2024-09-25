@@ -27,7 +27,7 @@ fun FirAnalysisResult.assertDiagnostic(
   if (expectMessage == null)
     fail("Expected no diagnostic message but found: \n$actualMessage")
 
-  assertEquals(expectMessage(), actualMessage)
+  assertEquals(expectMessage().trim(), actualMessage)
 }
 
 fun FirAnalysisResult.assertDiagnostics(
@@ -45,5 +45,5 @@ fun FirAnalysisResult.assertDiagnostics(
   if (expectMessages == null)
     fail("Expected no diagnostic message but found: \n$actualMessages")
 
-  assertEquals(expectMessages(), actualMessages)
+  assertEquals(expectMessages().trim(), actualMessages)
 }

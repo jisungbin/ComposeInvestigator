@@ -39,7 +39,11 @@ class InvalidationTraceTableInstantiationValidatorTest : AbstractCompilerTest() 
     assertFalse(analyze.fileAnnotations().contains(NoInvestigation::class.qualifiedName!!))
   }
 
-  private fun FirAnalysisResult.fileAnnotations() = result.outputs.first().fir.first().annotations.mapNotNull { annotation ->
-    annotation.annotationTypeRef.coneType.classId?.asFqNameString()
-  }
+  private fun FirAnalysisResult.fileAnnotations() =
+    result.outputs
+      .first().fir
+      .first().annotations
+      .mapNotNull { annotation ->
+        annotation.annotationTypeRef.coneType.classId?.asFqNameString()
+      }
 }

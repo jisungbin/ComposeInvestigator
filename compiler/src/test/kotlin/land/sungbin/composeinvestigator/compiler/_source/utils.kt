@@ -19,4 +19,3 @@ fun sourcePath(filename: String): String =
 fun sourceString(filename: String): String =
   File(sourcePath(filename)).readText()
 
-fun File.toSourceFile() = SourceFile(name, source = readText())

@@ -26,7 +26,7 @@ class ComposableNameExpressionCheckerTest : AbstractCompilerTest() {
 error: currently, only string hardcodes are supported as arguments to ComposableName.
   ComposableName(42.toString())
                  ^^^^^^^^^^^^^^
-      """.trim()
+      """
     }
   }
 }
