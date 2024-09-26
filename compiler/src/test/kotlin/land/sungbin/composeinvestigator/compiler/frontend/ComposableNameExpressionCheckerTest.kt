@@ -19,13 +19,25 @@ class ComposableNameExpressionCheckerTest : AbstractCompilerTest(sourceRoot = "f
     analyze.assertNoDiagnostic(UNSUPPORTED_COMPOSABLE_NAME)
   }
 
-  @Test fun magicNumberToStringExpression() {
-    val analyze = analyze(source("magicNumberToStringExpression.kt"))
+  @Test fun wrongExpressions() {
+    val analyze = analyze(source("wrongExpressions.kt"))
     analyze.assertDiagnostics(UNSUPPORTED_COMPOSABLE_NAME) {
       """
 error: currently, only string hardcodes are supported as arguments to ComposableName.
   ComposableName(42.toString())
                  ^^^^^^^^^^^^^^
+=====
+error: currently, only string hardcodes are supported as arguments to ComposableName.
+  ComposableName("My" + "Composable")
+                 ^^^^^^^^^^^^^^^^^^^^
+=====
+error: currently, only string hardcodes are supported as arguments to ComposableName.
+  ComposableName("My${'$'}{"Composable"}")
+                 ^^^^^^^^^^^^^^^^^^^^
+=====
+error: currently, only string hardcodes are supported as arguments to ComposableName.
+  ComposableName(String())
+                 ^^^^^^^^^
       """
     }
   }
