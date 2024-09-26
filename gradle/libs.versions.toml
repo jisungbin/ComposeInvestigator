@@ -11,9 +11,9 @@ jetbrains-annotation = "25.0.0"
 
 androidx-activity = "1.9.2"
 
-compose-runtime = "1.7.2"
-compose-stableMarker = "1.0.5"
 compose-activity = "1.9.2"
+compose-stableMarker = "1.0.5"
+compose-runtime = "1.7.2"
 
 spotless = "6.25.0"
 ktlint = "1.3.1"
@@ -38,18 +38,17 @@ spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
 [libraries]
 gradle-android = { module = "com.android.tools.build:gradle", version.ref = "gradle-android" }
 
-# TODO use multiplatform-annotations, a Kotlin artifact. (not yet released)
-#  https://github.com/JetBrains/java-annotations/blob/master/CHANGELOG.md#version-2500
 jetbrains-annotation = { module = "org.jetbrains:annotations", version.ref = "jetbrains-annotation" }
 
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
 
+compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
+compose-stableMarker = { module = "com.github.skydoves:compose-stable-marker", version.ref = "compose-stableMarker" }
+
 # TODO support for Compose Multiplatform
 #  https://github.com/jisungbin/ComposeInvestigator/issues/184
-compose-stableMarker = { module = "com.github.skydoves:compose-stable-marker", version.ref = "compose-stableMarker" }
 compose-runtime = { module = "androidx.compose.runtime:runtime", version.ref = "compose-runtime" }
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose-runtime" }
-compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
 
 test-mockk = { module = "io.mockk:mockk", version.ref = "test-mockk" }
 test-robolectric = { module = "org.robolectric:robolectric", version.ref = "test-robolectric" }
