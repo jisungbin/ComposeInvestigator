@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-@file:Suppress("unused")
+@file:Suppress("unused", "UnusedVariable")
 
 package land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall
 
@@ -14,8 +14,15 @@ import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTra
 
 @Composable private fun getCurrentComposableKeyName() {
   currentComposableInvalidationTracer.currentComposableKeyName
+  val inVariable = currentComposableInvalidationTracer
+
+  inFunctionDefaultArgument()
 
   @Composable fun nested() {
     currentComposableInvalidationTracer.currentComposableKeyName
   }
 }
+
+@Composable private fun inFunctionDefaultArgument(
+  keyed: String = currentComposableInvalidationTracer.currentComposableKeyName,
+) = Unit

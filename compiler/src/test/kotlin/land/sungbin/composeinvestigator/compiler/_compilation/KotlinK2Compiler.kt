@@ -200,6 +200,7 @@ class KotlinK2Compiler private constructor(private val environment: KotlinCoreEn
 
     fun create(
       disposable: Disposable,
+      quiet: Boolean = false,
       updateConfiguration: CompilerConfiguration.() -> Unit,
       registerExtensions: Project.(CompilerConfiguration) -> Unit,
     ): KotlinK2Compiler {
@@ -210,7 +211,7 @@ class KotlinK2Compiler private constructor(private val environment: KotlinCoreEn
         put(CommonConfigurationKeys.VERIFY_IR, IrVerificationMode.ERROR)
         put(CommonConfigurationKeys.ENABLE_IR_VISIBILITY_CHECKS, true)
         put(JVMConfigurationKeys.JVM_TARGET, JvmTarget.JVM_17)
-        messageCollector = TestMessageCollector
+        messageCollector = if (quiet) MessageCollector.NONE else NoisyMessageCollector
         updateConfiguration()
       }
 
@@ -227,7 +228,7 @@ class KotlinK2Compiler private constructor(private val environment: KotlinCoreEn
   }
 }
 
-private object TestMessageCollector : MessageCollector {
+private object NoisyMessageCollector : MessageCollector {
   override fun clear() {}
 
   override fun report(

@@ -18,5 +18,10 @@ private fun use(any: Any) = any.hashCode()
   use(any2)
 }
 
+@Composable private fun blockStableComposable(any: Int, any2: Int) {
+  use(any)
+  use(any2)
+}
+
 @Composable private fun expressionComposable(any: Any, any2: Any) =
   use(any) + use(any2)

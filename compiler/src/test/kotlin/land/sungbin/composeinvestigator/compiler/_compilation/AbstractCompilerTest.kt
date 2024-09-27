@@ -9,6 +9,8 @@ package land.sungbin.composeinvestigator.compiler._compilation
 
 import androidx.compose.compiler.plugins.kotlin.ComposePluginRegistrar
 import androidx.compose.compiler.plugins.kotlin.lower.dumpSrc
+import com.github.difflib.DiffUtils
+import com.github.difflib.UnifiedDiffUtils
 import java.io.File
 import java.util.EnumSet
 import kotlin.test.AfterTest
@@ -18,6 +20,7 @@ import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorFirExtension
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorFirstPhaseExtension
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorLastPhaseExtension
 import land.sungbin.composeinvestigator.compiler.FeatureFlag
+import land.sungbin.composeinvestigator.compiler._compilation.GoldenUtil.dumpSrcForGolden
 import land.sungbin.composeinvestigator.compiler._source.sourcePath
 import land.sungbin.composeinvestigator.compiler._source.sourceString
 import land.sungbin.composeinvestigator.runtime.ComposeInvestigatorConfig
@@ -59,58 +62,61 @@ abstract class AbstractCompilerTest(
   }
 
   @Suppress("UnstableApiUsage")
-  private fun createK2Compiler() =
-    KotlinK2Compiler.create(
-      disposable = disposable,
-      updateConfiguration = {
-        val languageVersion = LanguageVersion.fromFullVersionString(KotlinVersion.CURRENT.toString())!!.also { version ->
-          check(version.usesK2) { "Kotlin version $version is not a K2 version" }
-        }
-        val analysisFlags = mapOf<AnalysisFlag<*>, Any>(
-          AnalysisFlags.allowUnstableDependencies to true,
-          AnalysisFlags.skipPrereleaseCheck to true,
-          AnalysisFlags.optIn to listOf(
-            "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
-            "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
-          ),
-        )
+  private fun createK2Compiler(
+    features: EnumSet<FeatureFlag> = this.features,
+    quiet: Boolean = false,
+  ) = KotlinK2Compiler.create(
+    disposable = disposable,
+    quiet = quiet,
+    updateConfiguration = {
+      val languageVersion = LanguageVersion.fromFullVersionString(KotlinVersion.CURRENT.toString())!!.also { version ->
+        check(version.usesK2) { "Kotlin version $version is not a K2 version" }
+      }
+      val analysisFlags = mapOf<AnalysisFlag<*>, Any>(
+        AnalysisFlags.allowUnstableDependencies to true,
+        AnalysisFlags.skipPrereleaseCheck to true,
+        AnalysisFlags.optIn to listOf(
+          "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
+          "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
+        ),
+      )
 
-        languageVersionSettings = LanguageVersionSettingsImpl(
-          languageVersion = languageVersion,
-          apiVersion = ApiVersion.createByLanguageVersion(languageVersion),
-          analysisFlags = analysisFlags,
-        )
+      languageVersionSettings = LanguageVersionSettingsImpl(
+        languageVersion = languageVersion,
+        apiVersion = ApiVersion.createByLanguageVersion(languageVersion),
+        analysisFlags = analysisFlags,
+      )
 
-        configureJdkClasspathRoots()
-        addJvmClasspathRoots(defaultClassPath)
+      configureJdkClasspathRoots()
+      addJvmClasspathRoots(defaultClassPath)
 
-        if (!getBoolean(JVMConfigurationKeys.NO_JDK) && get(JVMConfigurationKeys.JDK_HOME) == null) {
-          put(JVMConfigurationKeys.JDK_HOME, File(System.getProperty("java.home")!!))
-        }
-      },
-      registerExtensions = { configuration ->
-        registerExtensionsForTest(this, configuration) {
-          FirExtensionRegistrarAdapter.registerExtension(ComposeInvestigatorFirExtensionRegistrar())
-          with(ComposePluginRegistrar) { registerCommonExtensions() }
-        }
-        extensionArea.getExtensionPoint(IrGenerationExtension.extensionPointName).run {
-          registerExtension(
-            ComposeInvestigatorFirstPhaseExtension(configuration.messageCollector, IrVerificationMode.ERROR, features),
-            LoadingOrder.FIRST,
-            this@create,
-          )
-          registerExtension(
-            ComposeInvestigatorLastPhaseExtension(configuration.messageCollector, IrVerificationMode.ERROR, features),
-            LoadingOrder.LAST,
-            this@create,
-          )
-        }
-        IrGenerationExtension.registerExtension(
-          this,
-          ComposePluginRegistrar.createComposeIrExtension(configuration),
+      if (!getBoolean(JVMConfigurationKeys.NO_JDK) && get(JVMConfigurationKeys.JDK_HOME) == null) {
+        put(JVMConfigurationKeys.JDK_HOME, File(System.getProperty("java.home")!!))
+      }
+    },
+    registerExtensions = { configuration ->
+      registerExtensionsForTest(this, configuration) {
+        FirExtensionRegistrarAdapter.registerExtension(ComposeInvestigatorFirExtensionRegistrar())
+        with(ComposePluginRegistrar) { registerCommonExtensions() }
+      }
+      extensionArea.getExtensionPoint(IrGenerationExtension.extensionPointName).run {
+        registerExtension(
+          ComposeInvestigatorFirstPhaseExtension(configuration.messageCollector, IrVerificationMode.ERROR, features),
+          LoadingOrder.FIRST,
+          this@create,
         )
-      },
-    )
+        registerExtension(
+          ComposeInvestigatorLastPhaseExtension(configuration.messageCollector, IrVerificationMode.ERROR, features),
+          LoadingOrder.LAST,
+          this@create,
+        )
+      }
+      IrGenerationExtension.registerExtension(
+        this,
+        ComposePluginRegistrar.createComposeIrExtension(configuration),
+      )
+    },
+  )
 
   protected fun analyze(file: SourceFile): FirAnalysisResult =
     createK2Compiler().analyze(file)
@@ -118,9 +124,23 @@ abstract class AbstractCompilerTest(
   protected fun compile(file: SourceFile): Fir2IrActualizedResult =
     createK2Compiler().compile(file)
 
-  protected fun irTest(file: SourceFile, expect: () -> String) {
-    val actual = createK2Compiler().compile(file).irModuleFragment.files.single()
-    assertEquals(expect().trim(), with(GoldenUtil) { actual.dumpSrcForGolden(code = file.source) })
+  protected fun clean(file: SourceFile) = diff(file) { "" }
+
+  protected fun diff(file: SourceFile, contextSize: Int = 5, expect: () -> String) {
+    val original = createK2Compiler(NO_FEATURES, quiet = true).compile(file).irModuleFragment.files.single()
+    val transformed = createK2Compiler().compile(file).irModuleFragment.files.single()
+
+    val originalLines = original.dumpSrcForGolden(source = file.source).lines()
+    val transformedLines = transformed.dumpSrcForGolden(source = file.source).lines()
+
+    val diff = UnifiedDiffUtils.generateUnifiedDiff(
+      /* originalFileName = */ "original-code.kt",
+      /* revisedFileName = */ "transformed-code.kt",
+      /* originalLines = */ originalLines,
+      /* patch = */ DiffUtils.diff(originalLines, transformedLines),
+      /* contextSize = */ contextSize,
+    )
+    assertEquals(expect().trim(), diff.drop(2).joinToString(separator = "\n"))
   }
 
   protected fun source(filename: String): SourceFile {
@@ -148,19 +168,21 @@ abstract class AbstractCompilerTest(
 
     // https://github.com/JetBrains/kotlin/blob/bb25d2f8aa74406ff0af254b2388fd601525386a/plugins/compose/compiler-hosted/integration-tests/src/jvmTest/kotlin/androidx/compose/compiler/plugins/kotlin/AbstractCompilerTest.kt#L212-L228
     private val defaultClassPath by lazy {
+      fun jar(clazz: Class<*>) = File(PathUtil.getJarPathForClass(clazz))
+
       listOf(
-        jarFor<Unit>(),
-        jarFor<kotlinx.coroutines.CoroutineScope>(),
-        jarFor<androidx.compose.runtime.Composable>(),
-        jarFor<androidx.compose.animation.EnterTransition>(),
-        jarFor<androidx.compose.ui.Modifier>(),
-        jarFor<androidx.compose.ui.graphics.ColorProducer>(),
-        jarFor<androidx.compose.ui.unit.Dp>(),
-        jarFor<androidx.compose.ui.text.input.TextFieldValue>(),
-        jarFor<androidx.compose.foundation.Indication>(),
-        jarFor<androidx.compose.foundation.text.KeyboardActions>(),
-        jarFor<androidx.compose.foundation.layout.RowScope>(),
-        jarFor<ComposeInvestigatorConfig>(),
+        jar(Unit::class.java),
+        jar(kotlinx.coroutines.CoroutineScope::class.java),
+        jar(androidx.compose.runtime.Composable::class.java),
+        jar(androidx.compose.animation.EnterTransition::class.java),
+        jar(androidx.compose.ui.Modifier::class.java),
+        jar(androidx.compose.ui.graphics.ColorProducer::class.java),
+        jar(androidx.compose.ui.unit.Dp::class.java),
+        jar(androidx.compose.ui.text.input.TextFieldValue::class.java),
+        jar(androidx.compose.foundation.Indication::class.java),
+        jar(androidx.compose.foundation.text.KeyboardActions::class.java),
+        jar(androidx.compose.foundation.layout.RowScope::class.java),
+        jar(ComposeInvestigatorConfig::class.java),
       )
     }
   }
@@ -173,7 +195,7 @@ private object GoldenUtil {
   private fun MatchResult.isNumber() = groupValues[1].isNotEmpty()
   private fun MatchResult.isFileName() = groups[4] != null
 
-  fun IrFile.dumpSrcForGolden(code: String): String {
+  fun IrFile.dumpSrcForGolden(source: String): String {
     val keySet = mutableListOf<Int>()
     return this
       .dumpSrc(useFir = true)
@@ -198,13 +220,13 @@ private object GoldenUtil {
       }
       // replace source information with source it references
       .replace(Regex("(%composer\\.start(Restart|Movable|Replaceable|Replace)Group\\([^\"\\n]*)\"(.*)\"\\)")) { match ->
-        "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[4], code)}\")"
+        "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[4], source)}\")"
       }
       .replace(Regex("(sourceInformation(MarkerStart)?\\(.*)\"(.*)\"\\)")) { match ->
-        "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[3], code)}\")"
+        "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[3], source)}\")"
       }
       .replace(Regex("(composableLambda[N]?\\([^\"\\n]*)\"(.*)\"\\)")) { match ->
-        "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[2], code)}\")"
+        "${match.groupValues[1]}\"${generateSourceInfo(match.groupValues[2], source)}\")"
       }
       .replace(Regex("(rememberComposableLambda[N]?)\\((-?\\d+)")) { match ->
         "${match.groupValues[1]}(<>"
@@ -311,5 +333,3 @@ private object GoldenUtil {
   private fun String.trimTrailingWhitespaces(): String =
     split('\n').joinToString("\n", transform = String::trimEnd)
 }
-
-private inline fun <reified T> jarFor() = File(PathUtil.getJarPathForClass(T::class.java))

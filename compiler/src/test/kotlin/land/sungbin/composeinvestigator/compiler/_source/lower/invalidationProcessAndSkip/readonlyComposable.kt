@@ -21,5 +21,11 @@ private fun blockComposable(any: Any, any2: Any) {
 }
 
 @Composable @ReadOnlyComposable
+private fun blockStableComposable(any: Int, any2: Int) {
+  use(any)
+  use(any2)
+}
+
+@Composable @ReadOnlyComposable
 private fun expressionComposable(any: Any, any2: Any) =
   use(any) + use(any2)
