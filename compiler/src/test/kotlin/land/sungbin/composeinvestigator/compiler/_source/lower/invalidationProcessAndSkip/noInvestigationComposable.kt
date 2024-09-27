@@ -21,5 +21,11 @@ private fun noInvestigationBlockComposable(any: Any, any2: Any) {
 }
 
 @Composable @NoInvestigation
+private fun noInvestigationBlockStableComposable(any: Int, any2: Int) {
+  use(any)
+  use(any2)
+}
+
+@Composable @NoInvestigation
 private fun noInvestigationExpressionComposable(any: Any, any2: Any) =
   use(any) + use(any2)

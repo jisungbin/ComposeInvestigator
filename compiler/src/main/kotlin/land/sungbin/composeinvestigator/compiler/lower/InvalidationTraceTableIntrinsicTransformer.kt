@@ -31,6 +31,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.constructors
+import org.jetbrains.kotlin.ir.util.copyWithOffsets
 import org.jetbrains.kotlin.ir.util.defaultType
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.getPropertySetter
@@ -85,8 +86,16 @@ public class InvalidationTraceTableIntrinsicTransformer(
                     .irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable]!!
                     .composable,
                 )
+                  .copyWithOffsets(
+                    startOffset = expression.startOffset,
+                    endOffset = expression.endOffset,
+                  )
               }
-              ?: context.irString(SpecialNames.UNKNOWN_STRING),
+              ?: context.irString(
+                SpecialNames.UNKNOWN_STRING,
+                startOffset = expression.startOffset,
+                endOffset = expression.endOffset,
+              ),
           )
         }
       }

@@ -5,7 +5,7 @@
  * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
  */
 
-@file:Suppress("unused")
+@file:Suppress("unused", "UnusedVariable")
 
 package land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall
 

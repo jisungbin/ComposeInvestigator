@@ -30,6 +30,7 @@ dependencies {
 
   testImplementation(projects.runtime)
   testImplementation(libs.compose.material)
+  testImplementation(libs.test.diffutil)
   testImplementation(kotlin("compiler-embeddable", version = libs.versions.kotlin.core.get()))
   testImplementation(kotlin("compose-compiler-plugin-embeddable", version = libs.versions.kotlin.core.get()))
   testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))

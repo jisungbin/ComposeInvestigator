@@ -37,8 +37,10 @@ public class ComposeInvestigatorFirstPhaseExtension(
 
     messageCollector.log("Enabled first-phase features: ${features.filter { it.phase == 0 }.joinToString()}")
 
-    moduleFragment.transformChildrenVoid(DurableComposableKeyAnalyzer(pluginContext, stabilityInferencer))
-    moduleFragment.transformChildrenVoid(tables)
+    if (features.isNotEmpty()) {
+      moduleFragment.transformChildrenVoid(DurableComposableKeyAnalyzer(pluginContext, stabilityInferencer))
+      moduleFragment.transformChildrenVoid(tables)
+    }
 
     if (features.count { it.phase == 0 } == 0) return
 

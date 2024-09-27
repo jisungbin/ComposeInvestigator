@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvestigator.compiler.lower
 
+import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN
 import land.sungbin.composeinvestigator.compiler.NO_INVESTIGATION_FQN
 import land.sungbin.composeinvestigator.compiler.log
@@ -40,7 +41,14 @@ public class InvalidationTraceTableInstanceTransformer(
 
   override fun visitFile(declaration: IrFile): IrFile =
     includeFileIRInExceptionTrace(declaration) {
-      if (declaration.hasAnnotation(NO_INVESTIGATION_FQN)) return declaration
+      if (
+        declaration.hasAnnotation(NO_INVESTIGATION_FQN) ||
+        // FIXME `fun c(l: @Composable () -> Unit)` ==> NO TABLE GENERATED
+        declaration.declarations
+          .filter { element -> element.hasComposableAnnotation() }
+          .all { element -> element.hasAnnotation(NO_INVESTIGATION_FQN) }
+      )
+        return declaration
 
       val existsTable = declaration.findDeclaration<IrProperty> { property ->
         property.backingField?.type?.classFqName == COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN

@@ -24,6 +24,14 @@ private fun blockComposable(any: Any, any2: Any) {
 }
 
 @Composable @NonRestartableComposable
+private fun blockStableComposable(any: Int, any2: Int) {
+  when (Random.nextBoolean()) {
+    true -> use(any)
+    else -> use(any2)
+  }
+}
+
+@Composable @NonRestartableComposable
 private fun expressionComposable(any: Any, any2: Any) =
   when (Random.nextBoolean()) {
     true -> use(any)
