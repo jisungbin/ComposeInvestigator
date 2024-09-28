@@ -14,6 +14,7 @@ import land.sungbin.composeinvestigator.compiler.NO_INVESTIGATION_FQN
 import land.sungbin.composeinvestigator.compiler.lower.unsafeLazy
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
+import org.jetbrains.kotlin.fir.FirAnnotationContainer
 import org.jetbrains.kotlin.fir.FirElement
 import org.jetbrains.kotlin.fir.FirSession
 import org.jetbrains.kotlin.fir.analysis.checkers.MppCheckerKind
@@ -22,7 +23,6 @@ import org.jetbrains.kotlin.fir.analysis.checkers.declaration.DeclarationChecker
 import org.jetbrains.kotlin.fir.analysis.checkers.declaration.FirFileChecker
 import org.jetbrains.kotlin.fir.analysis.extensions.FirAdditionalCheckersExtension
 import org.jetbrains.kotlin.fir.declarations.FirFile
-import org.jetbrains.kotlin.fir.declarations.FirFunction
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
 import org.jetbrains.kotlin.fir.declarations.validate
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
@@ -56,7 +56,20 @@ private object NoComposableFileChecker : FirFileChecker(MppCheckerKind.Common) {
     val composableCallVisitor = object : FirDefaultVisitorVoid() {
       override fun visitElement(element: FirElement) {
         if (hasComposable) return
-        element.acceptChildren(this)
+
+        if (element is FirAnnotationContainer)
+          visitAnnotationContainer(element)
+        else
+          element.acceptChildren(this)
+      }
+
+      override fun visitAnnotationContainer(container: FirAnnotationContainer) {
+        if (container.hasComposableAnnotation(context.session))
+          hasComposable = true
+
+        if (hasComposable) return
+
+        container.acceptChildren(this)
       }
 
       override fun visitFunctionCall(call: FirFunctionCall) {
@@ -65,19 +78,17 @@ private object NoComposableFileChecker : FirFileChecker(MppCheckerKind.Common) {
 
         if (hasComposable) return
 
-        super.visitFunctionCall(call)
+        call.acceptChildren(this)
       }
     }
 
     declaration.declarations.fastForEach { element ->
-      // fast path -- 1
+      // fast path
       if (element.hasComposableAnnotation(context.session))
         return@check // early return if the file has composable functions
 
-      if (element is FirFunction) // fast path -- 2
-        element.body?.acceptChildren(composableCallVisitor)
-      else // slow path
-        element.acceptChildren(composableCallVisitor)
+      // slow path
+      element.acceptChildren(composableCallVisitor)
     }
 
     if (hasComposable) return

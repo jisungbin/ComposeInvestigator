@@ -11,4 +11,10 @@ package land.sungbin.composeinvestigator.compiler._source.frontend.traceTableIns
 
 import androidx.compose.runtime.Composable
 
-private fun c(l: @Composable () -> Unit) {}
+private fun m() {
+  A().c {}
+}
+
+private class A {
+  fun c(l: @Composable () -> Unit) {}
+}

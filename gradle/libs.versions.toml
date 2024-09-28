@@ -22,6 +22,7 @@ test-mockk = "1.13.12"
 test-robolectric = "4.13"
 test-diffutil = "4.12"
 test-assertk = "0.28.1"
+test-kluent = "1.73"
 
 # Some of our tests use JUnit4 because we include an Android module.
 test-junit-core = "4.13.2"
@@ -58,6 +59,7 @@ test-junit-core = { module = "junit:junit", version.ref = "test-junit-core" }
 test-junit-enigne = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "test-junit-engine" }
 test-junit-compose = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-runtime" }
 test-assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "test-assertk" }
+test-kluent = { module = "org.amshove.kluent:kluent", version.ref = "test-kluent" }
 test-kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
 
 ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" } # for Renovate
