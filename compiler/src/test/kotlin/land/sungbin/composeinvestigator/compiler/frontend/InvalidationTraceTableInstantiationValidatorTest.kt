@@ -7,42 +7,41 @@
 
 package land.sungbin.composeinvestigator.compiler.frontend
 
-import kotlin.test.Ignore
 import kotlin.test.Test
-import kotlin.test.assertContains
-import kotlin.test.assertFalse
 import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
 import land.sungbin.composeinvestigator.compiler._compilation.FirAnalysisResult
 import land.sungbin.composeinvestigator.runtime.NoInvestigation
+import org.amshove.kluent.shouldContain
+import org.amshove.kluent.shouldNotContain
 import org.jetbrains.kotlin.fir.types.classId
 import org.jetbrains.kotlin.fir.types.coneType
 
-@Ignore("Need to reimplementation")
+// TODO I probably need more test cases, but I'm unsure which conditions to add...
 class InvalidationTraceTableInstantiationValidatorTest : AbstractCompilerTest(sourceRoot = "frontend/traceTableInstantiation") {
   @Test fun noneComposable() {
     val analyze = analyze(source("noneComposable.kt"))
-    assertContains(analyze.fileAnnotations(), NoInvestigation::class.qualifiedName!!)
+    analyze.fileAnnotations() shouldContain NO_INVESTIGATION_FQN
   }
 
   @Test fun singleComposableFunction() {
     val analyze = analyze(source("singleComposableFunction.kt"))
-
-    // TODO assertNotContains (KT-53336)
-    assertFalse(analyze.fileAnnotations().contains(NoInvestigation::class.qualifiedName!!))
+    analyze.fileAnnotations() shouldNotContain NO_INVESTIGATION_FQN
   }
 
   @Test fun singleComposableLambda() {
     val analyze = analyze(source("singleComposableLambda.kt"))
-
-    // TODO assertNotContains (KT-53336)
-    assertFalse(analyze.fileAnnotations().contains(NoInvestigation::class.qualifiedName!!))
+    analyze.fileAnnotations() shouldNotContain NO_INVESTIGATION_FQN
   }
 
   private fun FirAnalysisResult.fileAnnotations() =
     result.outputs
-      .first().fir
-      .first().annotations
+      .single().fir
+      .single().annotations
       .mapNotNull { annotation ->
         annotation.annotationTypeRef.coneType.classId?.asFqNameString()
       }
+
+  companion object {
+    val NO_INVESTIGATION_FQN = NoInvestigation::class.qualifiedName!!
+  }
 }
