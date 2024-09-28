@@ -29,10 +29,10 @@ fun BaseDiagnosticsCollector.withCompilerMessageSourceLocation() =
       }
 
       try {
-        val diagnosticList = diagnosticsByFilePath[filePath].orEmpty()
+        val diagnostics = diagnosticsByFilePath[filePath].orEmpty()
         val offsetsToPositions = positionFinder.value?.let { finder ->
           val sortedOffsets = TreeSet<Int>().apply {
-            for (diagnostic in diagnosticList) {
+            for (diagnostic in diagnostics) {
               if (diagnostic !is KtPsiDiagnostic) {
                 val range = DiagnosticUtils.firstRange(diagnostic.textRanges)
                 add(range.startOffset)
@@ -43,7 +43,7 @@ fun BaseDiagnosticsCollector.withCompilerMessageSourceLocation() =
           sortedOffsets.associateWith { pos -> finder.findNextPosition(pos) }
         }
 
-        for (diagnostic in diagnosticList.sortedWith(InFileDiagnosticsComparator)) {
+        for (diagnostic in diagnostics.sortedWith(InFileDiagnosticsComparator)) {
           when (diagnostic) {
             is KtPsiDiagnostic -> {
               val file = diagnostic.element.psi.containingFile

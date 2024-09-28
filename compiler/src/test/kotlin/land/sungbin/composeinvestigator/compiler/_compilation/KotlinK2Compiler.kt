@@ -7,7 +7,6 @@
 
 package land.sungbin.composeinvestigator.compiler._compilation
 
-import java.nio.charset.StandardCharsets
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.jvm.JvmIrDeserializerImpl
 import org.jetbrains.kotlin.cli.common.messages.AnalyzerWithCompilerReport
@@ -78,7 +77,6 @@ class SourceFile(
     ) {
       override fun getPath(): String = "${this@SourceFile.path}/$name"
     }
-    virtualFile.charset = StandardCharsets.UTF_8
 
     val factory = PsiFileFactory.getInstance(project) as PsiFileFactoryImpl
     val ktFile = factory.trySetupPsiForFile(

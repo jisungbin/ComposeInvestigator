@@ -23,7 +23,6 @@ import land.sungbin.composeinvestigator.compiler.FeatureFlag
 import land.sungbin.composeinvestigator.compiler._compilation.GoldenUtil.dumpSrcForGolden
 import land.sungbin.composeinvestigator.compiler._source.sourcePath
 import land.sungbin.composeinvestigator.compiler._source.sourceString
-import land.sungbin.composeinvestigator.runtime.ComposeInvestigatorConfig
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.cli.jvm.config.addJvmClasspathRoots
 import org.jetbrains.kotlin.cli.jvm.config.configureJdkClasspathRoots
@@ -88,7 +87,7 @@ abstract class AbstractCompilerTest(
       )
 
       configureJdkClasspathRoots()
-      addJvmClasspathRoots(defaultClassPath)
+      addJvmClasspathRoots(defaultClasspaths)
 
       if (!getBoolean(JVMConfigurationKeys.NO_JDK) && get(JVMConfigurationKeys.JDK_HOME) == null) {
         put(JVMConfigurationKeys.JDK_HOME, File(System.getProperty("java.home")!!))
@@ -167,22 +166,22 @@ abstract class AbstractCompilerTest(
     private val NO_FEATURES = EnumSet.noneOf(FeatureFlag::class.java)
 
     // https://github.com/JetBrains/kotlin/blob/bb25d2f8aa74406ff0af254b2388fd601525386a/plugins/compose/compiler-hosted/integration-tests/src/jvmTest/kotlin/androidx/compose/compiler/plugins/kotlin/AbstractCompilerTest.kt#L212-L228
-    private val defaultClassPath by lazy {
+    private val defaultClasspaths by lazy {
       fun jar(clazz: Class<*>) = File(PathUtil.getJarPathForClass(clazz))
 
       listOf(
         jar(Unit::class.java),
+        jar(land.sungbin.composeinvestigator.runtime.ComposeInvestigatorConfig::class.java),
         jar(kotlinx.coroutines.CoroutineScope::class.java),
         jar(androidx.compose.runtime.Composable::class.java),
-        jar(androidx.compose.animation.EnterTransition::class.java),
         jar(androidx.compose.ui.Modifier::class.java),
-        jar(androidx.compose.ui.graphics.ColorProducer::class.java),
         jar(androidx.compose.ui.unit.Dp::class.java),
+        jar(androidx.compose.ui.graphics.ColorProducer::class.java),
         jar(androidx.compose.ui.text.input.TextFieldValue::class.java),
         jar(androidx.compose.foundation.Indication::class.java),
-        jar(androidx.compose.foundation.text.KeyboardActions::class.java),
         jar(androidx.compose.foundation.layout.RowScope::class.java),
-        jar(ComposeInvestigatorConfig::class.java),
+        jar(androidx.compose.foundation.text.KeyboardActions::class.java),
+        jar(androidx.compose.animation.EnterTransition::class.java),
       )
     }
   }
