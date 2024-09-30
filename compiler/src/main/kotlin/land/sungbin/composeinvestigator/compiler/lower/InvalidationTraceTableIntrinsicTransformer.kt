@@ -62,6 +62,8 @@ public class InvalidationTraceTableIntrinsicTransformer(
     tableSymbol.getPropertyGetter(ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_KEY_NAME.asString())!!.owner
 
   override fun visitCall(expression: IrCall): IrExpression {
+    // TODO generating `throw Exception(NO_TABLE)` code to the target IR instead
+    //  of throwing it here if no table exists
     val table = tables[currentFile]
     return when (expression.symbol.owner.kotlinFqName) {
       currentTableGetterSymbol.kotlinFqName -> {

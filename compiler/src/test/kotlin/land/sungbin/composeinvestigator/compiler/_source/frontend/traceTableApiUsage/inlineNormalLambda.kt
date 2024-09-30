@@ -9,17 +9,20 @@
 
 package land.sungbin.composeinvestigator.compiler._source.frontend.traceTableApiUsage
 
+import land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable
 import land.sungbin.composeinvestigator.runtime.ComposableName
 import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
 
-private fun inlineNormalLambda() {
-  l {
-    with(currentComposableInvalidationTracer) {
-      currentComposableName
-      currentComposableName = ComposableName("")
-      currentComposableKeyName
-    }
+private inline fun inlineNormalLambda() {
+  val t = currentComposableInvalidationTracer
+  l(t) {
+    currentComposableName
+    it.currentComposableKeyName
+    currentComposableInvalidationTracer.currentComposableName = ComposableName("")
   }
 }
 
-private inline fun l(b: () -> Unit) = Unit
+private inline fun l(
+  t: ComposableInvalidationTraceTable,
+  b: ComposableInvalidationTraceTable.(ComposableInvalidationTraceTable) -> Unit,
+) = Unit

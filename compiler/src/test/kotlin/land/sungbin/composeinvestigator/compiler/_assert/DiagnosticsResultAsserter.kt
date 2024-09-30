@@ -13,9 +13,14 @@ import kotlin.test.fail
 import land.sungbin.composeinvestigator.compiler._compilation.FirAnalysisResult
 import org.jetbrains.kotlin.diagnostics.AbstractKtDiagnosticFactory
 
+private const val SEPARATOR = "\n=====\n"
+
 fun FirAnalysisResult.assertNoDiagnostic(diagnostic: AbstractKtDiagnosticFactory) {
   val results = diagnostics.getOrElse(diagnostic.name, ::emptyList)
-  assertTrue(results.isEmpty(), "Expected no diagnostic but found diagnostic(s).")
+  assertTrue(
+    results.isEmpty(),
+    "Expected no diagnostic but found diagnostics:\n${results.joinToString(SEPARATOR)}",
+  )
 }
 
 fun FirAnalysisResult.assertDiagnostics(
@@ -26,6 +31,6 @@ fun FirAnalysisResult.assertDiagnostics(
   if (results.isEmpty())
     fail("Expected diagnostics message but no diagnostic was found.")
 
-  val actualMessages = results.joinToString("\n=====\n")
+  val actualMessages = results.joinToString(SEPARATOR)
   assertEquals(expectMessages().trim(), actualMessages)
 }

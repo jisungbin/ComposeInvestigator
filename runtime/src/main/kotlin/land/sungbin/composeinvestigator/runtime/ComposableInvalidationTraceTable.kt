@@ -79,12 +79,11 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    * If you call this getter from a Composable configured as an anonymous function, it will always
    * be named 'anonymous.' Therefore, in this case, we recommend you specify your Composable name.
    */
-  @property:ComposableScope
   public var currentComposableName: ComposableName
-    @[Stable JvmSynthetic] get() {
+    @[Stable ComposableScope JvmSynthetic] get() {
       throw IntrinsicImplementedError()
     }
-    @JvmSynthetic set(@Suppress("unused") name) {
+    @[ComposableScope JvmSynthetic] set(@Suppress("unused") name) {
       throw IntrinsicImplementedError()
     }
 
@@ -126,7 +125,7 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    * found by ComposeInvestigator. If not found, returns `null`.
    */
   // TODO is this operation really O(1)?
-  //  When resolved, add this note into KDoc: *Note: This operation takes `O(1)`*.
+  //  When become clear, add this note into KDoc: *Note: This operation takes `O(1)`*.
   public fun findStateObjectName(value: Any): String? = stateObjectMap[value]
 
   /** @suppress ComposeInvestigator compiler-only API */

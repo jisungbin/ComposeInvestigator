@@ -13,9 +13,8 @@ import land.sungbin.composeinvestigator.runtime.ComposableName
 import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
 
 private inline fun inlineNormalFunction() {
-  with(currentComposableInvalidationTracer) {
-    currentComposableName
-    currentComposableName = ComposableName("")
-    currentComposableKeyName
-  }
+  val t = currentComposableInvalidationTracer
+  t.currentComposableName
+  t.currentComposableName = ComposableName("")
+  currentComposableInvalidationTracer.currentComposableKeyName
 }

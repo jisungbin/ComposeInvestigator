@@ -13,32 +13,27 @@ import land.sungbin.composeinvestigator.compiler._assert.assertDiagnostics
 import land.sungbin.composeinvestigator.compiler._assert.assertNoDiagnostic
 import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
 import land.sungbin.composeinvestigator.compiler.frontend.ComposeInvestigatorErrors.API_ACCESS_IN_NO_INVESTIGATION_FILE
-import land.sungbin.composeinvestigator.compiler.frontend.ComposeInvestigatorErrors.ILLEGAL_COMPOSABLE_SCOPE_CALL
 
-@Ignore("Need to rewrite logic to check if current function is in composable scope")
+// TODO asserts ILLEGAL_COMPOSABLE_SCOPE_CALL diagnostic
 class InvalidationTraceTableApiUsageCheckerTest : AbstractCompilerTest(sourceRoot = "frontend/traceTableApiUsage") {
   @Test fun composableFunction() {
     val analyze = analyze(source("composableFunction.kt"))
     analyze.assertNoDiagnostic(API_ACCESS_IN_NO_INVESTIGATION_FILE)
-    analyze.assertNoDiagnostic(ILLEGAL_COMPOSABLE_SCOPE_CALL)
   }
 
   @Test fun composableLambda() {
     val analyze = analyze(source("composableLambda.kt"))
     analyze.assertNoDiagnostic(API_ACCESS_IN_NO_INVESTIGATION_FILE)
-    analyze.assertNoDiagnostic(ILLEGAL_COMPOSABLE_SCOPE_CALL)
   }
 
   @Test fun inlineComposableFunction() {
     val analyze = analyze(source("inlineComposableFunction.kt"))
     analyze.assertNoDiagnostic(API_ACCESS_IN_NO_INVESTIGATION_FILE)
-    analyze.assertNoDiagnostic(ILLEGAL_COMPOSABLE_SCOPE_CALL)
   }
 
   @Test fun inlineComposableLambda() {
     val analyze = analyze(source("inlineComposableLambda.kt"))
     analyze.assertNoDiagnostic(API_ACCESS_IN_NO_INVESTIGATION_FILE)
-    analyze.assertNoDiagnostic(ILLEGAL_COMPOSABLE_SCOPE_CALL)
   }
 
   @Test fun inlineNormalFunction() {
@@ -46,35 +41,12 @@ class InvalidationTraceTableApiUsageCheckerTest : AbstractCompilerTest(sourceRoo
     analyze.assertDiagnostics(API_ACCESS_IN_NO_INVESTIGATION_FILE) {
       """
 error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-  with(currentComposableInvalidationTracer) {
-       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  val t = currentComposableInvalidationTracer
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 =====
 error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-    currentComposableName
-    ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-    currentComposableName = ComposableName("")
-    ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-    currentComposableKeyName
-    ^^^^^^^^^^^^^^^^^^^^^^^^
-      """
-    }
-    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_SCOPE_CALL) {
-      """
-error: @ComposableScope API can only be used in a Composable function.
-    currentComposableName
-    ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: @ComposableScope API can only be used in a Composable function.
-    currentComposableName = ComposableName("")
-    ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: @ComposableScope API can only be used in a Composable function.
-    currentComposableKeyName
-    ^^^^^^^^^^^^^^^^^^^^^^^^
+  currentComposableInvalidationTracer.currentComposableKeyName
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       """
     }
   }
@@ -84,35 +56,12 @@ error: @ComposableScope API can only be used in a Composable function.
     analyze.assertDiagnostics(API_ACCESS_IN_NO_INVESTIGATION_FILE) {
       """
 error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-    with(currentComposableInvalidationTracer) {
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  val t = currentComposableInvalidationTracer
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 =====
 error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-      currentComposableName
-      ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-      currentComposableName = ComposableName("")
-      ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-      currentComposableKeyName
-      ^^^^^^^^^^^^^^^^^^^^^^^^
-      """
-    }
-    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_SCOPE_CALL) {
-      """
-error: @ComposableScope API can only be used in a Composable function.
-      currentComposableName
-      ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: @ComposableScope API can only be used in a Composable function.
-      currentComposableName = ComposableName("")
-      ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: @ComposableScope API can only be used in a Composable function.
-      currentComposableKeyName
-      ^^^^^^^^^^^^^^^^^^^^^^^^
+    currentComposableInvalidationTracer.currentComposableName = ComposableName("")
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       """
     }
   }
@@ -122,35 +71,12 @@ error: @ComposableScope API can only be used in a Composable function.
     analyze.assertDiagnostics(API_ACCESS_IN_NO_INVESTIGATION_FILE) {
       """
 error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-  with(currentComposableInvalidationTracer) {
-       ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  val t = currentComposableInvalidationTracer
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 =====
 error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-    currentComposableName
-    ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-    currentComposableName = ComposableName("")
-    ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-    currentComposableKeyName
-    ^^^^^^^^^^^^^^^^^^^^^^^^
-      """
-    }
-    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_SCOPE_CALL) {
-      """
-error: @ComposableScope API can only be used in a Composable function.
-    currentComposableName
-    ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: @ComposableScope API can only be used in a Composable function.
-    currentComposableName = ComposableName("")
-    ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: @ComposableScope API can only be used in a Composable function.
-    currentComposableKeyName
-    ^^^^^^^^^^^^^^^^^^^^^^^^
+  currentComposableInvalidationTracer.currentComposableKeyName
+  ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       """
     }
   }
@@ -160,35 +86,40 @@ error: @ComposableScope API can only be used in a Composable function.
     analyze.assertDiagnostics(API_ACCESS_IN_NO_INVESTIGATION_FILE) {
       """
 error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-    with(currentComposableInvalidationTracer) {
-         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  val t = currentComposableInvalidationTracer
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 =====
 error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-      currentComposableName
-      ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-      currentComposableName = ComposableName("")
-      ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
-      currentComposableKeyName
-      ^^^^^^^^^^^^^^^^^^^^^^^^
+    currentComposableInvalidationTracer.currentComposableName = ComposableName("")
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       """
     }
-    analyze.assertDiagnostics(ILLEGAL_COMPOSABLE_SCOPE_CALL) {
+  }
+
+  @Test fun topLevelApiCallWithComposable() {
+    val analyze = analyze(source("topLevelApiCallWithComposable.kt"))
+    analyze.assertNoDiagnostic(API_ACCESS_IN_NO_INVESTIGATION_FILE)
+  }
+
+  @Test fun topLevelApiCallWithNoComposable() {
+    val analyze = analyze(source("topLevelApiCallWithNoComposable.kt"))
+    analyze.assertDiagnostics(API_ACCESS_IN_NO_INVESTIGATION_FILE) {
       """
-error: @ComposableScope API can only be used in a Composable function.
-      currentComposableName
-      ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: @ComposableScope API can only be used in a Composable function.
-      currentComposableName = ComposableName("")
-      ^^^^^^^^^^^^^^^^^^^^^
-=====
-error: @ComposableScope API can only be used in a Composable function.
-      currentComposableKeyName
-      ^^^^^^^^^^^^^^^^^^^^^^^^
+error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
+private val t = currentComposableInvalidationTracer
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+      """
+    }
+  }
+
+  @Ignore("NoComposableFileChecker should run first, but FirExtension has no guaranteed execution order?")
+  @Test fun topLevelApiCallWithAllNoInvestigationComposables() {
+    val analyze = analyze(source("topLevelApiCallWithAllNoInvestigationComposables.kt"))
+    analyze.assertDiagnostics(API_ACCESS_IN_NO_INVESTIGATION_FILE) {
+      """
+error: files that are '@file:NoInvestigation' or does not contain any Composables will not generate a ComposableInvalidationTraceTable.
+private val t = currentComposableInvalidationTracer
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
       """
     }
   }
