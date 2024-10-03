@@ -56,7 +56,7 @@ dependencyResolutionManagement {
         releasesOnly()
       }
     }
-    maven("https://androidx.dev/snapshots/builds/12257077/artifacts/repository") {
+    maven("https://androidx.dev/snapshots/builds/12450542/artifacts/repository") {
       mavenContent {
         snapshotsOnly()
       }
