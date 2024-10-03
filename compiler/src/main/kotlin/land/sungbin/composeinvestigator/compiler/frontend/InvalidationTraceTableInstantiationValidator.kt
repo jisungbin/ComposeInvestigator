@@ -24,7 +24,6 @@ import org.jetbrains.kotlin.fir.analysis.checkers.declaration.FirFileChecker
 import org.jetbrains.kotlin.fir.analysis.extensions.FirAdditionalCheckersExtension
 import org.jetbrains.kotlin.fir.declarations.FirFile
 import org.jetbrains.kotlin.fir.declarations.hasAnnotation
-import org.jetbrains.kotlin.fir.declarations.validate
 import org.jetbrains.kotlin.fir.expressions.FirFunctionCall
 import org.jetbrains.kotlin.fir.expressions.builder.buildAnnotation
 import org.jetbrains.kotlin.fir.expressions.impl.FirEmptyAnnotationArgumentMapping
@@ -101,7 +100,7 @@ private object NoComposableFileChecker : FirFileChecker(MppCheckerKind.Common) {
 
     declaration.replaceAnnotations(declaration.annotations.smartPlus(listOf(noInvestigationAnnotation)))
 
-    // Validate that the new annotations do not break the file.
-    declaration.validate()
+    // TODO Validate that the new annotations do not break the file.
+    //  Blocked by KT-59621: declaration.validate()
   }
 }
