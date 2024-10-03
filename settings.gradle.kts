@@ -69,6 +69,6 @@ include(
   ":runtime",
   ":compiler",
   ":compiler-gradle-plugin",
-  // ":compiler-integration-test",
+  ":compiler-integration-test",
   // ":sample",
 )
