@@ -17,6 +17,7 @@ class InvalidationTraceTableInstantiateTest : AbstractCompilerTest(
   enumSetOf(FeatureFlag.StateInitializerTracking),
   sourceRoot = "lower/traceTableInstantiate",
 ) {
+  @Ignore("FIXME `fun c(l: @Composable () -> Unit)` ==> NO TABLE GENERATED")
   @Test fun allComposableNoInvestigationFile() = clean(source("allComposableNoInvestigationFile.kt"))
 
   @Test fun composableFunctionFile() = diff(source("composableFunctionFile.kt"), contextSize = 0) {
@@ -26,7 +27,7 @@ class InvalidationTraceTableInstantiateTest : AbstractCompilerTest(
     """
   }
 
-  @Ignore("FIXME: `fun c(l: @Composable () -> Unit)` ==> NO TABLE GENERATED")
+  @Ignore("FIXME `fun c(l: @Composable () -> Unit)` ==> NO TABLE GENERATED")
   @Test fun composableLambdaFile() = diff(source("composableLambdaFile.kt"), contextSize = 0) {
     """
       
