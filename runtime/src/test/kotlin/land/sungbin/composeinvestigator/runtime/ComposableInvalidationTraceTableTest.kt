@@ -26,7 +26,7 @@ class ComposableInvalidationTraceTableTest {
     val reason = table.computeInvalidationReason(keyName = "keyName", arguments = listOf(argument))
 
     assertThat(table.affectedArguments).containsOnly("keyName" to listOf(argument))
-    assertThat(reason).isEqualTo(InvalidationReason.Initial)
+    assertThat(reason).isEqualTo(InvalidationResult.InitialComposition)
   }
 
   @Test fun computeInvalidationReasonWhenPreviousInfoExists() {
@@ -51,11 +51,11 @@ class ComposableInvalidationTraceTableTest {
     val reason = table.computeInvalidationReason(keyName = "keyName", arguments = listOf(newArgument))
 
     assertThat(table.affectedArguments).containsOnly("keyName" to listOf(newArgument))
-    assertThat(reason).isEqualTo(InvalidationReason.ArgumentChanged(listOf(oldArgument changedTo newArgument)))
+    assertThat(reason).isEqualTo(InvalidationResult.ArgumentChanged(listOf(oldArgument changedTo newArgument)))
   }
 
   @Test fun argumentChangedDisplayAsString() {
-    val reason = InvalidationReason.ArgumentChanged(
+    val reason = InvalidationResult.ArgumentChanged(
       listOf(
         ChangedArgument(
           previous = ValueArgument(

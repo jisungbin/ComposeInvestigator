@@ -10,9 +10,9 @@ package land.sungbin.composeinvestigator.compiler.test
 import land.sungbin.composeinvestigator.runtime.ComposableInformation
 import land.sungbin.composeinvestigator.runtime.ComposableInvalidationLogger
 import land.sungbin.composeinvestigator.runtime.ComposeInvestigatorConfig
-import land.sungbin.composeinvestigator.runtime.InvalidationType
+import land.sungbin.composeinvestigator.runtime.InvalidationResult
 
-typealias Investigated = Pair<ComposableInformation, InvalidationType>
+typealias Investigated = Pair<ComposableInformation, InvalidationResult>
 
 object TestConfiguration {
   val logs: List<Investigated>

@@ -22,8 +22,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import land.sungbin.composeinvestigator.compiler.test.TestConfiguration.logs
 import land.sungbin.composeinvestigator.runtime.ChangedArgument
-import land.sungbin.composeinvestigator.runtime.InvalidationReason
-import land.sungbin.composeinvestigator.runtime.InvalidationType
+import land.sungbin.composeinvestigator.runtime.InvalidationResult
 import land.sungbin.composeinvestigator.runtime.Stability
 import land.sungbin.composeinvestigator.runtime.ValueArgument
 
@@ -35,12 +34,7 @@ class SimpleTextTest {
 
   @Test fun initialComposition() = compositionTest {
     compose { SimpleText() }
-    assertThat(logs).containsOnly(
-      Investigated(
-        simpleText(),
-        InvalidationType.Processed(InvalidationReason.Initial),
-      ),
-    )
+    assertThat(logs).containsOnly(Investigated(simpleText(), InvalidationResult.InitialComposition))
   }
 
   @Test fun skipRecomposition() = compositionTest {
@@ -55,52 +49,39 @@ class SimpleTextTest {
     expectNoChanges()
 
     assertThat(logs).containsExactly(
-      Investigated(
-        simpleText(),
-        InvalidationType.Processed(InvalidationReason.Initial),
-      ),
-      Investigated(
-        simpleText(),
-        InvalidationType.Skipped,
-      ),
+      Investigated(simpleText(), InvalidationResult.InitialComposition),
+      Investigated(simpleText(), InvalidationResult.Skipped),
     )
   }
 
   @Test fun recomposition() = compositionTest {
     var value by mutableIntStateOf(0)
 
-    compose {
-      SimpleText(value.toString())
-    }
+    compose { SimpleText(value.toString()) }
 
     value++
     expectChanges()
 
     assertThat(logs).containsExactly(
+      Investigated(simpleText(), InvalidationResult.InitialComposition),
       Investigated(
         simpleText(),
-        InvalidationType.Processed(InvalidationReason.Initial),
-      ),
-      Investigated(
-        simpleText(),
-        InvalidationType.Processed(
-          InvalidationReason.ArgumentChanged(
-            listOf(
-              ChangedArgument(
-                previous = ValueArgument(
-                  name = "value",
-                  type = "kotlin.String",
-                  valueString = "0",
-                  valueHashCode = 48,
-                  stability = Stability.Stable,
-                ),
-                new = ValueArgument(
-                  name = "value",
-                  type = "kotlin.String",
-                  valueString = "1",
-                  valueHashCode = 49,
-                  stability = Stability.Stable,
-                ),
+        InvalidationResult.ArgumentChanged(
+          listOf(
+            ChangedArgument(
+              previous = ValueArgument(
+                name = "value",
+                type = "kotlin.String",
+                valueString = "0",
+                valueHashCode = 48,
+                stability = Stability.Stable,
+              ),
+              new = ValueArgument(
+                name = "value",
+                type = "kotlin.String",
+                valueString = "1",
+                valueHashCode = 49,
+                stability = Stability.Stable,
               ),
             ),
           ),

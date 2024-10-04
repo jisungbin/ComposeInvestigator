@@ -55,9 +55,8 @@ public val ComposeInvestigatorConfig_LOGGER: Name = identifier("logger")
 public val COMPOSABLE_INVALIDATION_LOGGER_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationLogger")
 public val ComposableInvalidationLogger_LOG: Name = identifier("log")
 
-public val INVALIDATION_TYPE_FQN: FqName = FqName("$ComposeInvestigatorRuntime.InvalidationType")
-public val InvalidationType_PROCESSED: Name = identifier("Processed")
-public val InvalidationType_SKIPPED: Name = identifier("Skipped")
+public val INVALIDATION_RESULT_FQN: FqName = FqName("$ComposeInvestigatorRuntime.InvalidationResult")
+public val InvalidationResult_SKIPPED: Name = identifier("Skipped")
 // END ComposableInvalidationLogger
 
 // START ComposableInvalidationTraceTable
