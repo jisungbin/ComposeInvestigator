@@ -16,11 +16,10 @@ import androidx.compose.runtime.mock.expectNoChanges
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import assertk.assertThat
-import assertk.assertions.containsExactly
-import assertk.assertions.containsOnly
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import land.sungbin.composeinvestigator.compiler.test.TestConfiguration.logs
+import land.sungbin.composeinvestigator.compiler.test.assertion.assertInvestigations
 import land.sungbin.composeinvestigator.runtime.ChangedArgument
 import land.sungbin.composeinvestigator.runtime.InvalidationResult
 import land.sungbin.composeinvestigator.runtime.Stability
@@ -34,7 +33,7 @@ class SimpleLayoutTest {
 
   @Test fun initialComposition() = compositionTest {
     compose { SimpleLayout() }
-    assertThat(logs).containsOnly(
+    assertThat(logs).assertInvestigations(
       Investigated(simpleLayout(), InvalidationResult.InitialComposition),
       Investigated(lambdaText(), InvalidationResult.InitialComposition),
     )
@@ -51,7 +50,7 @@ class SimpleLayoutTest {
     recomposeScope!!.invalidate()
     expectNoChanges()
 
-    assertThat(logs).containsExactly(
+    assertThat(logs).assertInvestigations(
       Investigated(simpleLayout(), InvalidationResult.InitialComposition),
       Investigated(lambdaText(), InvalidationResult.InitialComposition),
       Investigated(simpleLayout(), InvalidationResult.Skipped),
@@ -66,7 +65,7 @@ class SimpleLayoutTest {
     value++
     expectChanges()
 
-    assertThat(logs).containsExactly(
+    assertThat(logs).assertInvestigations(
       Investigated(simpleLayout(), InvalidationResult.InitialComposition),
       Investigated(lambdaText(), InvalidationResult.InitialComposition),
       Investigated(
