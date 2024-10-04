@@ -7,8 +7,10 @@
 
 package land.sungbin.composeinvestigator.runtime
 
+import androidx.compose.runtime.Composer
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable.AffectedName
 import org.jetbrains.annotations.TestOnly
 
 /** Returns the [ComposableInvalidationTraceTable] assigned to the current file. */
@@ -54,8 +56,21 @@ public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): Stri
  */
 @Immutable
 public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi public constructor() {
-  internal val stateObjectMap: MutableMap<Any, String> = mutableMapOf()
-  private val affectedArgumentMap: MutableMap<String, List<ValueArgument>> = mutableMapOf()
+  /**
+   * Represents the unique key of the affected Composable and the compound key.
+   *
+   * @property keyName Same as [currentComposableKeyName]
+   * @property compoundKey Same as [Composer.compoundKeyHash]
+   */
+  @JvmInline public value class AffectedName private constructor(private val value: String) {
+    public val keyName: String get() = value.substringBeforeLast('@')
+    public val compoundKey: Int get() = value.substringAfterLast('@').toInt()
+
+    @TestOnly public constructor(keyName: String, compoundKey: Int) : this("$keyName@$compoundKey")
+  }
+
+  private val stateObjectMap: MutableMap<Any, String> = mutableMapOf()
+  private val affectedArgumentMap: MutableMap<AffectedName, List<ValueArgument>> = mutableMapOf()
 
   /**
    * Returns the name of the current Composable, or you can define your own Composable name to use for
@@ -104,10 +119,10 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    * Returns all arguments that were affected by the value change. This is useful for debugging and
    * testing purposes.
    *
-   * Provide a [Map] consisting of a [unique key][currentComposableKeyName] for the affected Composables,
+   * Provide a [Map] consisting of a [unique affected name][AffectedName] for the affected Composables,
    * and a list of [ChangedArgument]s.
    */
-  public val affectedArguments: Map<String, List<ValueArgument>>
+  public val affectedArguments: Map<AffectedName, List<ValueArgument>>
     @Stable get() = affectedArgumentMap
 
   /**
@@ -135,12 +150,14 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
 
   /** @suppress ComposeInvestigator compiler-only API */
   @ComposeInvestigatorCompilerApi
-  public fun computeInvalidationReason(keyName: String, arguments: List<ValueArgument>): InvalidationResult {
-    val previousArguments = affectedArgumentMap[keyName]
+  public fun computeInvalidationReason(keyName: String, compoundKey: Int, arguments: List<ValueArgument>): InvalidationResult {
+    val affectedName = AffectedName(keyName, compoundKey)
+
+    val previousArguments = affectedArgumentMap[affectedName]
     val changed = ArrayList<ChangedArgument>(arguments.size)
 
     if (previousArguments == null) {
-      affectedArgumentMap[keyName] = arguments
+      affectedArgumentMap[affectedName] = arguments
       return InvalidationResult.InitialComposition
     }
 
@@ -152,7 +169,7 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
       if (previous.valueHashCode != new.valueHashCode) changed.add(previous changedTo new)
     }
 
-    affectedArgumentMap[keyName] = arguments
+    affectedArgumentMap[affectedName] = arguments
 
     return if (@Suppress("UsePropertyAccessSyntax") changed.isEmpty()) {
       InvalidationResult.Recomposition

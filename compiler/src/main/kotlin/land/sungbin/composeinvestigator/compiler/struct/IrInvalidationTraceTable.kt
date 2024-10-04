@@ -75,6 +75,7 @@ public class IrInvalidationTraceTable private constructor(private val prop: IrPr
 
   public fun irComputeInvalidationReason(
     keyName: IrConst,
+    compoundKey: IrExpression,
     arguments: IrValueAccessExpression,
   ): IrCall = IrCallImpl.fromSymbolOwner(
     startOffset = UNDEFINED_OFFSET,
@@ -84,7 +85,8 @@ public class IrInvalidationTraceTable private constructor(private val prop: IrPr
     fn.dispatchReceiver = propGetter()
   }.apply {
     putValueArgument(0, keyName)
-    putValueArgument(1, arguments)
+    putValueArgument(1, compoundKey)
+    putValueArgument(2, arguments)
   }
 
   public companion object {
