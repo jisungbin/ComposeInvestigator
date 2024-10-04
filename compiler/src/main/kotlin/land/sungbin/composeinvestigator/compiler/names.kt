@@ -32,8 +32,11 @@ public val HASH_CODE_FQN: FqName = BUILT_INS_PACKAGE_FQ_NAME.child(HASHCODE_NAME
 // END Kotlin/Java Standard Library
 
 // START Compose Runtime
+public val CURRENT_COMPOSER_FQN: FqName = FqName("$AndroidxComposeRuntime.currentComposer")
+
 public val COMPOSER_FQN: FqName = FqName("$AndroidxComposeRuntime.Composer")
 public val Composer_SKIP_TO_GROUP_END: Name = identifier("skipToGroupEnd")
+public val Composer_COMPOUND_KEY_HASH: Name = identifier("compoundKeyHash")
 
 public val STATE_FQN: FqName = FqName("$AndroidxComposeRuntime.State")
 // END Compose Runtime

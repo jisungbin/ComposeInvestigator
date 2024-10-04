@@ -38,7 +38,7 @@ kotlin {
 }
 
 dependencies {
-  compileOnly(libs.compose.stableMarker)
+  compileOnly(libs.compose.runtimeStubs)
 
   testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
   testImplementation(libs.test.assertk)

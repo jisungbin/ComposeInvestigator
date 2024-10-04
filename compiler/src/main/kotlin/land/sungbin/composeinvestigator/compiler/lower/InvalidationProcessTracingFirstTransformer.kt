@@ -97,9 +97,22 @@ internal class InvalidationProcessTracingFirstTransformer(
       newStatements += addValueArgumentToList
     }
 
+    val compoundKeyHashCall = IrCallImpl.fromSymbolOwner(
+      startOffset = UNDEFINED_OFFSET,
+      endOffset = UNDEFINED_OFFSET,
+      symbol = composerCompoundKeyHashSymbol,
+    ).also { fn ->
+      fn.dispatchReceiver = IrCallImpl.fromSymbolOwner(
+        startOffset = UNDEFINED_OFFSET,
+        endOffset = UNDEFINED_OFFSET,
+        symbol = currentComposerSymbol.owner.getter!!.symbol,
+      )
+    }
+
     val invalidationReasonVariable = scope.createTemporaryVariable(
       table.irComputeInvalidationReason(
         keyName = irString(currentKey.keyName),
+        compoundKey = compoundKeyHashCall,
         arguments = irGetValue(currentValueArguments),
       ),
       nameHint = "invalidationReason",
