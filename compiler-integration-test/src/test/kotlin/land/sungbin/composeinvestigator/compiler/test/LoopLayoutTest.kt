@@ -16,18 +16,15 @@ import androidx.compose.runtime.mock.expectNoChanges
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import assertk.assertThat
-import assertk.assertions.containsExactly
-import assertk.assertions.containsOnly
 import kotlin.test.BeforeTest
-import kotlin.test.Ignore
 import kotlin.test.Test
 import land.sungbin.composeinvestigator.compiler.test.TestConfiguration.logs
+import land.sungbin.composeinvestigator.compiler.test.assertion.assertInvestigations
 import land.sungbin.composeinvestigator.runtime.ChangedArgument
 import land.sungbin.composeinvestigator.runtime.InvalidationResult
 import land.sungbin.composeinvestigator.runtime.Stability
 import land.sungbin.composeinvestigator.runtime.ValueArgument
 
-@Ignore("currentCompositeKeyHash")
 class LoopLayoutTest {
   @BeforeTest fun prepare() {
     TestConfiguration.reset()
@@ -36,8 +33,12 @@ class LoopLayoutTest {
 
   @Test fun initialComposition() = compositionTest {
     compose { LoopLayout() }
-    assertThat(logs).containsOnly(
+    assertThat(logs).assertInvestigations(
       Investigated(loopLayout(), InvalidationResult.InitialComposition),
+      Investigated(loopText(), InvalidationResult.InitialComposition),
+      Investigated(loopText(), InvalidationResult.InitialComposition),
+      Investigated(loopText(), InvalidationResult.InitialComposition),
+      Investigated(loopText(), InvalidationResult.InitialComposition),
       Investigated(loopText(), InvalidationResult.InitialComposition),
     )
   }
@@ -53,8 +54,12 @@ class LoopLayoutTest {
     recomposeScope!!.invalidate()
     expectNoChanges()
 
-    assertThat(logs).containsExactly(
+    assertThat(logs).assertInvestigations(
       Investigated(loopLayout(), InvalidationResult.InitialComposition),
+      Investigated(loopText(), InvalidationResult.InitialComposition),
+      Investigated(loopText(), InvalidationResult.InitialComposition),
+      Investigated(loopText(), InvalidationResult.InitialComposition),
+      Investigated(loopText(), InvalidationResult.InitialComposition),
       Investigated(loopText(), InvalidationResult.InitialComposition),
       Investigated(loopLayout(), InvalidationResult.Skipped),
     )
@@ -68,8 +73,12 @@ class LoopLayoutTest {
     value++
     expectChanges()
 
-    assertThat(logs).containsExactly(
+    assertThat(logs).assertInvestigations(
       Investigated(loopLayout(), InvalidationResult.InitialComposition),
+      Investigated(loopText(), InvalidationResult.InitialComposition),
+      Investigated(loopText(), InvalidationResult.InitialComposition),
+      Investigated(loopText(), InvalidationResult.InitialComposition),
+      Investigated(loopText(), InvalidationResult.InitialComposition),
       Investigated(loopText(), InvalidationResult.InitialComposition),
       Investigated(
         loopLayout(),
@@ -94,7 +103,55 @@ class LoopLayoutTest {
           ),
         ),
       ),
-      Investigated(loopText(), InvalidationResult.Recomposition),
+      Investigated(loopText(), InvalidationResult.Skipped),
+      Investigated(loopText(), InvalidationResult.Skipped),
+      Investigated(
+        loopText(),
+        InvalidationResult.ArgumentChanged(
+          listOf(
+            ChangedArgument(
+              previous = ValueArgument(
+                name = "calucation",
+                type = "kotlin.Function0",
+                valueString = "() -> kotlin.String",
+                valueHashCode = 0,
+                stability = Stability.Stable,
+              ),
+              new = ValueArgument(
+                name = "calucation",
+                type = "kotlin.Function0",
+                valueString = "() -> kotlin.String",
+                valueHashCode = 0,
+                stability = Stability.Stable,
+              ),
+            ),
+          ),
+        ),
+      ),
+      Investigated(loopText(), InvalidationResult.Skipped),
+      Investigated(
+        loopText(),
+        InvalidationResult.ArgumentChanged(
+          listOf(
+            ChangedArgument(
+              previous = ValueArgument(
+                name = "calucation",
+                type = "kotlin.Function0",
+                valueString = "() -> kotlin.String",
+                valueHashCode = 0,
+                stability = Stability.Stable,
+              ),
+              new = ValueArgument(
+                name = "calucation",
+                type = "kotlin.Function0",
+                valueString = "() -> kotlin.String",
+                valueHashCode = 0,
+                stability = Stability.Stable,
+              ),
+            ),
+          ),
+        ),
+      ),
     )
   }
 }

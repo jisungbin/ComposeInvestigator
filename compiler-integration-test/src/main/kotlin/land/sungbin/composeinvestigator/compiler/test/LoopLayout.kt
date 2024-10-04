@@ -35,11 +35,11 @@ val loopLayoutTable by lazy { currentComposableInvalidationTracer }
 fun loopLayout() = ComposableInformation(
   name = "LoopLayout",
   packageName = "land.sungbin.composeinvestigator.compiler.test",
-  fileName = "SimpleLayout.kt",
+  fileName = "LoopLayout.kt",
 )
 
 fun loopText() = ComposableInformation(
   name = "LoopText",
   packageName = "land.sungbin.composeinvestigator.compiler.test",
-  fileName = "SimpleLayout.kt",
+  fileName = "LoopLayout.kt",
 )

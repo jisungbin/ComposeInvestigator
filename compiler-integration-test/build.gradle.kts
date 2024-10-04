@@ -19,6 +19,7 @@ kotlin {
       "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
     )
     freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=true")
+    freeCompilerArgs.add("-Xlambdas=class")
     sourceSets.all {
       languageSettings.enableLanguageFeature("ExplicitBackingFields")
     }
@@ -35,6 +36,7 @@ dependencies {
   kotlinCompilerPluginClasspath(projects.compiler)
 
   testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
+  testImplementation(kotlin("reflect")) // Used by assertk
   testImplementation(libs.test.kotlin.coroutines)
   testImplementation(libs.test.assertk)
 }
