@@ -12,8 +12,11 @@ import land.sungbin.composeinvestigator.runtime.ComposableInvalidationLogger
 import land.sungbin.composeinvestigator.runtime.ComposeInvestigatorConfig
 import land.sungbin.composeinvestigator.runtime.InvalidationType
 
+typealias Investigated = Pair<ComposableInformation, InvalidationType>
+
 object TestConfiguration {
-  val logs = mutableListOf<Pair<ComposableInformation, InvalidationType>>()
+  val logs: List<Investigated>
+    field = mutableListOf()
 
   init {
     ComposeInvestigatorConfig.logger = ComposableInvalidationLogger { composable, type ->

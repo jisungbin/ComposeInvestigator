@@ -19,6 +19,9 @@ kotlin {
       "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
     )
     freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=true")
+    sourceSets.all {
+      languageSettings.enableLanguageFeature("ExplicitBackingFields")
+    }
   }
 }
 
