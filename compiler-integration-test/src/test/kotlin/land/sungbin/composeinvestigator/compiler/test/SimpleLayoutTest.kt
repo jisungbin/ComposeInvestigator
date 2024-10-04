@@ -22,8 +22,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Test
 import land.sungbin.composeinvestigator.compiler.test.TestConfiguration.logs
 import land.sungbin.composeinvestigator.runtime.ChangedArgument
-import land.sungbin.composeinvestigator.runtime.InvalidationReason
-import land.sungbin.composeinvestigator.runtime.InvalidationType
+import land.sungbin.composeinvestigator.runtime.InvalidationResult
 import land.sungbin.composeinvestigator.runtime.Stability
 import land.sungbin.composeinvestigator.runtime.ValueArgument
 
@@ -36,14 +35,8 @@ class SimpleLayoutTest {
   @Test fun initialComposition() = compositionTest {
     compose { SimpleLayout() }
     assertThat(logs).containsOnly(
-      Investigated(
-        simpleLayout(),
-        InvalidationType.Processed(InvalidationReason.Initial),
-      ),
-      Investigated(
-        lambdaText(),
-        InvalidationType.Processed(InvalidationReason.Initial),
-      ),
+      Investigated(simpleLayout(), InvalidationResult.InitialComposition),
+      Investigated(lambdaText(), InvalidationResult.InitialComposition),
     )
   }
 
@@ -59,69 +52,47 @@ class SimpleLayoutTest {
     expectNoChanges()
 
     assertThat(logs).containsExactly(
-      Investigated(
-        simpleLayout(),
-        InvalidationType.Processed(InvalidationReason.Initial),
-      ),
-      Investigated(
-        lambdaText(),
-        InvalidationType.Processed(InvalidationReason.Initial),
-      ),
-      Investigated(
-        simpleLayout(),
-        InvalidationType.Skipped,
-      ),
+      Investigated(simpleLayout(), InvalidationResult.InitialComposition),
+      Investigated(lambdaText(), InvalidationResult.InitialComposition),
+      Investigated(simpleLayout(), InvalidationResult.Skipped),
     )
   }
 
   @Test fun recomposition() = compositionTest {
     var value by mutableIntStateOf(0)
 
-    compose {
-      SimpleLayout(value)
-    }
+    compose { SimpleLayout(value) }
 
     value++
     expectChanges()
 
     assertThat(logs).containsExactly(
+      Investigated(simpleLayout(), InvalidationResult.InitialComposition),
+      Investigated(lambdaText(), InvalidationResult.InitialComposition),
       Investigated(
         simpleLayout(),
-        InvalidationType.Processed(InvalidationReason.Initial),
-      ),
-      Investigated(
-        lambdaText(),
-        InvalidationType.Processed(InvalidationReason.Initial),
-      ),
-      Investigated(
-        simpleLayout(),
-        InvalidationType.Processed(
-          InvalidationReason.ArgumentChanged(
-            listOf(
-              ChangedArgument(
-                previous = ValueArgument(
-                  name = "value",
-                  type = "kotlin.Int",
-                  valueString = "0",
-                  valueHashCode = 0,
-                  stability = Stability.Stable,
-                ),
-                new = ValueArgument(
-                  name = "value",
-                  type = "kotlin.Int",
-                  valueString = "1",
-                  valueHashCode = 1,
-                  stability = Stability.Stable,
-                ),
+        InvalidationResult.ArgumentChanged(
+          listOf(
+            ChangedArgument(
+              previous = ValueArgument(
+                name = "value",
+                type = "kotlin.Int",
+                valueString = "0",
+                valueHashCode = 0,
+                stability = Stability.Stable,
+              ),
+              new = ValueArgument(
+                name = "value",
+                type = "kotlin.Int",
+                valueString = "1",
+                valueHashCode = 1,
+                stability = Stability.Stable,
               ),
             ),
           ),
         ),
       ),
-      Investigated(
-        lambdaText(),
-        InvalidationType.Processed(InvalidationReason.Invalidate),
-      ),
+      Investigated(lambdaText(), InvalidationResult.Recomposition),
     )
   }
 }

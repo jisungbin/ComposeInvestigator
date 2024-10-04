@@ -135,13 +135,13 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
 
   /** @suppress ComposeInvestigator compiler-only API */
   @ComposeInvestigatorCompilerApi
-  public fun computeInvalidationReason(keyName: String, arguments: List<ValueArgument>): InvalidationReason {
+  public fun computeInvalidationReason(keyName: String, arguments: List<ValueArgument>): InvalidationResult {
     val previousArguments = affectedArgumentMap[keyName]
     val changed = ArrayList<ChangedArgument>(arguments.size)
 
     if (previousArguments == null) {
       affectedArgumentMap[keyName] = arguments
-      return InvalidationReason.Initial
+      return InvalidationResult.InitialComposition
     }
 
     for (index in previousArguments.indices) {
@@ -155,9 +155,9 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
     affectedArgumentMap[keyName] = arguments
 
     return if (@Suppress("UsePropertyAccessSyntax") changed.isEmpty()) {
-      InvalidationReason.Invalidate
+      InvalidationResult.Recomposition
     } else {
-      InvalidationReason.ArgumentChanged(changed = changed)
+      InvalidationResult.ArgumentChanged(changed = changed)
     }
   }
 }

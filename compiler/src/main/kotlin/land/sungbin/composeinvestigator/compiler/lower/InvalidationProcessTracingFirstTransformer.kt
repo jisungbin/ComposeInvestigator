@@ -17,7 +17,6 @@ import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
-import org.jetbrains.kotlin.com.intellij.openapi.util.TextRangeScalarUtil.startOffset
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.Scope
@@ -107,7 +106,7 @@ internal class InvalidationProcessTracingFirstTransformer(
     )
     newStatements += invalidationReasonVariable
 
-    val invalidationTypeProcessed = invalidationLogger.irInvalidationTypeProcessed(irGetValue(invalidationReasonVariable))
+    val invalidationTypeProcessed = irGetValue(invalidationReasonVariable)
       .apply { type = invalidationLogger.irInvalidationTypeSymbol.defaultType }
     val logger = invalidationLogger.irLog(currentKey.composable, type = invalidationTypeProcessed)
 

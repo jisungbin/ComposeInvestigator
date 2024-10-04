@@ -11,26 +11,14 @@ import androidx.compose.runtime.Immutable
 
 /** @see ComposeInvestigatorConfig.logger */
 public fun interface ComposableInvalidationLogger {
-  public fun log(composable: ComposableInformation, type: InvalidationType)
+  public fun log(composable: ComposableInformation, type: InvalidationResult)
 }
 
-/** Indicates how the Composable was recomposed. */
+/** Defines the result of the invalidation requested for the Composable. */
 @Immutable
-public sealed class InvalidationType {
-  /** The Composable has actually been recomposed. */
-  public data class Processed(public val reason: InvalidationReason) : InvalidationType()
-
-  /** Recomposition was skipped because there were no changes to the Composable. */
-  public data object Skipped : InvalidationType()
-}
-
-/** Explains why the Composable was recomposed. */
-@Immutable
-public sealed class InvalidationReason {
-  abstract override fun toString(): String
-
+public sealed class InvalidationResult {
   /** The first composition (*not recomposition*). This happens by default. */
-  public data object Initial : InvalidationReason() {
+  public data object InitialComposition : InvalidationResult() {
     override fun toString(): String = "[Initial] Initial composition."
   }
 
@@ -39,7 +27,7 @@ public sealed class InvalidationReason {
    * by a call to `currentRecomposeScope.invalidate()` or when a field within that Composable
    * has been changed.
    */
-  public data object Invalidate : InvalidationReason() {
+  public data object Recomposition : InvalidationResult() {
     override fun toString(): String =
       "[Invalidate] An recomposition has been requested for the current Composable scope. " +
         "The state value in the body of that Composable function has most likely changed."
@@ -49,7 +37,7 @@ public sealed class InvalidationReason {
    * A argument in the Composable has been changed. The changed arguments are print sorted by
    * argument name.
    */
-  public data class ArgumentChanged(public val changed: List<ChangedArgument>) : InvalidationReason() {
+  public data class ArgumentChanged(public val changed: List<ChangedArgument>) : InvalidationResult() {
     override fun toString(): String = buildString {
       val sortedChanges = changed.sortedBy { field -> field.previous.name }
 
@@ -67,6 +55,9 @@ public sealed class InvalidationReason {
     }
   }
 
+  /** Recomposition was skipped because there were no changes to the Composable. */
+  public data object Skipped : InvalidationResult()
+
   /**
    * @suppress According to the Compose compiler's comments this should be determinable via the `$changed` argument.
    *
@@ -77,7 +68,7 @@ public sealed class InvalidationReason {
    * `androidx.compose.runtime.changedLowBitMask`. (in RecomposeScopeImpl.kt)
    */
   @Deprecated("Force reason is not supported yet.", level = DeprecationLevel.ERROR)
-  public data object Force /*: InvalidationReason()*/ {
+  public data object Force /*: InvalidationResult()*/ {
     override fun toString(): String = "[Force] A forced recomposition has been requested for the current Composable scope."
   }
 }
