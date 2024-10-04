@@ -12,14 +12,14 @@ import androidx.compose.runtime.mock.Text
 import land.sungbin.composeinvestigator.runtime.ComposableInformation
 import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
 
-val basicLayoutTable by lazy { currentComposableInvalidationTracer }
+val simpleTextTable by lazy { currentComposableInvalidationTracer }
 
-@Composable fun BasicLayout() {
-  Text("")
+@Composable fun SimpleText(value: String = "") {
+  Text(value)
 }
 
-fun basicLayout() = ComposableInformation(
-  name = "BasicLayout",
+fun simpleText() = ComposableInformation(
+  name = "SimpleText",
   packageName = "land.sungbin.composeinvestigator.compiler.test",
-  fileName = "BasicLayout.kt"
+  fileName = "SimpleText.kt",
 )
