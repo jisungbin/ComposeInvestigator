@@ -3,6 +3,7 @@
 package land.sungbin.composeinvestigator.runtime
 
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.RecomposeScope
 
 /** @see ComposeInvestigatorConfig.logger */
 public fun interface ComposableInvalidationLogger {
@@ -19,8 +20,8 @@ public sealed class InvalidationResult {
 
   /**
    * The current recompose scope has been requested to be recomposed. This can be caused
-   * by a call to `currentRecomposeScope.invalidate()` or when a field within that Composable
-   * has been changed.
+   * by a call to [`currentRecomposeScope.invalidate()`][RecomposeScope.invalidate] or
+   * when a field within that Composable has been changed.
    */
   public data object Recomposition : InvalidationResult() {
     override fun toString(): String =
@@ -60,7 +61,7 @@ public sealed class InvalidationResult {
    * (https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/compiler/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/lower/ComposableFunctionBodyTransformer.kt;l=381-382;drc=ea884612191a32933b697cc5062aa32505be4eaa)
    *
    * However, I haven't yet figured out how to determine this, so this type is not used. It's probably related to
-   * `androidx.compose.runtime.changedLowBitMask`. (in RecomposeScopeImpl.kt)
+   * [androidx.compose.runtime.changedLowBitMask]. (in RecomposeScopeImpl.kt)
    */
   @Deprecated("Force reason is not supported yet.", level = DeprecationLevel.ERROR)
   public data object Force /*: InvalidationResult()*/ {

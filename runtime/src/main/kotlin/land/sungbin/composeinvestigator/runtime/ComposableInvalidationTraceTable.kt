@@ -5,6 +5,7 @@ package land.sungbin.composeinvestigator.runtime
 import androidx.compose.runtime.Composer
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.snapshots.StateObject
 import land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable.AffectedName
 import org.jetbrains.annotations.TestOnly
 
@@ -64,12 +65,12 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
     @TestOnly public constructor(keyName: String, compoundKey: Int) : this("$keyName@$compoundKey")
   }
 
-  private val stateObjectMap: MutableMap<Any, String> = mutableMapOf()
+  private val stateObjectMap: MutableMap<StateObject, String> = mutableMapOf()
   private val affectedArgumentMap: MutableMap<AffectedName, List<ValueArgument>> = mutableMapOf()
 
   /**
-   * Returns the name of the current Composable, or you can define your own Composable name to use for
-   * ComposeInvestigator.
+   * Returns the name of the current Composable, or you can define your own Composable name to use
+   * for ComposeInvestigator.
    *
    * ```
    * @Composable fun MyComposable() {
@@ -131,17 +132,30 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
   }
 
   /**
-   * Considers the given [value] to be a `StateObject` and returns the field name of the [value]
-   * found by ComposeInvestigator. If not found, returns `null`.
+   * If the given [value] is a [StateObject] (corresponding to a [State]), returns the name of the
+   * variable to which the [value] is assigned.
+   *
+   * ```
+   * val myState = mutableStateOf(Any())
+   *
+   * table.findStateObjectName(myState) // result: "myState"
+   * ```
+   *
+   * If [value] is not a [StateObject], or if the assigned variable is not found, null is returned.
    */
   // TODO is this operation really O(1)?
   //  When become clear, add this note into KDoc: *Note: This operation takes `O(1)`*.
-  public fun findStateObjectName(value: Any): String? = stateObjectMap[value]
+  public fun findStateObjectName(value: Any): String? {
+    if (value !is StateObject) return null
+    return stateObjectMap[value]
+  }
 
   /** @suppress ComposeInvestigator compiler-only API */
   @ComposeInvestigatorCompilerApi
-  public fun <T : Any> registerStateObject(value: T, name: String): T =
-    value.apply { stateObjectMap[this] = name }
+  public fun <T : Any> registerStateObject(value: T, name: String): T {
+    if (value !is StateObject) return value
+    return value.apply { stateObjectMap[this] = name }
+  }
 
   /** @suppress ComposeInvestigator compiler-only API */
   @ComposeInvestigatorCompilerApi
