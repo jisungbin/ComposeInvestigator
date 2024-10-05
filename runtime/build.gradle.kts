@@ -8,24 +8,24 @@
 
 plugins {
   kotlin("jvm")
-  // alias(libs.plugins.kotlin.dokka)
+  alias(libs.plugins.kotlin.dokka)
   id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 
-// tasks.dokkaHtml {
-//  moduleName = "ComposeInvestigator Runtime API"
-//  moduleVersion = project.property("VERSION_NAME") as String
-//  outputDirectory = rootDir.resolve("documentation/site/runtime/api")
-//
-//  dokkaSourceSets.configureEach {
-//    jdkVersion = JavaVersion.VERSION_21.majorVersion.toInt()
-//  }
-//
-//  pluginsMapConfiguration = mapOf(
-//    "org.jetbrains.dokka.base.DokkaBase" to
-//      """{ "footerMessage": "ComposeInvestigator ⓒ 2024 Ji Sungbin" }""",
-//  )
-// }
+tasks.dokkaHtml {
+  moduleName = "ComposeInvestigator Runtime API"
+  moduleVersion = project.property("VERSION_NAME") as String
+  outputDirectory = rootDir.resolve("documentation/site/runtime/api")
+
+  dokkaSourceSets.configureEach {
+    jdkVersion = JavaVersion.VERSION_22.majorVersion.toInt()
+  }
+
+  pluginsMapConfiguration = mapOf(
+    "org.jetbrains.dokka.base.DokkaBase" to
+      """{ "footerMessage": "ComposeInvestigator ⓒ 2024 Ji Sungbin" }""",
+  )
+}
 
 kotlin {
   explicitApi()
