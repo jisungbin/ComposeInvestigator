@@ -15,11 +15,6 @@ import androidx.compose.runtime.Stable
  * @param compoundKey Same as [Composer.compoundKeyHash]. If no lookup
  * is possible, `null`.
  */
-// TODO when requesting an instance at the IR level, an existing instance
-//  should be reused if it has the same signature. Currently, we create a
-//  new instance for every time, which can result in numerous GCs being
-//  requested for every recomposition.
-// TODO add `compoundKey` field
 @Immutable
 public data class ComposableInformation(
   public val name: String,
