@@ -1,10 +1,5 @@
-/*
- * Developed by Ji Sungbin 2024.
- *
- * Licensed under the MIT.
- * Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
- */
-
+// Copyright 2024 Ji Sungbin
+// SPDX-License-Identifier: Apache-2.0
 import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
 import com.diffplug.gradle.spotless.BaseKotlinExtension
@@ -65,7 +60,10 @@ allprojects {
       target("**/*.kts")
       targetExclude("**/build/**/*.kts", "spotless/*.kts")
       useKtlint()
-      licenseHeaderFile(rootProject.file("spotless/copyright.kts"), "(^(?![\\/ ]\\*).*$)")
+      licenseHeaderFile(
+        rootProject.file("spotless/copyright.kts"),
+        "(@file|import|plugins|buildscript|dependencies|pluginManagement|dependencyResolutionManagement)",
+      )
     }
     format("xml") {
       target("**/*.xml")
