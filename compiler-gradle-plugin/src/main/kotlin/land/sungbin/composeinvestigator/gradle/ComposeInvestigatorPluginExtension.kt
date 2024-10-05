@@ -7,7 +7,7 @@ import org.gradle.api.model.ObjectFactory
 import org.gradle.api.provider.Property
 import org.gradle.kotlin.dsl.property
 
-public abstract class ComposeInvestigatorPluginExtension @Inject constructor(objects: ObjectFactory) {
+public abstract class ComposeInvestigatorPluginExtension @Inject public constructor(objects: ObjectFactory) {
   public val enabled: Property<Boolean> = objects.property<Boolean>().convention(true)
   public val verbose: Property<Boolean> = objects.property<Boolean>().convention(false)
 }

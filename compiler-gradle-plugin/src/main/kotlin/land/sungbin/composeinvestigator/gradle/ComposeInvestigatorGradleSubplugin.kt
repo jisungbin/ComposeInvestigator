@@ -20,7 +20,7 @@ public class ComposeInvestigatorGradleSubplugin : KotlinCompilerPluginSupportPlu
 
   override fun getPluginArtifact(): SubpluginArtifact =
     SubpluginArtifact(
-      groupId = "land.sungbin.composeinvestigator",
+      groupId = "in.sungb.composeinvestigator",
       artifactId = "composeinvestigator-compiler",
       version = VERSION,
     )
@@ -33,7 +33,7 @@ public class ComposeInvestigatorGradleSubplugin : KotlinCompilerPluginSupportPlu
 
     project.dependencies.add(
       compilation.implementationConfigurationName,
-      "land.sungbin.composeinvestigator:composeinvestigator-runtime:$VERSION",
+      "in.sungb.composeinvestigator:composeinvestigator-runtime:$VERSION",
     )
 
     return project.provider {
