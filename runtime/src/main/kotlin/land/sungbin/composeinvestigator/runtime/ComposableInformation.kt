@@ -32,7 +32,7 @@ public data class ComposableInformation(
   public val fileName: String,
   public val compoundKey: Int? = null,
 ) {
-  /** @suppress ComposeInvestigator runtime-only API. Use `copy(compoundKey = N)` instead. */
+  /** @suppress ComposeInvestigator compiler-only API. Use `copy(compoundKey = N)` instead. */
   @ComposeInvestigatorCompilerApi
   public fun withCompoundKey(compoundKey: Int): ComposableInformation =
     copy(compoundKey = compoundKey)
