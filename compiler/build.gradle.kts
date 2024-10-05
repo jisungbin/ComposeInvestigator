@@ -2,7 +2,23 @@
 // SPDX-License-Identifier: Apache-2.0
 plugins {
   kotlin("jvm")
+  alias(libs.plugins.kotlin.dokka)
   id(libs.plugins.gradle.publish.maven.get().pluginId)
+}
+
+tasks.dokkaHtml {
+  moduleName = "ComposeInvestigator Compiler API"
+  moduleVersion = project.property("VERSION_NAME") as String
+  outputDirectory = rootDir.resolve("documentation/site/compiler/api")
+
+  dokkaSourceSets.configureEach {
+    jdkVersion = JavaVersion.VERSION_22.majorVersion.toInt()
+  }
+
+  pluginsMapConfiguration = mapOf(
+    "org.jetbrains.dokka.base.DokkaBase" to
+      """{ "footerMessage": "ComposeInvestigator ⓒ 2024 Ji Sungbin" }""",
+  )
 }
 
 kotlin {
