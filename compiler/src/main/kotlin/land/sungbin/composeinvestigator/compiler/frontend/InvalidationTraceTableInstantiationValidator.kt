@@ -29,6 +29,13 @@ import org.jetbrains.kotlin.fir.types.constructClassLikeType
 import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitorVoid
 import org.jetbrains.kotlin.name.ClassId
 
+/**
+ * Transformer that adds an `@file:NoInvestigation` annotation to the file
+ * if the file does not have a Composable function.
+ *
+ * As a result, files with `@file:NoInvestigation` will *not* have a
+ * `ComposableInvalidationTraceTable` instantiated.
+ */
 public class InvalidationTraceTableInstantiationValidator(session: FirSession) : FirAdditionalCheckersExtension(session) {
   override val declarationCheckers: DeclarationCheckers = object : DeclarationCheckers() {
     override val fileCheckers: Set<FirFileChecker> = setOf(NoComposableFileChecker)

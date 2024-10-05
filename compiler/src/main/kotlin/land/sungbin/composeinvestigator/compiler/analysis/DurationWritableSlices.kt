@@ -7,7 +7,9 @@ import org.jetbrains.kotlin.ir.declarations.IrAttributeContainer
 import org.jetbrains.kotlin.util.slicedMap.BasicWritableSlice
 import org.jetbrains.kotlin.util.slicedMap.RewritePolicy
 import org.jetbrains.kotlin.util.slicedMap.WritableSlice
+import androidx.compose.compiler.plugins.kotlin.analysis.ComposeWritableSlices
 
+/** Same as [ComposeWritableSlices]. */
 public object DurationWritableSlices {
   public val DURABLE_FUNCTION_KEY: WritableSlice<IrAttributeContainer, ComposableKeyInfo> =
     BasicWritableSlice(RewritePolicy.DO_NOTHING)

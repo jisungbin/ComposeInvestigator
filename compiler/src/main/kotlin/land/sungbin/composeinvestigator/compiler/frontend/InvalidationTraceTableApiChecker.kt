@@ -35,6 +35,18 @@ import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.utils.addToStdlib.unreachableBranch
 
+/**
+ * Checker to validate use cases of the `ComposableInvalidationTraceTable` API.
+ *
+ * Currently, two validations are supported:
+ *
+ * 1. [TraceTableApiAccessChecker]: Using an API annotated with `@ComposableScope` outside
+ * of a Composable function, or using the `ComposableInvalidationTraceTable` API in a
+ * file that does not create a `ComposableInvalidationTraceTable`, will raise an error.
+ *
+ * 2. [ComposableNameExpressionChecker]: Raises an error if the argument to `ComposableName`
+ * is not hardcoded as a string.
+ */
 public class InvalidationTraceTableApiChecker(session: FirSession) : FirAdditionalCheckersExtension(session) {
   override val expressionCheckers: ExpressionCheckers = object : ExpressionCheckers() {
     override val propertyAccessExpressionCheckers = setOf(TraceTableApiAccessChecker)
