@@ -10,8 +10,11 @@ package land.sungbin.composeinvestigator.compiler.lower
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.normalize
 import androidx.compose.compiler.plugins.kotlin.irTrace
+import land.sungbin.composeinvestigator.compiler.CURRENT_COMPOSER_FQN
 import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
+import land.sungbin.composeinvestigator.compiler.fromFqName
 import land.sungbin.composeinvestigator.compiler.log
+import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTableHolder
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -24,10 +27,12 @@ import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
+import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
 import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.statements
+import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.SpecialNames
 
 internal class InvalidationProcessTracingFirstTransformer(
@@ -36,6 +41,9 @@ internal class InvalidationProcessTracingFirstTransformer(
   tables: IrInvalidationTraceTableHolder,
   private val stabilityInferencer: StabilityInferencer,
 ) : ComposeInvestigatorBaseLower(context, messageCollector, tables) {
+  private val currentComposerSymbol: IrPropertySymbol =
+    context.referenceProperties(CallableId.fromFqName(CURRENT_COMPOSER_FQN)).single()
+
   // TODO should I use regular variables instead of "temporary" variables?
   override fun firstTransformComposableBody(
     composable: IrSimpleFunction,
@@ -97,22 +105,33 @@ internal class InvalidationProcessTracingFirstTransformer(
       newStatements += addValueArgumentToList
     }
 
-    val compoundKeyHashCall = IrCallImpl.fromSymbolOwner(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      symbol = composerCompoundKeyHashSymbol,
-    ).also { fn ->
-      fn.dispatchReceiver = IrCallImpl.fromSymbolOwner(
+    // Avoid declaring duplicate IR nodes
+    fun compoundKeyHashCall(): IrCallImpl =
+      IrCallImpl.fromSymbolOwner(
         startOffset = UNDEFINED_OFFSET,
         endOffset = UNDEFINED_OFFSET,
-        symbol = currentComposerSymbol.owner.getter!!.symbol,
-      )
+        symbol = composerCompoundKeyHashSymbol,
+      ).also { fn ->
+        fn.dispatchReceiver = IrCallImpl.fromSymbolOwner(
+          startOffset = UNDEFINED_OFFSET,
+          endOffset = UNDEFINED_OFFSET,
+          symbol = currentComposerSymbol.owner.getter!!.symbol,
+        )
+      }
+
+    val affectedComposable = IrCallImpl.fromSymbolOwner(
+      startOffset = UNDEFINED_OFFSET,
+      endOffset = UNDEFINED_OFFSET,
+      symbol = IrComposableInformation.withCompoundKeySymbol(context),
+    ).apply {
+      dispatchReceiver = currentKey.composable
+      putValueArgument(0, compoundKeyHashCall())
     }
 
     val invalidationReasonVariable = scope.createTemporaryVariable(
       table.irComputeInvalidationReason(
         keyName = irString(currentKey.keyName),
-        compoundKey = compoundKeyHashCall,
+        compoundKey = compoundKeyHashCall(),
         arguments = irGetValue(currentValueArguments),
       ),
       nameHint = "invalidationReason",
@@ -121,7 +140,7 @@ internal class InvalidationProcessTracingFirstTransformer(
 
     val invalidationTypeProcessed = irGetValue(invalidationReasonVariable)
       .apply { type = invalidationLogger.irInvalidationTypeSymbol.defaultType }
-    val logger = invalidationLogger.irLog(currentKey.composable, type = invalidationTypeProcessed)
+    val logger = invalidationLogger.irLog(affectedComposable, type = invalidationTypeProcessed)
 
     newStatements += logger
 

@@ -26,25 +26,33 @@ class InvalidationSkipTransformTest : AbstractCompilerTest(
  }
  @Composable
  private fun blockComposable(any: Any, any2: Any, %composer: Composer?, %changed: Int) {
-@@ -22,10 +23,11 @@
+@@ -22,10 +23,15 @@
      tmp0
      if (isTraceInProgress()) {
        traceEventEnd()
      }
    } else {
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation("blockComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "movableComposable.kt"), Skipped)
++    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++      name = "blockComposable",
++      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++      fileName = "movableComposable.kt"
++    ).withCompoundKey(%composer.compoundKeyHash), Skipped)
      %composer.skipToGroupEnd()
    }
    %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
      blockComposable(any, any2, %composer, updateChangedFlags(%changed or 0b0001))
    }
-@@ -51,10 +53,11 @@
+@@ -51,10 +57,15 @@
      tmp0
      if (isTraceInProgress()) {
        traceEventEnd()
      }
    } else {
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation("blockStableComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "movableComposable.kt"), Skipped)
++    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++      name = "blockStableComposable",
++      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++      fileName = "movableComposable.kt"
++    ).withCompoundKey(%composer.compoundKeyHash), Skipped)
      %composer.skipToGroupEnd()
    }
    %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
@@ -79,25 +87,33 @@ class InvalidationSkipTransformTest : AbstractCompilerTest(
  }
  @Composable
  @ReadOnlyComposable
-@@ -20,10 +21,11 @@
+@@ -20,10 +21,15 @@
      use(any2)
      if (isTraceInProgress()) {
        traceEventEnd()
      }
    } else {
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation("blockComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "readonlyComposable.kt"), Skipped)
++    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++      name = "blockComposable",
++      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++      fileName = "readonlyComposable.kt"
++    ).withCompoundKey(%composer.compoundKeyHash), Skipped)
      %composer.skipToGroupEnd()
    }
    %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
      blockComposable(any, any2, %composer, updateChangedFlags(%changed or 0b0001))
    }
-@@ -47,10 +49,11 @@
+@@ -47,10 +53,15 @@
      use(any2)
      if (isTraceInProgress()) {
        traceEventEnd()
      }
    } else {
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation("blockStableComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "readonlyComposable.kt"), Skipped)
++    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++      name = "blockStableComposable",
++      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++      fileName = "readonlyComposable.kt"
++    ).withCompoundKey(%composer.compoundKeyHash), Skipped)
      %composer.skipToGroupEnd()
    }
    %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
@@ -130,25 +146,33 @@ class InvalidationSkipTransformTest : AbstractCompilerTest(
  }
  @Composable
  private fun blockComposable(any: Any, any2: Any, %composer: Composer?, %changed: Int) {
-@@ -19,10 +20,11 @@
+@@ -19,10 +20,15 @@
      use(any2)
      if (isTraceInProgress()) {
        traceEventEnd()
      }
    } else {
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation("blockComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "restartableComposable.kt"), Skipped)
++    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++      name = "blockComposable",
++      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++      fileName = "restartableComposable.kt"
++    ).withCompoundKey(%composer.compoundKeyHash), Skipped)
      %composer.skipToGroupEnd()
    }
    %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->
      blockComposable(any, any2, %composer, updateChangedFlags(%changed or 0b0001))
    }
-@@ -45,10 +47,11 @@
+@@ -45,10 +51,15 @@
      use(any2)
      if (isTraceInProgress()) {
        traceEventEnd()
      }
    } else {
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation("blockStableComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "restartableComposable.kt"), Skipped)
++    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++      name = "blockStableComposable",
++      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++      fileName = "restartableComposable.kt"
++    ).withCompoundKey(%composer.compoundKeyHash), Skipped)
      %composer.skipToGroupEnd()
    }
    %composer.endRestartGroup()?.updateScope { %composer: Composer?, %force: Int ->

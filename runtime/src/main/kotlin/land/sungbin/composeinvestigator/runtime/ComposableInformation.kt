@@ -7,6 +7,7 @@
 
 package land.sungbin.composeinvestigator.runtime
 
+import androidx.compose.runtime.Composer
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 
@@ -16,6 +17,8 @@ import androidx.compose.runtime.Stable
  * @param name Composable function name
  * @param packageName Package name that the Composable function is defined
  * @param fileName File name that the Composable function is defined
+ * @param compoundKey Same as [Composer.compoundKeyHash]. If no lookup
+ * is possible, `null`.
  */
 // TODO when requesting an instance at the IR level, an existing instance
 //  should be reused if it has the same signature. Currently, we create a
@@ -27,7 +30,13 @@ public data class ComposableInformation(
   public val name: String,
   public val packageName: String,
   public val fileName: String,
-)
+  public val compoundKey: Int? = null,
+) {
+  /** @suppress ComposeInvestigator runtime-only API. Use `copy(compoundKey = N)` instead. */
+  @ComposeInvestigatorCompilerApi
+  public fun withCompoundKey(compoundKey: Int): ComposableInformation =
+    copy(compoundKey = compoundKey)
+}
 
 /** Fully-qualified name of the Composable function. */
 public val ComposableInformation.fqPackageName: String

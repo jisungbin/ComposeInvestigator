@@ -85,6 +85,7 @@ public val Stability_COMBINED: Name = identifier("Combined")
 
 // START ComposableInformation
 public val COMPOSABLE_INFORMATION_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInformation")
+public val ComposableInformation_WITH_COMPOUND_KEY: Name = identifier("withCompoundKey")
 // END ComposableInformation
 
 // START ValueArguments

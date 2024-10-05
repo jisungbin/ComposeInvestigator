@@ -26,7 +26,7 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
  }
  @Composable
  private fun blockComposable(any: Any, any2: Any, %composer: Composer?, %changed: Int) {
-@@ -13,10 +14,17 @@
+@@ -13,10 +14,21 @@
    }
    if (%dirty and 0b00010011 != 0b00010010 || !%composer.skipping) {
      if (isTraceInProgress()) {
@@ -38,13 +38,17 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +    val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Any", any2.toString(), any2.hashCode(), Certain(false))
 +    tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +    val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%MovableComposableKt.computeInvalidationReason("fun-blockComposable(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-movableComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation("blockComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "movableComposable.kt"), tmp3_invalidationReason)
++    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++      name = "blockComposable",
++      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++      fileName = "movableComposable.kt"
++    ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
      %composer.startMovableGroup(<>, %composer.joinKey(any, any2))
      use(any)
      val tmp0 = use(any2)
      %composer.endMovableGroup()
      tmp0
-@@ -42,10 +50,17 @@
+@@ -42,10 +54,21 @@
    }
    if (%dirty and 0b00010011 != 0b00010010 || !%composer.skipping) {
      if (isTraceInProgress()) {
@@ -56,13 +60,17 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +    val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Int", any2.toString(), any2.hashCode(), Certain(true))
 +    tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +    val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%MovableComposableKt.computeInvalidationReason("fun-blockStableComposable(Int,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-movableComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation("blockStableComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "movableComposable.kt"), tmp3_invalidationReason)
++    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++      name = "blockStableComposable",
++      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++      fileName = "movableComposable.kt"
++    ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
      %composer.startMovableGroup(<>, %composer.joinKey(any, any2))
      use(any)
      val tmp0 = use(any2)
      %composer.endMovableGroup()
      tmp0
-@@ -63,10 +78,17 @@
+@@ -63,10 +86,21 @@
  private fun expressionComposable(any: Any, any2: Any, %composer: Composer?, %changed: Int): Int {
    %composer.startReplaceGroup(<>)
    if (isTraceInProgress()) {
@@ -74,7 +82,11 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +  val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Any", any2.toString(), any2.hashCode(), Certain(false))
 +  tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +  val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%MovableComposableKt.computeInvalidationReason("fun-expressionComposable(Any,Any)Int/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-movableComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+  ComposeInvestigatorConfig.logger.log(ComposableInformation("expressionComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "movableComposable.kt"), tmp3_invalidationReason)
++  ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    name = "expressionComposable",
++    packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++    fileName = "movableComposable.kt"
++  ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
    val tmp0 = <block>{
      %composer.startMovableGroup(<>, %composer.joinKey(any, any2))
      val tmp1 = use(any) + use(any2)
@@ -85,7 +97,7 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 
   @Test fun noGroupComposable() = diff(source("noGroupComposable.kt")) {
     """
-@@ -1,14 +1,22 @@
+@@ -1,14 +1,26 @@
 +val ComposableInvalidationTraceTableImpl%NoGroupComposableKt: ComposableInvalidationTraceTable = ComposableInvalidationTraceTable()
  private fun use(any: Any): Int {
    return any.hashCode()
@@ -102,13 +114,17 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +  val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Any", any2.toString(), any2.hashCode(), Certain(false))
 +  tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +  val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%NoGroupComposableKt.computeInvalidationReason("fun-blockComposable(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-noGroupComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+  ComposeInvestigatorConfig.logger.log(ComposableInformation("blockComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "noGroupComposable.kt"), tmp3_invalidationReason)
++  ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    name = "blockComposable",
++    packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++    fileName = "noGroupComposable.kt"
++  ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
    use(any)
    use(any2)
    if (isTraceInProgress()) {
      traceEventEnd()
    }
-@@ -17,10 +25,17 @@
+@@ -17,10 +29,21 @@
  @ExplicitGroupsComposable
  private fun blockStableComposable(any: Int, any2: Int, %composer: Composer?, %changed: Int) {
    if (isTraceInProgress()) {
@@ -120,13 +136,17 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +  val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Int", any2.toString(), any2.hashCode(), Certain(true))
 +  tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +  val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%NoGroupComposableKt.computeInvalidationReason("fun-blockStableComposable(Int,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-noGroupComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+  ComposeInvestigatorConfig.logger.log(ComposableInformation("blockStableComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "noGroupComposable.kt"), tmp3_invalidationReason)
++  ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    name = "blockStableComposable",
++    packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++    fileName = "noGroupComposable.kt"
++  ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
    use(any)
    use(any2)
    if (isTraceInProgress()) {
      traceEventEnd()
    }
-@@ -29,10 +44,17 @@
+@@ -29,10 +52,21 @@
  @ExplicitGroupsComposable
  private fun expressionComposable(any: Any, any2: Any, %composer: Composer?, %changed: Int): Int {
    if (isTraceInProgress()) {
@@ -138,7 +158,11 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +  val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Any", any2.toString(), any2.hashCode(), Certain(false))
 +  tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +  val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%NoGroupComposableKt.computeInvalidationReason("fun-expressionComposable(Any,Any)Int/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-noGroupComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+  ComposeInvestigatorConfig.logger.log(ComposableInformation("expressionComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "noGroupComposable.kt"), tmp3_invalidationReason)
++  ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    name = "expressionComposable",
++    packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++    fileName = "noGroupComposable.kt"
++  ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
    val tmp0 = use(any) + use(any2)
    if (isTraceInProgress()) {
      traceEventEnd()
@@ -161,7 +185,7 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
  }
  @Composable
  @ReadOnlyComposable
-@@ -14,10 +15,17 @@
+@@ -14,10 +15,21 @@
    }
    if (%dirty and 0b00010011 != 0b00010010 || !%composer.skipping) {
      if (isTraceInProgress()) {
@@ -173,13 +197,17 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +    val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Any", any2.toString(), any2.hashCode(), Certain(false))
 +    tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +    val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%ReadonlyComposableKt.computeInvalidationReason("fun-blockComposable(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-readonlyComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation("blockComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "readonlyComposable.kt"), tmp3_invalidationReason)
++    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++      name = "blockComposable",
++      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++      fileName = "readonlyComposable.kt"
++    ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
      use(any)
      use(any2)
      if (isTraceInProgress()) {
        traceEventEnd()
      }
-@@ -41,10 +49,17 @@
+@@ -41,10 +53,21 @@
    }
    if (%dirty and 0b00010011 != 0b00010010 || !%composer.skipping) {
      if (isTraceInProgress()) {
@@ -191,13 +219,17 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +    val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Int", any2.toString(), any2.hashCode(), Certain(true))
 +    tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +    val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%ReadonlyComposableKt.computeInvalidationReason("fun-blockStableComposable(Int,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-readonlyComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation("blockStableComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "readonlyComposable.kt"), tmp3_invalidationReason)
++    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++      name = "blockStableComposable",
++      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++      fileName = "readonlyComposable.kt"
++    ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
      use(any)
      use(any2)
      if (isTraceInProgress()) {
        traceEventEnd()
      }
-@@ -59,10 +74,17 @@
+@@ -59,10 +82,21 @@
  @ReadOnlyComposable
  private fun expressionComposable(any: Any, any2: Any, %composer: Composer?, %changed: Int): Int {
    if (isTraceInProgress()) {
@@ -209,7 +241,11 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +  val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Any", any2.toString(), any2.hashCode(), Certain(false))
 +  tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +  val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%ReadonlyComposableKt.computeInvalidationReason("fun-expressionComposable(Any,Any)Int/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-readonlyComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+  ComposeInvestigatorConfig.logger.log(ComposableInformation("expressionComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "readonlyComposable.kt"), tmp3_invalidationReason)
++  ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    name = "expressionComposable",
++    packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++    fileName = "readonlyComposable.kt"
++  ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
    val tmp0 = use(any) + use(any2)
    if (isTraceInProgress()) {
      traceEventEnd()
@@ -220,7 +256,7 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 
   @Test fun replaceableComposable() = diff(source("replaceableComposable.kt")) {
     """
-@@ -1,15 +1,23 @@
+@@ -1,15 +1,27 @@
 +val ComposableInvalidationTraceTableImpl%ReplaceableComposableKt: ComposableInvalidationTraceTable = ComposableInvalidationTraceTable()
  private fun use(any: Any): Int {
    return any.hashCode()
@@ -238,13 +274,17 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +  val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Any", any2.toString(), any2.hashCode(), Certain(false))
 +  tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +  val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%ReplaceableComposableKt.computeInvalidationReason("fun-blockComposable(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-replaceableComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+  ComposeInvestigatorConfig.logger.log(ComposableInformation("blockComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "replaceableComposable.kt"), tmp3_invalidationReason)
++  ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    name = "blockComposable",
++    packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++    fileName = "replaceableComposable.kt"
++  ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
    val tmp0_subject = Default.nextBoolean()
    when {
      tmp0_subject == true -> {
        use(any)
      }
-@@ -27,10 +35,17 @@
+@@ -27,10 +39,21 @@
  private fun blockStableComposable(any: Int, any2: Int, %composer: Composer?, %changed: Int) {
    %composer.startReplaceGroup(<>)
    if (isTraceInProgress()) {
@@ -256,13 +296,17 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +  val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Int", any2.toString(), any2.hashCode(), Certain(true))
 +  tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +  val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%ReplaceableComposableKt.computeInvalidationReason("fun-blockStableComposable(Int,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-replaceableComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+  ComposeInvestigatorConfig.logger.log(ComposableInformation("blockStableComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "replaceableComposable.kt"), tmp3_invalidationReason)
++  ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    name = "blockStableComposable",
++    packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++    fileName = "replaceableComposable.kt"
++  ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
    val tmp0_subject = Default.nextBoolean()
    when {
      tmp0_subject == true -> {
        use(any)
      }
-@@ -48,10 +63,17 @@
+@@ -48,10 +71,21 @@
  private fun expressionComposable(any: Any, any2: Any, %composer: Composer?, %changed: Int): Int {
    %composer.startReplaceGroup(<>)
    if (isTraceInProgress()) {
@@ -274,7 +318,11 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +  val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Any", any2.toString(), any2.hashCode(), Certain(false))
 +  tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +  val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%ReplaceableComposableKt.computeInvalidationReason("fun-expressionComposable(Any,Any)Int/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-replaceableComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+  ComposeInvestigatorConfig.logger.log(ComposableInformation("expressionComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "replaceableComposable.kt"), tmp3_invalidationReason)
++  ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    name = "expressionComposable",
++    packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++    fileName = "replaceableComposable.kt"
++  ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
    val tmp0 = <block>{
      val tmp0_subject = Default.nextBoolean()
      when {
@@ -292,7 +340,7 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
  }
  @Composable
  private fun blockComposable(any: Any, any2: Any, %composer: Composer?, %changed: Int) {
-@@ -13,10 +14,17 @@
+@@ -13,10 +14,21 @@
    }
    if (%dirty and 0b00010011 != 0b00010010 || !%composer.skipping) {
      if (isTraceInProgress()) {
@@ -304,13 +352,17 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +    val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Any", any2.toString(), any2.hashCode(), Certain(false))
 +    tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +    val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%RestartableComposableKt.computeInvalidationReason("fun-blockComposable(Any,Any)Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-restartableComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation("blockComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "restartableComposable.kt"), tmp3_invalidationReason)
++    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++      name = "blockComposable",
++      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++      fileName = "restartableComposable.kt"
++    ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
      use(any)
      use(any2)
      if (isTraceInProgress()) {
        traceEventEnd()
      }
-@@ -39,10 +47,17 @@
+@@ -39,10 +51,21 @@
    }
    if (%dirty and 0b00010011 != 0b00010010 || !%composer.skipping) {
      if (isTraceInProgress()) {
@@ -322,13 +374,17 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +    val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Int", any2.toString(), any2.hashCode(), Certain(true))
 +    tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +    val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%RestartableComposableKt.computeInvalidationReason("fun-blockStableComposable(Int,Int)Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-restartableComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation("blockStableComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "restartableComposable.kt"), tmp3_invalidationReason)
++    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++      name = "blockStableComposable",
++      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++      fileName = "restartableComposable.kt"
++    ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
      use(any)
      use(any2)
      if (isTraceInProgress()) {
        traceEventEnd()
      }
-@@ -57,10 +72,17 @@
+@@ -57,10 +80,21 @@
  private fun expressionComposable(any: Any, any2: Any, %composer: Composer?, %changed: Int): Int {
    %composer.startReplaceGroup(<>)
    if (isTraceInProgress()) {
@@ -340,7 +396,11 @@ class InvalidationProcessTransformTest : AbstractCompilerTest(
 +  val tmp2_any2%valueArgu = ValueArgument("any2", "kotlin.Any", any2.toString(), any2.hashCode(), Certain(false))
 +  tmp0_currentValueArguments.add(tmp2_any2%valueArgu)
 +  val tmp3_invalidationReason = ComposableInvalidationTraceTableImpl%RestartableComposableKt.computeInvalidationReason("fun-expressionComposable(Any,Any)Int/pkg-land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip/file-restartableComposable.kt", %composer.compoundKeyHash, tmp0_currentValueArguments)
-+  ComposeInvestigatorConfig.logger.log(ComposableInformation("expressionComposable", "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip", "restartableComposable.kt"), tmp3_invalidationReason)
++  ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    name = "expressionComposable",
++    packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
++    fileName = "restartableComposable.kt"
++  ).withCompoundKey(%composer.compoundKeyHash), tmp3_invalidationReason)
    val tmp0 = use(any) + use(any2)
    if (isTraceInProgress()) {
      traceEventEnd()

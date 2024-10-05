@@ -26,7 +26,8 @@ fun Assert<List<Investigated>>.assertInvestigations(vararg investigates: Investi
       val (actualInformation, actualResult) = actuals[index]
       val (investigateInformation, investigateResult) = investigates[index]
 
-      assertThat(actualInformation).isDataClassEqualTo(investigateInformation)
+      assertThat(actualInformation.copy(compoundKey = null))
+        .isDataClassEqualTo(investigateInformation.copy(compoundKey = null))
 
       if (
         actualResult is InvalidationResult.ArgumentChanged &&
