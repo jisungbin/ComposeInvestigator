@@ -10,7 +10,6 @@ package land.sungbin.composeinvestigator.compiler.lower
 import androidx.compose.compiler.plugins.kotlin.analysis.Stability
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
 import land.sungbin.composeinvestigator.compiler.COMPOSER_FQN
-import land.sungbin.composeinvestigator.compiler.CURRENT_COMPOSER_FQN
 import land.sungbin.composeinvestigator.compiler.Composer_COMPOUND_KEY_HASH
 import land.sungbin.composeinvestigator.compiler.Composer_SKIP_TO_GROUP_END
 import land.sungbin.composeinvestigator.compiler.HASH_CODE_FQN
@@ -55,7 +54,6 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrGetValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
-import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
 import org.jetbrains.kotlin.ir.types.classOrFail
 import org.jetbrains.kotlin.ir.types.classOrNull
@@ -88,8 +86,6 @@ public open class ComposeInvestigatorBaseLower(
   private var ownStabilityUnknownSymbol: IrClassSymbol? = null
   private var ownStabilityParameterSymbol: IrClassSymbol? = null
   private var ownStabilityCombinedSymbol: IrClassSymbol? = null
-
-  protected val currentComposerSymbol: IrPropertySymbol = context.referenceProperties(CallableId.fromFqName(CURRENT_COMPOSER_FQN)).single()
 
   private val composerSymbol = context.referenceClass(ClassId.topLevel(COMPOSER_FQN))!!
   private val composerSkipToGroupEndSymbol = composerSymbol.getSimpleFunction(Composer_SKIP_TO_GROUP_END.asString())!!
