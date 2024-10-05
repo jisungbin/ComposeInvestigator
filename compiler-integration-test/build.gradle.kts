@@ -23,13 +23,14 @@ dependencies {
   implementation(projects.runtime)
   implementation(libs.compose.runtime)
 
+  implementation(kotlin("reflect")) // Used by assertk
+  implementation(libs.test.assertk)
+
   implementation("androidx.compose.runtime:runtime-test-utils:1.8.0-SNAPSHOT") {
     because("Why SNAPSHOT? See https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/runtime/runtime-test-utils/build.gradle;l=71;drc=214c6abe4e624304956276717a0163fad3858be9")
   }
   kotlinCompilerPluginClasspath(projects.compiler)
 
   testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
-  testImplementation(kotlin("reflect")) // Used by assertk
   testImplementation(libs.test.kotlin.coroutines)
-  testImplementation(libs.test.assertk)
 }

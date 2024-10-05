@@ -34,6 +34,7 @@ public val Composer_SKIP_TO_GROUP_END: Name = identifier("skipToGroupEnd")
 public val Composer_COMPOUND_KEY_HASH: Name = identifier("compoundKeyHash")
 
 public val STATE_FQN: FqName = FqName("$AndroidxComposeRuntime.State")
+public val STATE_OBJECT_FQN: FqName = FqName("$AndroidxComposeRuntime.snapshots.StateObject")
 // END Compose Runtime
 
 // START ComposableScope
