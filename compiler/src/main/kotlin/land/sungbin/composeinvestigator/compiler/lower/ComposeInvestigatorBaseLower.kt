@@ -13,6 +13,7 @@ import land.sungbin.composeinvestigator.compiler.MUTABLE_LIST_OF_FQN
 import land.sungbin.composeinvestigator.compiler.NO_INVESTIGATION_FQN
 import land.sungbin.composeinvestigator.compiler.STABILITY_FQN
 import land.sungbin.composeinvestigator.compiler.STATE_FQN
+import land.sungbin.composeinvestigator.compiler.STATE_OBJECT_FQN
 import land.sungbin.composeinvestigator.compiler.Stability_CERTAIN
 import land.sungbin.composeinvestigator.compiler.Stability_COMBINED
 import land.sungbin.composeinvestigator.compiler.Stability_PARAMETER
@@ -87,6 +88,7 @@ public open class ComposeInvestigatorBaseLower(
   protected val composerCompoundKeyHashSymbol: IrSimpleFunctionSymbol = composerSymbol.getPropertyGetter(Composer_COMPOUND_KEY_HASH.toString())!!
 
   private val stateSymbol = context.referenceClass(ClassId.topLevel(STATE_FQN))!!
+  private val stateObjectSymbol = context.referenceClass(ClassId.topLevel(STATE_OBJECT_FQN))!!
 
   protected val mutableListOfSymbol: IrSimpleFunctionSymbol by unsafeLazy {
     context
@@ -211,10 +213,13 @@ public open class ComposeInvestigatorBaseLower(
   ): IrExpression = expression
 
   private fun IrVariable.isValidStateDeclaration(): Boolean {
-    val isState = type.classOrNull?.isSubtypeOfClass(stateSymbol.defaultType.classOrFail) == true
+    val isState = type.classOrNull?.let { clazz ->
+      clazz.isSubtypeOfClass(stateSymbol.defaultType.classOrFail) == true ||
+        clazz.isSubtypeOfClass(stateObjectSymbol.defaultType.classOrFail) == true
+    }
     val isTempVariable = origin == IrDeclarationOrigin.IR_TEMPORARY_VARIABLE
     val hasInitializer = initializer != null
-    return !type.isNullable() && isState && !isTempVariable && hasInitializer
+    return !type.isNullable() && isState == true && !isTempVariable && hasInitializer
   }
 
   protected fun Stability.asOwnStability(): IrConstructorCall {
