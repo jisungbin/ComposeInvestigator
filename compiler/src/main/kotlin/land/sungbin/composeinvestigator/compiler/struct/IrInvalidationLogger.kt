@@ -22,19 +22,26 @@ import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.getSimpleFunction
 import org.jetbrains.kotlin.name.ClassId
 
+/** Helper class to make the `ComposableInvalidationLogger` class easier to handle in IR. */
 public class IrInvalidationLogger(context: IrPluginContext) {
   private var loggerContainerSymbol = context.referenceClass(ClassId.topLevel(COMPOSE_INVESTIGATOR_CONFIG_FQN))!!
   private var loggerGetterSymbol = loggerContainerSymbol.getPropertyGetter(ComposeInvestigatorConfig_LOGGER.asString())!!
   private var loggerLogSymbol = loggerGetterSymbol.owner.returnType.classOrFail.getSimpleFunction(ComposableInvalidationLogger_LOG.asString())!!
 
-  public val irInvalidationTypeSymbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(INVALIDATION_RESULT_FQN))!!
+  public val irInvalidationResultSymbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(INVALIDATION_RESULT_FQN))!!
 
-  private var invalidationTypeSkippedSymbol =
-    irInvalidationTypeSymbol.owner.sealedSubclasses.first { clz -> clz.owner.name == InvalidationResult_SKIPPED }
+  private var invalidationResultSkippedSymbol =
+    irInvalidationResultSymbol.owner.sealedSubclasses.first { clz -> clz.owner.name == InvalidationResult_SKIPPED }
 
+  /**
+   * Create a call to `ComposableInvalidationLogger#log`.
+   *
+   * @param composable A `ComposableInformation` value (first value argument)
+   * @param result A `InvalidationResult` value (second value argument)
+   */
   public fun irLog(
     composable: IrDeclarationReference,
-    type: IrDeclarationReference,
+    result: IrDeclarationReference,
   ): IrCall = IrCallImpl.fromSymbolOwner(
     startOffset = UNDEFINED_OFFSET,
     endOffset = UNDEFINED_OFFSET,
@@ -54,14 +61,15 @@ public class IrInvalidationLogger(context: IrPluginContext) {
     }
   }.apply {
     putValueArgument(0, composable)
-    putValueArgument(1, type)
+    putValueArgument(1, result)
   }
 
-  public fun irInvalidationTypeSkipped(): IrGetObjectValue =
+  /** Gets the `InvalidationResult#Skipped` object call. */
+  public fun irInvalidationResultSkipped(): IrGetObjectValue =
     IrGetObjectValueImpl(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,
-      type = invalidationTypeSkippedSymbol.defaultType,
-      symbol = invalidationTypeSkippedSymbol,
+      type = invalidationResultSkippedSymbol.defaultType,
+      symbol = invalidationResultSkippedSymbol,
     )
 }

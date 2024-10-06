@@ -37,6 +37,12 @@ import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 
+/**
+ * Helper class to make the `ComposableInvalidationTraceTable` class easier to handle in IR.
+ *
+ * @param prop The property where `ComposableInvalidationTraceTable` is instantiated.
+ * It can be created with the [irInvalidationTraceTableProp] function.
+ */
 public class IrInvalidationTraceTable private constructor(private val prop: IrProperty) {
   private lateinit var registerStateObjectSymbol: IrSimpleFunctionSymbol
   private lateinit var computeInvalidationReasonSymbol: IrSimpleFunctionSymbol

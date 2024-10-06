@@ -18,9 +18,11 @@ import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
+/** Helper class to make the `ComposableInformation` class easier to handle in IR. */
 public class IrComposableInformation(context: IrPluginContext) {
   private val symbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INFORMATION_FQN))!!
 
+  /** Create a `ComposableInformation` constructor except for the `compoundKey` value. */
   public operator fun invoke(
     name: IrConst,
     packageName: IrConst,
@@ -34,6 +36,13 @@ public class IrComposableInformation(context: IrPluginContext) {
     putValueArgument(2, fileName)
   }
 
+  /**
+   * Copy the `ComposableInformation` constructor call, changing only `name` to the
+   * new value.
+   *
+   * @param target The target `ComposableInformation` constructor call to copy from.
+   * @param name The new value for the `name` parameter.
+   */
   public fun copyFrom(
     target: IrConstructorCall,
     name: IrConst,
@@ -46,8 +55,10 @@ public class IrComposableInformation(context: IrPluginContext) {
   public companion object {
     private var _withCompoundKeySymbol: WeakReference<IrSimpleFunctionSymbol>? = null
 
+    /** Get the `name` value from the `ComposableInformation` constructor call. */
     public fun getName(target: IrConstructorCall): IrConst = target.getValueArgument(0)!!.cast()
 
+    /** Gets the `ComposableInformation#withCompoundKey` symbol. */
     public fun withCompoundKeySymbol(context: IrPluginContext): IrSimpleFunctionSymbol =
       _withCompoundKeySymbol?.get() ?: run {
         val targetFqn = COMPOSABLE_INFORMATION_FQN.child(ComposableInformation_WITH_COMPOUND_KEY)

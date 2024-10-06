@@ -91,9 +91,9 @@ public class InvalidationSkipTracingLastTransformer(
       putValueArgument(0, compoundKeyHashCall)
     }
 
-    val invalidationTypeSkipped = invalidationLogger.irInvalidationTypeSkipped()
-      .apply { type = invalidationLogger.irInvalidationTypeSymbol.defaultType }
-    val logger = invalidationLogger.irLog(affectedComposable, type = invalidationTypeSkipped)
+    val invalidationResultSkipped = invalidationLogger.irInvalidationResultSkipped()
+      .apply { type = invalidationLogger.irInvalidationResultSymbol.defaultType }
+    val logger = invalidationLogger.irLog(affectedComposable, result = invalidationResultSkipped)
 
     return IrBlockImpl(
       startOffset = expression.startOffset,

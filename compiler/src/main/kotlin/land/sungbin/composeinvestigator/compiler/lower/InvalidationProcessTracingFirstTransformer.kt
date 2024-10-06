@@ -181,9 +181,9 @@ public class InvalidationProcessTracingFirstTransformer(
     )
     newStatements += invalidationReasonVariable
 
-    val invalidationTypeProcessed = irGetValue(invalidationReasonVariable)
-      .apply { type = invalidationLogger.irInvalidationTypeSymbol.defaultType }
-    val logger = invalidationLogger.irLog(affectedComposable, type = invalidationTypeProcessed)
+    val invalidationResultProcessed = irGetValue(invalidationReasonVariable)
+      .apply { type = invalidationLogger.irInvalidationResultSymbol.defaultType }
+    val logger = invalidationLogger.irLog(affectedComposable, result = invalidationResultProcessed)
 
     newStatements += logger
 
