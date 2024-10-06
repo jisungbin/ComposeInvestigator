@@ -30,11 +30,11 @@ import org.jetbrains.kotlin.name.FqName
  * The rules for generating the [unique path][ComposableKeyInfo.keyName] are the
  * same as the [DurableKeyTransformer] in the Compose Compiler.
  */
-// TODO complete our own implementation using FIR.
+// TODO Complete our own implementation using FIR.
 public class DurableComposableKeyAnalyzer(
   context: IrPluginContext,
   stabilityInferencer: StabilityInferencer,
-  featureFlags: FeatureFlags = FeatureFlags(), // TODO supports this feature
+  featureFlags: FeatureFlags = FeatureFlags(), // TODO Supports this feature
 ) : DurableKeyTransformer(
   context = context,
   keyVisitor = DurableKeyVisitor(),

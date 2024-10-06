@@ -12,13 +12,38 @@ import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.name.Name
 
-internal class StateInitializerFirstTransformer(
+/**
+ * Transforms the code to add the use of `ComposableInvalidationTraceTable#registerStateObject`
+ * in the definition of `State` or `StateObject`.
+ *
+ * ### Original
+ *
+ * ```
+ * @Composable fun MyComposable() {
+ *   val myState = remember { mutableStateOf(0) }
+ *   val myStateObject by remember { mutableStateMapOf(0 to 0) }
+ * }
+ * ```
+ *
+ * ### Transformed
+ *
+ * ```
+ * @Composable fun MyComposable() {
+ *   val myState = remember { mutableStateOf(0) }.also { state ->
+ *     currentComposableInvalidationTracer.registerStateObject(state, name = "myState")
+ *   }
+ *   val myStateObject by remember { mutableStateMapOf(0 to 0) }.also { stateObject ->
+ *     currentComposableInvalidationTracer.registerStateObject(stateObject, name = "myStateObject")
+ *   }
+ * }
+ */
+public class StateInitializerFirstTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
   tables: IrInvalidationTraceTableHolder,
 ) : ComposeInvestigatorBaseLower(context, messageCollector, tables) {
-  // TODO special behaviour of 'remember' and 'rememberSaveable':
-  //  transforms should be performed inside the 'remember(Saveable)' lambda, not outside of it.
+  // TODO Special behaviour of 'remember' and 'rememberSaveable':
+  //  Transforms should be performed inside the 'remember(Saveable)' lambda, not outside of it.
   override fun firstTransformStateInitializer(
     name: Name,
     initializer: IrExpression,

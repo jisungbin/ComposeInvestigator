@@ -23,7 +23,38 @@ import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.file
 
-internal class InvalidationSkipTracingLastTransformer(
+/**
+ * Generates code that reports whenever a Composable function is skipped during
+ * recomposition due to smart recomposition.
+ *
+ * ### Original
+ *
+ * ```
+ * @Composable fun DisplayPlusResult(a: Int, b: Int) {
+ *   Text((a + b).toString())
+ * }
+ * ```
+ *
+ * ### Transformed
+ *
+ * ```
+ * @Composable fun DisplayPlusResult(a: Int, b: Int) {
+ *   if (!currentComposer.skipping) {
+ *     Text((a + b).toString())
+ *   } else {
+ *     val affectedComposable = ComposableInformation(
+ *       name = "DisplayPlusResult",
+ *       packageName = "land.sungbin.composeinvestigator.sample",
+ *       fileName = "DisplayPlusResult.kt",
+ *       compoundKey = androidx.compose.runtime.currentCompositeKeyHash,
+ *     )
+ *     ComposeInvestigatorConfig.logger.log(affectedComposable, InvalidationReason.Skipped)
+ *     currentComposer.skipToGroupEnd()
+ *   }
+ * }
+ * ```
+ */
+public class InvalidationSkipTracingLastTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
   table: IrInvalidationTraceTableHolder,
@@ -41,7 +72,7 @@ internal class InvalidationSkipTracingLastTransformer(
     val currentKey = context.irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return expression
     val composer = composable.valueParameters
       .last { param -> param.type.classFqName == COMPOSER_FQN }
-      .let { composerParam -> irGetValue(composerParam) }
+      .let(::irGetValue)
 
     val compoundKeyHashCall = IrCallImpl.fromSymbolOwner(
       startOffset = UNDEFINED_OFFSET,

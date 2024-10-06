@@ -30,7 +30,55 @@ import org.jetbrains.kotlin.ir.util.statements
 import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.name.SpecialNames
 
-internal class InvalidationProcessTracingFirstTransformer(
+/**
+ * Generate code to find and report value arguments whose values have changed
+ * whenever a Composable function becomes (re)composed.
+ *
+ * ### Original
+ *
+ * ```
+ * @Composable fun DisplayPlusResult(a: Int, b: Int) {
+ *   Text((a + b).toString())
+ * }
+ * ```
+ *
+ * ### Transformed
+ *
+ * ```
+ * @Composable fun DisplayPlusResult(a: Int, b: Int) {
+ *   val currentValueArguments = listOf(
+ *     ValueArgument(
+ *       name = "a",
+ *       type = "kotlin.Int",
+ *       valueString = a.toString(),
+ *       valueHashCode = a.hashCode(),
+ *       stability = Stability.Stable,
+ *     ),
+ *     ValueArgument(
+ *       name = "b",
+ *       type = "kotlin.Int",
+ *       valueString = b.toString(),
+ *       valueHashCode = b.hashCode(),
+ *       stability = Stability.Stable,
+ *     ),
+ *   )
+ *   val affectedComposable = ComposableInformation(
+ *     name = "DisplayPlusResult",
+ *     packageName = "land.sungbin.composeinvestigator.sample",
+ *     fileName = "DisplayPlusResult.kt",
+ *     compoundKey = androidx.compose.runtime.currentCompositeKeyHash,
+ *   )
+ *   val invalidationReason = currentComposableInvalidationTracer.computeInvalidationReason(
+ *     keyName = "fun-DisplayPlusResult(Int,Int)Unit... (truncated)",
+ *     compoundKey = androidx.compose.runtime.currentCompositeKeyHash,
+ *     arguments = currentValueArguments,
+ *   )
+ *   ComposeInvestigatorConfig.logger.log(affectedComposable, invalidationReason)
+ *   Text((a + b).toString())
+ * }
+ * ```
+ */
+public class InvalidationProcessTracingFirstTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
   tables: IrInvalidationTraceTableHolder,
@@ -39,7 +87,7 @@ internal class InvalidationProcessTracingFirstTransformer(
   private val currentComposerSymbol: IrPropertySymbol =
     context.referenceProperties(CallableId.fromFqName(CURRENT_COMPOSER_FQN)).single()
 
-  // TODO should I use regular variables instead of "temporary" variables?
+  // TODO Should I use regular variables instead of "temporary" variables?
   override fun firstTransformComposableBody(
     composable: IrSimpleFunction,
     body: IrBody,
@@ -66,7 +114,7 @@ internal class InvalidationProcessTracingFirstTransformer(
     )
     newStatements += currentValueArguments
 
-    // TODO only process parameters that actually used.
+    // TODO Only process parameters that actually used.
     for (param in composable.valueParameters) {
       // Synthetic arguments are not handled.
       if (param.name.asString().startsWith('$')) continue

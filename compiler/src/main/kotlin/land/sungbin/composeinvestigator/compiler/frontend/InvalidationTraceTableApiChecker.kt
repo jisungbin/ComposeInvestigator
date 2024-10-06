@@ -59,8 +59,8 @@ private object TraceTableApiAccessChecker : FirPropertyAccessExpressionChecker(M
   private val COMPOSABLE_SCOPE = ClassId.topLevel(COMPOSABLE_SCOPE_FQN)
 
   override fun check(expression: FirPropertyAccessExpression, context: CheckerContext, reporter: DiagnosticReporter) {
-    // TODO when accessed by `it`, such as `traceTable.let { it.action() }`,
-    //  Symbol is `FirValueParameterSymbol`. These variants need to be handled separately.
+    // TODO When accessed by `it`, such as `traceTable.let { it.action() }`,
+    //  `Symbol` is `FirValueParameterSymbol`. These variants need to be handled separately.
     val callee = expression.calleeReference.toResolvedPropertySymbol() ?: return
 
     if (
@@ -78,7 +78,7 @@ private object TraceTableApiAccessChecker : FirPropertyAccessExpressionChecker(M
     context: CheckerContext,
     reporter: DiagnosticReporter,
   ) {
-    // FIXME the annotation for callee was not being looked up correctly.
+    // FIXME The annotation for callee was not being looked up correctly.
     //  I don't know the cause yet, so I'm temporarily disabling this check.
     return
 

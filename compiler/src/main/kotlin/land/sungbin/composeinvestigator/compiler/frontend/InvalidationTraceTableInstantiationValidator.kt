@@ -42,6 +42,8 @@ public class InvalidationTraceTableInstantiationValidator(session: FirSession) :
   }
 }
 
+// TODO `@file:NoInvestigation` should also be added when all Composable
+//  functions are `@NoInvestigation`.
 private object NoComposableFileChecker : FirFileChecker(MppCheckerKind.Common) {
   private val NO_INVESTIGATION = ClassId.topLevel(NO_INVESTIGATION_FQN)
   private val noInvestigationType by unsafeLazy {

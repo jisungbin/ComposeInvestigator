@@ -26,7 +26,7 @@ public class ComposeInvestigatorFirstPhaseExtension(
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
     val stabilityInferencer = StabilityInferencer(
       currentModule = moduleFragment.descriptor,
-      externalStableTypeMatchers = emptySet(), // TODO supports this feature
+      externalStableTypeMatchers = emptySet(), // TODO Supports this feature
     )
     val tables = InvalidationTraceTableInstanceTransformer(pluginContext, messageCollector)
 

@@ -101,6 +101,7 @@ public class IrInvalidationTraceTable private constructor(private val prop: IrPr
 
 @Volatile private var invalidationTraceTableClassSymbol: WeakReference<IrClassSymbol>? = null
 
+// FIXME Bug with two or more identical file names
 private fun irInvalidationTraceTableProp(context: IrPluginContext, currentFile: IrFile): IrProperty {
   val fileName = currentFile.fileEntry.name.substringAfterLast('/')
   val shortName = PackagePartClassUtils.getFilePartShortName(fileName)

@@ -88,7 +88,7 @@ public val ComposableInformation_WITH_COMPOUND_KEY: Name = identifier("withCompo
 public val VALUE_ARGUMENT_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ValueArgument")
 // END ValueArguments
 
-// TODO testing
+// TODO Testing
 public fun CallableId.Companion.fromFqName(fqName: FqName): CallableId {
   val paths = fqName.pathSegments()
   val lastUppercaseIndex = paths.indexOfLast { path -> path.asString().first().isUpperCase() }

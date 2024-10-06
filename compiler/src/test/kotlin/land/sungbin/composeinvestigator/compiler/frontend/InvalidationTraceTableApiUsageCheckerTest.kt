@@ -9,7 +9,7 @@ import land.sungbin.composeinvestigator.compiler._assert.assertNoDiagnostic
 import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTest
 import land.sungbin.composeinvestigator.compiler.frontend.ComposeInvestigatorErrors.API_ACCESS_IN_NO_INVESTIGATION_FILE
 
-// TODO asserts ILLEGAL_COMPOSABLE_SCOPE_CALL diagnostic
+// TODO Asserts ILLEGAL_COMPOSABLE_SCOPE_CALL diagnostic
 class InvalidationTraceTableApiUsageCheckerTest : AbstractCompilerTest(sourceRoot = "frontend/traceTableApiUsage") {
   @Test fun composableFunction() {
     val analyze = analyze(source("composableFunction.kt"))
