@@ -19,6 +19,7 @@ public object ComposeInvestigatorConfiguration {
   public val KEY_VERBOSE: CompilerConfigurationKey<Boolean> = CompilerConfigurationKey<Boolean>("Whether to enable verbose logging")
 }
 
+/** A [CommandLineProcessor] that handles two keys: [KEY_ENABLED] and [KEY_VERBOSE]. */
 public class ComposeInvestigatorCommandLineProcessor : CommandLineProcessor {
   override val pluginId: String = PLUGIN_ID
   override val pluginOptions: List<CliOption> = listOf(OPTION_ENABLED, OPTION_VERBOSE)

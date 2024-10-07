@@ -16,11 +16,24 @@ import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.config.messageCollector
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
+/**
+ * Registers the [IrGenerationExtension]'s of ComposeInvestigator into the Kotlin Compiler Plugin.
+ *
+ * This class registers the [IrGenerationExtension] in two [LoadingOrder] phases:
+ *
+ * 1. [LoadingOrder.FIRST] - Adds the [IrGenerationExtension] of ComposeInvestigator that
+ * must run *before* the Compose Compiler operates. This corresponds to [ComposeInvestigatorFirstPhaseExtension].
+ *
+ * 2. [LoadingOrder.LAST] - Adds the [IrGenerationExtension] of ComposeInvestigator
+ * that must run *after* the Compose Compiler has completed. This corresponds to [ComposeInvestigatorLastPhaseExtension].
+ *
+ * [ComposeInvestigatorPluginRegistrar] only supports the K2 Kotlin compiler.
+ */
 public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
   override val supportsK2: Boolean get() = true
 
-  // This deprecated override is safe to use up to Kotlin 2.1.0 by KT-55300.
-  // Also see: https://youtrack.jetbrains.com/issue/KT-52665/Deprecate-ComponentRegistrar#focus=Change-27-7999959.0-0
+  // TODO This deprecated override is safe to use up to Kotlin 2.1.0 by KT-55300.
+  //  See also: https://youtrack.jetbrains.com/issue/KT-52665/Deprecate-ComponentRegistrar#focus=Change-27-7999959.0-0
   override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
     val enabled = configuration.get(ComposeInvestigatorConfiguration.KEY_ENABLED, /* defaultValue = */ true)
     if (!enabled) return

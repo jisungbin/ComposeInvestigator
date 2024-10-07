@@ -13,6 +13,17 @@ import org.jetbrains.kotlin.config.IrVerificationMode
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
+/**
+ * Performs IR visiting/transformation tasks that must be executed *after* the
+ * code transformations conducted by the Compose Compiler.
+ *
+ * This class primarily handles tasks that depend on Composable Group structures.
+ *
+ * The following two IR transformations are carried out by this class:
+ *
+ * - [InvalidationTraceTableInstanceTransformer]
+ * - [InvalidationSkipTracingLastTransformer]
+ */
 public class ComposeInvestigatorLastPhaseExtension(
   private val messageCollector: MessageCollector,
   private val verificationMode: IrVerificationMode,

@@ -42,13 +42,18 @@ import org.jetbrains.kotlin.name.Name
  *
  * @param prop The property where `ComposableInvalidationTraceTable` is instantiated.
  * It can be created with the [irInvalidationTraceTableProp] function.
+ *
+ * @constructor Use the [IrInvalidationTraceTable.create] or [IrInvalidationTraceTable.from]
+ * function.
  */
 public class IrInvalidationTraceTable private constructor(private val prop: IrProperty) {
   private lateinit var registerStateObjectSymbol: IrSimpleFunctionSymbol
   private lateinit var computeInvalidationReasonSymbol: IrSimpleFunctionSymbol
 
+  /** Gets the underlying raw [prop] that this class is referencing. */
   internal val rawProp get() = prop
 
+  /** Returns an [IrCall] that invokes the getter of [rawProp]. */
   public fun propGetter(
     startOffset: Int = UNDEFINED_OFFSET,
     endOffset: Int = UNDEFINED_OFFSET,
@@ -58,6 +63,7 @@ public class IrInvalidationTraceTable private constructor(private val prop: IrPr
     symbol = prop.getter!!.symbol,
   )
 
+  /** Returns an [IrCall] that invokes `ComposableInvalidationTraceTable#registerStateObject`. */
   public fun irRegisterStateObject(
     value: IrExpression,
     name: IrConst,
@@ -74,6 +80,7 @@ public class IrInvalidationTraceTable private constructor(private val prop: IrPr
     putValueArgument(1, name)
   }
 
+  /** Returns an [IrCall] that invokes `ComposableInvalidationTraceTable#computeInvalidationReason`. */
   public fun irComputeInvalidationReason(
     keyName: IrConst,
     compoundKey: IrExpression,
@@ -97,9 +104,14 @@ public class IrInvalidationTraceTable private constructor(private val prop: IrPr
       computeInvalidationReasonSymbol = symbol.getSimpleFunction(ComposableInvalidationTraceTable_COMPUTE_INVALIDATION_REASON.asString())!!
     }
 
+    /** Creates a new instance of `ComposableInvalidationTraceTable` in the [given file][currentFile]. */
     public fun create(context: IrPluginContext, currentFile: IrFile): IrInvalidationTraceTable =
       IrInvalidationTraceTable(irInvalidationTraceTableProp(context, currentFile)).apply { makeTable() }
 
+    /**
+     * Initializes the [IrInvalidationTraceTable] class using an already [created instance][element] of
+     * `ComposableInvalidationTraceTable`.
+     */
     public fun from(element: IrProperty): IrInvalidationTraceTable =
       IrInvalidationTraceTable(element).apply { makeTable() }
   }
@@ -108,6 +120,11 @@ public class IrInvalidationTraceTable private constructor(private val prop: IrPr
 @Volatile private var invalidationTraceTableClassSymbol: WeakReference<IrClassSymbol>? = null
 
 // FIXME Bug with two or more identical file names
+/**
+ * Returns a [IrProperty] that initializes `ComposableInvalidationTraceTable`.
+ *
+ * @param currentFile The parent element of the property to be returned.
+ */
 private fun irInvalidationTraceTableProp(context: IrPluginContext, currentFile: IrFile): IrProperty {
   val fileName = currentFile.fileEntry.name.substringAfterLast('/')
   val shortName = PackagePartClassUtils.getFilePartShortName(fileName)

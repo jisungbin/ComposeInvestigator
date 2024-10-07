@@ -13,9 +13,11 @@ import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.name.ClassId
 
+/** Helper class to make the `ValueArgument` class easier to handle in IR. */
 public class IrValueArgument(context: IrPluginContext) {
   public val symbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(VALUE_ARGUMENT_FQN))!!
 
+  /** Returns an [IrConstructorCall] that invokes the constructor of `ValueArgument`. */
   public operator fun invoke(
     name: IrExpression,
     type: IrExpression,

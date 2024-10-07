@@ -2,7 +2,21 @@
 // SPDX-License-Identifier: Apache-2.0
 package land.sungbin.composeinvestigator.compiler
 
-/** @param phase 0: [ComposeInvestigatorFirstPhaseExtension], 1: [ComposeInvestigatorLastPhaseExtension] */
+import land.sungbin.composeinvestigator.compiler.lower.InvalidationProcessTracingFirstTransformer
+import land.sungbin.composeinvestigator.compiler.lower.InvalidationSkipTracingLastTransformer
+import land.sungbin.composeinvestigator.compiler.lower.InvalidationTraceTableIntrinsicTransformer
+import land.sungbin.composeinvestigator.compiler.lower.StateInitializerFirstTransformer
+
+/**
+ * Defines the feature that ComposeInvestigator will operate on.
+ *
+ * @property InvalidationProcessTracing [InvalidationProcessTracingFirstTransformer]
+ * @property InvalidationSkipTracing [InvalidationSkipTracingLastTransformer]
+ * @property InvalidationTraceTableIntrinsicCall [InvalidationTraceTableIntrinsicTransformer]
+ * @property StateInitializerTracking [StateInitializerFirstTransformer]
+ *
+ * @param phase 0: [ComposeInvestigatorFirstPhaseExtension], 1: [ComposeInvestigatorLastPhaseExtension]
+ */
 @Suppress("RedundantVisibilityModifier") // FIXME false negative
 public enum class FeatureFlag(public val phase: Int) {
   InvalidationProcessTracing(0),
