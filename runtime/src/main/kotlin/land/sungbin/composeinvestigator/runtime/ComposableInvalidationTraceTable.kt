@@ -143,8 +143,8 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    *
    * If [value] is not a [StateObject], or if the assigned variable is not found, null is returned.
    */
-  // TODO is this operation really O(1)?
-  //  When become clear, add this note into KDoc: *Note: This operation takes `O(1)`*.
+  // TODO Is this operation really O(1)? When become clear, add this note into KDoc:
+  //  *Note: This operation takes `O(1)`*.
   public fun findStateObjectName(value: Any): String? {
     if (value !is StateObject) return null
     return stateObjectMap[value]
@@ -152,6 +152,8 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
 
   /** @suppress ComposeInvestigator compiler-only API */
   @ComposeInvestigatorCompilerApi
+  // FIXME Storing the StateObject itself can potentially create a memory leak.
+  //  Consider storing immutable primitives like hashCode instead of the object.
   public fun <T : Any> registerStateObject(value: T, name: String): T {
     if (value !is StateObject) return value
     return value.apply { stateObjectMap[this] = name }

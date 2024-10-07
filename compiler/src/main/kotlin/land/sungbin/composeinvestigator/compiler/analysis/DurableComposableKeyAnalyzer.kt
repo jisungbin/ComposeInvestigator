@@ -12,7 +12,6 @@ import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyVisitor
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorCommandLineProcessor.Companion.PLUGIN_ID
 import land.sungbin.composeinvestigator.compiler.error
 import land.sungbin.composeinvestigator.compiler.lower.irString
-import land.sungbin.composeinvestigator.compiler.lower.unsafeLazy
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
@@ -24,11 +23,18 @@ import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.fqNameWhenAvailable
 import org.jetbrains.kotlin.name.FqName
 
-// TODO complete our own implementation using FIR.
+/**
+ * Visitor that generates a [ComposableKeyInfo] and stores it in
+ * [DurationWritableSlices.DURABLE_FUNCTION_KEY].
+ *
+ * The rules for generating the [unique path][ComposableKeyInfo.keyName] are the
+ * same as the [DurableKeyTransformer] in the Compose Compiler.
+ */
+// TODO Complete our own implementation using FIR.
 public class DurableComposableKeyAnalyzer(
   context: IrPluginContext,
   stabilityInferencer: StabilityInferencer,
-  featureFlags: FeatureFlags = FeatureFlags(), // TODO supports this feature
+  featureFlags: FeatureFlags = FeatureFlags(), // TODO Supports this feature
 ) : DurableKeyTransformer(
   context = context,
   keyVisitor = DurableKeyVisitor(),
@@ -37,7 +43,7 @@ public class DurableComposableKeyAnalyzer(
   metrics = EmptyModuleMetrics,
   featureFlags = featureFlags,
 ) {
-  private val messageCollector by unsafeLazy { context.createDiagnosticReporter(PLUGIN_ID) }
+  private val messageCollector by lazy { context.createDiagnosticReporter(PLUGIN_ID) }
   private val irComposableInformation = IrComposableInformation(context)
 
   override fun visitFile(declaration: IrFile): IrFile =

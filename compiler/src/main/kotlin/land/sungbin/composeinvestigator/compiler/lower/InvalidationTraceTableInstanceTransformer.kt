@@ -20,6 +20,28 @@ import org.jetbrains.kotlin.ir.util.hasAnnotation
 import org.jetbrains.kotlin.ir.util.setDeclarationsParent
 import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 
+/**
+ * Generates code to instantiate `ComposableInvalidationTraceTable` as the top-level
+ * variable of the current file, if the file is not annotated with `@file:NoInvestigation`.
+ *
+ * ### Original
+ *
+ * ```
+ * @Composable fun DisplayPlusResult(a: Int, b: Int) {
+ *   Text((a + b).toString())
+ * }
+ * ```
+ *
+ * ### Transformed
+ *
+ * ```
+ * val ComposableInvalidationTraceTableImpl%DisplayPlusResultKt = ComposableInvalidationTraceTable()
+ *
+ * @Composable fun DisplayPlusResult(a: Int, b: Int) {
+ *   Text((a + b).toString())
+ * }
+ * ```
+ */
 public class InvalidationTraceTableInstanceTransformer(
   private val context: IrPluginContext,
   private val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter()

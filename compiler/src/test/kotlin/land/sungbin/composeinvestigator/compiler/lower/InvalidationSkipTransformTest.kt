@@ -117,9 +117,8 @@ class InvalidationSkipTransformTest : AbstractCompilerTest(
     """
   }
 
-  // TODO
-  //  If the FeatureFlag is tuned so that the table is not needed, consider optimising to skip
-  //  creating the table instance. But how often does this happen in the real world?
+  // TODO If the FeatureFlag is tuned so that the table is not needed, consider optimising to
+  //  skip creating the table instance. But how often does this happen in the real world?
   @Test fun replaceableComposable() = diff(source("replaceableComposable.kt")) {
     """
 @@ -1,5 +1,6 @@

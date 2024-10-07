@@ -35,6 +35,18 @@ import org.jetbrains.kotlin.fir.types.resolvedType
 import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.utils.addToStdlib.unreachableBranch
 
+/**
+ * Checker to validate use cases of the `ComposableInvalidationTraceTable` API.
+ *
+ * Currently, two validations are supported:
+ *
+ * 1. [TraceTableApiAccessChecker]: Using an API annotated with `@ComposableScope` outside
+ * of a Composable function, or using the `ComposableInvalidationTraceTable` API in a
+ * file that does not create a `ComposableInvalidationTraceTable`, will raise an error.
+ *
+ * 2. [ComposableNameExpressionChecker]: Raises an error if the argument to `ComposableName`
+ * is not hardcoded as a string.
+ */
 public class InvalidationTraceTableApiChecker(session: FirSession) : FirAdditionalCheckersExtension(session) {
   override val expressionCheckers: ExpressionCheckers = object : ExpressionCheckers() {
     override val propertyAccessExpressionCheckers = setOf(TraceTableApiAccessChecker)
@@ -47,8 +59,8 @@ private object TraceTableApiAccessChecker : FirPropertyAccessExpressionChecker(M
   private val COMPOSABLE_SCOPE = ClassId.topLevel(COMPOSABLE_SCOPE_FQN)
 
   override fun check(expression: FirPropertyAccessExpression, context: CheckerContext, reporter: DiagnosticReporter) {
-    // TODO when accessed by `it`, such as `traceTable.let { it.action() }`,
-    //  Symbol is `FirValueParameterSymbol`. These variants need to be handled separately.
+    // TODO When accessed by `it`, such as `traceTable.let { it.action() }`,
+    //  `Symbol` is `FirValueParameterSymbol`. These variants need to be handled separately.
     val callee = expression.calleeReference.toResolvedPropertySymbol() ?: return
 
     if (
@@ -66,7 +78,7 @@ private object TraceTableApiAccessChecker : FirPropertyAccessExpressionChecker(M
     context: CheckerContext,
     reporter: DiagnosticReporter,
   ) {
-    // FIXME the annotation for callee was not being looked up correctly.
+    // FIXME The annotation for callee was not being looked up correctly.
     //  I don't know the cause yet, so I'm temporarily disabling this check.
     return
 

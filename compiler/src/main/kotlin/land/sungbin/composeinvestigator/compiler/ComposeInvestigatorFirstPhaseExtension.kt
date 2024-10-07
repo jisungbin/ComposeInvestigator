@@ -18,6 +18,21 @@ import org.jetbrains.kotlin.config.IrVerificationMode
 import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 
+/**
+ * Performs IR visiting/transformation tasks that must be executed *before* the
+ * code transformations conducted by the Compose Compiler.
+ *
+ * This class primarily handles tasks that should not be affected by Composable
+ * Group structures.
+ *
+ * The following five IR transformations are carried out by this class:
+ *
+ * - [DurableComposableKeyAnalyzer]
+ * - [InvalidationTraceTableInstanceTransformer]
+ * - [InvalidationProcessTracingFirstTransformer]
+ * - [StateInitializerFirstTransformer]
+ * - [InvalidationTraceTableIntrinsicTransformer]
+ */
 public class ComposeInvestigatorFirstPhaseExtension(
   private val messageCollector: MessageCollector,
   private val verificationMode: IrVerificationMode,
@@ -26,7 +41,7 @@ public class ComposeInvestigatorFirstPhaseExtension(
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
     val stabilityInferencer = StabilityInferencer(
       currentModule = moduleFragment.descriptor,
-      externalStableTypeMatchers = emptySet(), // TODO supports this feature
+      externalStableTypeMatchers = emptySet(), // TODO Supports this feature
     )
     val tables = InvalidationTraceTableInstanceTransformer(pluginContext, messageCollector)
 

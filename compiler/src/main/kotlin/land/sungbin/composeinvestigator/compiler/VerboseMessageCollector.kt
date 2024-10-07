@@ -6,13 +6,22 @@ import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSourceLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 
+/**
+ * A [MessageCollector] that outputs messages only when verbose is `true`. The verbose value
+ * can be set to `true` by using the [verbose] function.
+ */
 internal class VerboseMessageCollector(private val delegate: MessageCollector) : MessageCollector by delegate {
   private var verbose = false
 
-  internal fun verbose() = apply { verbose = true }
+  /** Enables verbose logging. */
+  internal fun verbose(): VerboseMessageCollector = apply { verbose = true }
 
-  override fun report(severity: CompilerMessageSeverity, message: String, location: CompilerMessageSourceLocation?) {
-    if (severity == CompilerMessageSeverity.LOGGING || !verbose) return
+  override fun report(
+    severity: CompilerMessageSeverity,
+    message: String,
+    location: CompilerMessageSourceLocation?,
+  ) {
+    if (!verbose) return
     delegate.report(severity, message, location)
   }
 }

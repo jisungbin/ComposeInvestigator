@@ -36,6 +36,10 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.SpecialNames
 import org.jetbrains.kotlin.utils.addToStdlib.cast
 
+/**
+ * Transforms the code to implement the use of the `ComposableInvalidationTraceTable`'s
+ * Intrinsic API by utilizing metadata generated at compile time by `ComposeInvestigator`.
+ */
 public class InvalidationTraceTableIntrinsicTransformer(
   private val context: IrPluginContext,
   private val irComposableInformation: IrComposableInformation,
@@ -57,7 +61,7 @@ public class InvalidationTraceTableIntrinsicTransformer(
     tableSymbol.getPropertyGetter(ComposableInvalidationTraceTable_CURRENT_COMPOSABLE_KEY_NAME.asString())!!.owner
 
   override fun visitCall(expression: IrCall): IrExpression {
-    // TODO generating `throw Exception(NO_TABLE)` code to the target IR instead
+    // TODO Generating `throw Exception(NO_TABLE)` code to the target IR instead
     //  of throwing it here if no table exists
     val table by lazy { tables[currentFile] }
     return when (expression.symbol.owner.kotlinFqName) {

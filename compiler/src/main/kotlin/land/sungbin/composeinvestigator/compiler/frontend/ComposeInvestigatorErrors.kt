@@ -12,6 +12,13 @@ import org.jetbrains.kotlin.diagnostics.rendering.RootDiagnosticRendererFactory
 import org.jetbrains.kotlin.psi.KtCallExpression
 import org.jetbrains.kotlin.psi.KtElement
 
+/**
+ * Define the diagnostics that ComposeInvestigator can generate. For each
+ * diagnosis, see the message associated with that diagnosis.
+ *
+ * @see ErrorMessages
+ * @see DiagnosticRendererFactory
+ */
 // Make this public so that this can be suppressed by the outside world.
 public object ComposeInvestigatorErrors {
   public val UNSUPPORTED_COMPOSABLE_NAME: KtDiagnosticFactory0

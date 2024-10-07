@@ -88,7 +88,11 @@ public val ComposableInformation_WITH_COMPOUND_KEY: Name = identifier("withCompo
 public val VALUE_ARGUMENT_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ValueArgument")
 // END ValueArguments
 
-// TODO testing
+/**
+ * Attempts to parse the given [fqName][FqName] and convert it to a [CallableId]. If the conversion
+ * to [CallableId] fails, an [IllegalStateException] is thrown.
+ */
+// TODO Testing
 public fun CallableId.Companion.fromFqName(fqName: FqName): CallableId {
   val paths = fqName.pathSegments()
   val lastUppercaseIndex = paths.indexOfLast { path -> path.asString().first().isUpperCase() }
@@ -112,7 +116,7 @@ public fun CallableId.Companion.fromFqName(fqName: FqName): CallableId {
         callableName = paths.last(),
       )
     } else {
-      // a.b.c.D.E.f -> packageName, classNames callableName
+      // a.b.c.D.E.f -> packageName, classNames, callableName
       CallableId(
         packageName = FqName(paths.subList(0, /* exclusive */ firstUppercaseIndex).joinToString(".", transform = Name::asString)),
         className = FqName(paths.subList(firstUppercaseIndex, /* exclusive */ lastUppercaseIndex + 1).joinToString(".", transform = Name::asString)),

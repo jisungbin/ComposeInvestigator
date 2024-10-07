@@ -51,7 +51,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrVarargImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.symbols.IrSimpleFunctionSymbol
-import org.jetbrains.kotlin.ir.types.classOrFail
+import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.impl.makeTypeProjection
@@ -71,6 +71,25 @@ import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 import org.jetbrains.kotlin.types.Variance
 
+/**
+ * This is the parent transformer for all transformations/visits made by
+ * ComposeInvestigator.
+ *
+ * This parent class exists to reduce common boilerplate code, and currently
+ * serves the following roles:
+ *
+ * 1. define commonly used [IrSymbol]s
+ * 2. provide a function to convert [Compose Stability][Stability] to ComposeInvestigator
+ * Stability
+ * 3. provide a sugar syntax for creating [IrConst]s
+ * 4. enable [includeFileIRInExceptionTrace] for visited files
+ * 5. call [firstTransformComposableBody] when visiting a Composable function with
+ * the conditions for ComposeInvestigator to work
+ * 6. call [lastTransformSkipToGroupEndCall] when visiting the expression
+ * `composer.skipToGroupEnd()`.
+ * 7. call [firstTransformStateInitializer] when visiting a `State` or `StateObject`
+ * definition
+ */
 public open class ComposeInvestigatorBaseLower(
   protected val context: IrPluginContext,
   protected val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter()
@@ -85,7 +104,10 @@ public open class ComposeInvestigatorBaseLower(
 
   private val composerSymbol = context.referenceClass(ClassId.topLevel(COMPOSER_FQN))!!
   private val composerSkipToGroupEndSymbol = composerSymbol.getSimpleFunction(Composer_SKIP_TO_GROUP_END.asString())!!
-  protected val composerCompoundKeyHashSymbol: IrSimpleFunctionSymbol = composerSymbol.getPropertyGetter(Composer_COMPOUND_KEY_HASH.toString())!!
+
+  protected val composerCompoundKeyHashSymbol: IrSimpleFunctionSymbol by unsafeLazy {
+    composerSymbol.getPropertyGetter(Composer_COMPOUND_KEY_HASH.toString())!!
+  }
 
   private val stateSymbol = context.referenceClass(ClassId.topLevel(STATE_FQN))!!
   private val stateObjectSymbol = context.referenceClass(ClassId.topLevel(STATE_OBJECT_FQN))!!
@@ -166,7 +188,7 @@ public open class ComposeInvestigatorBaseLower(
     else
       super.visitCall(expression)
 
-  // val state = remember { mutableStateOf(T) }
+  // val state = <ENTER HERE: remember { mutableStateOf(T) } >
   final override fun visitVariable(declaration: IrVariable): IrStatement {
     if (declaration.origin == IrDeclarationOrigin.PROPERTY_DELEGATE) return super.visitVariable(declaration)
     if (declaration.isValidStateDeclaration()) {
@@ -179,7 +201,7 @@ public open class ComposeInvestigatorBaseLower(
     return super.visitVariable(declaration)
   }
 
-  // var state by remember { mutableStateOf(T) }
+  // var state by <ENTER HERE: remember { mutableStateOf(T) } >
   final override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty): IrStatement {
     if (declaration.delegate.isValidStateDeclaration()) {
       declaration.delegate.initializer = firstTransformStateInitializer(
@@ -214,8 +236,8 @@ public open class ComposeInvestigatorBaseLower(
 
   private fun IrVariable.isValidStateDeclaration(): Boolean {
     val isState = type.classOrNull?.let { clazz ->
-      clazz.isSubtypeOfClass(stateSymbol.defaultType.classOrFail) == true ||
-        clazz.isSubtypeOfClass(stateObjectSymbol.defaultType.classOrFail) == true
+      clazz.isSubtypeOfClass(stateSymbol.defaultType.classOrNull ?: return false) == true ||
+        clazz.isSubtypeOfClass(stateObjectSymbol.defaultType.classOrNull ?: return false) == true
     }
     val isTempVariable = origin == IrDeclarationOrigin.IR_TEMPORARY_VARIABLE
     val hasInitializer = initializer != null

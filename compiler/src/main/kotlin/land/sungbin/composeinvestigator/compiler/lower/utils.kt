@@ -31,6 +31,8 @@ internal fun List<ScopeWithIr>.lastComposable() =
     .lastOrNull { scope -> scope.irElement.safeAs<IrSimpleFunction>()?.hasComposableAnnotation() == true }
     ?.irElement?.safeAs<IrSimpleFunction>()
 
+// TODO This is code taken from AOSP, but this function has been removed from AOSP recently.
+//  I need to check how it has been replaced.
 internal inline fun <T> includeFileIRInExceptionTrace(file: IrFile, body: () -> T): T {
   try {
     return body()
