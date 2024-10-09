@@ -1,31 +1,24 @@
 # Change Log
 
-ComposeInvestigator is heavily dependent on the version
-of [Compose Compiler](https://developer.android.com/jetpack/androidx/releases/compose-compiler),
-so the version of ComposeInvestigator follows the
-format `[Compose Compiler Version - ComposeInvestigator Version]`.
-
-In other words, you need to adjust the Compose Compiler version and Kotlin version to use
-ComposeInvestigator.
-
-It also depends slightly on the Compose Runtime and Compose Animation versions.
-The last tested versions are both `1.6.3`.
+ComposeInvestigator is heavily dependent on the Kotlin version. So the version of 
+ComposeInvestigator follows the format `[Kotlin Version - ComposeInvestigator Version]`.
 
 ---
 
 ## [Unreleased]
 
+- #172: Supports K2, with the entire logic rewritten. Some runtime features have
+  been removed, and no new features have been added. 
+
 ## [1.5.11-0.2.1] - 2024-03-23
 
-- No API changes
+- No API changes.
 
 ### Dependency updates
 
 - `Kotlin`: `1.9.22` -> `1.9.23`
 - `Compose Compiler`: `1.5.10` -> `1.5.11` 
-- `Compose Runtime`: `1.6.3` -> `1.6.4` 
-- `Gradle`: `8.6` -> `8.7`
-- `Android Gradle Plugin`: `8.2.2` -> `8.3.1`
+- `Compose Runtime`: `1.6.3` -> `1.6.4`
 
 ## [1.5.10-0.2.1] - 2024-03-12
 

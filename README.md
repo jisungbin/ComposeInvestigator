@@ -15,41 +15,24 @@ However, it can perform the following tasks:
 
 [*(Read the Medium's introductory post)*](https://jisungbin.medium.com/tracing-recompositions-without-boilerplate-code-e9800db1419e)
 
-*Currently, the K2 work is completed and is being tested.*
+*The K2 work has been completed and is currently in the final testing phase before release.*
 
 ---
 
-### Getting Started ![gradle-plugin-version](https://img.shields.io/maven-central/v/land.sungbin.composeinvestigator/composeinvestigator-gradle-plugin?style=flat-square)
+### Getting Started ![gradle-plugin-version](https://img.shields.io/maven-central/v/in.sungb.composeinvestigator/composeinvestigator-gradle-plugin?style=flat-square)
 
 Just add the plugin to your module-level Gradle like this:
 
 ```groovy
 plugins {
-  id 'land.sungbin.composeinvestigator' version '<version>'
+  id 'in.sungb.composeinvestigator' version '<version>'
 }
 ```
 
 > [!IMPORTANT]
 >
-> ComposeInvestigator is heavily dependent on the version
-> of [Compose Compiler](https://developer.android.com/jetpack/androidx/releases/compose-compiler),
-> so the version of ComposeInvestigator follows the format `[Compose Compiler Version - ComposeInvestigator Version]`.
->
-> In other words, you need to adjust the Compose Compiler version and Kotlin version to use ComposeInvestigator.
->
-> It also depends slightly on the Compose Runtime and Compose Animation versions. 
-> The last tested versions are both `1.6.3`.
-
-Snapshots of the development version are available in Sonatype's snapshots repository.
-
-```groovy
-repositories {
-  // ...
-  maven {
-    url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-  }
-}
-```
+> ComposeInvestigator is heavily dependent on the Kotlin version. So the version of 
+> ComposeInvestigator follows the format `[Kotlin Version - ComposeInvestigator Version]`.
 
 You don't need to use any APIs to get started. But if you're looking for a fancier experience,
 consider using the runtime API.
@@ -70,7 +53,7 @@ Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-   http://www.apache.org/licenses/LICENSE-2.0
+   https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,

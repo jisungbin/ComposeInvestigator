@@ -19,39 +19,35 @@ However, it can perform the following tasks:
 
 ---
 
-## Getting Started  ![gradle-plugin-version](https://img.shields.io/maven-central/v/land.sungbin.composeinvestigator/composeinvestigator-gradle-plugin?style=flat-square)
+## Getting Started  ![gradle-plugin-version](https://img.shields.io/maven-central/v/in.sungb.composeinvestigator/composeinvestigator-gradle-plugin?style=flat-square)
 
 Just add the plugin to your module-level Gradle like this:
 
 ```groovy
 plugins {
-  id 'land.sungbin.composeinvestigator' version '<version>'
+  id 'in.sungb.composeinvestigator' version '<version>'
 }
 ```
 
-Snapshots of the development version are available in Sonatype's snapshots repository.
-Snapshot versions are released only occasionally when pre-validation is needed to resolve issues.
+You don't need to use any APIs to get started. But if you're looking for a fancier experience, 
+consider using the runtime API.
 
-```groovy
-repositories {
-  // ...
-  maven {
-    url 'https://s01.oss.sonatype.org/content/repositories/snapshots/'
-  }
-}
+If you want to learn about the runtime API, check out [advanced](advanced.md) page.
+
+### License
+
 ```
+Copyright 2024 Ji Sungbin
 
-You don't need to use any APIs to get started. But if you're
-looking for a fancier experience, consider using the runtime API.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
 
-If you want to learn about the runtime API, check out our [advanced](advanced.md) page.
+   https://www.apache.org/licenses/LICENSE-2.0
 
-## Caveats
-
-- Currently, only Restartable Groups with all stable arguments are supported. In simple terms, most
-  composables are supported, but some special case composables are not. (#99, #133)
-
-## License
-
-ComposeInvestigator is available under
-the [MIT license](https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE).
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+```
