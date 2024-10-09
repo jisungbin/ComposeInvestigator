@@ -17,7 +17,7 @@ plugins {
 
 idea {
   module {
-    excludeDirs = excludeDirs + setOf(file("runtime/api"), file("documentation"))
+    excludeDirs = excludeDirs + setOf(file("documentation"))
   }
 }
 

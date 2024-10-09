@@ -59,7 +59,10 @@ jobs:
         run: cd documentation && mkdocs build
 
       - name: Build dokka at runtime
-        run: ./gradlew :runtime:dokkaHtml
+        run: ./gradlew :runtime:dokkaGenerate
+
+      - name: Build dokka at compiler
+        run: ./gradlew :compiler:dokkaGenerate
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
