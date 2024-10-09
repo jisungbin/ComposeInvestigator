@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: Apache-2.0
 package land.sungbin.composeinvestigator.compiler.struct
 
-import land.sungbin.composeinvestigator.compiler.COMPOSE_INVESTIGATOR_CONFIG_FQN
+import land.sungbin.composeinvestigator.compiler.COMPOSE_INVESTIGATOR_FQN
 import land.sungbin.composeinvestigator.compiler.ComposableInvalidationLogger_LOG
-import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorConfig_LOGGER
+import land.sungbin.composeinvestigator.compiler.ComposeInvestigator_LOGGER
 import land.sungbin.composeinvestigator.compiler.INVALIDATION_RESULT_FQN
 import land.sungbin.composeinvestigator.compiler.InvalidationResult_SKIPPED
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -24,8 +24,8 @@ import org.jetbrains.kotlin.name.ClassId
 
 /** Helper class to make the `ComposableInvalidationLogger` class easier to handle in IR. */
 public class IrInvalidationLogger(context: IrPluginContext) {
-  private var loggerContainerSymbol = context.referenceClass(ClassId.topLevel(COMPOSE_INVESTIGATOR_CONFIG_FQN))!!
-  private var loggerGetterSymbol = loggerContainerSymbol.getPropertyGetter(ComposeInvestigatorConfig_LOGGER.asString())!!
+  private var loggerContainerSymbol = context.referenceClass(ClassId.topLevel(COMPOSE_INVESTIGATOR_FQN))!!
+  private var loggerGetterSymbol = loggerContainerSymbol.getPropertyGetter(ComposeInvestigator_LOGGER.asString())!!
   private var loggerLogSymbol = loggerGetterSymbol.owner.returnType.classOrFail.getSimpleFunction(ComposableInvalidationLogger_LOG.asString())!!
 
   public val irInvalidationResultSymbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(INVALIDATION_RESULT_FQN))!!

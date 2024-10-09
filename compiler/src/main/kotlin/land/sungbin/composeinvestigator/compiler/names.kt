@@ -45,10 +45,10 @@ public val COMPOSABLE_SCOPE_FQN: FqName = FqName("$ComposeInvestigatorRuntime.Co
 public val NO_INVESTIGATION_FQN: FqName = FqName("$ComposeInvestigatorRuntime.NoInvestigation")
 // END NoInvestigation
 
-// START ComposeInvestigatorConfig
-public val COMPOSE_INVESTIGATOR_CONFIG_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposeInvestigatorConfig")
-public val ComposeInvestigatorConfig_LOGGER: Name = identifier("logger")
-// END ComposeInvestigatorConfig
+// START ComposeInvestigator
+public val COMPOSE_INVESTIGATOR_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposeInvestigator")
+public val ComposeInvestigator_LOGGER: Name = identifier("logger")
+// END ComposeInvestigator
 
 // START ComposableInvalidationLogger
 public val COMPOSABLE_INVALIDATION_LOGGER_FQN: FqName = FqName("$ComposeInvestigatorRuntime.ComposableInvalidationLogger")

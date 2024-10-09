@@ -48,7 +48,7 @@ import org.jetbrains.kotlin.ir.util.file
  *       fileName = "DisplayPlusResult.kt",
  *       compoundKey = androidx.compose.runtime.currentCompositeKeyHash,
  *     )
- *     ComposeInvestigatorConfig.logger.log(affectedComposable, InvalidationReason.Skipped)
+ *     ComposeInvestigator.logger.log(affectedComposable, InvalidationReason.Skipped)
  *     currentComposer.skipToGroupEnd()
  *   }
  * }
