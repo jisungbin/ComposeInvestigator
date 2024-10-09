@@ -6,19 +6,19 @@ plugins {
   id(libs.plugins.gradle.publish.maven.get().pluginId)
 }
 
-tasks.dokkaHtml {
+dokka {
   moduleName = "ComposeInvestigator Compiler API"
   moduleVersion = project.property("VERSION_NAME") as String
-  outputDirectory = rootDir.resolve("documentation/site/compiler/api")
+  dokkaPublicationDirectory = rootDir.resolve("documentation/site/compiler/api")
 
   dokkaSourceSets.configureEach {
     jdkVersion = JavaVersion.VERSION_22.majorVersion.toInt()
   }
 
-  pluginsMapConfiguration = mapOf(
-    "org.jetbrains.dokka.base.DokkaBase" to
-      """{ "footerMessage": "ComposeInvestigator ⓒ 2024 Ji Sungbin" }""",
-  )
+  pluginsConfiguration.html {
+    homepageLink = "https://jisungbin.github.io/ComposeInvestigator/"
+    footerMessage = "ComposeInvestigator ⓒ 2024 Ji Sungbin"
+  }
 }
 
 kotlin {
