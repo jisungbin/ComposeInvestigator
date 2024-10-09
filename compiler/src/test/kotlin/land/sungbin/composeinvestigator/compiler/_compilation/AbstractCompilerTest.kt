@@ -166,7 +166,7 @@ abstract class AbstractCompilerTest(
 
       listOf(
         jar(Unit::class.java),
-        jar(land.sungbin.composeinvestigator.runtime.ComposeInvestigatorConfig::class.java),
+        jar(land.sungbin.composeinvestigator.runtime.ComposeInvestigator::class.java),
         jar(kotlinx.coroutines.CoroutineScope::class.java),
         jar(androidx.compose.runtime.Composable::class.java),
         jar(androidx.compose.ui.Modifier::class.java),

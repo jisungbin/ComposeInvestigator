@@ -27,7 +27,7 @@ class InvalidationSkipTransformTest : AbstractCompilerTest(
        traceEventEnd()
      }
    } else {
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    ComposeInvestigator.logger.log(ComposableInformation(
 +      name = "blockComposable",
 +      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
 +      fileName = "movableComposable.kt"
@@ -43,7 +43,7 @@ class InvalidationSkipTransformTest : AbstractCompilerTest(
        traceEventEnd()
      }
    } else {
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    ComposeInvestigator.logger.log(ComposableInformation(
 +      name = "blockStableComposable",
 +      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
 +      fileName = "movableComposable.kt"
@@ -88,7 +88,7 @@ class InvalidationSkipTransformTest : AbstractCompilerTest(
        traceEventEnd()
      }
    } else {
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    ComposeInvestigator.logger.log(ComposableInformation(
 +      name = "blockComposable",
 +      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
 +      fileName = "readonlyComposable.kt"
@@ -104,7 +104,7 @@ class InvalidationSkipTransformTest : AbstractCompilerTest(
        traceEventEnd()
      }
    } else {
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    ComposeInvestigator.logger.log(ComposableInformation(
 +      name = "blockStableComposable",
 +      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
 +      fileName = "readonlyComposable.kt"
@@ -146,7 +146,7 @@ class InvalidationSkipTransformTest : AbstractCompilerTest(
        traceEventEnd()
      }
    } else {
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    ComposeInvestigator.logger.log(ComposableInformation(
 +      name = "blockComposable",
 +      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
 +      fileName = "restartableComposable.kt"
@@ -162,7 +162,7 @@ class InvalidationSkipTransformTest : AbstractCompilerTest(
        traceEventEnd()
      }
    } else {
-+    ComposeInvestigatorConfig.logger.log(ComposableInformation(
++    ComposeInvestigator.logger.log(ComposableInformation(
 +      name = "blockStableComposable",
 +      packageName = "land.sungbin.composeinvestigator.compiler._source.lower.invalidationProcessAndSkip",
 +      fileName = "restartableComposable.kt"

@@ -73,7 +73,7 @@ import org.jetbrains.kotlin.name.SpecialNames
  *     compoundKey = androidx.compose.runtime.currentCompositeKeyHash,
  *     arguments = currentValueArguments,
  *   )
- *   ComposeInvestigatorConfig.logger.log(affectedComposable, invalidationReason)
+ *   ComposeInvestigator.logger.log(affectedComposable, invalidationReason)
  *   Text((a + b).toString())
  * }
  * ```
