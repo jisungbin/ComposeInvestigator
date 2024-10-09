@@ -10,9 +10,9 @@ ComposeInvestigator comes with a default logging behavior that reports every tim
 occurs. However, if desired, you can change it to your own custom logging behavior.
 
 ``` kotlin
-ComposeInvestigatorConfig.logger = ComposableInvalidationLogger { composable, type ->
+ComposeInvestigatorConfig.logger = ComposableInvalidationLogger { composable, result ->
   // Your custom logging behavior
-  println("The '${composable.name}' composable has been invalidated: $type")
+  println("The '${composable.name}' composable has been invalidated: $result")
 }
 ```
 
@@ -27,7 +27,6 @@ The instance of `ComposableInvalidationTrackTable` created in the current file c
 using `currentComposableInvalidationTracker`.
 
 !!! tip
-
     If calling `currentComposableInvalidationTracker` at the top-level results in an error,
     try wrapping the call with `by lazy`.
     

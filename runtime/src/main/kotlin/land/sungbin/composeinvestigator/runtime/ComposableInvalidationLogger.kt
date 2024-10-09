@@ -7,7 +7,7 @@ import androidx.compose.runtime.RecomposeScope
 
 /** @see ComposeInvestigator.logger */
 public fun interface ComposableInvalidationLogger {
-  public fun log(composable: ComposableInformation, type: InvalidationResult)
+  public fun log(composable: ComposableInformation, result: InvalidationResult)
 }
 
 /** Defines the result of the invalidation requested for the Composable. */

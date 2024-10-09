@@ -15,7 +15,7 @@ public object ComposeInvestigator {
    * This logger is called whenever an recomposition is processed or skipped. This field
    * is variable, so you can easily change this.
    */
-  public var logger: ComposableInvalidationLogger = ComposableInvalidationLogger { composable, type ->
-    realLogger.log(Level.FINE, "The '{}' composable has been recomposed.\n$type", composable.name)
+  public var logger: ComposableInvalidationLogger = ComposableInvalidationLogger { composable, result ->
+    realLogger.log(Level.FINE, "The '{}' composable has been recomposed.\n$result", composable.name)
   }
 }
