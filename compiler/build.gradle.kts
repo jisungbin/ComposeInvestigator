@@ -12,7 +12,7 @@ dokka {
   dokkaPublicationDirectory = rootDir.resolve("documentation/site/compiler/api")
 
   dokkaSourceSets.configureEach {
-    jdkVersion = JavaVersion.VERSION_22.majorVersion.toInt()
+    jdkVersion = libs.versions.jdk.get().toInt()
   }
 
   pluginsConfiguration.html {
@@ -23,6 +23,8 @@ dokka {
 
 kotlin {
   explicitApi()
+  jvmToolchain(libs.versions.jdk.get().toInt())
+
   compilerOptions {
     optIn.addAll(
       "org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi",
@@ -37,15 +39,15 @@ kotlin {
 dependencies {
   compileOnly(kotlin("compiler-embeddable", version = libs.versions.kotlin.core.get()))
   compileOnly(kotlin("compose-compiler-plugin", version = libs.versions.kotlin.core.get()))
-  compileOnly(libs.jetbrains.annotation)
 
   testImplementation(projects.runtime)
-  testImplementation(libs.compose.material)
+  testImplementation(libs.compose.runtime)
   testImplementation(libs.test.diffutil)
   testImplementation(libs.test.kluent) // FIXME Temporary library to use until KT-53336 is resolved
+
+  testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
   testImplementation(kotlin("compiler-embeddable", version = libs.versions.kotlin.core.get()))
   testImplementation(kotlin("compose-compiler-plugin-embeddable", version = libs.versions.kotlin.core.get()))
-  testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
 
   kotlinCompilerPluginClasspathTest(kotlin("compose-compiler-plugin-embeddable", version = libs.versions.kotlin.core.get()))
 }

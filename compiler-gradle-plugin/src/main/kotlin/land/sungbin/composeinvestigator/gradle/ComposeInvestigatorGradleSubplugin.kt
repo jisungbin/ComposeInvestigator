@@ -8,6 +8,8 @@ import org.gradle.kotlin.dsl.create
 import org.gradle.kotlin.dsl.getByType
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilation
 import org.jetbrains.kotlin.gradle.plugin.KotlinCompilerPluginSupportPlugin
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet.Companion.COMMON_MAIN_SOURCE_SET_NAME
+import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetContainer
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
 
@@ -30,11 +32,20 @@ public class ComposeInvestigatorGradleSubplugin : KotlinCompilerPluginSupportPlu
   override fun applyToCompilation(compilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
     val project = compilation.target.project
     val extension = project.extensions.getByType<ComposeInvestigatorPluginExtension>()
+    val runtimeDependency = project.dependencies.create("in.sungb.composeinvestigator:composeinvestigator-runtime:$VERSION")
 
-    project.dependencies.add(
-      compilation.implementationConfigurationName,
-      "in.sungb.composeinvestigator:composeinvestigator-runtime:$VERSION",
-    )
+    if (project.plugins.hasPlugin("org.jetbrains.kotlin.multiplatform")) {
+      val kotlin = project.extensions.getByType<KotlinSourceSetContainer>()
+      kotlin.sourceSets.getByName(COMMON_MAIN_SOURCE_SET_NAME) {
+        kotlin {
+          dependencies {
+            implementation(runtimeDependency)
+          }
+        }
+      }
+    } else {
+      project.dependencies.add(compilation.implementationConfigurationName, runtimeDependency)
+    }
 
     return project.provider {
       listOf(
