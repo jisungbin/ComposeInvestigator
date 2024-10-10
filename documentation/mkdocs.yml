@@ -38,5 +38,5 @@ nav:
   - 'Advanced': 'advanced.md'
   - 'Under the Hood': 'internal.md'
   - 'Change Log': 'changelog.md'
-  - 'Compiler API ⏏': 'https://jisungbin.github.io/ComposeInvestigator/compiler/api/'
-  - 'Runtime API ⏏': 'https://jisungbin.github.io/ComposeInvestigator/runtime/api/'
+  - 'Compiler API ⏏': 'https://jisungbin.github.io/ComposeInvestigator/compiler/api/html'
+  - 'Runtime API ⏏': 'https://jisungbin.github.io/ComposeInvestigator/runtime/api/html'

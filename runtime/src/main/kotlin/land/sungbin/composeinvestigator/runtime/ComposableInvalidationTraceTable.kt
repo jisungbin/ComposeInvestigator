@@ -50,6 +50,7 @@ public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): Stri
  * [currentComposableInvalidationTracer]) without being instantiated, you will receive a
  * unexpected behaviour.
  */
+// TODO Consider a better name. The current name is slightly verbose.
 @Immutable
 public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi public constructor() {
   /**
@@ -142,6 +143,8 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    * ```
    *
    * If [value] is not a [StateObject], or if the assigned variable is not found, null is returned.
+   *
+   * @suppress This is not yet ready for public use.
    */
   // TODO Is this operation really O(1)? When become clear, add this note into KDoc:
   //  *Note: This operation takes `O(1)`*.
