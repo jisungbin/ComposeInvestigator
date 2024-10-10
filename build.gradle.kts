@@ -4,7 +4,6 @@ import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
 import com.diffplug.gradle.spotless.BaseKotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
-import org.gradle.kotlin.dsl.libs
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {

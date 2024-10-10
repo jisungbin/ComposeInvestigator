@@ -8,6 +8,11 @@ import kotlin.test.assertEquals
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.test.runTest
 
+// Copyright 2020-2023 JetBrains s.r.o. and respective authors and developers.
+// https://github.com/JetBrains/compose-multiplatform/blob/1b2669f59d8f9a5cda1a26388a51e8c6793981c8/compose/integrations/composable-test-cases/common/src/commonTest/kotlin/com.example.common/Test.kt
+
+// Modified by Ji Sungbin: code style changes
+
 class Test {
   @Test fun testEmptyPlainTextNode() {
     val root = runCompose {}

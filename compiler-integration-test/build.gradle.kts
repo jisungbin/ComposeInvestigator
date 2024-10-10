@@ -22,15 +22,7 @@ kotlin {
     }
   }
 
-  jvm {
-    compilations.all {
-      compileTaskProvider.configure {
-        compilerOptions {
-          freeCompilerArgs.add("-Xlambdas=class")
-        }
-      }
-    }
-  }
+  jvm()
 
   iosArm64()
   iosX64()
