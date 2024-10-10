@@ -7,8 +7,21 @@ ComposeInvestigator follows the format `[Kotlin Version - ComposeInvestigator Ve
 
 ## [Unreleased]
 
+## [2.1.0-Beta1-1.0.0-beta01] (unreleased)
+
 - #172: Supports K2, with the entire logic rewritten. Some runtime features have
   been removed, and no new features have been added. 
+
+### Artifact Address Update
+
+The artifact address has been changed as follows:
+ 
+- Previous: `land.sungbin.composeinvestigator`
+- Updated: `in.sungb.composeinvestigator`
+
+The domain sungbin.land has expired, and I no longer own `land.sungbin`. For future
+stability and maintenance, the artifact address has been changed to `in.sungb`, 
+which is under my ownership. The package name remains unchanged.
 
 ## [1.5.11-0.2.1] - 2024-03-23
 
@@ -43,8 +56,9 @@ ComposeInvestigator follows the format `[Kotlin Version - ComposeInvestigator Ve
 
 - Initial release.
 
-[Unreleased]: https://github.com/jisungbin/ComposeInvestigator/compare/1.5.11-0.2.1...HEAD
-[1.5.11-0.2.1]: https://github.com/jisungbin/ComposeInvestigator/releases/tag/1.5.11-0.2.1
+[Unreleased]: https://github.com/jisungbin/ComposeInvestigator/compare/2.1.0-Beta1-1.0.0-beta01...HEAD
+[2.1.0-Beta1-1.0.0-beta01]: https://github.com/jisungbin/ComposeInvestigator/releases/tag/2.1.0-Beta1-1.0.0-beta01 
+[1.5.11-0.2.1]: https://github.com/jisungbin/ComposeInvestigator/releases/tag/1.5.11-0.2.1 
 [1.5.10-0.2.1]: https://github.com/jisungbin/ComposeInvestigator/releases/tag/1.5.10-0.2.1
 [1.5.10-0.2.0]: https://github.com/jisungbin/ComposeInvestigator/releases/tag/1.5.10-0.2.0
 [1.5.10-0.1.1]: https://github.com/jisungbin/ComposeInvestigator/releases/tag/1.5.10-0.1.1
