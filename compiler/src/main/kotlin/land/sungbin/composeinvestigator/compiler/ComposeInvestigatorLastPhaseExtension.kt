@@ -27,7 +27,8 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
 public class ComposeInvestigatorLastPhaseExtension(
   private val messageCollector: MessageCollector,
   private val verificationMode: IrVerificationMode,
-  private val features: EnumSet<FeatureFlag> = EnumSet.allOf(FeatureFlag::class.java),
+  // TODO Consider accepting this value from an CommandLineProcessor.
+  private val features: EnumSet<FeatureFlag> = ComposeInvestigatorPluginRegistrar.DefaultEnabledFeatureFlags,
 ) : IrGenerationExtension {
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
     val tables = InvalidationTraceTableInstanceTransformer(pluginContext, messageCollector)

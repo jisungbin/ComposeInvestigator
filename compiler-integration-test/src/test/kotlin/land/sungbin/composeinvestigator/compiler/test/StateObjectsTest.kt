@@ -4,8 +4,10 @@ package land.sungbin.composeinvestigator.compiler.test
 
 import androidx.compose.runtime.mock.compositionTest
 import kotlin.test.BeforeTest
+import kotlin.test.Ignore
 import org.junit.jupiter.api.Test
 
+@Ignore("This feature is not yet ready for public use.")
 class StateObjectsTest {
   @BeforeTest fun prepare() {
     TestConfiguration.reset()
