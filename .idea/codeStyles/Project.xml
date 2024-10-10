@@ -1,15 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?><!--
-  ~ Developed by Ji Sungbin 2024.
-  ~
-  ~ Licensed under the MIT.
-  ~ Please see full license: https://github.com/jisungbin/ComposeInvestigator/blob/main/LICENSE
+  ~ Copyright 2024 Ji Sungbin
+  ~ SPDX-License-Identifier: Apache-2.0
   -->
 <component name="ProjectCodeStyleConfiguration">
   <code_scheme name="Project" version="173">
     <codeStyleSettings language="XML">
       <option name="FORCE_REARRANGE_MODE" value="1" />
       <indentOptions>
-        <option name="CONTINUATION_INDENT_SIZE" value="4" />
+        <option name="CONTINUATION_INDENT_SIZE" value="2" />
       </indentOptions>
       <arrangement>
         <rules>

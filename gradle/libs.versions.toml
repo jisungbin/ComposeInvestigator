@@ -22,10 +22,6 @@ test-diffutil = "4.12"
 test-assertk = "0.28.1"
 test-kluent = "1.73"
 
-# Some of our tests use JUnit4 because we include an Android module.
-test-junit-core = "4.13.2"
-test-junit-engine = "5.11.2"
-
 [plugins]
 gradle-publish-maven = { id = "com.vanniktech.maven.publish", version.ref = "gradle-publish-maven" }
 gradle-test-logging = { id = "com.adarshr.test-logger", version.ref = "gradle-test-logging" }
@@ -51,9 +47,6 @@ compose-runtimeStubs = { module = "androidx.compose.runtime:runtime-jvmstubs", v
 compose-material = { module = "androidx.compose.material:material", version.ref = "compose-runtime" }
 
 test-diffutil = { module = "io.github.java-diff-utils:java-diff-utils", version.ref = "test-diffutil" }
-test-junit-core = { module = "junit:junit", version.ref = "test-junit-core" }
-test-junit-enigne = { module = "org.junit.vintage:junit-vintage-engine", version.ref = "test-junit-engine" }
-test-junit-compose = { module = "androidx.compose.ui:ui-test-junit4", version.ref = "compose-runtime" }
 test-assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "test-assertk" }
 test-kluent = { module = "org.amshove.kluent:kluent", version.ref = "test-kluent" }
 test-kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
