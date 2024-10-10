@@ -169,14 +169,6 @@ abstract class AbstractCompilerTest(
         jar(land.sungbin.composeinvestigator.runtime.ComposeInvestigator::class.java),
         jar(kotlinx.coroutines.CoroutineScope::class.java),
         jar(androidx.compose.runtime.Composable::class.java),
-        jar(androidx.compose.ui.Modifier::class.java),
-        jar(androidx.compose.ui.unit.Dp::class.java),
-        jar(androidx.compose.ui.graphics.ColorProducer::class.java),
-        jar(androidx.compose.ui.text.input.TextFieldValue::class.java),
-        jar(androidx.compose.foundation.Indication::class.java),
-        jar(androidx.compose.foundation.layout.RowScope::class.java),
-        jar(androidx.compose.foundation.text.KeyboardActions::class.java),
-        jar(androidx.compose.animation.EnterTransition::class.java),
       )
     }
   }

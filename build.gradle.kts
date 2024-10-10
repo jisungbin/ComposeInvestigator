@@ -4,11 +4,13 @@ import com.adarshr.gradle.testlogger.TestLoggerExtension
 import com.adarshr.gradle.testlogger.theme.ThemeType
 import com.diffplug.gradle.spotless.BaseKotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
-import org.jetbrains.kotlin.gradle.dsl.KotlinTopLevelExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  kotlin("jvm") version libs.versions.kotlin.core
+  kotlin("multiplatform") version libs.versions.kotlin.core apply false
+  kotlin("plugin.compose") version libs.versions.kotlin.core apply false
+  alias(libs.plugins.gradle.android.application) apply false
+  alias(libs.plugins.compose.multiplatform) apply false
   alias(libs.plugins.spotless) apply false
   alias(libs.plugins.gradle.test.logging) apply false
   alias(libs.plugins.gradle.publish.maven) apply false
@@ -79,12 +81,6 @@ allprojects {
         "kotlin.RequiresOptIn",
         "kotlin.contracts.ExperimentalContracts",
       )
-    }
-  }
-
-  afterEvaluate {
-    extensions.configure<KotlinTopLevelExtension> {
-      jvmToolchain(22)
     }
   }
 }

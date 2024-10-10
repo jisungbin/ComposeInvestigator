@@ -1,7 +1,3 @@
-<?xml version="1.0" encoding="utf-8"?><!--
-  ~ Copyright 2024 Ji Sungbin
-  ~ SPDX-License-Identifier: Apache-2.0
-  -->
 <component name="InspectionProjectProfileManager">
   <profile version="1.0">
     <option name="myName" value="Project Default" />
@@ -33,6 +29,7 @@
     <inspection_tool class="PreviewPickerAnnotation" enabled="true" level="ERROR" enabled_by_default="true">
       <option name="composableFile" value="true" />
     </inspection_tool>
+    <inspection_tool class="SamePackageImport" enabled="true" level="WARNING" enabled_by_default="true" />
     <inspection_tool class="SpellCheckingInspection" enabled="false" level="TYPO" enabled_by_default="false">
       <option name="processCode" value="true" />
       <option name="processLiterals" value="true" />

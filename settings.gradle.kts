@@ -21,18 +21,7 @@ pluginManagement {
         releasesOnly()
       }
     }
-    maven("https://jitpack.io") {
-      mavenContent {
-        includeGroup("com.github.takahirom")
-      }
-    }
     mavenLocal()
-  }
-
-  resolutionStrategy.eachPlugin {
-    if (requested.id.id == "com.github.takahirom.decomposer") {
-      useModule("com.github.takahirom:decomposer:main-SNAPSHOT")
-    }
   }
 }
 
@@ -51,11 +40,6 @@ dependencyResolutionManagement {
         releasesOnly()
       }
     }
-    maven("https://androidx.dev/snapshots/builds/12450542/artifacts/repository") {
-      mavenContent {
-        snapshotsOnly()
-      }
-    }
     mavenLocal()
   }
 }
@@ -65,5 +49,5 @@ include(
   ":compiler",
   ":compiler-gradle-plugin",
   ":compiler-integration-test",
-  // ":sample",
+  ":samples:android",
 )

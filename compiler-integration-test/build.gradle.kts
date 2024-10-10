@@ -1,36 +1,60 @@
 // Copyright 2024 Ji Sungbin
 // SPDX-License-Identifier: Apache-2.0
+import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
+
 plugins {
-  kotlin("jvm")
-  alias(libs.plugins.kotlin.compose)
+  kotlin("multiplatform")
+  kotlin("plugin.compose")
 }
 
+@OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
+  jvmToolchain(libs.versions.jdk.get().toInt())
+
   compilerOptions {
     optIn.addAll(
       "land.sungbin.composeinvestigator.runtime.ComposeInvestigatorCompilerApi",
       "land.sungbin.composeinvestigator.runtime.ExperimentalComposeInvestigatorApi",
     )
     freeCompilerArgs.addAll("-P", "plugin:land.sungbin.composeinvestigator.compiler:verbose=true")
-    freeCompilerArgs.add("-Xlambdas=class")
     sourceSets.all {
       languageSettings.enableLanguageFeature("ExplicitBackingFields")
+    }
+  }
+
+  jvm()
+
+  iosArm64()
+  iosX64()
+  iosSimulatorArm64()
+
+  sourceSets {
+    commonMain {
+      dependencies {
+        implementation(projects.runtime)
+        implementation(libs.compose.runtime)
+        implementation(libs.kotlin.coroutines)
+        implementation(libs.test.assertk)
+      }
+    }
+
+    commonTest {
+      dependencies {
+        implementation(kotlin("test", version = libs.versions.kotlin.core.get()))
+        implementation(libs.test.kotlin.coroutines)
+      }
+    }
+
+    jvmTest {
+      dependencies {
+        implementation(kotlin("reflect", version = libs.versions.kotlin.core.get())) // Used by assertk
+      }
     }
   }
 }
 
 dependencies {
-  implementation(projects.runtime)
-  implementation(libs.compose.runtime)
-
-  implementation(kotlin("reflect")) // Used by assertk
-  implementation(libs.test.assertk)
-
-  implementation("androidx.compose.runtime:runtime-test-utils:1.8.0-SNAPSHOT") {
-    because("Why SNAPSHOT? See https://cs.android.com/androidx/platform/frameworks/support/+/androidx-main:compose/runtime/runtime-test-utils/build.gradle;l=71;drc=214c6abe4e624304956276717a0163fad3858be9")
-  }
-  kotlinCompilerPluginClasspath(projects.compiler)
-
-  testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
-  testImplementation(libs.test.kotlin.coroutines)
+  configurations
+    .filter { conf -> conf.name.contains("kotlinCompilerPluginClasspath") }
+    .forEach { conf -> conf(projects.compiler) }
 }

@@ -10,7 +10,14 @@ plugins {
 }
 
 val updateVersion by tasks.registering(UpdatePluginVersionTask::class) {
+  val copyright by lazy {
+    rootDir.resolve("spotless/copyright.kt")
+      .readText()
+      .replace("\$YEAR", Year.now().toString())
+  }
+
   version.set(project.property("VERSION_NAME") as String)
+  this.copyright.set(provider { copyright })
   destination.set(projectDir.walk().first { path -> path.endsWith("VERSION.kt") })
 }
 
@@ -42,6 +49,7 @@ dependencies {
 
 abstract class UpdatePluginVersionTask : DefaultTask() {
   @get:Input abstract val version: Property<String>
+  @get:Input abstract val copyright: Property<String>
   @get:InputFile abstract val destination: RegularFileProperty
 
   @TaskAction fun run() {
@@ -56,8 +64,7 @@ abstract class UpdatePluginVersionTask : DefaultTask() {
 
     destination.get().asFile.writeText(
       """
-      |// Copyright ${Year.now()} Ji Sungbin
-      |// SPDX-License-Identifier: Apache-2.0
+      |${copyright.get().replace("\n", "\n|")}
       |$packageLine
       |
       |internal const val VERSION = "${version.get()}"
