@@ -5,7 +5,7 @@ gradle-android = "8.7.1"
 gradle-publish-maven = "0.30.0"
 gradle-test-logging = "4.0.0"
 
-kotlin-core = "2.1.0-Beta1"
+kotlin-core = "2.1.0-Beta2"
 kotlin-dokka = "2.0.0-Beta"
 kotlin-coroutines = "1.9.0"
 
