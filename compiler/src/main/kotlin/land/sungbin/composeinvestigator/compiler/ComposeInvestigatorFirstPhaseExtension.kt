@@ -10,6 +10,7 @@ import land.sungbin.composeinvestigator.compiler.lower.InvalidationTraceTableIns
 import land.sungbin.composeinvestigator.compiler.lower.InvalidationTraceTableIntrinsicTransformer
 import land.sungbin.composeinvestigator.compiler.lower.StateInitializerFirstTransformer
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
+import org.jetbrains.kotlin.backend.common.IrValidatorConfig
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.validateIr
@@ -62,8 +63,10 @@ public class ComposeInvestigatorFirstPhaseExtension(
         moduleFragment,
         pluginContext.irBuiltIns,
         phaseName = "Before ComposeInvestigator First Phase",
-        checkProperties = true,
-        checkTypes = false, // TODO KT-68663
+        config = IrValidatorConfig(
+          checkProperties = true,
+          checkTypes = false, // TODO KT-68663
+        ),
       )
     }
 
@@ -82,8 +85,10 @@ public class ComposeInvestigatorFirstPhaseExtension(
         moduleFragment,
         pluginContext.irBuiltIns,
         phaseName = "After ComposeInvestigator First Phase",
-        checkProperties = true,
-        checkTypes = false, // TODO KT-68663
+        config = IrValidatorConfig(
+          checkProperties = true,
+          checkTypes = false, // TODO KT-68663
+        ),
       )
     }
   }

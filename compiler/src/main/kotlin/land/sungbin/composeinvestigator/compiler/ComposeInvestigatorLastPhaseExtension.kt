@@ -5,6 +5,7 @@ package land.sungbin.composeinvestigator.compiler
 import java.util.EnumSet
 import land.sungbin.composeinvestigator.compiler.lower.InvalidationSkipTracingLastTransformer
 import land.sungbin.composeinvestigator.compiler.lower.InvalidationTraceTableInstanceTransformer
+import org.jetbrains.kotlin.backend.common.IrValidatorConfig
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.validateIr
@@ -44,8 +45,10 @@ public class ComposeInvestigatorLastPhaseExtension(
         moduleFragment,
         pluginContext.irBuiltIns,
         phaseName = "Before ComposeInvestigator Last Phase",
-        checkProperties = true,
-        checkTypes = false, // TODO KT-68663
+        config = IrValidatorConfig(
+          checkProperties = true,
+          checkTypes = false, // TODO KT-68663
+        ),
       )
     }
 
@@ -60,8 +63,10 @@ public class ComposeInvestigatorLastPhaseExtension(
         moduleFragment,
         pluginContext.irBuiltIns,
         phaseName = "After ComposeInvestigator Last Phase",
-        checkProperties = true,
-        checkTypes = false, // There is implicit type downcasting: InvalidationType.Skipped -> InvalidationType
+        config = IrValidatorConfig(
+          checkProperties = true,
+          checkTypes = false, // There is implicit type downcasting: InvalidationType.Skipped -> InvalidationType
+        ),
       )
     }
   }
