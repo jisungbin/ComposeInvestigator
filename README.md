@@ -15,7 +15,7 @@ However, it can perform the following tasks:
 
 [*(Read the Medium's introductory post)*](https://jisungbin.medium.com/tracing-recompositions-without-boilerplate-code-e9800db1419e)
 
-*The K2 work has been completed and is currently in the final testing phase before release.*
+*Next release schedule: Released when Kotlin 2.1.0 is stable*
 
 ---
 
