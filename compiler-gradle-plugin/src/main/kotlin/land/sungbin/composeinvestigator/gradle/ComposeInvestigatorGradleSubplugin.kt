@@ -27,10 +27,10 @@ public class ComposeInvestigatorGradleSubplugin : KotlinCompilerPluginSupportPlu
       version = VERSION,
     )
 
-  override fun isApplicable(compilation: KotlinCompilation<*>): Boolean = true
+  override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = true
 
-  override fun applyToCompilation(compilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
-    val project = compilation.target.project
+  override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
+    val project = kotlinCompilation.target.project
     val extension = project.extensions.getByType<ComposeInvestigatorPluginExtension>()
     val runtimeDependency = project.dependencies.create("in.sungb.composeinvestigator:composeinvestigator-runtime:$VERSION")
 
@@ -44,7 +44,7 @@ public class ComposeInvestigatorGradleSubplugin : KotlinCompilerPluginSupportPlu
         }
       }
     } else {
-      project.dependencies.add(compilation.implementationConfigurationName, runtimeDependency)
+      project.dependencies.add(kotlinCompilation.implementationConfigurationName, runtimeDependency)
     }
 
     return project.provider {

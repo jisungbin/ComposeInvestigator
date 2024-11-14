@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.Scope
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.createBlockBody
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
@@ -190,9 +191,9 @@ public class InvalidationProcessTracingFirstTransformer(
     val newBody = context.irFactory.createBlockBody(
       startOffset = body.startOffset,
       endOffset = body.endOffset,
-    ).also { block ->
-      block.statements += newStatements
-      block.statements += body.statements
+    ) {
+      statements += newStatements
+      statements += body.statements
     }
 
     return newBody.also {
