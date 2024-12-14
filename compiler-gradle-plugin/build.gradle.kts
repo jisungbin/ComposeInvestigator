@@ -58,7 +58,7 @@ abstract class UpdatePluginVersionTask : DefaultTask() {
 
     destination.get().asFile.forEachLine { line ->
       if (line.startsWith("package")) packageLine = line
-      if (line.contains("const val VERSION")) currentVersion = line.split("\"")[1]
+      if (line.contains("const val VERSION")) currentVersion = line.split('"')[1]
     }
     if (currentVersion == version.get()) return
 

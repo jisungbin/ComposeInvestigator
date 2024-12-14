@@ -24,9 +24,10 @@ kotlin {
 
   jvm()
 
-  iosArm64()
-  iosX64()
-  iosSimulatorArm64()
+  // TODO
+  //  iosArm64()
+  //  iosX64()
+  //  iosSimulatorArm64()
 
   sourceSets {
     commonMain {
@@ -55,6 +56,6 @@ kotlin {
 
 dependencies {
   configurations
-    .filter { conf -> conf.name.contains("kotlinCompilerPluginClasspath") }
-    .forEach { conf -> conf(projects.compiler) }
+    .filter { configuration -> configuration.name.contains("kotlinCompilerPluginClasspath", ignoreCase = true) }
+    .forEach { configuration -> configuration(projects.compiler) }
 }

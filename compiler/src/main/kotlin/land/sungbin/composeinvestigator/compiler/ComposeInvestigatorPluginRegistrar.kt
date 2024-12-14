@@ -5,6 +5,7 @@
 package land.sungbin.composeinvestigator.compiler
 
 import java.util.EnumSet
+import org.jetbrains.kotlin.backend.common.IrValidatorConfig
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.cli.jvm.compiler.CompileEnvironmentException
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
@@ -60,5 +61,11 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
   public companion object {
     public val DefaultEnabledFeatureFlags: EnumSet<FeatureFlag> =
       EnumSet.allOf(FeatureFlag::class.java).apply { remove(FeatureFlag.StateInitializerTracking) }
+
+    public val DefaultIrValidatorConfig: IrValidatorConfig =
+      IrValidatorConfig(
+        checkProperties = true,
+        checkTypes = false, // TODO KT-68663
+      )
   }
 }

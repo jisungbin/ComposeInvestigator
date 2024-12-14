@@ -1,8 +1,5 @@
 // Copyright 2024 Ji Sungbin
 // SPDX-License-Identifier: Apache-2.0
-import org.gradle.kotlin.dsl.dokka
-import org.jetbrains.kotlin.gradle.ExperimentalKotlinGradlePluginApi
-
 plugins {
   kotlin("multiplatform")
   alias(libs.plugins.kotlin.dokka)
@@ -24,7 +21,6 @@ dokka {
   }
 }
 
-@OptIn(ExperimentalKotlinGradlePluginApi::class)
 kotlin {
   explicitApi()
   jvmToolchain(libs.versions.jdk.get().toInt())
@@ -38,9 +34,11 @@ kotlin {
 
   jvm()
 
-  iosArm64()
-  iosX64()
-  iosSimulatorArm64()
+  // FIXME Task :runtime:linkDebugTestIosSimulatorArm64 FAILED
+  //  e: java.lang.NullPointerException
+  // iosArm64()
+  // iosX64()
+  // iosSimulatorArm64()
 
   sourceSets {
     commonMain {

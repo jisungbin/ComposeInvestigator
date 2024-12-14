@@ -43,7 +43,7 @@ dependencies {
   testImplementation(projects.runtime)
   testImplementation(libs.compose.runtime)
   testImplementation(libs.test.diffutil)
-  testImplementation(libs.test.kluent) // FIXME Temporary library to use until KT-53336 is resolved
+  testImplementation(libs.test.kluent) // TODO Temporary library to use until KT-53336 is resolved
 
   testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
   testImplementation(kotlin("compiler-embeddable", version = libs.versions.kotlin.core.get()))
