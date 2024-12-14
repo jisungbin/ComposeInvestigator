@@ -12,7 +12,7 @@ PROJECTS=(
   ":compiler-gradle-plugin"
 )
 
-COMMAND_SUFFIX="publishMavenPublicationToMavenCentralRepository"
+COMMAND_SUFFIX="publishAndReleaseToMavenCentral"
 
 if [ "$1" == "local" ]; then
   COMMAND_SUFFIX="publishToMavenLocal"
@@ -23,5 +23,5 @@ NC='\033[0m' # No Color
 
 for PROJECT in "${PROJECTS[@]}"; do
   echo -e "${GREEN}Executing: ./gradlew ${PROJECT}:${COMMAND_SUFFIX}${NC}"
-  ./gradlew "${PROJECT}:${COMMAND_SUFFIX}" --console=plain
+  ./gradlew "${PROJECT}:${COMMAND_SUFFIX}" --console=plain --no-configuration-cache
 done
