@@ -2,20 +2,14 @@
 
 Trace the recomposition of a Composable with its cause without boilerplate code 😎.
 
-This tool was initiated for personal learning and has not been proven necessary for production.
+This tool was started for personal learning and has not been proven necessary for production.
 However, it can perform the following tasks:
 
 - **Reports if a Composable is skipped during recomposition.**
 - **Reports if the arguments of a Composable have changed and been recomposed.** It can also compare the
   values before and after the change.
 - **Reports if the state values inside a Composable have been modified.** It can also compare the values
-  before and after the change.
-- **Retrieves the call stack leading up to the invocation of a Composable.** This helps identify the
-  specific Composable being recomposed when the same Composable is reused in multiple places.
-
-[*(Read the Medium's introductory post)*](https://jisungbin.medium.com/tracing-recompositions-without-boilerplate-code-e9800db1419e)
-
-*Next release schedule: Released when Kotlin 2.1.0 is stable*
+  before and after the change. *(via ComposeInvestigator's runtime plugin)*
 
 ---
 
