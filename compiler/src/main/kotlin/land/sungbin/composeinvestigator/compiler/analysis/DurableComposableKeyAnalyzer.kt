@@ -6,7 +6,6 @@ import androidx.compose.compiler.plugins.kotlin.EmptyModuleMetrics
 import androidx.compose.compiler.plugins.kotlin.FeatureFlags
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.irTrace
-import androidx.compose.compiler.plugins.kotlin.lower.ComposableSymbolRemapper
 import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyVisitor
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorCommandLineProcessor.Companion.PLUGIN_ID
@@ -38,7 +37,6 @@ public class DurableComposableKeyAnalyzer(
 ) : DurableKeyTransformer(
   context = context,
   keyVisitor = DurableKeyVisitor(),
-  symbolRemapper = ComposableSymbolRemapper(),
   stabilityInferencer = stabilityInferencer,
   metrics = EmptyModuleMetrics,
   featureFlags = featureFlags,

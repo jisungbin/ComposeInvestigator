@@ -4,6 +4,7 @@ package land.sungbin.composeinvestigator.compiler
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import java.util.EnumSet
+import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorPluginRegistrar.Companion.DefaultIrValidatorConfig
 import land.sungbin.composeinvestigator.compiler.analysis.DurableComposableKeyAnalyzer
 import land.sungbin.composeinvestigator.compiler.lower.InvalidationProcessTracingFirstTransformer
 import land.sungbin.composeinvestigator.compiler.lower.InvalidationTraceTableInstanceTransformer
@@ -61,9 +62,8 @@ public class ComposeInvestigatorFirstPhaseExtension(
       performBasicIrValidation(
         moduleFragment,
         pluginContext.irBuiltIns,
-        phaseName = "Before ComposeInvestigator First Phase",
-        checkProperties = true,
-        checkTypes = false, // TODO KT-68663
+        "Before ComposeInvestigator First Phase",
+        DefaultIrValidatorConfig,
       )
     }
 
@@ -81,9 +81,8 @@ public class ComposeInvestigatorFirstPhaseExtension(
       performBasicIrValidation(
         moduleFragment,
         pluginContext.irBuiltIns,
-        phaseName = "After ComposeInvestigator First Phase",
-        checkProperties = true,
-        checkTypes = false, // TODO KT-68663
+        "After ComposeInvestigator First Phase",
+        DefaultIrValidatorConfig,
       )
     }
   }

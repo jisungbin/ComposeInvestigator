@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.config.messageCollector
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporterFactory
 import org.jetbrains.kotlin.diagnostics.impl.BaseDiagnosticsCollector
+import org.jetbrains.kotlin.diagnostics.impl.BaseDiagnosticsCollector.RawReporter
 import org.jetbrains.kotlin.diagnostics.rendering.RootDiagnosticRendererFactory
 import org.jetbrains.kotlin.fir.BinaryModuleData
 import org.jetbrains.kotlin.fir.DependencyListForCliModule
@@ -149,7 +150,11 @@ class KotlinK2Compiler private constructor(private val environment: KotlinCoreEn
       projectEnvironment = projectEnvironment,
     )
 
-    val reporter = DiagnosticReporterFactory.createReporter()
+    val reporter = DiagnosticReporterFactory.createReporter(
+      RawReporter { message, severity ->
+        if (severity.isError) error(message) else println("[${severity.name}] $message")
+      },
+    )
     val analysis = buildResolveAndCheckFirFromKtFiles(session, listOf(file.toKtFile(project)), reporter)
 
     return FirAnalysisResult(FirResult(listOf(analysis)), reporter)

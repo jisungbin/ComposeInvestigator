@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSet.Companion.COMMON_MAIN_
 import org.jetbrains.kotlin.gradle.plugin.KotlinSourceSetContainer
 import org.jetbrains.kotlin.gradle.plugin.SubpluginArtifact
 import org.jetbrains.kotlin.gradle.plugin.SubpluginOption
+import org.jetbrains.kotlin.gradle.plugin.kotlinToolingVersion
 
 public class ComposeInvestigatorGradleSubplugin : KotlinCompilerPluginSupportPlugin {
   override fun apply(target: Project) {
@@ -27,7 +28,12 @@ public class ComposeInvestigatorGradleSubplugin : KotlinCompilerPluginSupportPlu
       version = VERSION,
     )
 
-  override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean = true
+  // TODO test this
+  override fun isApplicable(kotlinCompilation: KotlinCompilation<*>): Boolean {
+    val project = kotlinCompilation.target.project
+    val kotlinVersion = project.kotlinToolingVersion
+    return kotlinVersion.major == 2
+  }
 
   override fun applyToCompilation(kotlinCompilation: KotlinCompilation<*>): Provider<List<SubpluginOption>> {
     val project = kotlinCompilation.target.project
