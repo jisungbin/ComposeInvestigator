@@ -17,9 +17,9 @@ class InvalidationTraceTableCallTest : AbstractCompilerTest(
 +val ComposableInvalidationTraceTableImpl%GetCurrentComposableKeyNameKt: ComposableInvalidationTraceTable = ComposableInvalidationTraceTable()
 @@ -8,2 +9,2 @@
 -    currentComposableInvalidationTracer.currentComposableKeyName
--    val inVariable = currentComposableInvalidationTracer
+-    val inVariable = currentComposableInvalidationTracer.currentComposableKeyName
 +    "fun-getCurrentComposableKeyName()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall/file-getCurrentComposableKeyName.kt"
-+    val inVariable = ComposableInvalidationTraceTableImpl%GetCurrentComposableKeyNameKt
++    val inVariable = "fun-getCurrentComposableKeyName()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall/file-getCurrentComposableKeyName.kt"
 @@ -17,1 +18,1 @@
 -      currentComposableInvalidationTracer.currentComposableKeyName
 +      "fun-nested()Unit/fun-getCurrentComposableKeyName()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall/file-getCurrentComposableKeyName.kt"

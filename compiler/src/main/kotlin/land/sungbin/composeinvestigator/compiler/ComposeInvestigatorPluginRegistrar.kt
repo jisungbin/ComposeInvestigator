@@ -7,14 +7,12 @@ package land.sungbin.composeinvestigator.compiler
 import java.util.EnumSet
 import org.jetbrains.kotlin.backend.common.IrValidatorConfig
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
-import org.jetbrains.kotlin.cli.jvm.compiler.CompileEnvironmentException
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.com.intellij.openapi.extensions.LoadingOrder
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.IrVerificationMode
-import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.config.messageCollector
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
@@ -46,8 +44,9 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
 
     configuration.messageCollector = messageCollector
 
-    if (!configuration.languageVersionSettings.languageVersion.usesK2)
-      throw CompileEnvironmentException(ErrorMessages.SUPPORTS_K2_ONLY)
+    // TODO
+    //  if (!configuration.languageVersionSettings.languageVersion.usesK2)
+    //   throw CompileEnvironmentException(ErrorMessages.SUPPORTS_K2_ONLY)
 
     FirExtensionRegistrarAdapter.registerExtension(project, ComposeInvestigatorFirExtensionRegistrar())
     project.extensionArea

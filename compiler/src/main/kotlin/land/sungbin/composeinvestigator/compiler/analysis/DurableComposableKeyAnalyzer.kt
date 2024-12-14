@@ -8,12 +8,12 @@ import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.irTrace
 import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyTransformer
 import androidx.compose.compiler.plugins.kotlin.lower.DurableKeyVisitor
-import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorCommandLineProcessor.Companion.PLUGIN_ID
-import land.sungbin.composeinvestigator.compiler.error
+import land.sungbin.composeinvestigator.compiler.log
 import land.sungbin.composeinvestigator.compiler.lower.irString
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
+import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
@@ -33,6 +33,7 @@ import org.jetbrains.kotlin.name.FqName
 public class DurableComposableKeyAnalyzer(
   context: IrPluginContext,
   stabilityInferencer: StabilityInferencer,
+  private val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter() (Blocked: "This API is not supported for K2")
   featureFlags: FeatureFlags = FeatureFlags(), // TODO Supports this feature
 ) : DurableKeyTransformer(
   context = context,
@@ -41,7 +42,6 @@ public class DurableComposableKeyAnalyzer(
   metrics = EmptyModuleMetrics,
   featureFlags = featureFlags,
 ) {
-  private val messageCollector by lazy { context.createDiagnosticReporter(PLUGIN_ID) }
   private val irComposableInformation = IrComposableInformation(context)
 
   override fun visitFile(declaration: IrFile): IrFile =
@@ -49,7 +49,9 @@ public class DurableComposableKeyAnalyzer(
 
   override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
     val (keyName, success) = buildKey("fun-${declaration.signatureString()}")
-    if (!success) messageCollector.error("Duplicate key: $keyName", declaration.getCompilerMessageLocation(declaration.file))
+
+    // TODO log -> error
+    if (!success) messageCollector.log("Duplicate key: $keyName", declaration.getCompilerMessageLocation(declaration.file))
 
     val composable = irComposableInformation(
       name = context.irString(declaration.name.asString()),

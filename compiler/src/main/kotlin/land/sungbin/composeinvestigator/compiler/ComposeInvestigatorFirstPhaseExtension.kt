@@ -50,14 +50,14 @@ public class ComposeInvestigatorFirstPhaseExtension(
     messageCollector.log("Enabled first-phase features: ${features.filter { it.phase == 0 }.joinToString()}")
 
     if (features.isNotEmpty()) {
-      moduleFragment.transformChildrenVoid(DurableComposableKeyAnalyzer(pluginContext, stabilityInferencer))
+      moduleFragment.transformChildrenVoid(DurableComposableKeyAnalyzer(pluginContext, stabilityInferencer, messageCollector))
       moduleFragment.transformChildrenVoid(tables)
     }
 
     if (features.count { it.phase == 0 } == 0) return
 
     // Input check. This should always pass, else something is horribly wrong upstream.
-    // Necessary because oftentimes the issue is upstream. (compiler bug, prior plugin, etc)
+    // Necessary because oftentimes the issue is upstream. (compiler bug, prior plugin, etc.)
     validateIr(messageCollector, verificationMode) {
       performBasicIrValidation(
         moduleFragment,

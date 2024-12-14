@@ -9,7 +9,7 @@ import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTra
 
 @Composable private fun getCurrentComposableKeyName() {
   currentComposableInvalidationTracer.currentComposableKeyName
-  val inVariable = currentComposableInvalidationTracer
+  val inVariable = currentComposableInvalidationTracer.currentComposableKeyName
 
   inFunctionDefaultArgument()
 

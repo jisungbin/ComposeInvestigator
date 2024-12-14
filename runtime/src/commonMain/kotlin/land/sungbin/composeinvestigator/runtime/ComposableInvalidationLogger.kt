@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package land.sungbin.composeinvestigator.runtime
 
+import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.RecomposeScope
 
 /** @see ComposeInvestigator.logger */
@@ -10,7 +11,7 @@ public fun interface ComposableInvalidationLogger {
 }
 
 /** Defines the result of the invalidation requested for the Composable. */
-public sealed class InvalidationResult {
+@Immutable public sealed class InvalidationResult {
   /** The first composition (*not recomposition*). This happens by default. */
   public data object InitialComposition : InvalidationResult() {
     override fun toString(): String = "[Initial] Initial composition."

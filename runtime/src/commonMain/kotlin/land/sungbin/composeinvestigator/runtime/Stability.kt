@@ -4,6 +4,8 @@
 
 package land.sungbin.composeinvestigator.runtime
 
+import androidx.compose.runtime.Immutable
+
 /**
  * Represents Compose's stability system. See the
  * [official documentation](https://developer.android.com/jetpack/compose/performance/stability)
@@ -13,7 +15,7 @@ package land.sungbin.composeinvestigator.runtime
  * [Compose compiler's implementation](https://github.com/JetBrains/kotlin/blob/ede0373c4e5c0506b1491c6eb4c8bc0660ef7d21/plugins/compose/compiler-hosted/src/main/java/androidx/compose/compiler/plugins/kotlin/analysis/Stability.kt#L238)
  * of the AOSP.
  */
-public sealed class Stability {
+@Immutable public sealed class Stability {
   abstract override fun toString(): String
 
   public data class Certain(public val stable: Boolean) : Stability() {

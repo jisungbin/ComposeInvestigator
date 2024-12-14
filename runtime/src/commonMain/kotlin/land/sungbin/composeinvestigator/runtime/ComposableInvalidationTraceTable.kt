@@ -4,11 +4,13 @@ package land.sungbin.composeinvestigator.runtime
 
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Composer
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import androidx.compose.runtime.snapshots.StateObject
 
 /** Returns the [ComposableInvalidationTraceTable] assigned to the current file. */
 public val currentComposableInvalidationTracer: ComposableInvalidationTraceTable
-  @JvmSynthetic get() = throw IntrinsicImplementedError()
+  @[Stable JvmSynthetic] get() = throw IntrinsicImplementedError()
 
 /**
  * Returns the name of the current Composable.
@@ -28,7 +30,7 @@ public annotation class ComposableName(public val name: String)
  * @see ComposableName
  */
 @Suppress("unused")
-public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): String = name
+@Stable public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): String = name
 
 /**
  * Classes that hold data from ComposeInvestigator.
@@ -48,7 +50,7 @@ public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): Stri
  * unexpected behaviour.
  */
 // TODO Consider a better name. The current name is slightly verbose.
-public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi public constructor() {
+@Immutable public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi public constructor() {
   /**
    * Represents the unique key of the affected Composable and the compound key.
    *
@@ -88,7 +90,7 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    * be named 'anonymous.' Therefore, in this case, we recommend you specify your Composable name.
    */
   public var currentComposableName: ComposableName
-    @[ComposableScope JvmSynthetic] get() {
+    @[Stable ComposableScope JvmSynthetic] get() {
       throw IntrinsicImplementedError()
     }
     @[ComposableScope JvmSynthetic] set(@Suppress("unused") name) {
@@ -106,7 +108,7 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    * of the AOSP.
    */
   public val currentComposableKeyName: String
-    @[ComposableScope JvmSynthetic] get() = throw IntrinsicImplementedError()
+    @[Stable ComposableScope JvmSynthetic] get() = throw IntrinsicImplementedError()
 
   /**
    * Returns all arguments that were affected by the value change. This is useful for debugging and
@@ -116,7 +118,7 @@ public class ComposableInvalidationTraceTable @ComposeInvestigatorCompilerApi pu
    * and a list of [ChangedArgument]s.
    */
   public val affectedArguments: Map<AffectedName, List<ValueArgument>>
-    get() = affectedArgumentMap
+    @Stable get() = affectedArgumentMap
 
   /**
    * Removes all arguments that were affected by the value change. This means that it also resets

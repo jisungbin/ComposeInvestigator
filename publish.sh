@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# Usage:
+#   ./publish.sh          # Publishes to Maven Central
+#   ./publish.sh local    # Publishes to Maven Local
+
 set -e
 
 PROJECTS=(

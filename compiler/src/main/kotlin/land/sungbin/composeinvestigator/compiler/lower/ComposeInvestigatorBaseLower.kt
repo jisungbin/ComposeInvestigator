@@ -92,7 +92,7 @@ import org.jetbrains.kotlin.types.Variance
  */
 public open class ComposeInvestigatorBaseLower(
   protected val context: IrPluginContext,
-  protected val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter()
+  protected val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter() (Blocked: "This API is not supported for K2")
   protected val tables: IrInvalidationTraceTableHolder,
 ) : IrElementTransformerVoidWithContext() {
   private var ownStabilitySymbol: IrClassSymbol? = null

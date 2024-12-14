@@ -3,6 +3,8 @@
 package land.sungbin.composeinvestigator.runtime
 
 import androidx.compose.runtime.Composer
+import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 
 /**
  * Indicates which Composables were affected by the state change.
@@ -13,18 +15,18 @@ import androidx.compose.runtime.Composer
  * @param compoundKey Same as [Composer.compoundKeyHash]. If no lookup
  * is possible, `null`.
  */
-public data class ComposableInformation(
+@Immutable public data class ComposableInformation(
   public val name: String,
   public val packageName: String,
   public val fileName: String,
   public val compoundKey: Int? = null,
 ) {
   /** @suppress ComposeInvestigator compiler-only API. Use `copy(compoundKey = N)` instead. */
-  @ComposeInvestigatorCompilerApi
+  @[ComposeInvestigatorCompilerApi Stable]
   public fun withCompoundKey(compoundKey: Int): ComposableInformation =
     copy(compoundKey = compoundKey)
 }
 
 /** Fully-qualified name of the Composable function. */
 public val ComposableInformation.fqPackageName: String
-  get() = packageName.takeUnless(String::isEmpty)?.plus(".").orEmpty() + name
+  @Stable get() = packageName.takeUnless(String::isEmpty)?.plus(".").orEmpty() + name
