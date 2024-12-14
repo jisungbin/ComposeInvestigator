@@ -2,8 +2,6 @@
 // SPDX-License-Identifier: Apache-2.0
 package land.sungbin.composeinvestigator.runtime
 
-import androidx.compose.runtime.Immutable
-
 /**
  * Represents information about the Composable function's value argument.
  *
@@ -13,7 +11,6 @@ import androidx.compose.runtime.Immutable
  * @param valueHashCode Hash code of the argument value
  * @param stability [Stability] information for the argument type
  */
-@Immutable
 public data class ValueArgument(
   public val name: String,
   public val type: String,
@@ -28,7 +25,6 @@ public data class ValueArgument(
  * @param previous Argument before recomposition
  * @param new Argument after recomposition
  */
-@Immutable
 public data class ChangedArgument(public val previous: ValueArgument, public val new: ValueArgument) {
   init {
     require(previous.name == new.name) {

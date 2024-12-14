@@ -78,16 +78,16 @@ import org.jetbrains.kotlin.types.Variance
  * This parent class exists to reduce common boilerplate code, and currently
  * serves the following roles:
  *
- * 1. define commonly used [IrSymbol]s
- * 2. provide a function to convert [Compose Stability][Stability] to ComposeInvestigator
+ * 1. Define commonly used [IrSymbol]s
+ * 2. Provide a function to convert [Compose Stability][Stability] to ComposeInvestigator
  * Stability
- * 3. provide a sugar syntax for creating [IrConst]s
- * 4. enable [includeFileIRInExceptionTrace] for visited files
- * 5. call [firstTransformComposableBody] when visiting a Composable function with
+ * 3. Provide a sugar syntax for creating [IrConst]s
+ * 4. Enable [includeFilePathInExceptionTrace] for visited files
+ * 5. Call [firstTransformComposableBody] when visiting a Composable function with
  * the conditions for ComposeInvestigator to work
- * 6. call [lastTransformSkipToGroupEndCall] when visiting the expression
+ * 6. Call [lastTransformSkipToGroupEndCall] when visiting the expression
  * `composer.skipToGroupEnd()`.
- * 7. call [firstTransformStateInitializer] when visiting a `State` or `StateObject`
+ * 7. Call [firstTransformStateInitializer] when visiting a `State` or `StateObject`
  * definition
  */
 public open class ComposeInvestigatorBaseLower(
@@ -141,7 +141,7 @@ public open class ComposeInvestigatorBaseLower(
   protected val valueArgument: IrValueArgument by unsafeLazy { IrValueArgument(context) }
 
   final override fun visitFileNew(declaration: IrFile): IrFile =
-    includeFileIRInExceptionTrace(declaration) {
+    includeFilePathInExceptionTrace(declaration) {
       if (declaration.hasAnnotation(NO_INVESTIGATION_FQN)) return declaration
       super.visitFileNew(declaration)
     }
@@ -191,7 +191,7 @@ public open class ComposeInvestigatorBaseLower(
   // val state = <ENTER HERE: remember { mutableStateOf(T) } >
   final override fun visitVariable(declaration: IrVariable): IrStatement {
     if (declaration.origin == IrDeclarationOrigin.PROPERTY_DELEGATE) return super.visitVariable(declaration)
-    if (declaration.isValidStateDeclaration()) {
+    if (declaration.isStateDeclaration()) {
       declaration.initializer = firstTransformStateInitializer(
         name = declaration.name,
         initializer = declaration.initializer!!,
@@ -203,7 +203,7 @@ public open class ComposeInvestigatorBaseLower(
 
   // var state by <ENTER HERE: remember { mutableStateOf(T) } >
   final override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty): IrStatement {
-    if (declaration.delegate.isValidStateDeclaration()) {
+    if (declaration.delegate.isStateDeclaration()) {
       declaration.delegate.initializer = firstTransformStateInitializer(
         name = declaration.name,
         initializer = declaration.delegate.initializer!!,
@@ -234,7 +234,7 @@ public open class ComposeInvestigatorBaseLower(
     table: IrInvalidationTraceTable,
   ): IrExpression = expression
 
-  private fun IrVariable.isValidStateDeclaration(): Boolean {
+  private fun IrVariable.isStateDeclaration(): Boolean {
     val isState = type.classOrNull?.let { clazz ->
       clazz.isSubtypeOfClass(stateSymbol.defaultType.classOrNull ?: return false) == true ||
         clazz.isSubtypeOfClass(stateObjectSymbol.defaultType.classOrNull ?: return false) == true

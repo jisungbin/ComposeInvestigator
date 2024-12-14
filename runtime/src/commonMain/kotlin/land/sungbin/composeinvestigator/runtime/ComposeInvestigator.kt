@@ -7,7 +7,7 @@ public object ComposeInvestigator {
   public const val LOGGER_DEFAULT_TAG: String = "ComposeInvestigator"
 
   /**
-   * This logger is called whenever an recomposition is processed or skipped. This field
+   * This logger is called whenever a recomposition is processed or skipped. This field
    * is variable, so you can easily change this.
    */
   public var logger: ComposableInvalidationLogger = ComposableInvalidationLogger { composable, result ->

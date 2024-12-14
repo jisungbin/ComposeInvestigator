@@ -44,7 +44,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
  */
 public class InvalidationTraceTableInstanceTransformer(
   private val context: IrPluginContext,
-  private val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter()
+  private val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter() (Blocked: "This API is not supported for K2")
 ) : IrElementTransformerVoid(), IrInvalidationTraceTableHolder {
   private val tables = mutableMapOf<IrFile, IrInvalidationTraceTable>()
 
@@ -56,7 +56,7 @@ public class InvalidationTraceTableInstanceTransformer(
     )
 
   override fun visitFile(declaration: IrFile): IrFile =
-    includeFileIRInExceptionTrace(declaration) {
+    includeFilePathInExceptionTrace(declaration) {
       if (
         declaration.hasAnnotation(NO_INVESTIGATION_FQN)
         // FIXME `fun c(l: @Composable () -> Unit)` ==> NO TABLE GENERATED

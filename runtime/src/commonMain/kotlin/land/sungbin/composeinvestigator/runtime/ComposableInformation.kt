@@ -3,8 +3,6 @@
 package land.sungbin.composeinvestigator.runtime
 
 import androidx.compose.runtime.Composer
-import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.Stable
 
 /**
  * Indicates which Composables were affected by the state change.
@@ -15,7 +13,6 @@ import androidx.compose.runtime.Stable
  * @param compoundKey Same as [Composer.compoundKeyHash]. If no lookup
  * is possible, `null`.
  */
-@Immutable
 public data class ComposableInformation(
   public val name: String,
   public val packageName: String,
@@ -30,4 +27,4 @@ public data class ComposableInformation(
 
 /** Fully-qualified name of the Composable function. */
 public val ComposableInformation.fqPackageName: String
-  @Stable get() = packageName.takeUnless(String::isEmpty)?.plus(".").orEmpty() + name
+  get() = packageName.takeUnless(String::isEmpty)?.plus(".").orEmpty() + name

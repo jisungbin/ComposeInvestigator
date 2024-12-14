@@ -3,15 +3,14 @@
 package land.sungbin.composeinvestigator.compiler.lower
 
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
-import androidx.compose.compiler.plugins.kotlin.lower.dumpSrc
 import org.jetbrains.kotlin.backend.common.ScopeWithIr
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.path
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
-import org.jetbrains.kotlin.ir.util.dump
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.kotlin.utils.exceptions.rethrowIntellijPlatformExceptionIfNeeded
 
@@ -31,17 +30,12 @@ internal fun List<ScopeWithIr>.lastComposable() =
     .lastOrNull { scope -> scope.irElement.safeAs<IrSimpleFunction>()?.hasComposableAnnotation() == true }
     ?.irElement?.safeAs<IrSimpleFunction>()
 
-// TODO This is code taken from AOSP, but this function has been removed from AOSP recently.
-//  I need to check how it has been replaced.
-internal inline fun <T> includeFileIRInExceptionTrace(file: IrFile, body: () -> T): T {
+internal inline fun <T> includeFilePathInExceptionTrace(file: IrFile, body: () -> T): T {
   try {
     return body()
   } catch (exception: Exception) {
     rethrowIntellijPlatformExceptionIfNeeded(exception)
-    throw Exception(
-      "IR lowering fail: ${file.dump()}\n\n\n${file.dumpSrc(useFir = true)}",
-      exception,
-    )
+    throw Exception("IR lowering failed at: ${file.path}", exception)
   }
 }
 

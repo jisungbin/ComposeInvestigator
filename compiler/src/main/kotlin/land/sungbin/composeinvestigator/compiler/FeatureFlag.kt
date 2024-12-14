@@ -17,7 +17,6 @@ import land.sungbin.composeinvestigator.compiler.lower.StateInitializerFirstTran
  *
  * @param phase 0: [ComposeInvestigatorFirstPhaseExtension], 1: [ComposeInvestigatorLastPhaseExtension]
  */
-@Suppress("RedundantVisibilityModifier") // FIXME false negative
 public enum class FeatureFlag(public val phase: Int) {
   InvalidationProcessTracing(0),
   InvalidationSkipTracing(1),

@@ -54,16 +54,16 @@ class SampleActivity : ComponentActivity() {
   ) {
     table.currentComposableName = ComposableName("EntryContent")
 
-    Text(text = System.currentTimeMillis().toString())
+    Text(System.currentTimeMillis().toString())
     Button(onClick = { currentMillis = System.currentTimeMillis() }) {
       table.currentComposableName = ComposableName("EntryUpdateButton")
 
-      Text(text = "Update current time")
+      Text("Update current time")
     }
     TimeDisplay(currentMillis)
   }
 }
 
 @Composable private fun TimeDisplay(milliseconds: Long) {
-  Text(text = "Current time: $milliseconds")
+  Text("Current time: $milliseconds")
 }
