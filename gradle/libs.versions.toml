@@ -6,7 +6,7 @@ gradle-publish-maven = "0.30.0"
 gradle-test-logging = "4.0.0"
 
 kotlin-core = "2.1.0"
-kotlin-dokka = "2.0.0-Beta"
+kotlin-dokka = "2.0.0"
 kotlin-coroutines = "1.9.0"
 
 androidx-activity = "1.9.3"
