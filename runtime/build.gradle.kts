@@ -9,7 +9,7 @@ plugins {
 dokka {
   moduleName = "ComposeInvestigator Runtime API"
   moduleVersion = project.property("VERSION_NAME") as String
-  dokkaPublicationDirectory = rootDir.resolve("documentation/site/runtime/api")
+  basePublicationsDirectory = rootDir.resolve("documentation/site/runtime/api")
 
   dokkaSourceSets.configureEach {
     jdkVersion = JavaVersion.VERSION_22.majorVersion.toInt()
