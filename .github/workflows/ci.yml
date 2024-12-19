@@ -40,7 +40,7 @@ jobs:
         run: ./gradlew build --stacktrace
 
       - name: Upload reports
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: build-reports
@@ -49,7 +49,7 @@ jobs:
             **/build/reports/*
 
       - name: Upload test results
-        if: always()
+        if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
           name: test-results
