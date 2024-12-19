@@ -12,7 +12,7 @@ dokka {
   basePublicationsDirectory = rootDir.resolve("documentation/site/runtime/api")
 
   dokkaSourceSets.configureEach {
-    jdkVersion = JavaVersion.VERSION_22.majorVersion.toInt()
+    jdkVersion = libs.versions.jdk.get().toInt()
   }
 
   pluginsConfiguration.html {
