@@ -7,8 +7,8 @@ import java.util.EnumSet
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorPluginRegistrar.Companion.DefaultIrValidatorConfig
 import land.sungbin.composeinvestigator.compiler.analysis.DurableComposableKeyAnalyzer
 import land.sungbin.composeinvestigator.compiler.lower.InvalidationProcessTracingFirstTransformer
-import land.sungbin.composeinvestigator.compiler.lower.InvalidationTraceTableInstanceTransformer
-import land.sungbin.composeinvestigator.compiler.lower.InvalidationTraceTableIntrinsicTransformer
+import land.sungbin.composeinvestigator.compiler.lower.InvalidationTraceTableInstantiateTransformer
+import land.sungbin.composeinvestigator.compiler.lower.InvalidationTraceTableIntrinsicCallTransformer
 import land.sungbin.composeinvestigator.compiler.lower.StateInitializerFirstTransformer
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
@@ -29,10 +29,10 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
  * The following five IR transformations are carried out by this class:
  *
  * - [DurableComposableKeyAnalyzer]
- * - [InvalidationTraceTableInstanceTransformer]
+ * - [InvalidationTraceTableInstantiateTransformer]
  * - [InvalidationProcessTracingFirstTransformer]
  * - [StateInitializerFirstTransformer]
- * - [InvalidationTraceTableIntrinsicTransformer]
+ * - [InvalidationTraceTableIntrinsicCallTransformer]
  */
 public class ComposeInvestigatorFirstPhaseExtension(
   private val messageCollector: MessageCollector,
@@ -45,7 +45,7 @@ public class ComposeInvestigatorFirstPhaseExtension(
       currentModule = moduleFragment.descriptor,
       externalStableTypeMatchers = emptySet(), // TODO Supports this feature
     )
-    val tables = InvalidationTraceTableInstanceTransformer(pluginContext, messageCollector)
+    val tables = InvalidationTraceTableInstantiateTransformer(pluginContext, messageCollector)
 
     messageCollector.log("Enabled first-phase features: ${features.filter { it.phase == 0 }.joinToString()}")
 
@@ -74,7 +74,7 @@ public class ComposeInvestigatorFirstPhaseExtension(
       moduleFragment.transformChildrenVoid(StateInitializerFirstTransformer(pluginContext, messageCollector, tables))
 
     if (FeatureFlag.InvalidationTraceTableIntrinsicCall in features)
-      moduleFragment.transformChildrenVoid(InvalidationTraceTableIntrinsicTransformer(pluginContext, IrComposableInformation(pluginContext), tables))
+      moduleFragment.transformChildrenVoid(InvalidationTraceTableIntrinsicCallTransformer(pluginContext, IrComposableInformation(pluginContext), tables))
 
     // Verify that our transformations didn't break something.
     validateIr(messageCollector, verificationMode) {

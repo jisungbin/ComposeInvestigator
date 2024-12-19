@@ -7,9 +7,9 @@ import land.sungbin.composeinvestigator.compiler._compilation.AbstractCompilerTe
 import org.jetbrains.kotlin.utils.addToStdlib.enumSetOf
 import org.junit.jupiter.api.Test
 
-class InvalidationTraceTableCallTest : AbstractCompilerTest(
+class InvalidationTraceTableIntrinsicCallTest : AbstractCompilerTest(
   enumSetOf(FeatureFlag.InvalidationTraceTableIntrinsicCall),
-  sourceRoot = "lower/traceTableCall",
+  sourceRoot = "lower/traceTableIntrinsicCall",
 ) {
   @Test fun getCurrentComposableKeyName() = diff(source("getCurrentComposableKeyName.kt"), contextSize = 0) {
     """
@@ -18,14 +18,14 @@ class InvalidationTraceTableCallTest : AbstractCompilerTest(
 @@ -8,2 +9,2 @@
 -    currentComposableInvalidationTracer.currentComposableKeyName
 -    val inVariable = currentComposableInvalidationTracer.currentComposableKeyName
-+    "fun-getCurrentComposableKeyName()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall/file-getCurrentComposableKeyName.kt"
-+    val inVariable = "fun-getCurrentComposableKeyName()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall/file-getCurrentComposableKeyName.kt"
++    "fun-getCurrentComposableKeyName()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableIntrinsicCall/file-getCurrentComposableKeyName.kt"
++    val inVariable = "fun-getCurrentComposableKeyName()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableIntrinsicCall/file-getCurrentComposableKeyName.kt"
 @@ -17,1 +18,1 @@
 -      currentComposableInvalidationTracer.currentComposableKeyName
-+      "fun-nested()Unit/fun-getCurrentComposableKeyName()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall/file-getCurrentComposableKeyName.kt"
++      "fun-nested()Unit/fun-getCurrentComposableKeyName()Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableIntrinsicCall/file-getCurrentComposableKeyName.kt"
 @@ -38,1 +39,1 @@
 -      keyed = currentComposableInvalidationTracer.currentComposableKeyName
-+      keyed = "fun-inFunctionDefaultArgument(String)Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableCall/file-getCurrentComposableKeyName.kt"
++      keyed = "fun-inFunctionDefaultArgument(String)Unit/pkg-land.sungbin.composeinvestigator.compiler._source.lower.traceTableIntrinsicCall/file-getCurrentComposableKeyName.kt"
     """
   }
 
@@ -93,6 +93,9 @@ class InvalidationTraceTableCallTest : AbstractCompilerTest(
 +    Unit
 @@ -15,1 +16,1 @@
 -      currentComposableInvalidationTracer.currentComposableName = @ComposableName(name = "BB!")
++      Unit
+@@ -58,1 +59,1 @@
+-      currentComposableInvalidationTracer.currentComposableName = @ComposableName(name = "CC!")
 +      Unit
     """
   }

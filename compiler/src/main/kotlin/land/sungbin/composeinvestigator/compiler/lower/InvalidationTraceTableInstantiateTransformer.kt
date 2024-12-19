@@ -42,7 +42,7 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
  * }
  * ```
  */
-public class InvalidationTraceTableInstanceTransformer(
+public class InvalidationTraceTableInstantiateTransformer(
   private val context: IrPluginContext,
   private val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter() (Blocked: "This API is not supported for K2")
 ) : IrElementTransformerVoid(), IrInvalidationTraceTableHolder {

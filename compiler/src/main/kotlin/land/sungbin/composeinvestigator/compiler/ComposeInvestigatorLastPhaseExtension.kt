@@ -5,7 +5,7 @@ package land.sungbin.composeinvestigator.compiler
 import java.util.EnumSet
 import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorPluginRegistrar.Companion.DefaultIrValidatorConfig
 import land.sungbin.composeinvestigator.compiler.lower.InvalidationSkipTracingLastTransformer
-import land.sungbin.composeinvestigator.compiler.lower.InvalidationTraceTableInstanceTransformer
+import land.sungbin.composeinvestigator.compiler.lower.InvalidationTraceTableInstantiateTransformer
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.validateIr
@@ -22,7 +22,7 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
  *
  * The following two IR transformations are carried out by this class:
  *
- * - [InvalidationTraceTableInstanceTransformer]
+ * - [InvalidationTraceTableInstantiateTransformer]
  * - [InvalidationSkipTracingLastTransformer]
  */
 public class ComposeInvestigatorLastPhaseExtension(
@@ -32,7 +32,7 @@ public class ComposeInvestigatorLastPhaseExtension(
   private val features: EnumSet<FeatureFlag> = ComposeInvestigatorPluginRegistrar.DefaultEnabledFeatureFlags,
 ) : IrGenerationExtension {
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-    val tables = InvalidationTraceTableInstanceTransformer(pluginContext, messageCollector)
+    val tables = InvalidationTraceTableInstantiateTransformer(pluginContext, messageCollector)
 
     messageCollector.log("Enabled last-phase features: ${features.filter { it.phase == 1 }.joinToString()}")
 

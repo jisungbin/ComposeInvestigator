@@ -40,7 +40,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.cast
  * Transforms the code to implement the use of the `ComposableInvalidationTraceTable`'s
  * Intrinsic API by utilizing metadata generated at compile time by `ComposeInvestigator`.
  */
-public class InvalidationTraceTableIntrinsicTransformer(
+public class InvalidationTraceTableIntrinsicCallTransformer(
   private val context: IrPluginContext,
   private val irComposableInformation: IrComposableInformation,
   private val tables: IrInvalidationTraceTableHolder,

@@ -7,7 +7,7 @@ import kotlin.test.BeforeTest
 import kotlin.test.Ignore
 import kotlin.test.Test
 
-@Ignore // This feature is not yet ready for public use.
+@Ignore("This feature is not yet ready for public use.")
 class StateObjectsTest {
   @BeforeTest fun prepare() {
     TestConfiguration.reset()

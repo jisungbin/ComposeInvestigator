@@ -16,7 +16,6 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.coroutineContext
 import kotlin.coroutines.resume
 import kotlin.coroutines.suspendCoroutine
-import kotlin.jvm.JvmInline
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.Job
@@ -124,7 +123,7 @@ fun runCompose(
 }
 
 suspend inline fun runningCompose(noinline content: @Composable () -> Unit): RunningJob =
-  RunningJob(Job().apply { runCompose(coroutineContext + this, content) })
+  RunningJob(Job()).also { running -> runCompose(coroutineContext + running.job, content) }
 
 @Composable fun Text(text: String) {
   ComposeNode<StringsNode, StringsNodeApplier>(

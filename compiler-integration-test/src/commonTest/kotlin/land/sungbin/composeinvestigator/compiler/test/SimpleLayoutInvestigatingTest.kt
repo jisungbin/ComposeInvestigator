@@ -9,27 +9,31 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.setValue
 import assertk.assertThat
 import composemock.action
-import composemock.runCompose
 import composemock.runningCompose
 import kotlin.test.BeforeTest
 import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
 import land.sungbin.composeinvestigator.compiler.test.TestConfiguration.logs
 import land.sungbin.composeinvestigator.compiler.test.assertion.assertInvestigations
+import land.sungbin.composeinvestigator.compiler.test.util.awaitInvalidation
 import land.sungbin.composeinvestigator.runtime.ChangedArgument
 import land.sungbin.composeinvestigator.runtime.InvalidationResult
 import land.sungbin.composeinvestigator.runtime.Stability
 import land.sungbin.composeinvestigator.runtime.ValueArgument
 
-class SimpleTextTest {
+class SimpleLayoutInvestigatingTest {
   @BeforeTest fun prepare() {
     TestConfiguration.reset()
-    simpleTextTable.reset()
+    simpleLayoutTable.reset()
   }
 
   @Test fun initialComposition() = runTest {
-    runCompose { SimpleText() }
-    assertThat(logs).assertInvestigations(Investigated(simpleText(), InvalidationResult.InitialComposition))
+    runningCompose { SimpleLayout() } action {
+      assertThat(logs).assertInvestigations(
+        Investigated(simpleLayout(), InvalidationResult.InitialComposition),
+        Investigated(numberText(), InvalidationResult.InitialComposition),
+      )
+    }
   }
 
   @Test fun skipRecomposition() = runTest {
@@ -37,14 +41,15 @@ class SimpleTextTest {
 
     runningCompose {
       recomposeScope = currentRecomposeScope
-      SimpleText()
+      SimpleLayout()
     } action {
       recomposeScope!!.invalidate()
       awaitInvalidation()
 
       assertThat(logs).assertInvestigations(
-        Investigated(simpleText(), InvalidationResult.InitialComposition),
-        Investigated(simpleText(), InvalidationResult.Skipped),
+        Investigated(simpleLayout(), InvalidationResult.InitialComposition),
+        Investigated(numberText(), InvalidationResult.InitialComposition),
+        Investigated(simpleLayout(), InvalidationResult.Skipped),
       )
     }
   }
@@ -52,29 +57,53 @@ class SimpleTextTest {
   @Test fun recomposition() = runTest {
     var value by mutableIntStateOf(0)
 
-    runningCompose { SimpleText(value.toString()) } action {
+    runningCompose { SimpleLayout(value) } action {
       value++
       awaitInvalidation()
 
       assertThat(logs).assertInvestigations(
-        Investigated(simpleText(), InvalidationResult.InitialComposition),
+        Investigated(simpleLayout(), InvalidationResult.InitialComposition),
+        Investigated(numberText(), InvalidationResult.InitialComposition),
         Investigated(
-          simpleText(),
+          simpleLayout(),
           InvalidationResult.ArgumentChanged(
             listOf(
               ChangedArgument(
                 previous = ValueArgument(
                   name = "value",
-                  type = "kotlin.String",
+                  type = "kotlin.Int",
                   valueString = "0",
-                  valueHashCode = 48,
+                  valueHashCode = 0,
                   stability = Stability.Stable,
                 ),
                 new = ValueArgument(
                   name = "value",
-                  type = "kotlin.String",
+                  type = "kotlin.Int",
                   valueString = "1",
-                  valueHashCode = 49,
+                  valueHashCode = 1,
+                  stability = Stability.Stable,
+                ),
+              ),
+            ),
+          ),
+        ),
+        Investigated(
+          numberText(),
+          InvalidationResult.ArgumentChanged(
+            listOf(
+              ChangedArgument(
+                previous = ValueArgument(
+                  name = "value",
+                  type = "kotlin.Int",
+                  valueString = "0",
+                  valueHashCode = 0,
+                  stability = Stability.Stable,
+                ),
+                new = ValueArgument(
+                  name = "value",
+                  type = "kotlin.Int",
+                  valueString = "1",
+                  valueHashCode = 1,
                   stability = Stability.Stable,
                 ),
               ),

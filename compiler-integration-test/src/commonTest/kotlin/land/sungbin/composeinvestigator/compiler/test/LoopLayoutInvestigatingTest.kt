@@ -16,12 +16,13 @@ import kotlin.test.Test
 import kotlinx.coroutines.test.runTest
 import land.sungbin.composeinvestigator.compiler.test.TestConfiguration.logs
 import land.sungbin.composeinvestigator.compiler.test.assertion.assertInvestigations
+import land.sungbin.composeinvestigator.compiler.test.util.awaitInvalidation
 import land.sungbin.composeinvestigator.runtime.ChangedArgument
 import land.sungbin.composeinvestigator.runtime.InvalidationResult
 import land.sungbin.composeinvestigator.runtime.Stability
 import land.sungbin.composeinvestigator.runtime.ValueArgument
 
-class LoopLayoutTest {
+class LoopLayoutInvestigatingTest {
   @BeforeTest fun prepare() {
     TestConfiguration.reset()
     loopLayoutTable.reset()
