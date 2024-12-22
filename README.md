@@ -1,3 +1,10 @@
+> [!WARNING]
+>
+> ### This tool has many issues and is not recommended for use.
+>
+> I'm currently redeveloping this tool from the ground up. It will take a long time
+> to reach a stable stage.
+
 ## ComposeInvestigator
 
 Trace the recomposition of a Composable with its cause without boilerplate code 😎.
