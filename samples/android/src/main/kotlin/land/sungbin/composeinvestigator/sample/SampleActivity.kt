@@ -22,14 +22,14 @@ import androidx.compose.ui.unit.dp
 import land.sungbin.composeinvestigator.runtime.ComposableInvalidationLogger
 import land.sungbin.composeinvestigator.runtime.ComposableName
 import land.sungbin.composeinvestigator.runtime.ComposeInvestigator
-import land.sungbin.composeinvestigator.runtime.currentComposableInvalidationTracer
+import land.sungbin.composeinvestigator.runtime.currentComposeInvestigator
 
-private val table by lazy { currentComposableInvalidationTracer }
+private val table by lazy { currentComposeInvestigator }
 
 class SampleActivity : ComponentActivity() {
   init {
     ComposeInvestigator.logger = ComposableInvalidationLogger { composable, result ->
-      Log.d(ComposeInvestigator.LOGGER_DEFAULT_TAG, "The '${composable.name}' composable has been recomposed.\n$result")
+      Log.d(ComposeInvestigator.LOGGER_DEFAULT_TAG, "The '${composable.simpleName}' composable has been recomposed.\n$result")
     }
   }
 
