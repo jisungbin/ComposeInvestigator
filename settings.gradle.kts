@@ -49,5 +49,5 @@ include(
   ":runtime",
   ":compiler",
   ":compiler-gradle-plugin",
-  ":samples:android",
+  // ":samples:android",
 )

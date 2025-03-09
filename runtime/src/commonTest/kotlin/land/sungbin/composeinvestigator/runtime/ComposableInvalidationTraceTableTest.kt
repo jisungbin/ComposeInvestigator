@@ -3,14 +3,12 @@
 package land.sungbin.composeinvestigator.runtime
 
 import assertk.assertThat
-import assertk.assertions.containsOnly
 import assertk.assertions.isEqualTo
 import kotlin.test.Test
-import land.sungbin.composeinvestigator.runtime.ComposableInvalidationTraceTable.AffectedName
 
 class ComposableInvalidationTraceTableTest {
   @Test fun computeInvalidationReasonWhenNoPreviousInfo() {
-    val table = ComposableInvalidationTraceTable()
+    val table = ComposeInvestigator()
 
     val argument = ValueArgument(
       name = "name",
@@ -19,14 +17,13 @@ class ComposableInvalidationTraceTableTest {
       valueString = "value",
       valueHashCode = 0,
     )
-    val reason = table.computeInvalidationReason(keyName = "keyName", compoundKey = 0, arguments = listOf(argument))
+    val reason = table.computeInvalidationReason(compoundKey = 0, arguments = listOf(argument))
 
-    assertThat(table.affectedArguments).containsOnly(AffectedName("keyName", compoundKey = 0) to listOf(argument))
     assertThat(reason).isEqualTo(InvalidationResult.InitialComposition)
   }
 
   @Test fun computeInvalidationReasonWhenPreviousInfoExists() {
-    val table = ComposableInvalidationTraceTable()
+    val table = ComposeInvestigator()
 
     val oldArgument = ValueArgument(
       name = "name",
@@ -43,10 +40,9 @@ class ComposableInvalidationTraceTableTest {
       valueHashCode = 1,
     )
 
-    table.computeInvalidationReason(keyName = "keyName", compoundKey = 0, arguments = listOf(oldArgument))
-    val reason = table.computeInvalidationReason(keyName = "keyName", compoundKey = 0, arguments = listOf(newArgument))
+    table.computeInvalidationReason(compoundKey = 0, arguments = listOf(oldArgument))
+    val reason = table.computeInvalidationReason(compoundKey = 0, arguments = listOf(newArgument))
 
-    assertThat(table.affectedArguments).containsOnly(AffectedName("keyName", compoundKey = 0) to listOf(newArgument))
     assertThat(reason).isEqualTo(InvalidationResult.ArgumentChanged(listOf(oldArgument changedTo newArgument)))
   }
 
