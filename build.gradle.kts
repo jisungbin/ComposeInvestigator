@@ -1,18 +1,15 @@
 // Copyright 2024 Ji Sungbin
 // SPDX-License-Identifier: Apache-2.0
-import com.adarshr.gradle.testlogger.TestLoggerExtension
-import com.adarshr.gradle.testlogger.theme.ThemeType
 import com.diffplug.gradle.spotless.BaseKotlinExtension
 import com.diffplug.gradle.spotless.SpotlessExtension
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
-  kotlin("multiplatform") version libs.versions.kotlin.core apply false
-  kotlin("plugin.compose") version libs.versions.kotlin.core apply false
+  kotlin("multiplatform") version libs.versions.kotlin.asProvider().get() apply false
+  kotlin("plugin.compose") version libs.versions.kotlin.asProvider().get() apply false
   alias(libs.plugins.gradle.android.application) apply false
   alias(libs.plugins.compose.multiplatform) apply false
   alias(libs.plugins.spotless) apply false
-  alias(libs.plugins.gradle.test.logging) apply false
   alias(libs.plugins.gradle.publish.maven) apply false
   idea
 }
@@ -91,21 +88,8 @@ subprojects {
   group = project.property("GROUP") as String
   version = project.property("VERSION_NAME") as String
 
-  apply {
-    plugin(rootProject.libs.plugins.gradle.test.logging.get().pluginId)
-  }
-
-  extensions.configure<TestLoggerExtension> {
-    theme = ThemeType.MOCHA_PARALLEL
-    slowThreshold = 10_000
-  }
-
   tasks.withType<Test> {
     useJUnitPlatform()
     outputs.upToDateWhen { false }
   }
-}
-
-tasks.register<Delete>("cleanAll") {
-  delete(*allprojects.map { project -> project.layout.buildDirectory }.toTypedArray())
 }

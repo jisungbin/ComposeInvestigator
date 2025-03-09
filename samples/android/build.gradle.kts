@@ -8,7 +8,7 @@ plugins {
 
 android {
   namespace = "land.sungbin.composeinvestigator.sample"
-  compileSdk = 34
+  compileSdk = 35
 
   defaultConfig {
     minSdk = 24
@@ -17,10 +17,6 @@ android {
   compileOptions {
     sourceCompatibility = JavaVersion.toVersion(libs.versions.jdk.get().toInt())
     targetCompatibility = JavaVersion.toVersion(libs.versions.jdk.get().toInt())
-  }
-
-  sourceSets {
-    getByName("main").java.srcDir("src/main/kotlin")
   }
 }
 
