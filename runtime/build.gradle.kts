@@ -17,7 +17,7 @@ dokka {
 
   pluginsConfiguration.html {
     homepageLink = "https://jisungbin.github.io/ComposeInvestigator/"
-    footerMessage = "ComposeInvestigator ⓒ 2024 Ji Sungbin"
+    footerMessage = "ComposeInvestigator ⓒ 2025 Ji Sungbin"
   }
 }
 
@@ -50,14 +50,14 @@ kotlin {
 
     commonTest {
       dependencies {
-        implementation(kotlin("test", version = libs.versions.kotlin.core.get()))
+        implementation(kotlin("test", version = libs.versions.kotlin.asProvider().get()))
         implementation(libs.test.assertk)
       }
     }
 
     jvmTest {
       dependencies {
-        implementation(kotlin("reflect", version = libs.versions.kotlin.core.get())) // Used by assertk
+        implementation(kotlin("reflect", version = libs.versions.kotlin.asProvider().get())) // Used by assertk
       }
     }
   }
