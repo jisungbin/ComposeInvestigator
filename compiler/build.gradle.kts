@@ -1,4 +1,4 @@
-// Copyright 2024 Ji Sungbin
+// Copyright 2025 Ji Sungbin
 // SPDX-License-Identifier: Apache-2.0
 plugins {
   kotlin("jvm")
@@ -17,7 +17,7 @@ dokka {
 
   pluginsConfiguration.html {
     homepageLink = "https://jisungbin.github.io/ComposeInvestigator/"
-    footerMessage = "ComposeInvestigator ⓒ 2024 Ji Sungbin"
+    footerMessage = "ComposeInvestigator ⓒ 2025 Ji Sungbin"
   }
 }
 
@@ -37,17 +37,6 @@ kotlin {
 }
 
 dependencies {
-  compileOnly(kotlin("compiler-embeddable", version = libs.versions.kotlin.core.get()))
-  compileOnly(kotlin("compose-compiler-plugin", version = libs.versions.kotlin.core.get()))
-
-  testImplementation(projects.runtime)
-  testImplementation(libs.compose.runtime)
-  testImplementation(libs.test.diffutil)
-  testImplementation(libs.test.kluent) // TODO Temporary library to use until KT-53336 is resolved
-
-  testImplementation(kotlin("test-junit5", version = libs.versions.kotlin.core.get()))
-  testImplementation(kotlin("compiler-embeddable", version = libs.versions.kotlin.core.get()))
-  testImplementation(kotlin("compose-compiler-plugin-embeddable", version = libs.versions.kotlin.core.get()))
-
-  kotlinCompilerPluginClasspathTest(kotlin("compose-compiler-plugin-embeddable", version = libs.versions.kotlin.core.get()))
+  compileOnly(kotlin("compiler-embeddable", version = libs.versions.kotlin.asProvider().get()))
+  compileOnly(kotlin("compose-compiler-plugin", version = libs.versions.kotlin.asProvider().get()))
 }

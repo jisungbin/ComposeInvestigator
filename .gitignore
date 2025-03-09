@@ -6,8 +6,8 @@
 !/.idea/codeStyles
 !/.idea/dictionaries
 !/.idea/inspectionProfiles
-!/.idea/README.md
 *.iml
+.DS_Store
 .gradle
 .kotlin
 build
