@@ -1,51 +1,36 @@
 [versions]
 jdk = "17"
 
-gradle-android = "8.8.0"
-gradle-publish-maven = "0.31.0"
-gradle-test-logging = "4.0.0"
-
-kotlin-core = "2.1.0"
-kotlin-dokka = "2.0.0"
+kotlin = "2.1.10"
 kotlin-coroutines = "1.10.1"
 
-androidx-activity = "1.9.3"
-androidx-annotation = "1.9.1"
+androidx-activity = "1.10.1"
 
-compose-activity = "1.9.3"
 compose-multiplatform = "1.7.3"
 
-spotless = "7.0.2"
 ktlint = "1.5.0"
 
-test-diffutil = "4.15"
-test-assertk = "0.28.1"
-test-kluent = "1.73"
-
 [plugins]
-gradle-publish-maven = { id = "com.vanniktech.maven.publish", version.ref = "gradle-publish-maven" }
-gradle-android-application = { id = "com.android.application", version.ref = "gradle-android" }
-gradle-test-logging = { id = "com.adarshr.test-logger", version.ref = "gradle-test-logging" }
+gradle-android-application = { id = "com.android.application", version = "8.9.0" }
+gradle-publish-maven = { id = "com.vanniktech.maven.publish", version = "0.31.0" }
 
-kotlin-dokka = { id = "org.jetbrains.dokka", version.ref = "kotlin-dokka" }
+kotlin-dokka = { id = "org.jetbrains.dokka", version = "2.0.0" }
 
 compose-multiplatform = { id = "org.jetbrains.compose", version.ref = "compose-multiplatform" }
 
-spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
+spotless = { id = "com.diffplug.spotless", version = "7.0.2" }
 
 [libraries]
 kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlin-coroutines" }
 
 androidx-activity = { module = "androidx.activity:activity-ktx", version.ref = "androidx-activity" }
-androidx-annotation = { module = "androidx.annotation:annotation", version.ref = "androidx-annotation" }
+androidx-annotation = { module = "androidx.annotation:annotation", version = "1.9.1" }
 
-compose-activity = { module = "androidx.activity:activity-compose", version.ref = "compose-activity" }
+compose-activity = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
 compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "compose-multiplatform" }
 
-test-diffutil = { module = "io.github.java-diff-utils:java-diff-utils", version.ref = "test-diffutil" }
-test-assertk = { module = "com.willowtreeapps.assertk:assertk", version.ref = "test-assertk" }
-test-kluent = { module = "org.amshove.kluent:kluent", version.ref = "test-kluent" }
+test-assertk = { module = "com.willowtreeapps.assertk:assertk", version = "0.28.1" }
 test-kotlin-coroutines = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlin-coroutines" }
 
 ktlint-cli = { module = "com.pinterest.ktlint:ktlint-cli", version.ref = "ktlint" } # for Renovate

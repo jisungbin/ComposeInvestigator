@@ -14,6 +14,7 @@ pluginManagement {
       mavenContent {
         includeGroupByRegex(".*google.*")
         includeGroupByRegex(".*android.*")
+        releasesOnly()
       }
     }
     mavenCentral {
@@ -48,6 +49,5 @@ include(
   ":runtime",
   ":compiler",
   ":compiler-gradle-plugin",
-  ":compiler-integration-test",
   ":samples:android",
 )

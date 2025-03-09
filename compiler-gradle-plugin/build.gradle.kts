@@ -16,9 +16,9 @@ val updateVersion by tasks.registering(UpdatePluginVersionTask::class) {
       .replace("\$YEAR", Year.now().toString())
   }
 
-  version.set(project.property("VERSION_NAME") as String)
+  version.set(provider { project.property("VERSION_NAME") as String })
   this.copyright.set(provider { copyright })
-  destination.set(projectDir.walk().first { path -> path.endsWith("VERSION.kt") })
+  destination.set(provider { RegularFile { projectDir.walk().first { path -> path.endsWith("VERSION.kt") } } })
 }
 
 tasks.matching { task ->
@@ -44,7 +44,7 @@ kotlin {
 }
 
 dependencies {
-  compileOnly(kotlin("gradle-plugin", version = libs.versions.kotlin.core.get()))
+  compileOnly(kotlin("gradle-plugin"))
 }
 
 abstract class UpdatePluginVersionTask : DefaultTask() {
