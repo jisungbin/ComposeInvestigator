@@ -4,32 +4,13 @@ package land.sungbin.composeinvestigator.runtime
 
 import androidx.annotation.VisibleForTesting
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.NoLiveLiterals
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.snapshots.StateObject
 
 /** Returns the [ComposeInvestigator] assigned to the current file. */
 public val currentComposeInvestigator: ComposeInvestigator
   @[Stable JvmSynthetic] get() = intrinsicImplementedError()
-
-/**
- * Returns the name of the current Composable.
- * See [ComposeInvestigator.currentComposableName].
- *
- * You can get [name] directly from the property delegation.
- * See [ComposableName.getValue].
- */
-@MustBeDocumented
-@Target() // We use an annotation class to prevent LiveLiteral transform from the Compose compiler.
-@Retention(AnnotationRetention.SOURCE)
-public annotation class ComposableName(public val name: String)
-
-/**
- * `val name: String by ComposableName("MyComposable") // result: "MyComposable"`
- *
- * @see ComposableName
- */
-@Suppress("unused")
-@Stable public operator fun ComposableName.getValue(thisRef: Any?, property: Any?): String = name
 
 /**
  * Classes that hold data from ComposeInvestigator.
@@ -51,39 +32,22 @@ public annotation class ComposableName(public val name: String)
 @Immutable public class ComposeInvestigator @ComposeInvestigatorCompilerApi public constructor() {
   private val stateObjectMap: MutableMap<StateObject, String> = mutableMapOf()
   private val argumentMap: MutableMap<Int, List<ValueArgument>> = mutableMapOf()
+  private val nameMap: MutableMap<Int, String> = mutableMapOf()
 
-  /**
-   * Returns the name of the current Composable, or you can define your own Composable name to use
-   * for ComposeInvestigator.
-   *
-   * ```
-   * @Composable fun MyComposable() {
-   *   val table = currentComposableInvalidationTracer
-   *
-   *   val originalName = table.currentComposableName.name
-   *   assertEquals(originalName, "MyComposable") // Ok
-   *
-   *   table.currentComposableName = ComposableName("AwesomeComposable")
-   *   val newName = table.currentComposableName.name
-   *   assertEquals(newName, "AwesomeComposable") // Ok
-   * }
-   * ```
-   *
-   * This is used as the value of [name][ComposableInformation.simpleName] in [ComposableInformation].
-   *
-   * If you call this getter from a Composable configured as an anonymous function, it will always
-   * be named 'anonymous.' Therefore, in this case, we recommend you specify your Composable name.
-   */
-  public var currentComposableName: ComposableName
-    @[Stable ComposableScope JvmSynthetic] get() {
-      intrinsicImplementedError()
-    }
-    @[ComposableScope JvmSynthetic] set(@Suppress("unused") name) {
-      intrinsicImplementedError()
-    }
+  @NoLiveLiterals @ComposableScope
+  @Stable public fun setComposableName(name: String, compoundKey: Int = intrinsicImplementedError()) {
+    nameMap[compoundKey] = name
+  }
+
+  @NoLiveLiterals @ComposableScope
+  @Stable public fun getComposableName(
+    compoundKey: Int = intrinsicImplementedError(),
+    default: String = intrinsicImplementedError(),
+  ): String = nameMap[compoundKey] ?: default
 
   @VisibleForTesting public fun reset() {
     argumentMap.clear()
+    nameMap.clear()
   }
 
   /**
@@ -105,10 +69,10 @@ public annotation class ComposableName(public val name: String)
     return stateObjectMap[value]
   }
 
-  /** @suppress ComposeInvestigator compiler-only API */
-  @ComposeInvestigatorCompilerApi
   // FIXME Storing the StateObject itself can potentially create a memory leak.
   //  Consider storing immutable primitives like hashCode instead of the object.
+  /** @suppress ComposeInvestigator compiler-only API */
+  @ComposeInvestigatorCompilerApi
   public fun <T : Any> registerStateObject(value: T, name: String): T {
     if (value !is StateObject) return value
     return value.apply { stateObjectMap[this] = name }

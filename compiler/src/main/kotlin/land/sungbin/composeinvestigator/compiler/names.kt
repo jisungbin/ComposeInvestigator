@@ -29,7 +29,7 @@ public object ComposeNames {
   public val currentComposer: FqName = ANDROIDX_COMPOSE_RUNTIME_FQN.child(identifier("currentComposer"))
 
   public val state: FqName = ANDROIDX_COMPOSE_RUNTIME_FQN.child(identifier("State"))
-  public val stateObject: FqName = ANDROIDX_COMPOSE_RUNTIME_FQN.child(identifier("snapshots.StateObject"))
+  public val stateObject: FqName = ANDROIDX_COMPOSE_RUNTIME_FQN.child(identifier("snapshots")).child(identifier("StateObject"))
 }
 
 public object InvestigatorNames {
@@ -37,7 +37,8 @@ public object InvestigatorNames {
   public val noInvestigation: FqName = COMPOSE_INVESTIGATOR_RUNTIME_FQN.child(identifier("NoInvestigation"))
 
   public val composeInvestigator: FqName = COMPOSE_INVESTIGATOR_RUNTIME_FQN.child(identifier("ComposeInvestigator"))
-  public val composeInvestigatorCurrentComposablenName: FqName = composeInvestigator.child(identifier("currentComposableName"))
+  public val composeInvestigatorSetComposableName: FqName = composeInvestigator.child(identifier("setComposableName"))
+  public val composeInvestigatorGetComposableName: FqName = composeInvestigator.child(identifier("getComposableName"))
   public val composeInvestigatorRegisterStateObject: FqName = composeInvestigator.child(identifier("registerStateObject"))
   public val composeInvestigatorComputeInvalidationReason: FqName = composeInvestigator.child(identifier("computeInvalidationReason"))
   public val composeInvestigatorLogger: FqName = composeInvestigator.child(identifier("Companion")).child(identifier("Logger"))
@@ -49,7 +50,6 @@ public object InvestigatorNames {
   public val invalidationResult: FqName = COMPOSE_INVESTIGATOR_RUNTIME_FQN.child(identifier("InvalidationResult"))
   public val invalidationResultSkipped: FqName = invalidationResult.child(identifier("Skipped"))
 
-  public val composableName: FqName = COMPOSE_INVESTIGATOR_RUNTIME_FQN.child(identifier("ComposableName"))
   public val composableInformation: FqName = COMPOSE_INVESTIGATOR_RUNTIME_FQN.child(identifier("ComposableInformation"))
   public val valueArgument: FqName = COMPOSE_INVESTIGATOR_RUNTIME_FQN.child(identifier("ValueArgument"))
 
