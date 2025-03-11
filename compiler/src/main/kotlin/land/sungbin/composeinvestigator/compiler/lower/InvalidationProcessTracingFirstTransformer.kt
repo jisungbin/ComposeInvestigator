@@ -10,8 +10,8 @@ import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.fromFqName
 import land.sungbin.composeinvestigator.compiler.log
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTableHolder
+import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigator
+import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigatorHolder
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -82,7 +82,7 @@ import org.jetbrains.kotlin.name.SpecialNames
 public class InvalidationProcessTracingFirstTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
-  tables: IrInvalidationTraceTableHolder,
+  tables: IrComposeInvestigatorHolder,
   private val stabilityInferencer: StabilityInferencer,
 ) : ComposeInvestigatorBaseLower(context, messageCollector, tables) {
   private val currentComposerSymbol: IrPropertySymbol =
@@ -92,7 +92,7 @@ public class InvalidationProcessTracingFirstTransformer(
   override fun firstTransformComposableBody(
     composable: IrSimpleFunction,
     body: IrBody,
-    table: IrInvalidationTraceTable,
+    table: IrComposeInvestigator,
   ): IrBody {
     messageCollector.log(
       "Visit composable body: ${composable.name}",
@@ -183,7 +183,7 @@ public class InvalidationProcessTracingFirstTransformer(
     newStatements += invalidationReasonVariable
 
     val invalidationResultProcessed = irGetValue(invalidationReasonVariable)
-      .apply { type = invalidationLogger.irInvalidationResultSymbol.defaultType }
+      .apply { type = invalidationLogger.invalidationResultSymbol.defaultType }
     val logger = invalidationLogger.irLog(affectedComposable, result = invalidationResultProcessed)
 
     newStatements += logger

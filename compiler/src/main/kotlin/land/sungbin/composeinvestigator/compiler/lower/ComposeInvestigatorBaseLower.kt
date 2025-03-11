@@ -21,8 +21,8 @@ import land.sungbin.composeinvestigator.compiler.Stability_RUNTIME
 import land.sungbin.composeinvestigator.compiler.Stability_UNKNOWN
 import land.sungbin.composeinvestigator.compiler.fromFqName
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationLogger
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTableHolder
+import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigator
+import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigatorHolder
 import land.sungbin.composeinvestigator.compiler.struct.IrValueArgument
 import land.sungbin.composeinvestigator.compiler.struct.get
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
@@ -93,7 +93,7 @@ import org.jetbrains.kotlin.types.Variance
 public open class ComposeInvestigatorBaseLower(
   protected val context: IrPluginContext,
   protected val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter() (Blocked: "This API is not supported for K2")
-  protected val tables: IrInvalidationTraceTableHolder,
+  protected val tables: IrComposeInvestigatorHolder,
 ) : IrElementTransformerVoidWithContext() {
   private var ownStabilitySymbol: IrClassSymbol? = null
   private var ownStabilityCertainSymbol: IrClassSymbol? = null
@@ -217,21 +217,21 @@ public open class ComposeInvestigatorBaseLower(
   protected open fun firstTransformComposableBody(
     composable: IrSimpleFunction,
     body: IrBody,
-    table: IrInvalidationTraceTable,
+    table: IrComposeInvestigator,
   ): IrBody = body
 
   // (MUST) LoadingOrder.FIRST
   protected open fun firstTransformStateInitializer(
     name: Name,
     initializer: IrExpression,
-    table: IrInvalidationTraceTable,
+    table: IrComposeInvestigator,
   ): IrExpression = initializer
 
   // (MUST) LoadingOrder.LAST
   protected open fun lastTransformSkipToGroupEndCall(
     composable: IrSimpleFunction,
     expression: IrCall,
-    table: IrInvalidationTraceTable,
+    table: IrComposeInvestigator,
   ): IrExpression = expression
 
   private fun IrVariable.isStateDeclaration(): Boolean {

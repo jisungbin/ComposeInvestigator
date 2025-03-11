@@ -7,8 +7,8 @@ import land.sungbin.composeinvestigator.compiler.COMPOSER_FQN
 import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.log
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTableHolder
+import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigator
+import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigatorHolder
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -57,12 +57,12 @@ import org.jetbrains.kotlin.ir.util.file
 public class InvalidationSkipTracingLastTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
-  table: IrInvalidationTraceTableHolder,
+  table: IrComposeInvestigatorHolder,
 ) : ComposeInvestigatorBaseLower(context, messageCollector, table) {
   override fun lastTransformSkipToGroupEndCall(
     composable: IrSimpleFunction,
     expression: IrCall,
-    table: IrInvalidationTraceTable,
+    table: IrComposeInvestigator,
   ): IrExpression {
     messageCollector.log(
       "Visit skipToGroupEnd call: ${composable.name}",
@@ -92,7 +92,7 @@ public class InvalidationSkipTracingLastTransformer(
     }
 
     val invalidationResultSkipped = invalidationLogger.irInvalidationResultSkipped()
-      .apply { type = invalidationLogger.irInvalidationResultSymbol.defaultType }
+      .apply { type = invalidationLogger.invalidationResultSymbol.defaultType }
     val logger = invalidationLogger.irLog(affectedComposable, result = invalidationResultSkipped)
 
     return IrBlockImpl(
