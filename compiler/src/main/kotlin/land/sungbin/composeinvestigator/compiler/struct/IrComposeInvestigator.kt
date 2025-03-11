@@ -3,6 +3,7 @@
 package land.sungbin.composeinvestigator.compiler.struct
 
 import java.lang.ref.WeakReference
+import land.sungbin.composeinvestigator.compiler.InvestigatorFqNames
 import land.sungbin.composeinvestigator.compiler.InvestigatorNames
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
@@ -110,9 +111,9 @@ public class IrComposeInvestigator private constructor(internal val property: Ir
   public companion object {
     private fun IrComposeInvestigator.makeTable() {
       val symbol = property.backingField!!.type.classOrFail
-      getComposableNameSymbol = symbol.getSimpleFunction(InvestigatorNames.composeInvestigatorGetComposableName.shortName().asString())!!
-      registerStateObjectSymbol = symbol.getSimpleFunction(InvestigatorNames.composeInvestigatorRegisterStateObject.shortName().asString())!!
-      computeInvalidationReasonSymbol = symbol.getSimpleFunction(InvestigatorNames.composeInvestigatorComputeInvalidationReason.shortName().asString())!!
+      getComposableNameSymbol = symbol.getSimpleFunction(InvestigatorNames.getComposableName.asString())!!
+      registerStateObjectSymbol = symbol.getSimpleFunction(InvestigatorNames.registerStateObject.asString())!!
+      computeInvalidationReasonSymbol = symbol.getSimpleFunction(InvestigatorNames.computeInvalidationReason.asString())!!
     }
 
     /** Creates a new instance of `ComposeInvestigator` in the [given file][currentFile]. */
@@ -143,7 +144,7 @@ private fun irComposeInvestigatorProperty(context: IrPluginContext, currentFile:
   val propName = Name.identifier("ComposableInvalidationTraceTableImpl$$shortName")
 
   val targetSymbol = composeInvestigatorSymbolCache?.get() ?: (
-    context.referenceClass(ClassId.topLevel(InvestigatorNames.composeInvestigator))!!
+    context.referenceClass(ClassId.topLevel(InvestigatorFqNames.ComposeInvestigator))!!
       .also { symbol -> composeInvestigatorSymbolCache = WeakReference(symbol) }
     )
 

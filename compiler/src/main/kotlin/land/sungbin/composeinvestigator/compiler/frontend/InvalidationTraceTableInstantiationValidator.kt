@@ -5,7 +5,7 @@ package land.sungbin.composeinvestigator.compiler.frontend
 import androidx.compose.compiler.plugins.kotlin.k2.hasComposableAnnotation
 import androidx.compose.compiler.plugins.kotlin.k2.isComposable
 import androidx.compose.compiler.plugins.kotlin.lower.fastForEach
-import land.sungbin.composeinvestigator.compiler.InvestigatorNames
+import land.sungbin.composeinvestigator.compiler.InvestigatorFqNames
 import land.sungbin.composeinvestigator.compiler.lower.unsafeLazy
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
@@ -45,7 +45,7 @@ public class InvalidationTraceTableInstantiationValidator(session: FirSession) :
 // TODO `@file:NoInvestigation` should also be added when all Composable
 //  functions are `@NoInvestigation`.
 private object NoComposableFileChecker : FirFileChecker(MppCheckerKind.Common) {
-  private val NO_INVESTIGATION = ClassId.topLevel(InvestigatorNames.noInvestigation)
+  private val NO_INVESTIGATION = ClassId.topLevel(InvestigatorFqNames.NoInvestigation)
   private val noInvestigationType by unsafeLazy {
     buildResolvedTypeRef {
       coneType = NO_INVESTIGATION.constructClassLikeType()

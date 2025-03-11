@@ -113,7 +113,7 @@ public val currentComposeInvestigator: ComposeInvestigator
      * This logger is called whenever a recomposition is processed or skipped. This field
      * is variable, so you can easily change this.
      */
-    public var logger: InvalidationLogger = InvalidationLogger { composable, result ->
+    public var Logger: InvalidationLogger = InvalidationLogger { composable, result ->
       println("[$LOGGER_DEFAULT_TAG] The '${composable.simpleName}' composable has been recomposed.\n$result")
     }
   }

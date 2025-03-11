@@ -2,8 +2,8 @@
 // SPDX-License-Identifier: Apache-2.0
 package land.sungbin.composeinvestigator.compiler.struct
 
+import land.sungbin.composeinvestigator.compiler.InvestigatorFqNames
 import land.sungbin.composeinvestigator.compiler.InvestigatorNames
-import land.sungbin.composeinvestigator.compiler.fromFqName
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.expressions.IrCall
@@ -13,24 +13,28 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
+import org.jetbrains.kotlin.ir.types.classOrFail
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.companionObject
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
-import org.jetbrains.kotlin.name.CallableId
+import org.jetbrains.kotlin.ir.util.getSimpleFunction
 import org.jetbrains.kotlin.name.ClassId
 
 /** Helper class to make the `ComposableInvalidationLogger` class easier to handle in IR. */
 public class IrInvalidationLogger(context: IrPluginContext) {
-  private val composeInvestigatorCompanion =
-    context.referenceClass(ClassId.topLevel(InvestigatorNames.composeInvestigator))!!.owner.companionObject()!!
+  private val composeInvestigatorCompanion = context.referenceClass(ClassId.topLevel(InvestigatorFqNames.ComposeInvestigator))!!
   private val composeInvestigatorLoggerSymbol =
-    composeInvestigatorCompanion.getPropertyGetter(InvestigatorNames.composeInvestigatorLogger.shortName().asString())!!
+    composeInvestigatorCompanion
+      .owner
+      .companionObject()!!
+      .getPropertyGetter(InvestigatorNames.Logger.asString())!!
 
-  private val loggerLogSymbol = context.referenceFunctions(CallableId.fromFqName(InvestigatorNames.invalidationLoggerLog)).single()
+  private val loggerLogSymbol =
+    composeInvestigatorLoggerSymbol.owner.returnType.classOrFail.getSimpleFunction(InvestigatorNames.log.asString())!!
 
-  public val invalidationResultSymbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(InvestigatorNames.invalidationResult))!!
+  public val invalidationResultSymbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(InvestigatorFqNames.InvalidationResult))!!
   private val invalidationResultSkippedSymbol =
-    invalidationResultSymbol.owner.sealedSubclasses.first { clz -> clz.owner.name == InvestigatorNames.invalidationResultSkipped }
+    invalidationResultSymbol.owner.sealedSubclasses.first { clz -> clz.owner.name == InvestigatorNames.Skipped }
 
   /**
    * Create a call to `ComposableInvalidationLogger#log`.
@@ -55,8 +59,8 @@ public class IrInvalidationLogger(context: IrPluginContext) {
         loggerGetter.dispatchReceiver = IrGetObjectValueImpl(
           startOffset = UNDEFINED_OFFSET,
           endOffset = UNDEFINED_OFFSET,
-          type = composeInvestigatorCompanion.symbol.defaultType,
-          symbol = composeInvestigatorCompanion.symbol,
+          type = composeInvestigatorCompanion.defaultType,
+          symbol = composeInvestigatorCompanion.owner.symbol,
         )
       }
     }.apply {

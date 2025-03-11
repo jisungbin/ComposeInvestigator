@@ -4,7 +4,7 @@ package land.sungbin.composeinvestigator.compiler.frontend
 
 import androidx.compose.compiler.plugins.kotlin.k2.ComposableFunction
 import androidx.compose.compiler.plugins.kotlin.k2.hasComposableAnnotation
-import land.sungbin.composeinvestigator.compiler.InvestigatorNames
+import land.sungbin.composeinvestigator.compiler.InvestigatorFqNames
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.FirSession
@@ -40,8 +40,8 @@ public class InvalidationTraceTableApiChecker(session: FirSession) : FirAddition
 }
 
 private object ComposeInvestigatorApiCallChecker : FirPropertyAccessExpressionChecker(MppCheckerKind.Common) {
-  private val NO_INVESTIGATION = ClassId.topLevel(InvestigatorNames.noInvestigation)
-  private val COMPOSABLE_SCOPE = ClassId.topLevel(InvestigatorNames.composableScope)
+  private val NO_INVESTIGATION = ClassId.topLevel(InvestigatorFqNames.NoInvestigation)
+  private val COMPOSABLE_SCOPE = ClassId.topLevel(InvestigatorFqNames.ComposableScope)
 
   override fun check(expression: FirPropertyAccessExpression, context: CheckerContext, reporter: DiagnosticReporter) {
     // TODO When accessed by `it`, such as `traceTable.let { it.action() }`,
@@ -49,7 +49,7 @@ private object ComposeInvestigatorApiCallChecker : FirPropertyAccessExpressionCh
     val callee = expression.calleeReference.toResolvedPropertySymbol() ?: return
 
     if (
-      callee.callableId.asSingleFqName() == InvestigatorNames.currentComposeInvestigator &&
+      callee.callableId.asSingleFqName() == InvestigatorFqNames.currentComposeInvestigator &&
       context.isNoInvestigationFile()
     )
       reporter.reportOn(expression.source, ComposeInvestigatorErrors.ILLEGAL_API_ACCESS_IN_NO_INVESTIGATION_FILE, context)
