@@ -12,7 +12,7 @@ import land.sungbin.composeinvestigator.compiler.lower.StateInitializerFirstTran
  *
  * @property InvalidationProcessTracing [InvalidationProcessTracingFirstTransformer]
  * @property InvalidationSkipTracing [InvalidationSkipTracingLastTransformer]
- * @property InvalidationTraceTableIntrinsicCall [InvalidationTraceTableIntrinsicCallTransformer]
+ * @property ComposeInvestigatorIntrinsicCall [InvalidationTraceTableIntrinsicCallTransformer]
  * @property StateInitializerTracking [StateInitializerFirstTransformer]
  *
  * @param phase 0: [ComposeInvestigatorFirstPhaseExtension], 1: [ComposeInvestigatorLastPhaseExtension]
@@ -20,6 +20,6 @@ import land.sungbin.composeinvestigator.compiler.lower.StateInitializerFirstTran
 public enum class FeatureFlag(public val phase: Int) {
   InvalidationProcessTracing(0),
   InvalidationSkipTracing(1),
-  InvalidationTraceTableIntrinsicCall(0),
+  ComposeInvestigatorIntrinsicCall(0),
   StateInitializerTracking(0),
 }

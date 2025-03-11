@@ -7,12 +7,14 @@ package land.sungbin.composeinvestigator.compiler
 import java.util.EnumSet
 import org.jetbrains.kotlin.backend.common.IrValidatorConfig
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
+import org.jetbrains.kotlin.cli.jvm.compiler.CompileEnvironmentException
 import org.jetbrains.kotlin.com.intellij.mock.MockProject
 import org.jetbrains.kotlin.com.intellij.openapi.extensions.LoadingOrder
 import org.jetbrains.kotlin.compiler.plugin.ComponentRegistrar
 import org.jetbrains.kotlin.config.CommonConfigurationKeys
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.IrVerificationMode
+import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.config.messageCollector
 import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 
@@ -33,10 +35,10 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
   override val supportsK2: Boolean get() = true
 
   // TODO This deprecated override is safe to use up to Kotlin 2.1.0 by KT-55300.
-  //  See also: https://youtrack.jetbrains.com/issue/KT-52665/Deprecate-ComponentRegistrar#focus=Change-27-7999959.0-0
+  //  See also: KT-55300 Provide a mechanism to describe ordering and dependencies for compiler plugins
   override fun registerProjectComponents(project: MockProject, configuration: CompilerConfiguration) {
-    val enabled = configuration.get(ComposeInvestigatorConfiguration.KEY_ENABLED, /* defaultValue = */ true)
-    if (!enabled) return
+    val enabledFeatures = configuration.get(ComposeInvestigatorConfiguration.KEY_FEATURES, /* defaultValue = */ defaultEnabledFeatureFlags)
+    if (enabledFeatures.isEmpty()) return
 
     val verbose = configuration.get(ComposeInvestigatorConfiguration.KEY_VERBOSE, /* defaultValue = */ false)
     val messageCollector = VerboseMessageCollector(configuration.messageCollector).apply { if (verbose) verbose() }
@@ -44,27 +46,42 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
 
     configuration.messageCollector = messageCollector
 
-    // TODO
-    //  if (!configuration.languageVersionSettings.languageVersion.usesK2)
-    //   throw CompileEnvironmentException(ErrorMessages.SUPPORTS_K2_ONLY)
+    if (!configuration.languageVersionSettings.languageVersion.usesK2)
+      throw CompileEnvironmentException(ErrorMessages.SUPPORTS_K2_ONLY)
 
     FirExtensionRegistrarAdapter.registerExtension(project, ComposeInvestigatorFirExtensionRegistrar())
     project.extensionArea
       .getExtensionPoint(IrGenerationExtension.extensionPointName)
       .run {
-        registerExtension(ComposeInvestigatorFirstPhaseExtension(messageCollector, verificationMode), LoadingOrder.FIRST, project)
-        registerExtension(ComposeInvestigatorLastPhaseExtension(messageCollector, verificationMode), LoadingOrder.LAST, project)
+        registerExtension(
+          ComposeInvestigatorFirstPhaseExtension(messageCollector, verificationMode, enabledFeatures),
+          LoadingOrder.FIRST,
+          project,
+        )
+
+        if (enabledFeatures.any { it.phase == 1 })
+          registerExtension(
+            ComposeInvestigatorLastPhaseExtension(messageCollector, verificationMode, enabledFeatures),
+            LoadingOrder.LAST,
+            project,
+          )
       }
   }
 
   public companion object {
-    public val DefaultEnabledFeatureFlags: EnumSet<FeatureFlag> =
+    private val defaultEnabledFeatureFlags: EnumSet<FeatureFlag> =
       EnumSet.allOf(FeatureFlag::class.java).apply { remove(FeatureFlag.StateInitializerTracking) }
 
-    public val DefaultIrValidatorConfig: IrValidatorConfig =
+    public val IrValidatorConfig: IrValidatorConfig =
       IrValidatorConfig(
-        checkProperties = true,
+        checkTreeConsistency = true,
         checkTypes = false, // TODO KT-68663
+        checkProperties = true,
+        checkValueScopes = true,
+        checkTypeParameterScopes = true,
+        checkCrossFileFieldUsage = true,
+        checkAllKotlinFieldsArePrivate = true,
+        checkVisibilities = true,
       )
   }
 }
