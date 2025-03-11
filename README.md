@@ -4,6 +4,8 @@
 >
 > I'm currently redeveloping this tool from the ground up. It will take a long time
 > to reach a stable stage.
+>
+> Please see [rework](https://github.com/jisungbin/ComposeInvestigator/tree/rework) branch.
 
 ## ComposeInvestigator
 
