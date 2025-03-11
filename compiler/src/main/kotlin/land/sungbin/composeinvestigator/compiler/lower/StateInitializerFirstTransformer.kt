@@ -3,8 +3,8 @@
 package land.sungbin.composeinvestigator.compiler.lower
 
 import land.sungbin.composeinvestigator.compiler.log
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTableHolder
+import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigator
+import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigatorHolder
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -40,21 +40,21 @@ import org.jetbrains.kotlin.name.Name
 public class StateInitializerFirstTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
-  tables: IrInvalidationTraceTableHolder,
+  tables: IrComposeInvestigatorHolder,
 ) : ComposeInvestigatorBaseLower(context, messageCollector, tables) {
   // TODO Special behaviour of 'remember' and 'rememberSaveable':
   //  Transforms should be performed inside the 'remember[Saveable]' lambda, not outside of it.
   override fun firstTransformStateInitializer(
     name: Name,
     initializer: IrExpression,
-    table: IrInvalidationTraceTable,
+    table: IrComposeInvestigator,
   ): IrExpression {
     messageCollector.log(
       "Visit state initializer: ${name.asString()}",
       initializer.getCompilerMessageLocation(table.rawProp.file),
     )
 
-    return table.irRegisterStateObject(initializer, irString(name.asString())).also {
+    return table.callRegisterStateObject(initializer, irString(name.asString())).also {
       messageCollector.log(
         "Transform state initializer succeed: ${name.asString()}",
         initializer.getCompilerMessageLocation(table.rawProp.file),

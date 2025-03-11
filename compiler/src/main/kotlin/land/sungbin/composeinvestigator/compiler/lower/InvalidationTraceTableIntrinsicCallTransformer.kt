@@ -13,7 +13,7 @@ import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.analysis.set
 import land.sungbin.composeinvestigator.compiler.fromFqName
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTableHolder
+import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigatorHolder
 import land.sungbin.composeinvestigator.compiler.struct.get
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -43,7 +43,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.cast
 public class InvalidationTraceTableIntrinsicCallTransformer(
   private val context: IrPluginContext,
   private val irComposableInformation: IrComposableInformation,
-  private val tables: IrInvalidationTraceTableHolder,
+  private val tables: IrComposeInvestigatorHolder,
 ) : IrElementTransformerVoidWithContext() {
   private val tableSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN))!!
   private val composableNameSymbol = context.referenceClass(ClassId.topLevel(COMPOSABLE_NAME_FQN))!!.owner

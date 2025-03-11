@@ -5,8 +5,8 @@ package land.sungbin.composeinvestigator.compiler.lower
 import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN
 import land.sungbin.composeinvestigator.compiler.NO_INVESTIGATION_FQN
 import land.sungbin.composeinvestigator.compiler.log
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTable
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationTraceTableHolder
+import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigator
+import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigatorHolder
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.ir.getKtFile
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -45,10 +45,10 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
 public class InvalidationTraceTableInstantiateTransformer(
   private val context: IrPluginContext,
   private val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter() (Blocked: "This API is not supported for K2")
-) : IrElementTransformerVoid(), IrInvalidationTraceTableHolder {
-  private val tables = mutableMapOf<IrFile, IrInvalidationTraceTable>()
+) : IrElementTransformerVoid(), IrComposeInvestigatorHolder {
+  private val tables = mutableMapOf<IrFile, IrComposeInvestigator>()
 
-  override fun tableByFile(file: IrFile): IrInvalidationTraceTable =
+  override fun getByFile(file: IrFile): IrComposeInvestigator =
     tables[file] ?: throw CompilationException(
       "No table for ${file.name}",
       /* cause = */ null,
@@ -69,8 +69,8 @@ public class InvalidationTraceTableInstantiateTransformer(
       val existsTable = declaration.findDeclaration<IrProperty> { property ->
         property.backingField?.type?.classFqName == COMPOSABLE_INVALIDATION_TRACE_TABLE_FQN
       }
-      val table = existsTable?.let(IrInvalidationTraceTable::from) ?: run {
-        IrInvalidationTraceTable.create(context, declaration).also { table ->
+      val table = existsTable?.let(IrComposeInvestigator::from) ?: run {
+        IrComposeInvestigator.create(context, declaration).also { table ->
           declaration.declarations.add(0, table.rawProp.also { prop -> prop.setDeclarationsParent(declaration) })
         }
       }
