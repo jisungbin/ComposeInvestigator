@@ -20,7 +20,7 @@ public class IrComposableInformation(context: IrPluginContext) {
     name: IrConst,
     packageName: IrConst,
     fileName: IrConst,
-    compoundKey: IrExpression?,
+    compoundKey: IrExpression,
   ): IrConstructorCallImpl =
     IrConstructorCallImpl.fromSymbolOwner(
       type = symbol.defaultType,
@@ -29,6 +29,6 @@ public class IrComposableInformation(context: IrPluginContext) {
       putValueArgument(0, name)
       putValueArgument(1, packageName)
       putValueArgument(2, fileName)
-      if (compoundKey != null) putValueArgument(3, compoundKey)
+      putValueArgument(3, compoundKey)
     }
 }
