@@ -26,6 +26,18 @@ internal fun IrPluginContext.irString(
     value = value,
   )
 
+internal fun IrPluginContext.irBoolean(
+  value: Boolean,
+  startOffset: Int = UNDEFINED_OFFSET,
+  endOffset: Int = UNDEFINED_OFFSET,
+): IrConst =
+  IrConstImpl.boolean(
+    startOffset = startOffset,
+    endOffset = endOffset,
+    type = irBuiltIns.booleanType,
+    value = value,
+  )
+
 internal fun List<ScopeWithIr>.lastComposable(): IrSimpleFunction? =
   this
     .lastOrNull { scope -> scope.irElement.safeAs<IrSimpleFunction>()?.hasComposableAnnotation() == true }

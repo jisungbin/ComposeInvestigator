@@ -4,7 +4,7 @@ package land.sungbin.composeinvestigator.compiler
 
 import land.sungbin.composeinvestigator.compiler.lower.InvalidationProcessTracingFirstTransformer
 import land.sungbin.composeinvestigator.compiler.lower.InvalidationSkipTracingLastTransformer
-import land.sungbin.composeinvestigator.compiler.lower.InvalidationTraceTableIntrinsicCallTransformer
+import land.sungbin.composeinvestigator.compiler.lower.ComposeInvestigatorIntrinsicCallTransformer
 import land.sungbin.composeinvestigator.compiler.lower.StateInitializerFirstTransformer
 
 /**
@@ -12,7 +12,7 @@ import land.sungbin.composeinvestigator.compiler.lower.StateInitializerFirstTran
  *
  * @property InvalidationProcessTracing [InvalidationProcessTracingFirstTransformer]
  * @property InvalidationSkipTracing [InvalidationSkipTracingLastTransformer]
- * @property ComposeInvestigatorIntrinsicCall [InvalidationTraceTableIntrinsicCallTransformer]
+ * @property ComposeInvestigatorIntrinsicCall [ComposeInvestigatorIntrinsicCallTransformer]
  * @property StateInitializerTracking [StateInitializerFirstTransformer]
  *
  * @param phase 0: [ComposeInvestigatorFirstPhaseExtension], 1: [ComposeInvestigatorLastPhaseExtension]

@@ -13,7 +13,6 @@ import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
 import land.sungbin.composeinvestigator.compiler.analysis.set
 import land.sungbin.composeinvestigator.compiler.fromFqName
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
-import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigatorHolder
 import land.sungbin.composeinvestigator.compiler.struct.get
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
@@ -40,7 +39,7 @@ import org.jetbrains.kotlin.utils.addToStdlib.cast
  * Transforms the code to implement the use of the `ComposableInvalidationTraceTable`'s
  * Intrinsic API by utilizing metadata generated at compile time by `ComposeInvestigator`.
  */
-public class InvalidationTraceTableIntrinsicCallTransformer(
+public class ComposeInvestigatorIntrinsicCallTransformer(
   private val context: IrPluginContext,
   private val irComposableInformation: IrComposableInformation,
 ) : IrElementTransformerVoidWithContext() {

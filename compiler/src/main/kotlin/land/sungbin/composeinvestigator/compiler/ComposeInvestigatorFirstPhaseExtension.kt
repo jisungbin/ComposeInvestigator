@@ -6,7 +6,7 @@ import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import java.util.EnumSet
 import land.sungbin.composeinvestigator.compiler.lower.InvalidationProcessTracingFirstTransformer
 import land.sungbin.composeinvestigator.compiler.lower.ComposeInvestigatorInstantiateTransformer
-import land.sungbin.composeinvestigator.compiler.lower.InvalidationTraceTableIntrinsicCallTransformer
+import land.sungbin.composeinvestigator.compiler.lower.ComposeInvestigatorIntrinsicCallTransformer
 import land.sungbin.composeinvestigator.compiler.lower.StateInitializerFirstTransformer
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
@@ -29,7 +29,7 @@ import org.jetbrains.kotlin.ir.visitors.transformChildrenVoid
  * - [ComposeInvestigatorInstantiateTransformer]
  * - [InvalidationProcessTracingFirstTransformer]
  * - [StateInitializerFirstTransformer]
- * - [InvalidationTraceTableIntrinsicCallTransformer]
+ * - [ComposeInvestigatorIntrinsicCallTransformer]
  */
 public class ComposeInvestigatorFirstPhaseExtension(
   private val messageCollector: MessageCollector,
@@ -66,7 +66,7 @@ public class ComposeInvestigatorFirstPhaseExtension(
       )
 
     if (FeatureFlag.ComposeInvestigatorIntrinsicCall in features)
-      moduleFragment.transformChildrenVoid(InvalidationTraceTableIntrinsicCallTransformer(pluginContext, IrComposableInformation(pluginContext)))
+      moduleFragment.transformChildrenVoid(ComposeInvestigatorIntrinsicCallTransformer(pluginContext, IrComposableInformation(pluginContext)))
 
     if (FeatureFlag.StateInitializerTracking in features)
       moduleFragment.transformChildrenVoid(StateInitializerFirstTransformer(pluginContext, messageCollector))

@@ -21,6 +21,7 @@ import org.jetbrains.kotlin.ir.declarations.IrProperty
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrStatementOrigin
 import org.jetbrains.kotlin.ir.expressions.IrValueAccessExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
@@ -59,7 +60,9 @@ public class IrComposeInvestigator private constructor(internal val property: Ir
       startOffset = startOffset,
       endOffset = endOffset,
       symbol = property.getter!!.symbol,
-    )
+    ).apply {
+      origin = IrStatementOrigin.GET_PROPERTY
+    }
 
   public fun irGetComposableName(
     compoundKey: IrConst,
@@ -76,7 +79,7 @@ public class IrComposeInvestigator private constructor(internal val property: Ir
     }
 
   /** Returns an [IrCall] that invokes `ComposeInvestigator#registerStateObject`. */
-  public fun callRegisterStateObject(
+  public fun irRegisterStateObject(
     value: IrExpression,
     name: IrConst,
   ): IrCall =
@@ -140,7 +143,7 @@ public var IrFile.irComposeInvestigator: IrComposeInvestigator? by irAttribute(f
 private fun irComposeInvestigatorProperty(context: IrPluginContext, currentFile: IrFile): IrProperty {
   val fileName = currentFile.fileEntry.name.substringAfterLast('/')
   val shortName = PackagePartClassUtils.getFilePartShortName(fileName)
-  val propName = Name.identifier("ComposableInvalidationTraceTableImpl$$shortName")
+  val propName = Name.identifier("ComposeInvestigatorImpl$$shortName")
 
   val targetSymbol = composeInvestigatorSymbolCache?.get() ?: (
     context.referenceClass(InvestigatorClassIds.ComposeInvestigator)!!

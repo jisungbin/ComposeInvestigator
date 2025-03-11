@@ -28,7 +28,7 @@ private val table by lazy { currentComposeInvestigator }
 
 class SampleActivity : ComponentActivity() {
   init {
-    ComposeInvestigator.logger = ComposableInvalidationLogger { composable, result ->
+    ComposeInvestigator.Logger = ComposableInvalidationLogger { composable, result ->
       Log.d(ComposeInvestigator.LOGGER_DEFAULT_TAG, "The '${composable.simpleName}' composable has been recomposed.\n$result")
     }
   }

@@ -26,12 +26,12 @@ import androidx.compose.runtime.Immutable
     override fun toString(): String = "Runtime($name)"
   }
 
-  public data class Unknown(public val name: String) : Stability() {
-    override fun toString(): String = "Uncertain($name)"
-  }
-
   public data class Parameter(public val name: String) : Stability() {
     override fun toString(): String = "Parameter($name)"
+  }
+
+  public data class Unknown(public val name: String) : Stability() {
+    override fun toString(): String = "Uncertain($name)"
   }
 
   public class Combined(public vararg val elements: Stability) : Stability() {

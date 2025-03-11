@@ -4,31 +4,23 @@ package land.sungbin.composeinvestigator.compiler.lower
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.normalize
-import androidx.compose.compiler.plugins.kotlin.irTrace
-import land.sungbin.composeinvestigator.compiler.CURRENT_COMPOSER_FQN
-import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
-import land.sungbin.composeinvestigator.compiler.fromFqName
 import land.sungbin.composeinvestigator.compiler.log
-import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
-import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigator
-import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigatorHolder
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
-import org.jetbrains.kotlin.ir.builders.Scope
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.createBlockBody
+import org.jetbrains.kotlin.ir.declarations.name
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
-import org.jetbrains.kotlin.ir.symbols.IrPropertySymbol
 import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.statements
-import org.jetbrains.kotlin.name.CallableId
+import org.jetbrains.kotlin.name.Name.identifier
 import org.jetbrains.kotlin.name.SpecialNames
 
 /**
@@ -74,7 +66,7 @@ import org.jetbrains.kotlin.name.SpecialNames
  *     compoundKey = androidx.compose.runtime.currentCompositeKeyHash,
  *     arguments = currentValueArguments,
  *   )
- *   ComposeInvestigator.logger.log(affectedComposable, invalidationReason)
+ *   ComposeInvestigator.Logger.log(affectedComposable, invalidationReason)
  *   Text((a + b).toString())
  * }
  * ```
@@ -84,37 +76,27 @@ public class InvalidationProcessTracingFirstTransformer(
   messageCollector: MessageCollector,
   private val stabilityInferencer: StabilityInferencer,
 ) : ComposeInvestigatorBaseLower(context, messageCollector) {
-  private val currentComposerSymbol: IrPropertySymbol =
-    context.referenceProperties(CallableId.fromFqName(CURRENT_COMPOSER_FQN)).single()
-
-  // TODO Should I use regular variables instead of "temporary" variables?
-  override fun firstTransformComposableBody(
-    composable: IrSimpleFunction,
-    body: IrBody,
-    table: IrComposeInvestigator,
-  ): IrBody {
+  override fun firstTransformComposableBody(composable: IrSimpleFunction, body: IrBody): IrBody {
     messageCollector.log(
       "Visit composable body: ${composable.name}",
       body.getCompilerMessageLocation(composable.file),
     )
 
-    val scope = Scope(composable.symbol)
-    val currentKey = context.irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return body
     val newStatements = mutableListOf<IrStatement>()
 
-    val currentValueArguments = scope.createTemporaryVariable(
-      IrCallImpl.fromSymbolOwner(
-        startOffset = UNDEFINED_OFFSET,
-        endOffset = UNDEFINED_OFFSET,
-        symbol = mutableListOfSymbol,
-      ).apply {
-        putTypeArgument(0, valueArgument.symbol.defaultType)
-      },
-      nameHint = "currentValueArguments",
-    )
+    val currentValueArguments =
+      irVariable(
+        identifier("currentValueArguments"),
+        IrCallImpl.fromSymbolOwner(
+          startOffset = UNDEFINED_OFFSET,
+          endOffset = UNDEFINED_OFFSET,
+          symbol = mutableListOfSymbol,
+        ).apply {
+          putTypeArgument(0, irValueArgument.symbol.defaultType)
+        },
+      )
     newStatements += currentValueArguments
 
-    // TODO Only process parameters that actually used.
     for (param in composable.valueParameters) {
       // Synthetic arguments are not handled.
       if (param.name.asString().startsWith('$')) continue
@@ -123,83 +105,70 @@ public class InvalidationProcessTracingFirstTransformer(
       val type = irString(param.type.classFqName?.asString() ?: SpecialNames.ANONYMOUS_STRING)
       val valueString = irToString(irGetValue(param))
       val valueHashCode = irHashCode(irGetValue(param))
-      val stability = stabilityInferencer.stabilityOf(irGetValue(param)).normalize().asOwnStability()
+      val stability = stabilityInferencer.stabilityOf(irGetValue(param)).normalize()
 
-      val valueArgumentVariable = scope.createTemporaryVariable(
-        valueArgument(
-          name = name,
-          type = type,
-          valueString = valueString,
-          valueHashCode = valueHashCode,
-          stability = stability,
-        ),
-        nameHint = "${param.name.asString()}\$valueArgu",
-      )
-      val addValueArgumentToList = IrCallImpl.fromSymbolOwner(
-        startOffset = UNDEFINED_OFFSET,
-        endOffset = UNDEFINED_OFFSET,
-        symbol = mutableListAddSymbol,
-      ).apply {
-        dispatchReceiver = irGetValue(currentValueArguments)
-        putValueArgument(0, irGetValue(valueArgumentVariable))
-      }
+      val valueArgumentVariable =
+        irVariable(
+          identifier("${param.name.asString()}\$valueArgument"),
+          irValueArgument(
+            name = name,
+            type = type,
+            valueString = valueString,
+            valueHashCode = valueHashCode,
+            stability = with(irRuntimeStability) { stability.asRuntimeStability() },
+          ),
+        )
+      val addValueArgumentToList =
+        IrCallImpl.fromSymbolOwner(
+          startOffset = UNDEFINED_OFFSET,
+          endOffset = UNDEFINED_OFFSET,
+          symbol = mutableListAddSymbol,
+        ).apply {
+          dispatchReceiver = irGetValue(currentValueArguments)
+          putValueArgument(0, irGetValue(valueArgumentVariable))
+        }
 
       newStatements += valueArgumentVariable
       newStatements += addValueArgumentToList
     }
 
-    // Avoid declaring duplicate IR nodes
-    fun compoundKeyHashCall(): IrCallImpl =
-      IrCallImpl.fromSymbolOwner(
-        startOffset = UNDEFINED_OFFSET,
-        endOffset = UNDEFINED_OFFSET,
-        symbol = composerCompoundKeyHashSymbol,
-      ).also { fn ->
-        fn.dispatchReceiver = IrCallImpl.fromSymbolOwner(
-          startOffset = UNDEFINED_OFFSET,
-          endOffset = UNDEFINED_OFFSET,
-          symbol = currentComposerSymbol.owner.getter!!.symbol,
-        )
-      }
-
-    val affectedComposable = IrCallImpl.fromSymbolOwner(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      symbol = IrComposableInformation.withCompoundKeySymbol(context),
-    ).apply {
-      dispatchReceiver = currentKey.composable
-      putValueArgument(0, compoundKeyHashCall())
-    }
-
-    val invalidationReasonVariable = scope.createTemporaryVariable(
-      table.irComputeInvalidationReason(
-        keyName = irString(currentKey.keyName),
-        compoundKey = compoundKeyHashCall(),
-        arguments = irGetValue(currentValueArguments),
-      ),
-      nameHint = "invalidationReason",
-    )
+    val invalidationReasonVariable =
+      irVariable(
+        identifier("invalidationReason"),
+        composable.file
+          .irComposeInvestigator()
+          .irComputeInvalidationReason(
+            irCompoundKeyHashCall(irCurrentComposer()),
+            irGetValue(currentValueArguments),
+          ),
+      )
     newStatements += invalidationReasonVariable
 
-    val invalidationResultProcessed = irGetValue(invalidationReasonVariable)
-      .apply { type = invalidationLogger.invalidationResultSymbol.defaultType }
-    val logger = invalidationLogger.irLog(affectedComposable, result = invalidationResultProcessed)
+    val composableInformation =
+      irComposableInformation(
+        irString(composable.name.asString()),
+        irString(composable.file.packageFqName.asString()),
+        irString(composable.file.name),
+        irCompoundKeyHashCall(irCurrentComposer()),
+      )
+    val invalidationResult =
+      irGetValue(invalidationReasonVariable, type = irInvalidationLogger.invalidationResultSymbol.defaultType)
 
+    val logger = irInvalidationLogger.irLog(composableInformation, invalidationResult)
     newStatements += logger
 
-    val newBody = context.irFactory.createBlockBody(
+    return context.irFactory.createBlockBody(
       startOffset = body.startOffset,
-      endOffset = body.endOffset,
+      endOffset = UNDEFINED_OFFSET,
     ) {
       statements += newStatements
       statements += body.statements
     }
-
-    return newBody.also {
-      messageCollector.log(
-        "Transform composable body succeed: ${composable.name}",
-        body.getCompilerMessageLocation(composable.file),
-      )
-    }
+      .also {
+        messageCollector.log(
+          "Transform composable body succeed: ${composable.name}",
+          body.getCompilerMessageLocation(composable.file),
+        )
+      }
   }
 }

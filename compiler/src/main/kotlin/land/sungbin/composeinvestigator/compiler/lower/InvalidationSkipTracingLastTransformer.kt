@@ -2,23 +2,16 @@
 // SPDX-License-Identifier: Apache-2.0
 package land.sungbin.composeinvestigator.compiler.lower
 
-import androidx.compose.compiler.plugins.kotlin.irTrace
-import land.sungbin.composeinvestigator.compiler.COMPOSER_FQN
-import land.sungbin.composeinvestigator.compiler.analysis.DurationWritableSlices
+import androidx.compose.compiler.plugins.kotlin.ComposeClassIds
 import land.sungbin.composeinvestigator.compiler.log
-import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
-import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigator
-import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigatorHolder
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
-import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.name
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
-import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
-import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.file
@@ -48,7 +41,7 @@ import org.jetbrains.kotlin.ir.util.file
  *       fileName = "DisplayPlusResult.kt",
  *       compoundKey = androidx.compose.runtime.currentCompositeKeyHash,
  *     )
- *     ComposeInvestigator.logger.log(affectedComposable, InvalidationReason.Skipped)
+ *     ComposeInvestigator.Logger.log(affectedComposable, InvalidationReason.Skipped)
  *     currentComposer.skipToGroupEnd()
  *   }
  * }
@@ -58,41 +51,29 @@ public class InvalidationSkipTracingLastTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
 ) : ComposeInvestigatorBaseLower(context, messageCollector) {
-  override fun lastTransformSkipToGroupEndCall(
-    composable: IrSimpleFunction,
-    expression: IrCall,
-    table: IrComposeInvestigator,
-  ): IrExpression {
+  override fun lastTransformSkipToGroupEndCall(composable: IrSimpleFunction, expression: IrCall): IrExpression {
     messageCollector.log(
       "Visit skipToGroupEnd call: ${composable.name}",
       expression.getCompilerMessageLocation(composable.file),
     )
 
-    val currentKey = context.irTrace[DurationWritableSlices.DURABLE_FUNCTION_KEY, composable] ?: return expression
-    val composer = composable.valueParameters
-      .last { param -> param.type.classFqName == COMPOSER_FQN }
-      .let(::irGetValue)
+    val composer =
+      composable.valueParameters
+        .last { param -> param.type.classFqName == ComposeClassIds.Composer }
+        .let(::irGetValue)
 
-    val compoundKeyHashCall = IrCallImpl.fromSymbolOwner(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      symbol = composerCompoundKeyHashSymbol,
-    ).also { fn ->
-      fn.dispatchReceiver = composer
-    }
+    val composableInformation =
+      irComposableInformation(
+        irString(composable.name.asString()),
+        irString(composable.file.packageFqName.asString()),
+        irString(composable.file.name),
+        irCompoundKeyHashCall(composer),
+      )
+    val invalidationResult =
+      irInvalidationLogger.irInvalidationResultSkipped()
+        .apply { type = irInvalidationLogger.invalidationResultSymbol.defaultType }
 
-    val affectedComposable = IrCallImpl.fromSymbolOwner(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      symbol = IrComposableInformation.withCompoundKeySymbol(context),
-    ).apply {
-      dispatchReceiver = currentKey.composable
-      putValueArgument(0, compoundKeyHashCall)
-    }
-
-    val invalidationResultSkipped = invalidationLogger.irInvalidationResultSkipped()
-      .apply { type = invalidationLogger.invalidationResultSymbol.defaultType }
-    val logger = invalidationLogger.irLog(affectedComposable, result = invalidationResultSkipped)
+    val logger = irInvalidationLogger.irLog(composableInformation, invalidationResult)
 
     return IrBlockImpl(
       startOffset = expression.startOffset,

@@ -5,7 +5,7 @@ package land.sungbin.composeinvestigator.runtime
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.RecomposeScope
 
-/** @see ComposeInvestigator.logger */
+/** @see ComposeInvestigator.Logger */
 public fun interface InvalidationLogger {
   public fun log(composable: ComposableInformation, result: InvalidationResult)
 }

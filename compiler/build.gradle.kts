@@ -37,6 +37,7 @@ kotlin {
 }
 
 dependencies {
+  compileOnly(kotlin("stdlib", version = libs.versions.kotlin.asProvider().get()))
   compileOnly(kotlin("compiler-embeddable", version = libs.versions.kotlin.asProvider().get()))
   compileOnly(kotlin("compose-compiler-plugin", version = libs.versions.kotlin.asProvider().get()))
 }

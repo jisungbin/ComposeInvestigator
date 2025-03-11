@@ -1,3 +1,5 @@
+// Copyright 2025 Ji Sungbin
+// SPDX-License-Identifier: Apache-2.0
 package land.sungbin.composeinvestigator.compiler
 
 import org.jetbrains.kotlin.builtins.StandardNames.BUILT_INS_PACKAGE_FQ_NAME
