@@ -5,7 +5,7 @@ package land.sungbin.composeinvestigator.compiler.frontend
 import androidx.compose.compiler.plugins.kotlin.k2.hasComposableAnnotation
 import androidx.compose.compiler.plugins.kotlin.k2.isComposable
 import androidx.compose.compiler.plugins.kotlin.lower.fastForEach
-import land.sungbin.composeinvestigator.compiler.InvestigatorFqNames
+import land.sungbin.composeinvestigator.compiler.InvestigatorClassIds
 import land.sungbin.composeinvestigator.compiler.lower.unsafeLazy
 import org.jetbrains.kotlin.descriptors.annotations.AnnotationUseSiteTarget
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
@@ -27,7 +27,6 @@ import org.jetbrains.kotlin.fir.smartPlus
 import org.jetbrains.kotlin.fir.types.builder.buildResolvedTypeRef
 import org.jetbrains.kotlin.fir.types.constructClassLikeType
 import org.jetbrains.kotlin.fir.visitors.FirDefaultVisitorVoid
-import org.jetbrains.kotlin.name.ClassId
 
 /**
  * Transformer that adds an `@file:NoInvestigation` annotation to the file if the file
@@ -42,18 +41,17 @@ public class InvalidationTraceTableInstantiationValidator(session: FirSession) :
   }
 }
 
-// TODO `@file:NoInvestigation` should also be added when all Composable
-//  functions are `@NoInvestigation`.
+// TODO `@file:NoInvestigation` should also be added when all Composable functions
+//  are `@NoInvestigation`.
 private object NoComposableFileChecker : FirFileChecker(MppCheckerKind.Common) {
-  private val NO_INVESTIGATION = ClassId.topLevel(InvestigatorFqNames.NoInvestigation)
   private val noInvestigationType by unsafeLazy {
     buildResolvedTypeRef {
-      coneType = NO_INVESTIGATION.constructClassLikeType()
+      coneType = InvestigatorClassIds.NoInvestigation.constructClassLikeType()
     }
   }
 
   override fun check(declaration: FirFile, context: CheckerContext, reporter: DiagnosticReporter) {
-    if (declaration.hasAnnotation(NO_INVESTIGATION, context.session)) return
+    if (declaration.hasAnnotation(InvestigatorClassIds.NoInvestigation, context.session)) return
     var hasComposable = false
 
     val composableCallVisitor = object : FirDefaultVisitorVoid() {

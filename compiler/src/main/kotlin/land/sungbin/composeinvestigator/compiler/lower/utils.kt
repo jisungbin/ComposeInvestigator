@@ -18,17 +18,19 @@ internal fun IrPluginContext.irString(
   value: String,
   startOffset: Int = UNDEFINED_OFFSET,
   endOffset: Int = UNDEFINED_OFFSET,
-): IrConst = IrConstImpl.string(
-  startOffset = startOffset,
-  endOffset = endOffset,
-  type = irBuiltIns.stringType,
-  value = value,
-)
+): IrConst =
+  IrConstImpl.string(
+    startOffset = startOffset,
+    endOffset = endOffset,
+    type = irBuiltIns.stringType,
+    value = value,
+  )
 
-internal fun List<ScopeWithIr>.lastComposable() =
+internal fun List<ScopeWithIr>.lastComposable(): IrSimpleFunction? =
   this
     .lastOrNull { scope -> scope.irElement.safeAs<IrSimpleFunction>()?.hasComposableAnnotation() == true }
-    ?.irElement?.safeAs<IrSimpleFunction>()
+    ?.irElement
+    ?.safeAs<IrSimpleFunction>()
 
 internal inline fun <T> includeFilePathInExceptionTrace(file: IrFile, body: () -> T): T {
   try {

@@ -4,7 +4,8 @@ package land.sungbin.composeinvestigator.compiler.frontend
 
 import androidx.compose.compiler.plugins.kotlin.k2.ComposableFunction
 import androidx.compose.compiler.plugins.kotlin.k2.hasComposableAnnotation
-import land.sungbin.composeinvestigator.compiler.InvestigatorFqNames
+import land.sungbin.composeinvestigator.compiler.InvestigatorClassIds
+import land.sungbin.composeinvestigator.compiler.InvestigatorCallableIds
 import org.jetbrains.kotlin.diagnostics.DiagnosticReporter
 import org.jetbrains.kotlin.diagnostics.reportOn
 import org.jetbrains.kotlin.fir.FirSession
@@ -23,7 +24,6 @@ import org.jetbrains.kotlin.fir.references.toResolvedPropertySymbol
 import org.jetbrains.kotlin.fir.symbols.impl.FirPropertySymbol
 import org.jetbrains.kotlin.fir.types.coneType
 import org.jetbrains.kotlin.fir.types.functionTypeKind
-import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.utils.addToStdlib.unreachableBranch
 
 /**
@@ -40,16 +40,13 @@ public class InvalidationTraceTableApiChecker(session: FirSession) : FirAddition
 }
 
 private object ComposeInvestigatorApiCallChecker : FirPropertyAccessExpressionChecker(MppCheckerKind.Common) {
-  private val NO_INVESTIGATION = ClassId.topLevel(InvestigatorFqNames.NoInvestigation)
-  private val COMPOSABLE_SCOPE = ClassId.topLevel(InvestigatorFqNames.ComposableScope)
-
   override fun check(expression: FirPropertyAccessExpression, context: CheckerContext, reporter: DiagnosticReporter) {
     // TODO When accessed by `it`, such as `traceTable.let { it.action() }`,
     //  `Symbol` is `FirValueParameterSymbol`. These variants need to be handled separately.
     val callee = expression.calleeReference.toResolvedPropertySymbol() ?: return
 
     if (
-      callee.callableId.asSingleFqName() == InvestigatorFqNames.currentComposeInvestigator &&
+      callee.callableId == InvestigatorCallableIds.currentComposeInvestigator &&
       context.isNoInvestigationFile()
     )
       reporter.reportOn(expression.source, ComposeInvestigatorErrors.ILLEGAL_API_ACCESS_IN_NO_INVESTIGATION_FILE, context)
@@ -65,9 +62,9 @@ private object ComposeInvestigatorApiCallChecker : FirPropertyAccessExpressionCh
     reporter: DiagnosticReporter,
   ) {
     if (
-      !callee.hasAnnotation(COMPOSABLE_SCOPE, context.session) &&
-      callee.getterSymbol?.hasAnnotation(COMPOSABLE_SCOPE, context.session) != true &&
-      callee.setterSymbol?.hasAnnotation(COMPOSABLE_SCOPE, context.session) != true
+      !callee.hasAnnotation(InvestigatorClassIds.ComposableScope, context.session) &&
+      callee.getterSymbol?.hasAnnotation(InvestigatorClassIds.ComposableScope, context.session) != true &&
+      callee.setterSymbol?.hasAnnotation(InvestigatorClassIds.ComposableScope, context.session) != true
     )
       return
 
@@ -76,7 +73,7 @@ private object ComposeInvestigatorApiCallChecker : FirPropertyAccessExpressionCh
   }
 
   private fun CheckerContext.isNoInvestigationFile() =
-    containingFile!!.hasAnnotation(NO_INVESTIGATION, session)
+    containingFile!!.hasAnnotation(InvestigatorClassIds.NoInvestigation, session)
 
   fun CheckerContext.isComposableScope(): Boolean =
     when (val declaration = findClosest<FirFunction>() ?: return false) {

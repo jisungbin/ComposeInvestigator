@@ -40,8 +40,7 @@ import org.jetbrains.kotlin.name.Name
 public class StateInitializerFirstTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
-  tables: IrComposeInvestigatorHolder,
-) : ComposeInvestigatorBaseLower(context, messageCollector, tables) {
+) : ComposeInvestigatorBaseLower(context, messageCollector) {
   // TODO Special behaviour of 'remember' and 'rememberSaveable':
   //  Transforms should be performed inside the 'remember[Saveable]' lambda, not outside of it.
   override fun firstTransformStateInitializer(

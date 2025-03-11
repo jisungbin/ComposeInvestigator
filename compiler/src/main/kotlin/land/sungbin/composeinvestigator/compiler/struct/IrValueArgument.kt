@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package land.sungbin.composeinvestigator.compiler.struct
 
-import land.sungbin.composeinvestigator.compiler.InvestigatorFqNames
+import land.sungbin.composeinvestigator.compiler.InvestigatorClassIds
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.expressions.IrConstructorCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -11,11 +11,10 @@ import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.constructors
-import org.jetbrains.kotlin.name.ClassId
 
 /** Helper class to make the `ValueArgument` class easier to handle in IR. */
 public class IrValueArgument(context: IrPluginContext) {
-  public val symbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(InvestigatorFqNames.ValueArgument))!!
+  public val symbol: IrClassSymbol = context.referenceClass(InvestigatorClassIds.ValueArgument)!!
 
   /** Returns an [IrConstructorCall] that invokes the constructor of `ValueArgument`. */
   public operator fun invoke(

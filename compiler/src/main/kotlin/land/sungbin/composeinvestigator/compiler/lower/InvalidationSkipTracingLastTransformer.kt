@@ -57,8 +57,7 @@ import org.jetbrains.kotlin.ir.util.file
 public class InvalidationSkipTracingLastTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
-  table: IrComposeInvestigatorHolder,
-) : ComposeInvestigatorBaseLower(context, messageCollector, table) {
+) : ComposeInvestigatorBaseLower(context, messageCollector) {
   override fun lastTransformSkipToGroupEndCall(
     composable: IrSimpleFunction,
     expression: IrCall,

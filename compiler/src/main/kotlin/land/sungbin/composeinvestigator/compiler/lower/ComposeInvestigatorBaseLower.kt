@@ -2,29 +2,25 @@
 // SPDX-License-Identifier: Apache-2.0
 package land.sungbin.composeinvestigator.compiler.lower
 
+import androidx.compose.compiler.plugins.kotlin.ComposeClassIds
+import androidx.compose.compiler.plugins.kotlin.ComposeFqNames
 import androidx.compose.compiler.plugins.kotlin.analysis.Stability
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
-import land.sungbin.composeinvestigator.compiler.COMPOSER_FQN
-import land.sungbin.composeinvestigator.compiler.Composer_COMPOUND_KEY_HASH
-import land.sungbin.composeinvestigator.compiler.Composer_SKIP_TO_GROUP_END
+import land.sungbin.composeinvestigator.compiler.ComposeNames
 import land.sungbin.composeinvestigator.compiler.HASH_CODE_FQN
 import land.sungbin.composeinvestigator.compiler.MUTABLE_LIST_ADD_FQN
 import land.sungbin.composeinvestigator.compiler.MUTABLE_LIST_OF_FQN
 import land.sungbin.composeinvestigator.compiler.NO_INVESTIGATION_FQN
 import land.sungbin.composeinvestigator.compiler.STABILITY_FQN
-import land.sungbin.composeinvestigator.compiler.STATE_FQN
-import land.sungbin.composeinvestigator.compiler.STATE_OBJECT_FQN
 import land.sungbin.composeinvestigator.compiler.Stability_CERTAIN
 import land.sungbin.composeinvestigator.compiler.Stability_COMBINED
 import land.sungbin.composeinvestigator.compiler.Stability_PARAMETER
 import land.sungbin.composeinvestigator.compiler.Stability_RUNTIME
 import land.sungbin.composeinvestigator.compiler.Stability_UNKNOWN
 import land.sungbin.composeinvestigator.compiler.fromFqName
-import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationLogger
 import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigator
-import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigatorHolder
+import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationLogger
 import land.sungbin.composeinvestigator.compiler.struct.IrValueArgument
-import land.sungbin.composeinvestigator.compiler.struct.get
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -93,7 +89,6 @@ import org.jetbrains.kotlin.types.Variance
 public open class ComposeInvestigatorBaseLower(
   protected val context: IrPluginContext,
   protected val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter() (Blocked: "This API is not supported for K2")
-  protected val tables: IrComposeInvestigatorHolder,
 ) : IrElementTransformerVoidWithContext() {
   private var ownStabilitySymbol: IrClassSymbol? = null
   private var ownStabilityCertainSymbol: IrClassSymbol? = null
@@ -102,15 +97,12 @@ public open class ComposeInvestigatorBaseLower(
   private var ownStabilityParameterSymbol: IrClassSymbol? = null
   private var ownStabilityCombinedSymbol: IrClassSymbol? = null
 
-  private val composerSymbol = context.referenceClass(ClassId.topLevel(COMPOSER_FQN))!!
-  private val composerSkipToGroupEndSymbol = composerSymbol.getSimpleFunction(Composer_SKIP_TO_GROUP_END.asString())!!
+  private val composerSymbol = context.referenceClass(ClassId.topLevel(ComposeFqNames.Composer))!!
+  private val composerSkipToGroupEndSymbol = composerSymbol.getSimpleFunction(ComposeNames.skipToGroupEnd.asString())!!
+  protected val composerCompoundKeyHashSymbol: IrSimpleFunctionSymbol = composerSymbol.getPropertyGetter(ComposeNames.compoundKeyHash.asString())!!
 
-  protected val composerCompoundKeyHashSymbol: IrSimpleFunctionSymbol by unsafeLazy {
-    composerSymbol.getPropertyGetter(Composer_COMPOUND_KEY_HASH.toString())!!
-  }
-
-  private val stateSymbol = context.referenceClass(ClassId.topLevel(STATE_FQN))!!
-  private val stateObjectSymbol = context.referenceClass(ClassId.topLevel(STATE_OBJECT_FQN))!!
+  private val stateSymbol = context.referenceClass(ComposeClassIds.State)!!
+  private val stateObjectSymbol = context.referenceClass(ClassId.topLevel(ComposeFqNames.StateObject))!!
 
   protected val mutableListOfSymbol: IrSimpleFunctionSymbol by unsafeLazy {
     context

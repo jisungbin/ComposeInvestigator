@@ -82,9 +82,8 @@ import org.jetbrains.kotlin.name.SpecialNames
 public class InvalidationProcessTracingFirstTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
-  tables: IrComposeInvestigatorHolder,
   private val stabilityInferencer: StabilityInferencer,
-) : ComposeInvestigatorBaseLower(context, messageCollector, tables) {
+) : ComposeInvestigatorBaseLower(context, messageCollector) {
   private val currentComposerSymbol: IrPropertySymbol =
     context.referenceProperties(CallableId.fromFqName(CURRENT_COMPOSER_FQN)).single()
 

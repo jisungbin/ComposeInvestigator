@@ -3,7 +3,7 @@
 package land.sungbin.composeinvestigator.compiler.struct
 
 import java.lang.ref.WeakReference
-import land.sungbin.composeinvestigator.compiler.InvestigatorFqNames
+import land.sungbin.composeinvestigator.compiler.InvestigatorClassIds
 import land.sungbin.composeinvestigator.compiler.InvestigatorNames
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
@@ -34,7 +34,6 @@ import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
 import org.jetbrains.kotlin.ir.util.constructors
 import org.jetbrains.kotlin.ir.util.getSimpleFunction
 import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
-import org.jetbrains.kotlin.name.ClassId
 import org.jetbrains.kotlin.name.Name
 
 /**
@@ -144,7 +143,7 @@ private fun irComposeInvestigatorProperty(context: IrPluginContext, currentFile:
   val propName = Name.identifier("ComposableInvalidationTraceTableImpl$$shortName")
 
   val targetSymbol = composeInvestigatorSymbolCache?.get() ?: (
-    context.referenceClass(ClassId.topLevel(InvestigatorFqNames.ComposeInvestigator))!!
+    context.referenceClass(InvestigatorClassIds.ComposeInvestigator)!!
       .also { symbol -> composeInvestigatorSymbolCache = WeakReference(symbol) }
     )
 

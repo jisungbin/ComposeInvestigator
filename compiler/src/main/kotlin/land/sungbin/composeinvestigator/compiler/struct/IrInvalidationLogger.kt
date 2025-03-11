@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package land.sungbin.composeinvestigator.compiler.struct
 
-import land.sungbin.composeinvestigator.compiler.InvestigatorFqNames
+import land.sungbin.composeinvestigator.compiler.InvestigatorClassIds
 import land.sungbin.composeinvestigator.compiler.InvestigatorNames
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -18,11 +18,10 @@ import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.companionObject
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.getSimpleFunction
-import org.jetbrains.kotlin.name.ClassId
 
 /** Helper class to make the `ComposableInvalidationLogger` class easier to handle in IR. */
 public class IrInvalidationLogger(context: IrPluginContext) {
-  private val composeInvestigatorCompanion = context.referenceClass(ClassId.topLevel(InvestigatorFqNames.ComposeInvestigator))!!
+  private val composeInvestigatorCompanion = context.referenceClass(InvestigatorClassIds.ComposeInvestigator)!!
   private val composeInvestigatorLoggerSymbol =
     composeInvestigatorCompanion
       .owner
@@ -32,7 +31,7 @@ public class IrInvalidationLogger(context: IrPluginContext) {
   private val loggerLogSymbol =
     composeInvestigatorLoggerSymbol.owner.returnType.classOrFail.getSimpleFunction(InvestigatorNames.log.asString())!!
 
-  public val invalidationResultSymbol: IrClassSymbol = context.referenceClass(ClassId.topLevel(InvestigatorFqNames.InvalidationResult))!!
+  public val invalidationResultSymbol: IrClassSymbol = context.referenceClass(InvestigatorClassIds.InvalidationResult)!!
   private val invalidationResultSkippedSymbol =
     invalidationResultSymbol.owner.sealedSubclasses.first { clz -> clz.owner.name == InvestigatorNames.Skipped }
 

@@ -6,7 +6,6 @@ import land.sungbin.composeinvestigator.compiler.COMPOSABLE_INVALIDATION_TRACE_T
 import land.sungbin.composeinvestigator.compiler.NO_INVESTIGATION_FQN
 import land.sungbin.composeinvestigator.compiler.log
 import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigator
-import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigatorHolder
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.ir.getKtFile
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -42,10 +41,10 @@ import org.jetbrains.kotlin.ir.visitors.IrElementTransformerVoid
  * }
  * ```
  */
-public class InvalidationTraceTableInstantiateTransformer(
+public class ComposeInvestigatorInstantiateTransformer(
   private val context: IrPluginContext,
   private val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter() (Blocked: "This API is not supported for K2")
-) : IrElementTransformerVoid(), IrComposeInvestigatorHolder {
+) : IrElementTransformerVoid() {
   private val tables = mutableMapOf<IrFile, IrComposeInvestigator>()
 
   override fun getByFile(file: IrFile): IrComposeInvestigator =
@@ -59,10 +58,10 @@ public class InvalidationTraceTableInstantiateTransformer(
     includeFilePathInExceptionTrace(declaration) {
       if (
         declaration.hasAnnotation(NO_INVESTIGATION_FQN)
-        // FIXME `fun c(l: @Composable () -> Unit)` ==> NO TABLE GENERATED
-        // declaration.declarations
-        //   .filter { element -> element.hasComposableAnnotation() }
-        //   .all { element -> element.hasAnnotation(NO_INVESTIGATION_FQN) }
+      // FIXME `fun c(l: @Composable () -> Unit)` ==> NO TABLE GENERATED
+      // declaration.declarations
+      //   .filter { element -> element.hasComposableAnnotation() }
+      //   .all { element -> element.hasAnnotation(NO_INVESTIGATION_FQN) }
       )
         return declaration
 

@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package land.sungbin.composeinvestigator.compiler.struct
 
-import land.sungbin.composeinvestigator.compiler.InvestigatorFqNames
+import land.sungbin.composeinvestigator.compiler.InvestigatorClassIds
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -10,11 +10,10 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.constructors
-import org.jetbrains.kotlin.name.ClassId
 
 /** Helper class to make the `ComposableInformation` class easier to handle in IR. */
 public class IrComposableInformation(context: IrPluginContext) {
-  private val symbol = context.referenceClass(ClassId.topLevel(InvestigatorFqNames.ComposableInformation))!!
+  private val symbol = context.referenceClass(InvestigatorClassIds.ComposableInformation)!!
 
   public operator fun invoke(
     name: IrConst,
