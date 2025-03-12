@@ -4,10 +4,11 @@ package land.sungbin.composeinvestigator.compiler.lower
 
 import androidx.compose.compiler.plugins.kotlin.ComposeClassIds
 import land.sungbin.composeinvestigator.compiler.log
+import land.sungbin.composeinvestigator.compiler.struct.irComposeInvestigator
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.name
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
@@ -51,7 +52,7 @@ public class InvalidationSkipTracingLastTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
 ) : ComposeInvestigatorBaseLower(context, messageCollector) {
-  override fun lastTransformSkipToGroupEndCall(composable: IrSimpleFunction, expression: IrCall): IrExpression {
+  override fun lastTransformSkipToGroupEndCall(composable: IrFunction, expression: IrCall): IrExpression {
     messageCollector.log(
       "Visit skipToGroupEnd call: ${composable.name}",
       expression.getCompilerMessageLocation(composable.file),
@@ -61,13 +62,15 @@ public class InvalidationSkipTracingLastTransformer(
       composable.valueParameters
         .last { param -> param.type.classFqName == ComposeClassIds.Composer }
         .let(::irGetValue)
+    val investigator = composable.file.irComposeInvestigator()
+    val compoundKey = irCompoundKeyHash(composer)
 
     val composableInformation =
       irComposableInformation(
-        irString(composable.name.asString()),
+        investigator.irGetComposableName(compoundKey, irString(composable.name.asString())),
         irString(composable.file.packageFqName.asString()),
         irString(composable.file.name),
-        irCompoundKeyHashCall(composer),
+        compoundKey,
       )
     val invalidationResult =
       irInvalidationLogger.irInvalidationResultSkipped()

@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 package land.sungbin.composeinvestigator.compiler
 
+import androidx.compose.compiler.plugins.kotlin.ComposeCallableIds
 import org.jetbrains.kotlin.builtins.StandardNames.BUILT_INS_PACKAGE_FQ_NAME
 import org.jetbrains.kotlin.builtins.StandardNames.COLLECTIONS_PACKAGE_FQ_NAME
 import org.jetbrains.kotlin.builtins.StandardNames.HASHCODE_NAME
@@ -16,7 +17,17 @@ public object StandardCallableIds {
   public val hashCode: CallableId = CallableId(BUILT_INS_PACKAGE_FQ_NAME, HASHCODE_NAME)
 }
 
+@Suppress("UnusedReceiverParameter")
+public val ComposeCallableIds.rememberSaveable: CallableId
+  get() = CallableId(FqName("androidx.compose.runtime.saveable"), identifier("rememberSaveable"))
+
 public object InvestigatorCallableIds {
   public val currentComposeInvestigator: CallableId =
     CallableId(FqName("land.sungbin.composeinvestigator.runtime"), identifier("currentComposeInvestigator"))
+
+  public val setComposableName: CallableId =
+    CallableId(InvestigatorClassIds.ComposeInvestigator, identifier("setComposableName"))
+
+  public val getComposableName: CallableId =
+    CallableId(InvestigatorClassIds.ComposeInvestigator, identifier("getComposableName"))
 }

@@ -3,11 +3,12 @@
 package land.sungbin.composeinvestigator.compiler.lower
 
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
+import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorCompilationException
 import org.jetbrains.kotlin.backend.common.ScopeWithIr
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrFile
-import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.path
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
@@ -38,11 +39,14 @@ internal fun IrPluginContext.irBoolean(
     value = value,
   )
 
-internal fun List<ScopeWithIr>.lastComposable(): IrSimpleFunction? =
+internal fun List<ScopeWithIr>.lastComposable(): IrFunction? =
   this
-    .lastOrNull { scope -> scope.irElement.safeAs<IrSimpleFunction>()?.hasComposableAnnotation() == true }
+    .lastOrNull { scope -> scope.irElement.safeAs<IrFunction>()?.hasComposableAnnotation() == true }
     ?.irElement
-    ?.safeAs<IrSimpleFunction>()
+    ?.safeAs<IrFunction>()
+
+internal fun irError(message: String, cause: Throwable? = null): Nothing =
+  throw ComposeInvestigatorCompilationException(message, cause)
 
 internal inline fun <T> includeFilePathInExceptionTrace(file: IrFile, body: () -> T): T {
   try {

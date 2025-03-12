@@ -5,6 +5,7 @@ package land.sungbin.composeinvestigator.compiler.struct
 import land.sungbin.composeinvestigator.compiler.InvestigatorClassIds
 import land.sungbin.composeinvestigator.compiler.InvestigatorNames
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.jvm.functionByName
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
@@ -17,7 +18,6 @@ import org.jetbrains.kotlin.ir.types.classOrFail
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.companionObject
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
-import org.jetbrains.kotlin.ir.util.getSimpleFunction
 
 /** Helper class to make the `ComposableInvalidationLogger` class easier to handle in IR. */
 public class IrInvalidationLogger(context: IrPluginContext) {
@@ -29,7 +29,7 @@ public class IrInvalidationLogger(context: IrPluginContext) {
       .getPropertyGetter(InvestigatorNames.Logger.asString())!!
 
   private val loggerLogSymbol =
-    composeInvestigatorLoggerSymbol.owner.returnType.classOrFail.getSimpleFunction(InvestigatorNames.log.asString())!!
+    composeInvestigatorLoggerSymbol.owner.returnType.classOrFail.functionByName(InvestigatorNames.log.asString())
 
   public val invalidationResultSymbol: IrClassSymbol = context.referenceClass(InvestigatorClassIds.InvalidationResult)!!
   private val invalidationResultSkippedSymbol =

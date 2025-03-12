@@ -8,7 +8,6 @@ import land.sungbin.composeinvestigator.compiler.lower.InvalidationProcessTracin
 import land.sungbin.composeinvestigator.compiler.lower.ComposeInvestigatorInstantiateTransformer
 import land.sungbin.composeinvestigator.compiler.lower.ComposeInvestigatorIntrinsicCallTransformer
 import land.sungbin.composeinvestigator.compiler.lower.StateInitializerFirstTransformer
-import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.validateIr
@@ -39,9 +38,6 @@ public class ComposeInvestigatorFirstPhaseExtension(
   override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
     messageCollector.log("Enabled first-phase features: ${features.filter { it.phase == 0 }.joinToString()}")
 
-    val composeInvestigatorInstantiator = ComposeInvestigatorInstantiateTransformer(pluginContext, messageCollector)
-    moduleFragment.transformChildrenVoid(composeInvestigatorInstantiator)
-
     // Input check. This should always pass, else something is horribly wrong upstream.
     // Necessary because oftentimes the issue is upstream. (compiler bug, prior plugin, etc.)
     validateIr(messageCollector, verificationMode) {
@@ -52,6 +48,12 @@ public class ComposeInvestigatorFirstPhaseExtension(
         ComposeInvestigatorPluginRegistrar.IrValidatorConfig,
       )
     }
+
+    val composeInvestigatorInstantiator = ComposeInvestigatorInstantiateTransformer(pluginContext, messageCollector)
+    moduleFragment.transformChildrenVoid(composeInvestigatorInstantiator)
+
+    if (FeatureFlag.ComposeInvestigatorIntrinsicCall in features)
+      moduleFragment.transformChildrenVoid(ComposeInvestigatorIntrinsicCallTransformer(pluginContext, messageCollector))
 
     if (FeatureFlag.InvalidationProcessTracing in features)
       moduleFragment.transformChildrenVoid(
@@ -64,9 +66,6 @@ public class ComposeInvestigatorFirstPhaseExtension(
           ),
         ),
       )
-
-    if (FeatureFlag.ComposeInvestigatorIntrinsicCall in features)
-      moduleFragment.transformChildrenVoid(ComposeInvestigatorIntrinsicCallTransformer(pluginContext, IrComposableInformation(pluginContext)))
 
     if (FeatureFlag.StateInitializerTracking in features)
       moduleFragment.transformChildrenVoid(StateInitializerFirstTransformer(pluginContext, messageCollector))

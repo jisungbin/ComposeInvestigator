@@ -5,8 +5,10 @@ package land.sungbin.composeinvestigator.compiler.struct
 import java.lang.ref.WeakReference
 import land.sungbin.composeinvestigator.compiler.InvestigatorClassIds
 import land.sungbin.composeinvestigator.compiler.InvestigatorNames
+import land.sungbin.composeinvestigator.compiler.lower.irError
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.lower.DeclarationIrBuilder
+import org.jetbrains.kotlin.backend.jvm.functionByName
 import org.jetbrains.kotlin.descriptors.DescriptorVisibilities
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.builders.declarations.addGetter
@@ -33,7 +35,6 @@ import org.jetbrains.kotlin.ir.types.classOrFail
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.SYNTHETIC_OFFSET
 import org.jetbrains.kotlin.ir.util.constructors
-import org.jetbrains.kotlin.ir.util.getSimpleFunction
 import org.jetbrains.kotlin.load.kotlin.PackagePartClassUtils
 import org.jetbrains.kotlin.name.Name
 
@@ -43,8 +44,7 @@ import org.jetbrains.kotlin.name.Name
  * @param property The property where `ComposeInvestigator` is instantiated. It can be
  * created with the [irComposeInvestigatorProperty] function.
  *
- * @constructor Use the [IrComposeInvestigator.create] or [IrComposeInvestigator.from]
- * function.
+ * @constructor Use the [IrComposeInvestigator.create]
  */
 public class IrComposeInvestigator private constructor(internal val property: IrProperty) {
   private lateinit var getComposableNameSymbol: IrSimpleFunctionSymbol
@@ -65,7 +65,7 @@ public class IrComposeInvestigator private constructor(internal val property: Ir
     }
 
   public fun irGetComposableName(
-    compoundKey: IrConst,
+    compoundKey: IrCall, // Expected to get irCompoundKeyHash
     default: IrConst,
   ): IrCall =
     IrCallImpl.fromSymbolOwner(
@@ -97,7 +97,7 @@ public class IrComposeInvestigator private constructor(internal val property: Ir
 
   /** Returns an [IrCall] that invokes `ComposableInvalidationTraceTable#computeInvalidationReason`. */
   public fun irComputeInvalidationReason(
-    compoundKey: IrExpression,
+    compoundKey: IrCall, // Expected to get irCompoundKeyHash
     arguments: IrValueAccessExpression,
   ): IrCall =
     IrCallImpl.fromSymbolOwner(
@@ -111,27 +111,21 @@ public class IrComposeInvestigator private constructor(internal val property: Ir
     }
 
   public companion object {
-    private fun IrComposeInvestigator.makeTable() {
-      val symbol = property.backingField!!.type.classOrFail
-      getComposableNameSymbol = symbol.getSimpleFunction(InvestigatorNames.getComposableName.asString())!!
-      registerStateObjectSymbol = symbol.getSimpleFunction(InvestigatorNames.registerStateObject.asString())!!
-      computeInvalidationReasonSymbol = symbol.getSimpleFunction(InvestigatorNames.computeInvalidationReason.asString())!!
-    }
-
-    /** Creates a new instance of `ComposeInvestigator` in the [given file][currentFile]. */
-    public fun create(context: IrPluginContext, currentFile: IrFile): IrComposeInvestigator =
-      IrComposeInvestigator(irComposeInvestigatorProperty(context, currentFile)).apply { makeTable() }
-
-    /**
-     * Initializes the [IrComposeInvestigator] class using an already [created instance][element] of
-     * `ComposeInvestigator`.
-     */
-    public fun from(element: IrProperty): IrComposeInvestigator =
-      IrComposeInvestigator(element).apply { makeTable() }
+    /** Creates a new instance of `ComposeInvestigator` in the [given file][targetFile]. */
+    public fun create(context: IrPluginContext, targetFile: IrFile): IrComposeInvestigator =
+      IrComposeInvestigator(irComposeInvestigatorProperty(context, targetFile)).apply {
+        val symbol = property.backingField!!.type.classOrFail
+        getComposableNameSymbol = symbol.functionByName(InvestigatorNames.getComposableName.asString())
+        registerStateObjectSymbol = symbol.functionByName(InvestigatorNames.registerStateObject.asString())
+        computeInvalidationReasonSymbol = symbol.functionByName(InvestigatorNames.computeInvalidationReason.asString())
+      }
   }
 }
 
 public var IrFile.irComposeInvestigator: IrComposeInvestigator? by irAttribute(followAttributeOwner = false)
+
+public fun IrFile.irComposeInvestigator(): IrComposeInvestigator =
+  this.irComposeInvestigator ?: irError("ComposeInvestigator is not instantiated")
 
 @Volatile private var composeInvestigatorSymbolCache: WeakReference<IrClassSymbol>? = null
 

@@ -2,13 +2,26 @@
 // SPDX-License-Identifier: Apache-2.0
 package land.sungbin.composeinvestigator.compiler.lower
 
+import androidx.compose.compiler.plugins.kotlin.ComposeCallableIds
 import land.sungbin.composeinvestigator.compiler.log
+import land.sungbin.composeinvestigator.compiler.rememberSaveable
+import land.sungbin.composeinvestigator.compiler.struct.irComposeInvestigator
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
+import org.jetbrains.kotlin.ir.backend.js.utils.valueArguments
 import org.jetbrains.kotlin.ir.declarations.IrFile
+import org.jetbrains.kotlin.ir.expressions.IrBlockBody
+import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
+import org.jetbrains.kotlin.ir.expressions.IrReturn
+import org.jetbrains.kotlin.ir.util.callableId
+import org.jetbrains.kotlin.ir.util.isFunctionTypeOrSubtype
+import org.jetbrains.kotlin.ir.util.statements
 import org.jetbrains.kotlin.name.Name
+import org.jetbrains.kotlin.utils.addToStdlib.cast
+import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 
 /**
  * Transforms the code to add the use of `ComposableInvalidationTraceTable#registerStateObject`
@@ -39,13 +52,41 @@ public class StateInitializerFirstTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
 ) : ComposeInvestigatorBaseLower(context, messageCollector) {
-  // TODO Special behaviour of 'remember' and 'rememberSaveable':
-  //  Transforms should be performed inside the 'remember[Saveable]' lambda, not outside of it.
   override fun firstTransformStateInitializer(name: Name, initializer: IrExpression, file: IrFile): IrExpression {
     messageCollector.log(
       "Visit state initializer: ${name.asString()}",
       initializer.getCompilerMessageLocation(file),
     )
+
+    if (
+      initializer is IrCall &&
+      (
+        initializer.symbol.owner.callableId == ComposeCallableIds.remember ||
+          initializer.symbol.owner.callableId == ComposeCallableIds.rememberSaveable
+        )
+    ) {
+      val rememberBody =
+        initializer.valueArguments
+          .lastOrNull { it?.type?.isFunctionTypeOrSubtype() == true }
+          ?.cast<IrFunctionExpression>()
+          ?: return initializer
+      val returnExpression = rememberBody.function.body?.statements?.last()?.safeAs<IrReturn>() ?: return initializer
+
+      val newReturnStatement = file.irComposeInvestigator().irRegisterStateObject(returnExpression.value, irString(name.asString()))
+
+      rememberBody.function
+        .body!!.cast<IrBlockBody>()
+        .statements
+        .last().cast<IrReturn>()
+        .value = newReturnStatement
+
+      return initializer.also {
+        messageCollector.log(
+          "Transform state initializer succeed: ${name.asString()}",
+          returnExpression.getCompilerMessageLocation(file),
+        )
+      }
+    }
 
     return file.irComposeInvestigator()
       .irRegisterStateObject(initializer, irString(name.asString()))

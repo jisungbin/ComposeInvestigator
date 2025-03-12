@@ -12,7 +12,6 @@ public object ComposeNames {
 }
 
 public object InvestigatorNames {
-  public val setComposableName: Name = identifier("setComposableName")
   public val getComposableName: Name = identifier("getComposableName")
   public val registerStateObject: Name = identifier("registerStateObject")
   public val computeInvalidationReason: Name = identifier("computeInvalidationReason")

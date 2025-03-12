@@ -4,6 +4,7 @@ package land.sungbin.composeinvestigator.compiler.struct
 
 import land.sungbin.composeinvestigator.compiler.InvestigatorClassIds
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
@@ -16,7 +17,7 @@ public class IrComposableInformation(context: IrPluginContext) {
   private val symbol = context.referenceClass(InvestigatorClassIds.ComposableInformation)!!
 
   public operator fun invoke(
-    name: IrConst,
+    name: IrCall, // Expected to get irGetComposableName
     packageName: IrConst,
     fileName: IrConst,
     compoundKey: IrExpression,

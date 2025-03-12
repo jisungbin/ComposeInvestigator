@@ -10,19 +10,19 @@ import land.sungbin.composeinvestigator.compiler.InvestigatorClassIds
 import land.sungbin.composeinvestigator.compiler.StandardCallableIds
 import land.sungbin.composeinvestigator.compiler.StateObject
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
-import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigator
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationLogger
 import land.sungbin.composeinvestigator.compiler.struct.IrRuntimeStability
 import land.sungbin.composeinvestigator.compiler.struct.IrValueArgument
-import land.sungbin.composeinvestigator.compiler.struct.irComposeInvestigator
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
+import org.jetbrains.kotlin.backend.jvm.JvmIrTypeSystemContext
 import org.jetbrains.kotlin.backend.jvm.ir.parentClassId
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
 import org.jetbrains.kotlin.ir.declarations.IrFile
+import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrLocalDelegatedProperty
 import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.IrValueDeclaration
@@ -43,12 +43,10 @@ import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.IrVariableSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrVariableSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.isInt
-import org.jetbrains.kotlin.ir.types.isNullable
 import org.jetbrains.kotlin.ir.types.isNullableAny
-import org.jetbrains.kotlin.ir.types.isSubtypeOfClass
+import org.jetbrains.kotlin.ir.types.isSubtypeOf
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.hasAnnotation
@@ -72,6 +70,8 @@ public open class ComposeInvestigatorBaseLower(
   protected val context: IrPluginContext,
   protected val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter() (Blocked: "This API is not supported for K2")
 ) : IrElementTransformerVoidWithContext() {
+  private val typeSystemContext = JvmIrTypeSystemContext(context.irBuiltIns)
+
   protected val irRuntimeStability: IrRuntimeStability by lazy { IrRuntimeStability(context) }
   protected val irComposableInformation: IrComposableInformation by lazy { IrComposableInformation(context) }
   protected val irInvalidationLogger: IrInvalidationLogger by lazy { IrInvalidationLogger(context) }
@@ -124,7 +124,7 @@ public open class ComposeInvestigatorBaseLower(
   // } else {
   //   $composer.skipToGroupEnd()
   // }
-  final override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
+  override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
     if (
       declaration.hasAnnotation(InvestigatorClassIds.NoInvestigation) ||
       declaration.body == null ||
@@ -147,7 +147,7 @@ public open class ComposeInvestigatorBaseLower(
   //   <ENTER HERE>
   //   $composer.skipToGroupEnd()
   // }
-  final override fun visitCall(expression: IrCall): IrExpression =
+  override fun visitCall(expression: IrCall): IrExpression =
     if (
       expression.symbol.owner.parentClassId == ComposeClassIds.Composer &&
       expression.symbol.owner.name == ComposeNames.skipToGroupEnd
@@ -157,22 +157,28 @@ public open class ComposeInvestigatorBaseLower(
       super.visitCall(expression)
 
   // val state = <ENTER HERE: remember { mutableStateOf(T) } >
-  final override fun visitVariable(declaration: IrVariable): IrStatement {
+  override fun visitVariable(declaration: IrVariable): IrStatement {
     if (declaration.origin == IrDeclarationOrigin.PROPERTY_DELEGATE)
       return super.visitVariable(declaration)
 
-    if (declaration.isStateDeclaration())
-      declaration.initializer =
-        firstTransformStateInitializer(declaration.name, declaration.initializer!!, declaration.file)
+    run {
+      if (declaration.type.isState() && !declaration.isVar && !declaration.isLateinit) {
+        val initializer = declaration.initializer ?: return@run
+        declaration.initializer = firstTransformStateInitializer(declaration.name, initializer, declaration.file)
+      }
+    }
 
     return super.visitVariable(declaration)
   }
 
   // var state by <ENTER HERE: remember { mutableStateOf(T) } >
-  final override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty): IrStatement {
-    if (declaration.delegate.isStateDeclaration())
-      declaration.delegate.initializer =
-        firstTransformStateInitializer(declaration.name, declaration.delegate.initializer!!, declaration.file)
+  override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty): IrStatement {
+    run {
+      if (declaration.type.isState() && !declaration.delegate.isVar && !declaration.delegate.isLateinit) {
+        val initializer = declaration.delegate.initializer ?: return@run
+        declaration.delegate.initializer = firstTransformStateInitializer(declaration.name, initializer, declaration.file)
+      }
+    }
 
     return super.visitLocalDelegatedProperty(declaration)
   }
@@ -192,12 +198,9 @@ public open class ComposeInvestigatorBaseLower(
 
   // (MUST) LoadingOrder.LAST
   protected open fun lastTransformSkipToGroupEndCall(
-    composable: IrSimpleFunction,
+    composable: IrFunction,
     expression: IrCall,
   ): IrExpression = expression
-
-  protected fun IrFile.irComposeInvestigator(): IrComposeInvestigator =
-    checkNotNull(this.irComposeInvestigator) { "ComposeInvestigator is not instantiated" }
 
   protected fun irVariable(
     name: Name,
@@ -232,7 +235,7 @@ public open class ComposeInvestigatorBaseLower(
       symbol = currentComposerSymbol.owner.getter!!.symbol,
     )
 
-  protected fun irCompoundKeyHashCall(composer: IrDeclarationReference): IrCall =
+  protected fun irCompoundKeyHash(composer: IrDeclarationReference): IrCall =
     IrCallImpl.fromSymbolOwner(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,
@@ -277,13 +280,7 @@ public open class ComposeInvestigatorBaseLower(
       extensionReceiver = value
     }
 
-  private fun IrVariable.isStateDeclaration(): Boolean {
-    val isState = type.classOrNull?.let { clazz ->
-      clazz.isSubtypeOfClass(stateSymbol.defaultType.classOrNull ?: return false) ||
-        clazz.isSubtypeOfClass(stateObjectSymbol.defaultType.classOrNull ?: return false)
-    }
-    val isTempVariable = origin == IrDeclarationOrigin.IR_TEMPORARY_VARIABLE
-    val hasInitializer = initializer != null
-    return !type.isNullable() && isState == true && !isTempVariable && hasInitializer
-  }
+  private fun IrType.isState(): Boolean =
+    isSubtypeOf(stateSymbol.defaultType, typeSystemContext) ||
+      isSubtypeOf(stateObjectSymbol.defaultType, typeSystemContext)
 }

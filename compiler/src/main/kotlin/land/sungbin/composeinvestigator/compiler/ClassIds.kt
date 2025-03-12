@@ -9,6 +9,7 @@ import org.jetbrains.kotlin.name.Name.identifier
 
 private val AndroidxComposeRuntimeRoot = FqName("androidx.compose.runtime")
 
+@Suppress("UnusedReceiverParameter")
 public val ComposeClassIds.StateObject
   get() = ClassId(AndroidxComposeRuntimeRoot.child(identifier("snapshots")), identifier("StateObject"))
 

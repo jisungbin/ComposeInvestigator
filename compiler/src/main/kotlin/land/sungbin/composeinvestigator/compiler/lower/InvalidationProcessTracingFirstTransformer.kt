@@ -5,6 +5,7 @@ package land.sungbin.composeinvestigator.compiler.lower
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.normalize
 import land.sungbin.composeinvestigator.compiler.log
+import land.sungbin.composeinvestigator.compiler.struct.irComposeInvestigator
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -82,6 +83,8 @@ public class InvalidationProcessTracingFirstTransformer(
       body.getCompilerMessageLocation(composable.file),
     )
 
+    val investigator = composable.file.irComposeInvestigator()
+    val compoundKey = irCompoundKeyHash(irCurrentComposer())
     val newStatements = mutableListOf<IrStatement>()
 
     val currentValueArguments =
@@ -135,21 +138,16 @@ public class InvalidationProcessTracingFirstTransformer(
     val invalidationReasonVariable =
       irVariable(
         identifier("invalidationReason"),
-        composable.file
-          .irComposeInvestigator()
-          .irComputeInvalidationReason(
-            irCompoundKeyHashCall(irCurrentComposer()),
-            irGetValue(currentValueArguments),
-          ),
+        investigator.irComputeInvalidationReason(compoundKey, irGetValue(currentValueArguments)),
       )
     newStatements += invalidationReasonVariable
 
     val composableInformation =
       irComposableInformation(
-        irString(composable.name.asString()),
+        investigator.irGetComposableName(compoundKey, irString(composable.name.asString())),
         irString(composable.file.packageFqName.asString()),
         irString(composable.file.name),
-        irCompoundKeyHashCall(irCurrentComposer()),
+        compoundKey,
       )
     val invalidationResult =
       irGetValue(invalidationReasonVariable, type = irInvalidationLogger.invalidationResultSymbol.defaultType)
