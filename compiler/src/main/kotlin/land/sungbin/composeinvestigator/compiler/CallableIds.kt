@@ -3,6 +3,7 @@
 package land.sungbin.composeinvestigator.compiler
 
 import androidx.compose.compiler.plugins.kotlin.ComposeCallableIds
+import androidx.compose.compiler.plugins.kotlin.ComposeClassIds
 import org.jetbrains.kotlin.builtins.StandardNames.BUILT_INS_PACKAGE_FQ_NAME
 import org.jetbrains.kotlin.builtins.StandardNames.COLLECTIONS_PACKAGE_FQ_NAME
 import org.jetbrains.kotlin.builtins.StandardNames.HASHCODE_NAME
@@ -20,6 +21,10 @@ public object StandardCallableIds {
 @Suppress("UnusedReceiverParameter")
 public val ComposeCallableIds.rememberSaveable: CallableId
   get() = CallableId(FqName("androidx.compose.runtime.saveable"), identifier("rememberSaveable"))
+
+@Suppress("UnusedReceiverParameter")
+public val ComposeCallableIds.skipToGroupEnd: CallableId
+  get() = CallableId(ComposeClassIds.Composer, identifier("skipToGroupEnd"))
 
 public object InvestigatorCallableIds {
   public val currentComposeInvestigator: CallableId =

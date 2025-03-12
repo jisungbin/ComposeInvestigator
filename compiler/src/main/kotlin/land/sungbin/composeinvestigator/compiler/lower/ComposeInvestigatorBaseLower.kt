@@ -9,6 +9,7 @@ import land.sungbin.composeinvestigator.compiler.ComposeNames
 import land.sungbin.composeinvestigator.compiler.InvestigatorClassIds
 import land.sungbin.composeinvestigator.compiler.StandardCallableIds
 import land.sungbin.composeinvestigator.compiler.StateObject
+import land.sungbin.composeinvestigator.compiler.skipToGroupEnd
 import land.sungbin.composeinvestigator.compiler.struct.IrComposableInformation
 import land.sungbin.composeinvestigator.compiler.struct.IrInvalidationLogger
 import land.sungbin.composeinvestigator.compiler.struct.IrRuntimeStability
@@ -16,7 +17,6 @@ import land.sungbin.composeinvestigator.compiler.struct.IrValueArgument
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.JvmIrTypeSystemContext
-import org.jetbrains.kotlin.backend.jvm.ir.parentClassId
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -47,6 +47,7 @@ import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isNullableAny
 import org.jetbrains.kotlin.ir.types.isSubtypeOf
+import org.jetbrains.kotlin.ir.util.callableId
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.hasAnnotation
@@ -148,10 +149,7 @@ public open class ComposeInvestigatorBaseLower(
   //   $composer.skipToGroupEnd()
   // }
   override fun visitCall(expression: IrCall): IrExpression =
-    if (
-      expression.symbol.owner.parentClassId == ComposeClassIds.Composer &&
-      expression.symbol.owner.name == ComposeNames.skipToGroupEnd
-    )
+    if (expression.symbol.owner.callableId == ComposeCallableIds.skipToGroupEnd)
       lastTransformSkipToGroupEndCall(allScopes.lastComposable()!!, expression)
     else
       super.visitCall(expression)

@@ -7,7 +7,6 @@ import org.jetbrains.kotlin.name.Name.identifier
 import org.jetbrains.kotlin.name.SpecialNames
 
 public object ComposeNames {
-  public val skipToGroupEnd: Name = identifier("skipToGroupEnd")
   public val compoundKeyHash: Name = identifier("compoundKeyHash")
 }
 
