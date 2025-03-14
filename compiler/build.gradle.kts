@@ -29,15 +29,57 @@ kotlin {
     optIn.addAll(
       "org.jetbrains.kotlin.compiler.plugin.ExperimentalCompilerApi",
       "org.jetbrains.kotlin.utils.addToStdlib.UnsafeCastFunction",
-      // Only works with IR phase, not FIR.
-      // See https://slack-chats.kotlinlang.org/t/16073880/is-there-a-doc-writeup-somewhere-about-unsafeduringirconstru.
+      // FYI: https://slack-chats.kotlinlang.org/t/16073880/is-there-a-doc-writeup-somewhere-about-unsafeduringirconstru.
       "org.jetbrains.kotlin.ir.symbols.UnsafeDuringIrConstructionAPI",
     )
   }
 }
 
+val investigatorRuntimeClasspath: Configuration by configurations.creating
+
 dependencies {
-  compileOnly(kotlin("stdlib", version = libs.versions.kotlin.asProvider().get()))
-  compileOnly(kotlin("compiler-embeddable", version = libs.versions.kotlin.asProvider().get()))
-  compileOnly(kotlin("compose-compiler-plugin", version = libs.versions.kotlin.asProvider().get()))
+  val kotlinVersion = libs.versions.kotlin.asProvider().get()
+
+  compileOnly(kotlin("stdlib", version = kotlinVersion))
+  compileOnly(kotlin("compiler-embeddable", version = kotlinVersion))
+  compileOnly(kotlin("compose-compiler-plugin", version = kotlinVersion))
+
+  investigatorRuntimeClasspath(projects.runtime)
+  investigatorRuntimeClasspath(libs.compose.runtime)
+  testImplementation(kotlin("compiler", version = kotlinVersion))
+  testImplementation(kotlin("compose-compiler-plugin", version = kotlinVersion))
+  testImplementation(kotlin("compiler-internal-test-framework", version = kotlinVersion))
+  testImplementation(kotlin("test-junit5", version = kotlinVersion))
+
+  // Dependencies required to run the internal test framework.
+  testRuntimeOnly(kotlin("annotations-jvm", version = kotlinVersion))
+}
+
+tasks.register<JavaExec>("generateTests") {
+  inputs
+    .dir(layout.projectDirectory.dir("src/test/data"))
+    .withPropertyName("testData")
+    .withPathSensitivity(PathSensitivity.RELATIVE)
+  outputs
+    .dir(layout.projectDirectory.dir("src/test/java"))
+    .withPropertyName("generatedTests")
+
+  classpath = sourceSets.test.get().runtimeClasspath
+  mainClass.set("land.sungbin.composeinvestigator.compiler.GenerateTestsKt")
+  workingDir = rootDir
+}
+
+tasks.withType<Test> {
+  dependsOn(investigatorRuntimeClasspath)
+  inputs
+    .dir(layout.projectDirectory.dir("src/test/data"))
+    .withPropertyName("testData")
+    .withPathSensitivity(PathSensitivity.RELATIVE)
+
+  workingDir = rootDir
+  systemProperty("investigatorRuntime.classpath", investigatorRuntimeClasspath.asPath)
+
+  // Properties required to run the internal test framework.
+  systemProperty("idea.home.path", rootDir)
+  systemProperty("idea.ignore.disabled.plugins", "true")
 }

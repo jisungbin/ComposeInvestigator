@@ -21,11 +21,8 @@ idea {
 }
 
 allprojects {
-  apply {
-    plugin(rootProject.libs.plugins.spotless.get().pluginId)
-  }
-
-  extensions.configure<SpotlessExtension> {
+  apply(plugin = rootProject.libs.plugins.spotless.get().pluginId)
+  configure<SpotlessExtension> {
     fun BaseKotlinExtension.useKtlint() {
       ktlint(rootProject.libs.versions.ktlint.get()).editorConfigOverride(
         mapOf(
@@ -53,16 +50,16 @@ allprojects {
 
     kotlin {
       target("**/*.kt")
-      targetExclude("**/build/**/*.kt", "spotless/*.kt")
+      targetExclude("**/build/**/*.kt", "**/src/test/data/**", "spotless/*.kt")
       useKtlint()
       licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
     }
     kotlinGradle {
-      target("**/*.kts")
-      targetExclude("**/build/**/*.kts", "spotless/*.kts")
+      target("*.kts")
+      targetExclude("**/build/**/*.kts")
       useKtlint()
       licenseHeaderFile(
-        rootProject.file("spotless/copyright.kts"),
+        rootProject.file("spotless/copyright.kt"),
         "(@file|import|plugins|buildscript|dependencies|pluginManagement|dependencyResolutionManagement)",
       )
     }

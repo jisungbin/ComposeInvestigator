@@ -6,6 +6,7 @@
 !/.idea/codeStyles
 !/.idea/dictionaries
 !/.idea/inspectionProfiles
+!/.idea/kotlinTestDataPluginTestDataPaths.xml
 *.iml
 .DS_Store
 .gradle

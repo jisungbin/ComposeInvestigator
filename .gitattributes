@@ -1,0 +1,3 @@
+compiler/src/test/**/*.java linguist-generated=true
+compiler/src/test/**/*.fir.txt linguist-generated=true
+compiler/src/test/**/*.fir.diag.txt linguist-generated=true

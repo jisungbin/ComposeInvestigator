@@ -1,0 +1,11 @@
+FILE: MyDump.kt
+    public final val a: R|land/sungbin/composeinvestigator/runtime/ComposeInvestigator|by R|kotlin/lazy|<R|land/sungbin/composeinvestigator/runtime/ComposeInvestigator|>(<L> = lazy@fun <anonymous>(): R|land/sungbin/composeinvestigator/runtime/ComposeInvestigator| <inline=NoInline>  {
+        ^ R|land/sungbin/composeinvestigator/runtime/currentComposeInvestigator|
+    }
+    )
+        public get(): R|land/sungbin/composeinvestigator/runtime/ComposeInvestigator| {
+            ^ D|/a|.R|kotlin/getValue|<R|land/sungbin/composeinvestigator/runtime/ComposeInvestigator|>(Null(null), ::R|/a|)
+        }
+    @R|androidx/compose/runtime/Composable|() public final fun test2(): R|kotlin/Unit| {
+        R|kotlin/io/println|(String(TEST!))
+    }
