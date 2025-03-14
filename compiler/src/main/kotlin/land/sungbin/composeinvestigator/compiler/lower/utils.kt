@@ -12,6 +12,8 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.path
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstImpl
+import org.jetbrains.kotlin.ir.util.callableId
+import org.jetbrains.kotlin.name.CallableId
 import org.jetbrains.kotlin.utils.addToStdlib.safeAs
 import org.jetbrains.kotlin.utils.exceptions.rethrowIntellijPlatformExceptionIfNeeded
 
@@ -47,6 +49,9 @@ internal fun List<ScopeWithIr>.lastComposable(): IrFunction? =
 
 internal fun irError(message: String, cause: Throwable? = null): Nothing =
   throw ComposeInvestigatorCompilationException(message, cause)
+
+public val IrFunction.callableIdOrNull: CallableId?
+  get() = runCatching { callableId }.getOrNull()
 
 internal inline fun <T> includeFilePathInExceptionTrace(file: IrFile, body: () -> T): T {
   try {

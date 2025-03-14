@@ -16,7 +16,6 @@ import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
 import org.jetbrains.kotlin.ir.expressions.IrReturn
-import org.jetbrains.kotlin.ir.util.callableId
 import org.jetbrains.kotlin.ir.util.isFunctionTypeOrSubtype
 import org.jetbrains.kotlin.ir.util.statements
 import org.jetbrains.kotlin.name.Name
@@ -61,8 +60,8 @@ public class StateInitializerFirstTransformer(
     if (
       initializer is IrCall &&
       (
-        initializer.symbol.owner.callableId == ComposeCallableIds.remember ||
-          initializer.symbol.owner.callableId == ComposeCallableIds.rememberSaveable
+        initializer.symbol.owner.callableIdOrNull == ComposeCallableIds.remember ||
+          initializer.symbol.owner.callableIdOrNull == ComposeCallableIds.rememberSaveable
         )
     ) {
       val rememberBody =

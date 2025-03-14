@@ -18,9 +18,11 @@ import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.jvm.JvmIrTypeSystemContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
+import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrDeclarationOrigin
+import org.jetbrains.kotlin.ir.declarations.IrDeclarationParent
 import org.jetbrains.kotlin.ir.declarations.IrFile
 import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.IrLocalDelegatedProperty
@@ -33,6 +35,7 @@ import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrSyntheticBody
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
@@ -47,10 +50,12 @@ import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isNullableAny
 import org.jetbrains.kotlin.ir.types.isSubtypeOf
-import org.jetbrains.kotlin.ir.util.callableId
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.hasAnnotation
+import org.jetbrains.kotlin.ir.util.statements
+import org.jetbrains.kotlin.ir.visitors.IrVisitorVoid
+import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
 import org.jetbrains.kotlin.name.Name
 
 /**
@@ -119,12 +124,7 @@ public open class ComposeInvestigatorBaseLower(
       super.visitFileNew(declaration)
     }
 
-  // if (%dirty and 0b0011 != 0b0010 || !%composer.skipping) {
-  //   <ENTER HERE>
-  //   magic()
-  // } else {
-  //   $composer.skipToGroupEnd()
-  // }
+  // Visit composable function declarations
   override fun visitSimpleFunction(declaration: IrSimpleFunction): IrStatement {
     if (
       declaration.hasAnnotation(InvestigatorClassIds.NoInvestigation) ||
@@ -142,14 +142,38 @@ public open class ComposeInvestigatorBaseLower(
     return super.visitSimpleFunction(declaration)
   }
 
-  // if (%dirty and 0b0011 != 0b0010 || !%composer.skipping) {
-  //   magic()
-  // } else {
-  //   <ENTER HERE>
-  //   $composer.skipToGroupEnd()
-  // }
+  // Visit composable function expressions
+  override fun visitFunctionExpression(expression: IrFunctionExpression): IrExpression {
+    fun IrStatement.hasComposableCall(): Boolean {
+      var result = false
+
+      acceptChildrenVoid(
+        object : IrVisitorVoid() {
+          override fun visitElement(element: IrElement) {
+            if (!result) element.acceptChildrenVoid(this)
+          }
+
+          override fun visitCall(expression: IrCall) {
+            if (expression.symbol.owner.hasComposableAnnotation())
+              result = true
+            else
+              super.visitCall(expression)
+          }
+        },
+      )
+
+      return result
+    }
+
+    if (expression.function.body?.statements?.any { it.hasComposableCall() } == true)
+      expression.function.body = firstTransformComposableBody(expression.function, expression.function.body!!)
+
+    return super.visitFunctionExpression(expression)
+  }
+
+  // Visit composer.skipToGroupEnd() calls
   override fun visitCall(expression: IrCall): IrExpression =
-    if (expression.symbol.owner.callableId == ComposeCallableIds.skipToGroupEnd)
+    if (expression.symbol.owner.callableIdOrNull == ComposeCallableIds.skipToGroupEnd)
       lastTransformSkipToGroupEndCall(allScopes.lastComposable()!!, expression)
     else
       super.visitCall(expression)
@@ -203,6 +227,7 @@ public open class ComposeInvestigatorBaseLower(
   protected fun irVariable(
     name: Name,
     initializer: IrExpression,
+    parent: IrDeclarationParent,
     origin: IrDeclarationOrigin = IrDeclarationOrigin.DEFINED,
     symbol: IrVariableSymbol = IrVariableSymbolImpl(),
     type: IrType = initializer.type,
@@ -224,6 +249,7 @@ public open class ComposeInvestigatorBaseLower(
       endOffset = endOffset,
     ).apply {
       this.initializer = initializer
+      this.parent = parent
     }
 
   protected fun irCurrentComposer(): IrCall =

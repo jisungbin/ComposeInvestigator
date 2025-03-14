@@ -13,8 +13,9 @@ import org.jetbrains.kotlin.ir.declarations.name
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
-import org.jetbrains.kotlin.ir.types.classFqName
+import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.defaultType
+import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.util.file
 
 /**
@@ -60,7 +61,7 @@ public class InvalidationSkipTracingLastTransformer(
 
     val composer =
       composable.valueParameters
-        .last { param -> param.type.classFqName == ComposeClassIds.Composer }
+        .last { param -> param.type.classOrNull?.owner?.classId == ComposeClassIds.Composer }
         .let(::irGetValue)
     val investigator = composable.file.irComposeInvestigator()
     val compoundKey = irCompoundKeyHash(composer)

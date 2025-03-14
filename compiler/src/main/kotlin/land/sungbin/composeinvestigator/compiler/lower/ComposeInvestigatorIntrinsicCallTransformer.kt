@@ -8,14 +8,14 @@ import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.util.callableId
 
 public class ComposeInvestigatorIntrinsicCallTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
 ) : ComposeInvestigatorBaseLower(context, messageCollector) {
   override fun visitCall(expression: IrCall): IrExpression =
-    when (expression.symbol.owner.callableId) {
+    when (expression.symbol.owner.callableIdOrNull) {
+      null -> super.visitCall(expression)
       InvestigatorCallableIds.currentComposeInvestigator -> {
         currentFile.irComposeInvestigator().irPropertyGetter(expression.startOffset)
       }

@@ -19,6 +19,7 @@ import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.types.classFqName
 import org.jetbrains.kotlin.ir.types.defaultType
+import org.jetbrains.kotlin.ir.types.typeWith
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.statements
 import org.jetbrains.kotlin.name.Name.identifier
@@ -95,8 +96,11 @@ public class InvalidationProcessTracingFirstTransformer(
           endOffset = UNDEFINED_OFFSET,
           symbol = mutableListOfSymbol,
         ).apply {
-          putTypeArgument(0, irValueArgument.symbol.defaultType)
+          val typeArgument = irValueArgument.symbol.defaultType
+          type = context.irBuiltIns.listClass.typeWith(typeArgument)
+          putTypeArgument(0, typeArgument)
         },
+        parent = composable,
       )
     newStatements += currentValueArguments
 
@@ -120,6 +124,7 @@ public class InvalidationProcessTracingFirstTransformer(
             valueHashCode = valueHashCode,
             stability = with(irRuntimeStability) { stability.asRuntimeStability() },
           ),
+          parent = composable,
         )
       val addValueArgumentToList =
         IrCallImpl.fromSymbolOwner(
@@ -139,6 +144,7 @@ public class InvalidationProcessTracingFirstTransformer(
       irVariable(
         identifier("invalidationReason"),
         investigator.irComputeInvalidationReason(compoundKey, irGetValue(currentValueArguments)),
+        parent = composable,
       )
     newStatements += invalidationReasonVariable
 
