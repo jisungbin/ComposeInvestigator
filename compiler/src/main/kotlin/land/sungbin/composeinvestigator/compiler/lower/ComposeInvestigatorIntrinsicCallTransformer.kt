@@ -3,7 +3,6 @@
 package land.sungbin.composeinvestigator.compiler.lower
 
 import land.sungbin.composeinvestigator.compiler.InvestigatorCallableIds
-import land.sungbin.composeinvestigator.compiler.struct.irComposeInvestigator
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.expressions.IrCall
@@ -16,16 +15,7 @@ public class ComposeInvestigatorIntrinsicCallTransformer(
   override fun visitCall(expression: IrCall): IrExpression =
     when (expression.symbol.owner.callableIdOrNull) {
       null -> super.visitCall(expression)
-      InvestigatorCallableIds.currentComposeInvestigator -> {
-        currentFile.irComposeInvestigator().irPropertyGetter(expression.startOffset)
-      }
-      InvestigatorCallableIds.setComposableName -> {
-        if (expression.getValueArgument(1) == null) // compoundKey
-          expression.putValueArgument(1, irCompoundKeyHash(irCurrentComposer()))
-
-        super.visitCall(expression)
-      }
-      InvestigatorCallableIds.getComposableName -> {
+      InvestigatorCallableIds.getCurrentComposableName -> {
         if (expression.getValueArgument(0) == null) // compoundKey
           expression.putValueArgument(0, irCompoundKeyHash(irCurrentComposer()))
 

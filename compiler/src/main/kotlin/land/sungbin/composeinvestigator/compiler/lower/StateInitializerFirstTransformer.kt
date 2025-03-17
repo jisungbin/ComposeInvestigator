@@ -5,7 +5,7 @@ package land.sungbin.composeinvestigator.compiler.lower
 import androidx.compose.compiler.plugins.kotlin.ComposeCallableIds
 import land.sungbin.composeinvestigator.compiler.log
 import land.sungbin.composeinvestigator.compiler.rememberSaveable
-import land.sungbin.composeinvestigator.compiler.struct.irComposeInvestigator
+import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigator
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -51,6 +51,8 @@ public class StateInitializerFirstTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
 ) : ComposeInvestigatorBaseLower(context, messageCollector) {
+  private val investigator = IrComposeInvestigator(context)
+
   override fun firstTransformStateInitializer(name: Name, initializer: IrExpression, file: IrFile): IrExpression {
     messageCollector.log(
       "Visit state initializer: ${name.asString()}",
@@ -71,7 +73,7 @@ public class StateInitializerFirstTransformer(
           ?: return initializer
       val returnExpression = rememberBody.function.body?.statements?.last()?.safeAs<IrReturn>() ?: return initializer
 
-      val newReturnStatement = file.irComposeInvestigator().irRegisterStateObject(returnExpression.value, irString(name.asString()))
+      val newReturnStatement = investigator.irRegisterStateObject(returnExpression.value, irString(name.asString()))
 
       rememberBody.function
         .body!!.cast<IrBlockBody>()
@@ -87,7 +89,7 @@ public class StateInitializerFirstTransformer(
       }
     }
 
-    return file.irComposeInvestigator()
+    return investigator
       .irRegisterStateObject(initializer, irString(name.asString()))
       .also {
         messageCollector.log(

@@ -4,7 +4,7 @@ package land.sungbin.composeinvestigator.compiler.lower
 
 import androidx.compose.compiler.plugins.kotlin.ComposeClassIds
 import land.sungbin.composeinvestigator.compiler.log
-import land.sungbin.composeinvestigator.compiler.struct.irComposeInvestigator
+import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigator
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -63,12 +63,12 @@ public class InvalidationSkipTracingLastTransformer(
       composable.valueParameters
         .last { param -> param.type.classOrNull?.owner?.classId == ComposeClassIds.Composer }
         .let(::irGetValue)
-    val investigator = composable.file.irComposeInvestigator()
+    val investigator = IrComposeInvestigator(context)
     val compoundKey = irCompoundKeyHash(composer)
 
     val composableInformation =
       irComposableInformation(
-        investigator.irGetComposableName(compoundKey, irString(composable.name.asString())),
+        investigator.irGetCurrentComposableName(irString(composable.name.asString()), compoundKey),
         irString(composable.file.packageFqName.asString()),
         irString(composable.file.name),
         compoundKey,

@@ -85,7 +85,7 @@ public open class ComposeInvestigatorBaseLower(
 
   private val currentComposerSymbol by unsafeLazy { context.referenceProperties(ComposeCallableIds.currentComposer).single() }
   private val composerSymbol by unsafeLazy { context.referenceClass(ComposeClassIds.Composer)!! }
-  private val composerCompoundKeyHashSymbol: IrSimpleFunctionSymbol by unsafeLazy {
+  private val composerCompoundKeyHashSymbol by unsafeLazy {
     composerSymbol.getPropertyGetter(ComposeNames.compoundKeyHash.asString())!!
   }
 

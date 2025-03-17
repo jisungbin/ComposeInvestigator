@@ -5,7 +5,7 @@ package land.sungbin.composeinvestigator.compiler.lower
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import androidx.compose.compiler.plugins.kotlin.analysis.normalize
 import land.sungbin.composeinvestigator.compiler.log
-import land.sungbin.composeinvestigator.compiler.struct.irComposeInvestigator
+import land.sungbin.composeinvestigator.compiler.struct.IrComposeInvestigator
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.backend.common.getCompilerMessageLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -84,7 +84,7 @@ public class InvalidationProcessTracingFirstTransformer(
       body.getCompilerMessageLocation(composable.file),
     )
 
-    val investigator = composable.file.irComposeInvestigator()
+    val investigator = IrComposeInvestigator(context)
     val compoundKey = irCompoundKeyHash(irCurrentComposer())
     val newStatements = mutableListOf<IrStatement>()
 
@@ -150,7 +150,7 @@ public class InvalidationProcessTracingFirstTransformer(
 
     val composableInformation =
       irComposableInformation(
-        investigator.irGetComposableName(compoundKey, irString(composable.name.asString())),
+        investigator.irGetCurrentComposableName(irString(composable.name.asString()), compoundKey),
         irString(composable.file.packageFqName.asString()),
         irString(composable.file.name),
         compoundKey,

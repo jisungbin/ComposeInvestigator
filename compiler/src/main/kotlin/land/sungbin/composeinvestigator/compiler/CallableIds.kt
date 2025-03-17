@@ -27,12 +27,6 @@ public val ComposeCallableIds.skipToGroupEnd: CallableId
   get() = CallableId(ComposeClassIds.Composer, identifier("skipToGroupEnd"))
 
 public object InvestigatorCallableIds {
-  public val currentComposeInvestigator: CallableId =
-    CallableId(FqName("land.sungbin.composeinvestigator.runtime"), identifier("currentComposeInvestigator"))
-
-  public val setComposableName: CallableId =
-    CallableId(InvestigatorClassIds.ComposeInvestigator, identifier("setComposableName"))
-
-  public val getComposableName: CallableId =
-    CallableId(InvestigatorClassIds.ComposeInvestigator, identifier("getComposableName"))
+  public val getCurrentComposableName: CallableId =
+    CallableId(InvestigatorClassIds.ComposeInvestigator, InvestigatorNames.getCurrentComposableName)
 }

@@ -3,46 +3,38 @@
 package land.sungbin.composeinvestigator.runtime
 
 import androidx.annotation.VisibleForTesting
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.ExplicitGroupsComposable
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.NoLiveLiterals
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.currentCompositeKeyHash
 import androidx.compose.runtime.snapshots.StateObject
 
-/** Returns the [ComposeInvestigator] assigned to the current file. */
-public val currentComposeInvestigator: ComposeInvestigator
-  @[Stable JvmSynthetic] get() = intrinsicImplementedError()
+@Immutable public object ComposeInvestigator {
+  public const val LOGGER_DEFAULT_TAG: String = "ComposeInvestigator"
 
-/**
- * Classes that hold data from ComposeInvestigator.
- *
- * **This class is created as a singleton for *every* file**, so be careful in production
- * environments. (ComposeInvestigator is not recommended for production)
- *
- * This class is automatically generated and managed at the compiler level in ComposeInvestigator,
- * and you should be very careful about controlling this instance directly.
- *
- * To get the instance of [ComposeInvestigator] created in the current file,
- * use [currentComposeInvestigator].
- *
- * If a file is annotated with [NoInvestigation] or do not have any Composables, this class will
- * not be instantiated in that file. If you use this class's APIs (including the
- * [currentComposeInvestigator]) without being instantiated, you will receive a
- * unexpected behaviour.
- */
-@Immutable public class ComposeInvestigator @ComposeInvestigatorCompilerApi public constructor() {
-  private val stateObjectMap: MutableMap<StateObject, String> = mutableMapOf()
-  private val argumentMap: MutableMap<Int, List<ValueArgument>> = mutableMapOf()
-  private val nameMap: MutableMap<Int, String> = mutableMapOf()
-
-  @NoLiveLiterals @ComposableScope
-  @Stable public fun setComposableName(name: String, compoundKey: Int = intrinsicImplementedError()) {
-    nameMap[compoundKey] = name
+  /**
+   * This logger is called whenever a recomposition is processed or skipped. This field
+   * is variable, so you can easily change this.
+   */
+  public var Logger: InvalidationLogger = InvalidationLogger { composable, result ->
+    println("[$LOGGER_DEFAULT_TAG] The '${composable.simpleName}' composable has been recomposed.\n$result")
   }
 
-  @NoLiveLiterals @ComposableScope
-  @Stable public fun getComposableName(
-    compoundKey: Int = intrinsicImplementedError(),
-    default: String = intrinsicImplementedError(),
+  private val stateObjectMap = mutableMapOf<StateObject, String>()
+  private val argumentMap = mutableMapOf<Int, List<ValueArgument>>()
+  private val nameMap = mutableMapOf<Int, String>()
+
+  @[Composable ExplicitGroupsComposable NoLiveLiterals]
+  @Stable public fun setCurrentComposableName(name: String) {
+    nameMap[currentCompositeKeyHash] = name
+  }
+
+  @[Composable ExplicitGroupsComposable NoLiveLiterals]
+  @Stable public fun getCurrentComposableName(
+    default: String = TODO("Implemented as an intrinsic. Did you apply ComposeInvestigator plugin?"),
+    compoundKey: Int = currentCompositeKeyHash,
   ): String = nameMap[compoundKey] ?: default
 
   @VisibleForTesting public fun reset() {
@@ -105,20 +97,4 @@ public val currentComposeInvestigator: ComposeInvestigator
       InvalidationResult.ArgumentChanged(changed = changed)
     }
   }
-
-  public companion object {
-    public const val LOGGER_DEFAULT_TAG: String = "ComposeInvestigator"
-
-    /**
-     * This logger is called whenever a recomposition is processed or skipped. This field
-     * is variable, so you can easily change this.
-     */
-    public var Logger: InvalidationLogger = InvalidationLogger { composable, result ->
-      println("[$LOGGER_DEFAULT_TAG] The '${composable.simpleName}' composable has been recomposed.\n$result")
-    }
-  }
 }
-
-@Suppress("NOTHING_TO_INLINE")
-private inline fun intrinsicImplementedError(): Nothing =
-  throw NotImplementedError("Implemented as an intrinsic. Did you apply ComposeInvestigator plugin?")
