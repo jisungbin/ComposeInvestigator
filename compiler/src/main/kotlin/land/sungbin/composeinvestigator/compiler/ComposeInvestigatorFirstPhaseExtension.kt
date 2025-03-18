@@ -4,7 +4,6 @@ package land.sungbin.composeinvestigator.compiler
 
 import androidx.compose.compiler.plugins.kotlin.analysis.StabilityInferencer
 import java.util.EnumSet
-import land.sungbin.composeinvestigator.compiler.lower.ComposeInvestigatorInstantiateTransformer
 import land.sungbin.composeinvestigator.compiler.lower.ComposeInvestigatorIntrinsicCallTransformer
 import land.sungbin.composeinvestigator.compiler.lower.InvalidationProcessTracingFirstTransformer
 import land.sungbin.composeinvestigator.compiler.lower.StateInitializerFirstTransformer
@@ -48,9 +47,6 @@ public class ComposeInvestigatorFirstPhaseExtension(
         ComposeInvestigatorPluginRegistrar.IrValidatorConfig,
       )
     }
-
-    val composeInvestigatorInstantiator = ComposeInvestigatorInstantiateTransformer(pluginContext, messageCollector)
-    moduleFragment.transformChildrenVoid(composeInvestigatorInstantiator)
 
     if (FeatureFlag.ComposeInvestigatorIntrinsicCall in features)
       moduleFragment.transformChildrenVoid(ComposeInvestigatorIntrinsicCallTransformer(pluginContext, messageCollector))

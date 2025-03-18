@@ -3,7 +3,6 @@
 package land.sungbin.composeinvestigator.compiler
 
 import java.util.EnumSet
-import land.sungbin.composeinvestigator.compiler.lower.ComposeInvestigatorInstantiateTransformer
 import land.sungbin.composeinvestigator.compiler.lower.InvalidationSkipTracingLastTransformer
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext

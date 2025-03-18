@@ -3,7 +3,6 @@
 package land.sungbin.composeinvestigator.compiler.lower
 
 import androidx.compose.compiler.plugins.kotlin.hasComposableAnnotation
-import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorCompilationException
 import org.jetbrains.kotlin.backend.common.ScopeWithIr
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
@@ -46,9 +45,6 @@ internal fun List<ScopeWithIr>.lastComposable(): IrFunction? =
     .lastOrNull { scope -> scope.irElement.safeAs<IrFunction>()?.hasComposableAnnotation() == true }
     ?.irElement
     ?.safeAs<IrFunction>()
-
-internal fun irError(message: String, cause: Throwable? = null): Nothing =
-  throw ComposeInvestigatorCompilationException(message, cause)
 
 public val IrFunction.callableIdOrNull: CallableId?
   get() = runCatching { callableId }.getOrNull()
