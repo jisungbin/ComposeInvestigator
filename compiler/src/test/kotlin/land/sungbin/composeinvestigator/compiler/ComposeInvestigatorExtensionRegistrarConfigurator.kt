@@ -28,7 +28,7 @@ fun TestConfigurationBuilder.configureInvestigatorPlugin() {
   useCustomRuntimeClasspathProviders(::ComposeInvestigatorRuntimeClasspathProvider)
 
   defaultDirectives {
-    JVM_TARGET.with(JvmTarget.JVM_17)
+    JVM_TARGET with JvmTarget.JVM_17
     +FULL_JDK
   }
 }
