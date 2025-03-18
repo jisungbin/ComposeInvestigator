@@ -13,7 +13,6 @@ import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar.ExtensionSto
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.IrVerificationMode
 import org.jetbrains.kotlin.config.JvmTarget
-import org.jetbrains.kotlin.fir.extensions.FirExtensionRegistrarAdapter
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.directives.JvmEnvironmentConfigurationDirectives.FULL_JDK
 import org.jetbrains.kotlin.test.directives.JvmEnvironmentConfigurationDirectives.JVM_TARGET
@@ -61,7 +60,6 @@ class InvestigatorExtensionRegistrarConfigurator(service: TestServices) : Enviro
       }
     }
 
-    FirExtensionRegistrarAdapter.registerExtension(ComposeInvestigatorFirExtensionRegistrar())
     IrGenerationExtension.registerExtension(
       ComposeInvestigatorFirstPhaseExtension(
         messageCollector,
