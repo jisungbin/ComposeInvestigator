@@ -1,0 +1,44 @@
+@Composable
+fun MyComposable($composer: Composer?, $changed: Int) {
+  $composer = $composer.startRestartGroup(-517460042)
+  sourceInformation($composer, "C(MyComposable)6@208L18,7@259L8,7@242L25:nonStateOrStateObjectCall.kt")
+  if ($changed != 0 || !$composer.skipping) {
+    if (isTraceInProgress()) {
+      traceEventStart(-517460042, $changed, -1, "MyComposable (nonStateOrStateObjectCall.kt:4)")
+    }
+    val a = 1
+    val b = <block>{
+      $composer.startReplaceGroup(1849434622)
+      sourceInformation($composer, "CC(remember):nonStateOrStateObjectCall.kt#9igjgp")
+      val tmp0_group = $composer.cache(false) {
+        Any()
+      }
+      $composer.endReplaceGroup()
+      tmp0_group
+    }
+    val c = rememberSaveable(
+      saver = null,
+      key = null,
+      init = $composer.startReplaceGroup(1849434622)
+      sourceInformation($composer, "CC(remember):nonStateOrStateObjectCall.kt#9igjgp")
+      val tmp1_group = $composer.cache(false) {
+        {
+          Unit
+        }
+      }
+      $composer.endReplaceGroup()
+      tmp1_group,
+      $composer = $composer,
+      $changed = 3072,
+      $default = 6
+    )
+    if (isTraceInProgress()) {
+      traceEventEnd()
+    }
+  } else {
+    $composer.skipToGroupEnd()
+  }
+  $composer.endRestartGroup()?.updateScope { $composer: Composer?, $force: Int ->
+    MyComposable($composer, updateChangedFlags($changed or 0b0001))
+  }
+}

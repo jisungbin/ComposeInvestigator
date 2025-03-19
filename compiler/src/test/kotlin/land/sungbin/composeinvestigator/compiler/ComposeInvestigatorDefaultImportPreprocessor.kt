@@ -6,6 +6,9 @@ import org.jetbrains.kotlin.test.model.TestFile
 import org.jetbrains.kotlin.test.services.ReversibleSourceFilePreprocessor
 import org.jetbrains.kotlin.test.services.TestServices
 
+// Source: https://github.com/ZacSweers/metro/blob/74fa417b3d22cdf39d64772f8089fd73d594917b/compiler-tests/src/test/kotlin/dev/zacsweers/metro/compiler/MetroDefaultImportPreprocessor.kt#L9
+//  Copyright (C) 2025 Zac Sweers
+//  SPDX-License-Identifier: Apache-2.0
 class ComposeInvestigatorDefaultImportPreprocessor(services: TestServices) : ReversibleSourceFilePreprocessor(services) {
   private val additionalImportStatements
     get() =

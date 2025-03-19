@@ -16,17 +16,14 @@ import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.classOrFail
 import org.jetbrains.kotlin.ir.types.defaultType
-import org.jetbrains.kotlin.ir.util.companionObject
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
 
 /** Helper class to make the `ComposableInvalidationLogger` class easier to handle in IR. */
 public class IrInvalidationLogger(context: IrPluginContext) {
-  private val composeInvestigatorCompanion = context.referenceClass(InvestigatorClassIds.ComposeInvestigator)!!
+  private val irComposeInvestigator = IrComposeInvestigator(context).symbol
+
   private val composeInvestigatorLoggerSymbol =
-    composeInvestigatorCompanion
-      .owner
-      .companionObject()!!
-      .getPropertyGetter(InvestigatorNames.Logger.asString())!!
+    irComposeInvestigator.getPropertyGetter(InvestigatorNames.Logger.asString())!!
 
   private val loggerLogSymbol =
     composeInvestigatorLoggerSymbol.owner.returnType.classOrFail.functionByName(InvestigatorNames.log.asString())
@@ -58,8 +55,8 @@ public class IrInvalidationLogger(context: IrPluginContext) {
         loggerGetter.dispatchReceiver = IrGetObjectValueImpl(
           startOffset = UNDEFINED_OFFSET,
           endOffset = UNDEFINED_OFFSET,
-          type = composeInvestigatorCompanion.defaultType,
-          symbol = composeInvestigatorCompanion.owner.symbol,
+          type = irComposeInvestigator.defaultType,
+          symbol = irComposeInvestigator.owner.symbol,
         )
       }
     }.apply {

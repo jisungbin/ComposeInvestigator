@@ -17,6 +17,7 @@ import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.util.classId
 import org.jetbrains.kotlin.ir.util.file
+import org.jetbrains.kotlin.ir.util.shallowCopy
 
 /**
  * Generates code that reports whenever a Composable function is skipped during
@@ -59,19 +60,20 @@ public class InvalidationSkipTracingLastTransformer(
       expression.getCompilerMessageLocation(composable.file),
     )
 
+    val investigator = IrComposeInvestigator(context)
     val composer =
       composable.valueParameters
         .last { param -> param.type.classOrNull?.owner?.classId == ComposeClassIds.Composer }
         .let(::irGetValue)
-    val investigator = IrComposeInvestigator(context)
-    val compoundKey = irCompoundKeyHash(composer)
+
+    fun compoundKey() = irCompoundKeyHash(composer.shallowCopy())
 
     val composableInformation =
       irComposableInformation(
-        investigator.irGetCurrentComposableName(irString(composable.name.asString()), compoundKey),
+        investigator.irGetCurrentComposableName(irString(composable.name.asString()), compoundKey()),
         irString(composable.file.packageFqName.asString()),
         irString(composable.file.name),
-        compoundKey,
+        compoundKey(),
       )
     val invalidationResult =
       irInvalidationLogger.irInvalidationResultSkipped()

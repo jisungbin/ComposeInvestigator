@@ -1,0 +1,19 @@
+@Composable
+fun MyComposable($composer: Composer?, $changed: Int) {
+  $composer = $composer.startRestartGroup(1387332387)
+  sourceInformation($composer, "C(MyComposable)5@180L26:getCurrentComposableNameOnRegularFunction.kt")
+  if ($changed != 0 || !$composer.skipping) {
+    if (isTraceInProgress()) {
+      traceEventStart(1387332387, $changed, -1, "MyComposable (getCurrentComposableNameOnRegularFunction.kt:4)")
+    }
+    ComposeInvestigator.getCurrentComposableName(null, 0, $composer, 0b000110000000, 0b0011)
+    if (isTraceInProgress()) {
+      traceEventEnd()
+    }
+  } else {
+    $composer.skipToGroupEnd()
+  }
+  $composer.endRestartGroup()?.updateScope { $composer: Composer?, $force: Int ->
+    MyComposable($composer, updateChangedFlags($changed or 0b0001))
+  }
+}

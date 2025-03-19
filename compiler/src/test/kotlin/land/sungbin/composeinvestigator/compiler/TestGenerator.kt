@@ -12,7 +12,7 @@ fun main() {
       testDataRoot = "compiler/src/testData",
       testsRoot = "compiler/src/test-generated",
     ) {
-      testClass<AbstractComposeInvestigatorFirBlackBoxTest> { model("codegen") }
+      testClass<AbstractComposeInvestigatorFirJvmIrTest> { model("codegen") }
     }
   }
 }

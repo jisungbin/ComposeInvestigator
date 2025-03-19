@@ -21,9 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import land.sungbin.composeinvestigator.runtime.ComposeInvestigator
 import land.sungbin.composeinvestigator.runtime.InvalidationLogger
-import land.sungbin.composeinvestigator.runtime.currentComposeInvestigator
-
-private val investigator by lazy { currentComposeInvestigator }
 
 class SampleActivity : ComponentActivity() {
   init {
@@ -51,11 +48,11 @@ class SampleActivity : ComponentActivity() {
       alignment = Alignment.CenterVertically,
     ),
   ) {
-    investigator.setComposableName("EntryContent")
+    ComposeInvestigator.setCurrentComposableName("EntryContent")
 
     Text(System.currentTimeMillis().toString())
     Button(onClick = { currentMillis = System.currentTimeMillis() }) {
-      investigator.setComposableName("EntryUpdateButton")
+      ComposeInvestigator.setCurrentComposableName("EntryUpdateButton")
 
       Text("Update current time")
     }

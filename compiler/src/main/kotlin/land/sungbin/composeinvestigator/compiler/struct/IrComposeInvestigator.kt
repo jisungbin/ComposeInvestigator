@@ -16,18 +16,12 @@ import org.jetbrains.kotlin.ir.expressions.IrValueAccessExpression
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.IrGetObjectValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
+import org.jetbrains.kotlin.ir.symbols.IrClassSymbol
 import org.jetbrains.kotlin.ir.types.defaultType
+import org.jetbrains.kotlin.ir.util.shallowCopy
 
-/**
- * Helper class to make the `ComposeInvestigator` class easier to handle in IR.
- *
- * @param property The property where `ComposeInvestigator` is instantiated. It can be
- * created with the [irComposeInvestigatorProperty] function.
- *
- * @constructor Use the [IrComposeInvestigator.create]
- */
 public class IrComposeInvestigator(private val context: IrPluginContext) {
-  private val symbol by lazy { context.referenceClass(InvestigatorClassIds.ComposeInvestigator)!! }
+  public val symbol: IrClassSymbol by lazy { context.referenceClass(InvestigatorClassIds.ComposeInvestigator)!! }
 
   public val irComposeInvestigator: IrGetObjectValue by unsafeLazy {
     IrGetObjectValueImpl(
@@ -50,7 +44,7 @@ public class IrComposeInvestigator(private val context: IrPluginContext) {
       endOffset = UNDEFINED_OFFSET,
       symbol = getCurrentComposableName,
     ).apply {
-      dispatchReceiver = irComposeInvestigator
+      dispatchReceiver = irComposeInvestigator.shallowCopy()
       putValueArgument(0, default)
       putValueArgument(1, compoundKey)
     }
@@ -65,7 +59,7 @@ public class IrComposeInvestigator(private val context: IrPluginContext) {
       endOffset = UNDEFINED_OFFSET,
       symbol = registerStateObjectSymbol,
     ).apply {
-      dispatchReceiver = irComposeInvestigator
+      dispatchReceiver = irComposeInvestigator.shallowCopy()
       type = value.type
       putTypeArgument(0, value.type)
       putValueArgument(0, value)
@@ -82,7 +76,7 @@ public class IrComposeInvestigator(private val context: IrPluginContext) {
       endOffset = UNDEFINED_OFFSET,
       symbol = computeInvalidationReasonSymbol,
     ).apply {
-      dispatchReceiver = irComposeInvestigator
+      dispatchReceiver = irComposeInvestigator.shallowCopy()
       putValueArgument(0, compoundKey)
       putValueArgument(1, arguments)
     }

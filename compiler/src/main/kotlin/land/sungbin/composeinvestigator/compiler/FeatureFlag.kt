@@ -5,6 +5,6 @@ package land.sungbin.composeinvestigator.compiler
 public enum class FeatureFlag(public val phase: Int) {
   InvalidationProcessTracing(0),
   InvalidationSkipTracing(1),
-  ComposeInvestigatorIntrinsicCall(0),
+  IntrinsicCall(0),
   StateInitializerTracking(0),
 }

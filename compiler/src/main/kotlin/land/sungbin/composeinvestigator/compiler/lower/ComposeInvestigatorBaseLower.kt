@@ -33,7 +33,6 @@ import org.jetbrains.kotlin.ir.declarations.impl.IrVariableImpl
 import org.jetbrains.kotlin.ir.expressions.IrBody
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
-import org.jetbrains.kotlin.ir.expressions.IrDeclarationReference
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
@@ -259,7 +258,7 @@ public open class ComposeInvestigatorBaseLower(
       symbol = currentComposerSymbol.owner.getter!!.symbol,
     )
 
-  protected fun irCompoundKeyHash(composer: IrDeclarationReference): IrCall =
+  protected fun irCompoundKeyHash(composer: IrExpression): IrCall =
     IrCallImpl.fromSymbolOwner(
       startOffset = UNDEFINED_OFFSET,
       endOffset = UNDEFINED_OFFSET,

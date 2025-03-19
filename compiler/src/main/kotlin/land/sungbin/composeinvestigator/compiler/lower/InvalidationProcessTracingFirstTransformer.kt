@@ -85,7 +85,6 @@ public class InvalidationProcessTracingFirstTransformer(
     )
 
     val investigator = IrComposeInvestigator(context)
-    val compoundKey = irCompoundKeyHash(irCurrentComposer())
     val newStatements = mutableListOf<IrStatement>()
 
     val currentValueArguments =
@@ -143,17 +142,17 @@ public class InvalidationProcessTracingFirstTransformer(
     val invalidationReasonVariable =
       irVariable(
         identifier("invalidationReason"),
-        investigator.irComputeInvalidationReason(compoundKey, irGetValue(currentValueArguments)),
+        investigator.irComputeInvalidationReason(compoundKey(), irGetValue(currentValueArguments)),
         parent = composable,
       )
     newStatements += invalidationReasonVariable
 
     val composableInformation =
       irComposableInformation(
-        investigator.irGetCurrentComposableName(irString(composable.name.asString()), compoundKey),
+        investigator.irGetCurrentComposableName(irString(composable.name.asString()), compoundKey()),
         irString(composable.file.packageFqName.asString()),
         irString(composable.file.name),
-        compoundKey,
+        compoundKey(),
       )
     val invalidationResult =
       irGetValue(invalidationReasonVariable, type = irInvalidationLogger.invalidationResultSymbol.defaultType)
@@ -175,4 +174,6 @@ public class InvalidationProcessTracingFirstTransformer(
         )
       }
   }
+
+  private fun compoundKey() = irCompoundKeyHash(irCurrentComposer())
 }

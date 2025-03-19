@@ -50,7 +50,7 @@ allprojects {
 
     kotlin {
       target("**/*.kt")
-      targetExclude("**/build/**/*.kt", "**/src/test/data/**", "spotless/*.kt")
+      targetExclude("**/build/**/*.kt", "**/src/testData/**", "spotless/*.kt")
       useKtlint()
       licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
     }

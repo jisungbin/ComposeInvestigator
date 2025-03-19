@@ -1,6 +1,7 @@
 // Copyright 2025 Ji Sungbin
 // SPDX-License-Identifier: Apache-2.0
 plugins {
+  idea
   kotlin("jvm")
   alias(libs.plugins.kotlin.dokka)
   id(libs.plugins.gradle.publish.maven.get().pluginId)
@@ -35,6 +36,13 @@ kotlin {
   }
 }
 
+sourceSets {
+  val testGeneratedSourceSetRoot = projectDir.resolve("src/test-generated")
+
+  getByName("test").java.srcDir(testGeneratedSourceSetRoot.path)
+  idea.module.generatedSourceDirs.add(testGeneratedSourceSetRoot)
+}
+
 val investigatorRuntimeClasspath: Configuration by configurations.creating
 
 dependencies {
@@ -42,10 +50,12 @@ dependencies {
 
   compileOnly(kotlin("stdlib", version = kotlinVersion))
   compileOnly(kotlin("compiler-embeddable", version = kotlinVersion))
-  compileOnly(kotlin("compose-compiler-plugin", version = kotlinVersion))
+  compileOnly(kotlin("compose-compiler-plugin-embeddable", version = kotlinVersion))
 
   investigatorRuntimeClasspath(projects.runtime)
   investigatorRuntimeClasspath(libs.compose.runtime)
+  investigatorRuntimeClasspath(libs.compose.runtime.saveable)
+
   testImplementation(kotlin("compiler", version = kotlinVersion))
   testImplementation(kotlin("compose-compiler-plugin", version = kotlinVersion))
   testImplementation(kotlin("compiler-internal-test-framework", version = kotlinVersion))
@@ -57,22 +67,22 @@ dependencies {
 
 tasks.register<JavaExec>("generateTests") {
   inputs
-    .dir(layout.projectDirectory.dir("src/test/data"))
+    .dir(layout.projectDirectory.dir("src/testData"))
     .withPropertyName("testData")
     .withPathSensitivity(PathSensitivity.RELATIVE)
   outputs
-    .dir(layout.projectDirectory.dir("src/test/java"))
+    .dir(layout.projectDirectory.dir("src/test-generated"))
     .withPropertyName("generatedTests")
 
   classpath = sourceSets.test.get().runtimeClasspath
-  mainClass.set("land.sungbin.composeinvestigator.compiler.GenerateTestsKt")
+  mainClass.set("land.sungbin.composeinvestigator.compiler.TestGeneratorKt")
   workingDir = rootDir
 }
 
 tasks.withType<Test> {
   dependsOn(investigatorRuntimeClasspath)
   inputs
-    .dir(layout.projectDirectory.dir("src/test/data"))
+    .dir(layout.projectDirectory.dir("src/testData"))
     .withPropertyName("testData")
     .withPathSensitivity(PathSensitivity.RELATIVE)
 

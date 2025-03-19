@@ -48,7 +48,7 @@ public class ComposeInvestigatorFirstPhaseExtension(
       )
     }
 
-    if (FeatureFlag.ComposeInvestigatorIntrinsicCall in features)
+    if (FeatureFlag.IntrinsicCall in features)
       moduleFragment.transformChildrenVoid(ComposeInvestigatorIntrinsicCallTransformer(pluginContext, messageCollector))
 
     if (FeatureFlag.InvalidationProcessTracing in features)

@@ -1,0 +1,65 @@
+@Composable
+fun MyComposable($composer: Composer?, $changed: Int) {
+  $composer = $composer.startRestartGroup(-408525)
+  sourceInformation($composer, "C(MyComposable)6@233L31,7@301L22,7@284L39:delegateStateCall.kt")
+  if ($changed != 0 || !$composer.skipping) {
+    if (isTraceInProgress()) {
+      traceEventStart(-408525, $changed, -1, "MyComposable (delegateStateCall.kt:4)")
+    }
+    val a by {
+      val a$delegate = mutableStateOf(
+        value = ""
+      )
+      get() {
+        return a$delegate.getValue(null, ::a$delegate)
+      }
+    }
+    val b by {
+      val b$delegate = <block>{
+        $composer.startReplaceGroup(1849434622)
+        sourceInformation($composer, "CC(remember):delegateStateCall.kt#9igjgp")
+        val tmp0_group = $composer.cache(false) {
+          mutableStateOf(
+            value = ""
+          )
+        }
+        $composer.endReplaceGroup()
+        tmp0_group
+      }
+      get() {
+        return b$delegate.getValue(null, ::b$delegate)
+      }
+    }
+    val c by {
+      val c$delegate = rememberSaveable(
+        saver = null,
+        key = null,
+        init = $composer.startReplaceGroup(1849434622)
+        sourceInformation($composer, "CC(remember):delegateStateCall.kt#9igjgp")
+        val tmp1_group = $composer.cache(false) {
+          {
+            mutableStateOf(
+              value = ""
+            )
+          }
+        }
+        $composer.endReplaceGroup()
+        tmp1_group,
+        $composer = $composer,
+        $changed = 3072,
+        $default = 6
+      )
+      get() {
+        return c$delegate.getValue(null, ::c$delegate)
+      }
+    }
+    if (isTraceInProgress()) {
+      traceEventEnd()
+    }
+  } else {
+    $composer.skipToGroupEnd()
+  }
+  $composer.endRestartGroup()?.updateScope { $composer: Composer?, $force: Int ->
+    MyComposable($composer, updateChangedFlags($changed or 0b0001))
+  }
+}

@@ -1,12 +1,12 @@
 [versions]
 jdk = "17"
 
-kotlin = "2.1.10"
+kotlin = "2.1.20-RC3"
 kotlin-coroutines = "1.10.1"
 
 androidx-activity = "1.10.1"
 
-compose-multiplatform = "1.7.3"
+compose-multiplatform = "1.8.0-alpha04"
 
 ktlint = "1.5.0"
 
@@ -28,6 +28,7 @@ androidx-annotation = { module = "androidx.annotation:annotation", version = "1.
 
 compose-activity = { module = "androidx.activity:activity-compose", version.ref = "androidx-activity" }
 compose-runtime = { module = "org.jetbrains.compose.runtime:runtime", version.ref = "compose-multiplatform" }
+compose-runtime-saveable = { module = "org.jetbrains.compose.runtime:runtime-saveable", version.ref = "compose-multiplatform" }
 compose-material = { module = "org.jetbrains.compose.material:material", version.ref = "compose-multiplatform" }
 
 test-assertk = { module = "com.willowtreeapps.assertk:assertk", version = "0.28.1" }

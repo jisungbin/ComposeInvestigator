@@ -33,7 +33,7 @@ import androidx.compose.runtime.snapshots.StateObject
 
   @[Composable ExplicitGroupsComposable NoLiveLiterals]
   @Stable public fun getCurrentComposableName(
-    default: String = TODO("Implemented as an intrinsic. Did you apply ComposeInvestigator plugin?"),
+    default: String = throw NotImplementedError("Implemented as an intrinsic. Did you apply ComposeInvestigator plugin?"),
     compoundKey: Int = currentCompositeKeyHash,
   ): String = nameMap[compoundKey] ?: default
 
