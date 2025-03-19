@@ -12,28 +12,20 @@ import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.compiler.plugin.CompilerPluginRegistrar.ExtensionStorage
 import org.jetbrains.kotlin.config.CompilerConfiguration
 import org.jetbrains.kotlin.config.IrVerificationMode
-import org.jetbrains.kotlin.config.JvmTarget
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
-import org.jetbrains.kotlin.test.directives.JvmEnvironmentConfigurationDirectives.FULL_JDK
-import org.jetbrains.kotlin.test.directives.JvmEnvironmentConfigurationDirectives.JVM_TARGET
 import org.jetbrains.kotlin.test.directives.model.singleOrZeroValue
 import org.jetbrains.kotlin.test.model.TestModule
 import org.jetbrains.kotlin.test.services.EnvironmentConfigurator
 import org.jetbrains.kotlin.test.services.TestServices
 
 fun TestConfigurationBuilder.configureInvestigatorPlugin() {
-  useConfigurators(::InvestigatorExtensionRegistrarConfigurator, ::RuntimeEnvironmentConfigurator)
+  useConfigurators(::InvestigatorExtensionRegistrarConfigurator, ::ComposeInvestigatorRuntimeEnvironmentConfigurator)
   useDirectives(ComposeInvestigatorDirectives)
   useSourcePreprocessor(::ComposeInvestigatorDefaultImportPreprocessor)
   useCustomRuntimeClasspathProviders(::ComposeInvestigatorRuntimeClasspathProvider)
-
-  defaultDirectives {
-    JVM_TARGET with JvmTarget.JVM_17
-    +FULL_JDK
-  }
 }
 
-class InvestigatorExtensionRegistrarConfigurator(service: TestServices) : EnvironmentConfigurator(service) {
+class InvestigatorExtensionRegistrarConfigurator(services: TestServices) : EnvironmentConfigurator(services) {
   override fun ExtensionStorage.registerCompilerExtensions(module: TestModule, configuration: CompilerConfiguration) {
     val investigatorFeatures =
       module.directives

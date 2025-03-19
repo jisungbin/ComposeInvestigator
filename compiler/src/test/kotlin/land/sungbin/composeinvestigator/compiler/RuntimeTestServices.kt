@@ -15,12 +15,12 @@ private val investigatorRuntimeClasspath by lazy {
     ?: error("Unable to get a valid classpath from 'investigatorRuntime.classpath' property")
 }
 
-class RuntimeEnvironmentConfigurator(service: TestServices) : EnvironmentConfigurator(service) {
+class ComposeInvestigatorRuntimeEnvironmentConfigurator(services: TestServices) : EnvironmentConfigurator(services) {
   override fun configureCompilerConfiguration(configuration: CompilerConfiguration, module: TestModule) {
     configuration.addJvmClasspathRoots(investigatorRuntimeClasspath)
   }
 }
 
-class ComposeInvestigatorRuntimeClasspathProvider(service: TestServices) : RuntimeClasspathProvider(service) {
+class ComposeInvestigatorRuntimeClasspathProvider(services: TestServices) : RuntimeClasspathProvider(services) {
   override fun runtimeClassPaths(module: TestModule): List<File> = investigatorRuntimeClasspath
 }

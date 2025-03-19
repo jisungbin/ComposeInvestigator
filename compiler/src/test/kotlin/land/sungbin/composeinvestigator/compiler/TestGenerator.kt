@@ -5,14 +5,14 @@ package land.sungbin.composeinvestigator.compiler
 import org.jetbrains.kotlin.generators.generateTestGroupSuiteWithJUnit5
 
 fun main() {
+  System.setProperty("java.awt.headless", "true")
+
   generateTestGroupSuiteWithJUnit5 {
     testGroup(
-      testDataRoot = "compiler/src/test/data",
-      testsRoot = "compiler/src/test/java",
+      testDataRoot = "compiler/src/testData",
+      testsRoot = "compiler/src/test-generated",
     ) {
-      testClass<AbstractBoxTest> { model("box") }
-      testClass<AbstractFirDumpTest> { model("dump/fir") }
-//      testClass<AbstractDiagnosticTest> { model("diagnostic") }
+      testClass<AbstractComposeInvestigatorFirBlackBoxTest> { model("codegen") }
     }
   }
 }

@@ -5,15 +5,11 @@ package land.sungbin.composeinvestigator.compiler
 import org.jetbrains.kotlin.test.directives.model.SimpleDirectivesContainer
 
 object ComposeInvestigatorDirectives : SimpleDirectivesContainer() {
-  val INVESTIGATOR_FEATURE_FLAG by
-    valueDirective("[ComposeInvestigator] Feature flags to enable. If omitted, all flags are enabled.") {
-      it.split(',').map(FeatureFlag::valueOf)
-    }
-
-  val COMPOSE_FEATURE_FLAG by
-    valueDirective("[Compose] Feature flags to enable") { it.split(',').map(ComposeFeatureFlag::valueOf) }
+  val INVESTIGATOR_FEATURE_FLAG by enumDirective<FeatureFlag>("[ComposeInvestigator] Feature flags to enable. If omitted, all flags are enabled.")
+  val COMPOSE_FEATURE_FLAG by enumDirective<ComposeFeatureFlag>("[Compose] Feature flags to enable")
 }
 
+@Suppress("unused")
 enum class ComposeFeatureFlag {
   LiveLiterals,
   StrongSkipping,

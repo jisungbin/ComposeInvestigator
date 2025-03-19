@@ -6,7 +6,7 @@ import org.jetbrains.kotlin.test.model.TestFile
 import org.jetbrains.kotlin.test.services.ReversibleSourceFilePreprocessor
 import org.jetbrains.kotlin.test.services.TestServices
 
-class ComposeInvestigatorDefaultImportPreprocessor(service: TestServices) : ReversibleSourceFilePreprocessor(service) {
+class ComposeInvestigatorDefaultImportPreprocessor(services: TestServices) : ReversibleSourceFilePreprocessor(services) {
   private val additionalImportStatements
     get() =
       """
