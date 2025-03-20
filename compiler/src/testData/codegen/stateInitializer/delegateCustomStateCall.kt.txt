@@ -1,18 +1,20 @@
+object MyState : State<Any> {
+  val value: Any
+    get() {
+      return ""
+    }
+}
 @Composable
 fun MyComposable() {
   val a by {
-    val a$delegate = ComposeInvestigator.registerStateObject(mutableStateOf(
-      value = ""
-    ), "a")
+    val a$delegate = ComposeInvestigator.registerStateObject(MyState, "a")
     get() {
       return a$delegate.getValue(null, ::a$delegate)
     }
   }
   val b by {
     val b$delegate = remember {
-      ComposeInvestigator.registerStateObject(mutableStateOf(
-        value = ""
-      ), "b")
+      ComposeInvestigator.registerStateObject(MyState, "b")
     }
     get() {
       return b$delegate.getValue(null, ::b$delegate)
@@ -20,9 +22,7 @@ fun MyComposable() {
   }
   val c by {
     val c$delegate = rememberSaveable {
-      ComposeInvestigator.registerStateObject(mutableStateOf(
-        value = ""
-      ), "c")
+      ComposeInvestigator.registerStateObject(MyState, "c")
     }
     get() {
       return c$delegate.getValue(null, ::c$delegate)

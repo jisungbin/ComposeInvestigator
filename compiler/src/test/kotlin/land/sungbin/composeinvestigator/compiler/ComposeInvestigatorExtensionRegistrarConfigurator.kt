@@ -5,10 +5,10 @@ package land.sungbin.composeinvestigator.compiler
 import androidx.compose.compiler.plugins.kotlin.ComposeIrGenerationExtension
 import androidx.compose.compiler.plugins.kotlin.FeatureFlags
 import java.util.EnumSet
-import org.jetbrains.kotlin.backend.common.IrValidatorConfig
+import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorDirectives.COMPOSE_FEATURES
+import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorDirectives.INVESTIGATOR_FEATURES
+import land.sungbin.composeinvestigator.compiler.ComposeInvestigatorDirectives.WITH_COMPOSE
 import org.jetbrains.kotlin.backend.common.extensions.IrGenerationExtension
-import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.backend.common.validateIr
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSeverity
 import org.jetbrains.kotlin.cli.common.messages.CompilerMessageSourceLocation
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
@@ -20,7 +20,6 @@ import org.jetbrains.kotlin.config.LanguageVersion
 import org.jetbrains.kotlin.config.LanguageVersionSettingsImpl
 import org.jetbrains.kotlin.config.languageVersionSettings
 import org.jetbrains.kotlin.config.messageCollector
-import org.jetbrains.kotlin.ir.declarations.IrModuleFragment
 import org.jetbrains.kotlin.test.builders.TestConfigurationBuilder
 import org.jetbrains.kotlin.test.directives.model.singleOrZeroValue
 import org.jetbrains.kotlin.test.model.TestModule
@@ -40,24 +39,22 @@ class InvestigatorExtensionRegistrarConfigurator(services: TestServices) : Envir
 
     val investigatorFeatures =
       module.directives
-        .singleOrZeroValue(ComposeInvestigatorDirectives.INVESTIGATOR_FEATURES).orEmpty()
+        .singleOrZeroValue(INVESTIGATOR_FEATURES).orEmpty()
         .let {
           if (it.isEmpty())
             EnumSet.allOf(FeatureFlag::class.java)
           else
             EnumSet.of(it.first(), *it.toTypedArray())
         }
-    val composeFeatures =
-      module.directives
-        .singleOrZeroValue(ComposeInvestigatorDirectives.COMPOSE_FEATURES)
-        .orEmpty()
+    val enablesComposeCompiler = WITH_COMPOSE in module.directives
+    val composeFeatures = module.directives.singleOrZeroValue(COMPOSE_FEATURES).orEmpty()
 
     val messageCollector = object : MessageCollector {
       override fun clear() = Unit
       override fun hasErrors(): Boolean = false
       override fun report(severity: CompilerMessageSeverity, message: String, location: CompilerMessageSourceLocation?) {
         if (severity.isError)
-          kotlin.error("$message at $location")
+          throw AssertionError("$message at $location")
         else
           println("[$severity] $message at $location")
       }
@@ -65,69 +62,28 @@ class InvestigatorExtensionRegistrarConfigurator(services: TestServices) : Envir
     configuration.messageCollector = messageCollector
 
     IrGenerationExtension.registerExtension(
-      ComposeIrGenerationExtension(
-        liveLiteralsV2Enabled = ComposeFeatureFlag.LiveLiterals in composeFeatures,
-        useK2 = true,
-        featureFlags = FeatureFlags(composeFeatures.map { it.name }),
-        messageCollector = MessageCollector.NONE,
-      ),
-    )
-    IrGenerationExtension.registerExtension(IrTestExtension())
-
-    /*IrGenerationExtension.registerExtension(
       ComposeInvestigatorFirstPhaseExtension(
         messageCollector,
         IrVerificationMode.ERROR,
         investigatorFeatures,
       ),
     )
-    IrGenerationExtension.registerExtension(
-      ComposeIrGenerationExtension(
-        liveLiteralsV2Enabled = ComposeFeatureFlag.LiveLiterals in composeFeatures,
-        useK2 = true,
-        featureFlags = FeatureFlags(composeFeatures.map { it.name }),
-        messageCollector = MessageCollector.NONE,
-      ),
-    )
+    if (enablesComposeCompiler) {
+      IrGenerationExtension.registerExtension(
+        ComposeIrGenerationExtension(
+          liveLiteralsV2Enabled = ComposeFeatureFlag.LiveLiterals in composeFeatures,
+          useK2 = true,
+          featureFlags = FeatureFlags(composeFeatures.map { it.name }),
+          messageCollector = MessageCollector.NONE,
+        ),
+      )
+    }
     IrGenerationExtension.registerExtension(
       ComposeInvestigatorLastPhaseExtension(
         messageCollector,
         IrVerificationMode.ERROR,
         investigatorFeatures,
       ),
-    )*/
-  }
-}
-
-private class IrTestExtension : IrGenerationExtension {
-  override fun generate(moduleFragment: IrModuleFragment, pluginContext: IrPluginContext) {
-    validateIr(
-      object : MessageCollector {
-        override fun clear() {}
-
-        override fun report(severity: CompilerMessageSeverity, message: String, location: CompilerMessageSourceLocation?) {
-          if (severity.isError) kotlin.error(message)
-        }
-
-        override fun hasErrors(): Boolean = false
-      },
-      IrVerificationMode.ERROR,
-    ) {
-      performBasicIrValidation(
-        moduleFragment,
-        pluginContext.irBuiltIns,
-        "TEST TEST TEST",
-        IrValidatorConfig(
-          checkTreeConsistency = true,
-          checkTypes = false, // TODO KT-68663
-          checkProperties = true,
-          checkValueScopes = true,
-          checkTypeParameterScopes = true,
-          checkCrossFileFieldUsage = true,
-          checkAllKotlinFieldsArePrivate = true,
-          checkVisibilities = true,
-        ),
-      )
-    }
+    )
   }
 }

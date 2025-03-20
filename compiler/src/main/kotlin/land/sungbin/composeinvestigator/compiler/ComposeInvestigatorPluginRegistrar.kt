@@ -67,8 +67,7 @@ public class ComposeInvestigatorPluginRegistrar : ComponentRegistrar {
   }
 
   public companion object {
-    private val defaultEnabledFeatureFlags: EnumSet<FeatureFlag> =
-      EnumSet.allOf(FeatureFlag::class.java).apply { remove(FeatureFlag.StateInitializerTracking) }
+    private val defaultEnabledFeatureFlags = EnumSet.allOf(FeatureFlag::class.java)
 
     public val IrValidatorConfig: IrValidatorConfig =
       IrValidatorConfig(

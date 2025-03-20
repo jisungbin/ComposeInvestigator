@@ -51,7 +51,7 @@ public class IrComposeInvestigator(private val context: IrPluginContext) {
 
   /** Returns an [IrCall] that invokes `ComposeInvestigator#registerStateObject`. */
   public fun irRegisterStateObject(
-    value: IrExpression,
+    expression: IrExpression,
     name: IrConst,
   ): IrCall =
     IrCallImpl.fromSymbolOwner(
@@ -60,9 +60,9 @@ public class IrComposeInvestigator(private val context: IrPluginContext) {
       symbol = registerStateObjectSymbol,
     ).apply {
       dispatchReceiver = irComposeInvestigator.shallowCopy()
-      type = value.type
-      putTypeArgument(0, value.type)
-      putValueArgument(0, value)
+      type = expression.type
+      putTypeArgument(0, expression.type)
+      putValueArgument(0, expression)
       putValueArgument(1, name)
     }
 

@@ -1,50 +1,16 @@
 @Composable
-fun MyComposable($composer: Composer?, $changed: Int) {
-  $composer = $composer.startRestartGroup(-2106847721)
-  sourceInformation($composer, "C(MyComposable)6@259L31,7@340L22,7@323L39:directStateCall.kt")
-  if ($changed != 0 || !$composer.skipping) {
-    if (isTraceInProgress()) {
-      traceEventStart(-2106847721, $changed, -1, "MyComposable (directStateCall.kt:4)")
-    }
-    val a = mutableStateOf(
+fun MyComposable() {
+  val a = ComposeInvestigator.registerStateObject(mutableStateOf(
+    value = ""
+  ), "a")
+  val b = remember {
+    ComposeInvestigator.registerStateObject(mutableStateOf(
       value = ""
-    )
-    val b = <block>{
-      $composer.startReplaceGroup(1849434622)
-      sourceInformation($composer, "CC(remember):directStateCall.kt#9igjgp")
-      val tmp0_group = $composer.cache(false) {
-        mutableStateOf(
-          value = ""
-        )
-      }
-      $composer.endReplaceGroup()
-      tmp0_group
-    }
-    val c = rememberSaveable(
-      saver = null,
-      key = null,
-      init = $composer.startReplaceGroup(1849434622)
-      sourceInformation($composer, "CC(remember):directStateCall.kt#9igjgp")
-      val tmp1_group = $composer.cache(false) {
-        {
-          mutableStateOf(
-            value = ""
-          )
-        }
-      }
-      $composer.endReplaceGroup()
-      tmp1_group,
-      $composer = $composer,
-      $changed = 3072,
-      $default = 6
-    )
-    if (isTraceInProgress()) {
-      traceEventEnd()
-    }
-  } else {
-    $composer.skipToGroupEnd()
+    ), "b")
   }
-  $composer.endRestartGroup()?.updateScope { $composer: Composer?, $force: Int ->
-    MyComposable($composer, updateChangedFlags($changed or 0b0001))
+  val c = rememberSaveable {
+    ComposeInvestigator.registerStateObject(mutableStateOf(
+      value = ""
+    ), "c")
   }
 }

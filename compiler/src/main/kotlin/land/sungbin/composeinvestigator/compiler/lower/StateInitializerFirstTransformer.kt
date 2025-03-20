@@ -83,7 +83,7 @@ public class StateInitializerFirstTransformer(
 
       return initializer.also {
         messageCollector.log(
-          "Transform state initializer succeed: ${name.asString()}",
+          "Transform remember/rememberSaveable state initializer succeed: ${name.asString()}",
           returnExpression.getCompilerMessageLocation(file),
         )
       }

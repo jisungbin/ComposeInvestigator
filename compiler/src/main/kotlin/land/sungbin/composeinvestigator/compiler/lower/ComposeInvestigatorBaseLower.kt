@@ -16,7 +16,6 @@ import land.sungbin.composeinvestigator.compiler.struct.IrRuntimeStability
 import land.sungbin.composeinvestigator.compiler.struct.IrValueArgument
 import org.jetbrains.kotlin.backend.common.IrElementTransformerVoidWithContext
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.backend.jvm.JvmIrTypeSystemContext
 import org.jetbrains.kotlin.cli.common.messages.MessageCollector
 import org.jetbrains.kotlin.ir.IrElement
 import org.jetbrains.kotlin.ir.IrStatement
@@ -45,13 +44,12 @@ import org.jetbrains.kotlin.ir.symbols.IrSymbol
 import org.jetbrains.kotlin.ir.symbols.IrVariableSymbol
 import org.jetbrains.kotlin.ir.symbols.impl.IrVariableSymbolImpl
 import org.jetbrains.kotlin.ir.types.IrType
-import org.jetbrains.kotlin.ir.types.defaultType
 import org.jetbrains.kotlin.ir.types.isInt
 import org.jetbrains.kotlin.ir.types.isNullableAny
-import org.jetbrains.kotlin.ir.types.isSubtypeOf
 import org.jetbrains.kotlin.ir.util.file
 import org.jetbrains.kotlin.ir.util.getPropertyGetter
 import org.jetbrains.kotlin.ir.util.hasAnnotation
+import org.jetbrains.kotlin.ir.util.isSubtypeOfClass
 import org.jetbrains.kotlin.ir.util.statements
 import org.jetbrains.kotlin.ir.visitors.IrVisitorVoid
 import org.jetbrains.kotlin.ir.visitors.acceptChildrenVoid
@@ -75,8 +73,6 @@ public open class ComposeInvestigatorBaseLower(
   protected val context: IrPluginContext,
   protected val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter() (Blocked: "This API is not supported for K2")
 ) : IrElementTransformerVoidWithContext() {
-  private val typeSystemContext = JvmIrTypeSystemContext(context.irBuiltIns)
-
   protected val irRuntimeStability: IrRuntimeStability by lazy { IrRuntimeStability(context) }
   protected val irComposableInformation: IrComposableInformation by lazy { IrComposableInformation(context) }
   protected val irInvalidationLogger: IrInvalidationLogger by lazy { IrInvalidationLogger(context) }
@@ -195,9 +191,10 @@ public open class ComposeInvestigatorBaseLower(
   // var state by <ENTER HERE: remember { mutableStateOf(T) } >
   override fun visitLocalDelegatedProperty(declaration: IrLocalDelegatedProperty): IrStatement {
     run {
-      if (declaration.type.isState() && !declaration.delegate.isVar && !declaration.delegate.isLateinit) {
-        val initializer = declaration.delegate.initializer ?: return@run
-        declaration.delegate.initializer = firstTransformStateInitializer(declaration.name, initializer, declaration.file)
+      val delegate = declaration.delegate
+      if (delegate.type.isState() && !delegate.isVar && !delegate.isLateinit) {
+        val initializer = delegate.initializer ?: return@run
+        delegate.initializer = firstTransformStateInitializer(declaration.name, initializer, declaration.file)
       }
     }
 
@@ -304,6 +301,5 @@ public open class ComposeInvestigatorBaseLower(
     }
 
   private fun IrType.isState(): Boolean =
-    isSubtypeOf(stateSymbol.defaultType, typeSystemContext) ||
-      isSubtypeOf(stateObjectSymbol.defaultType, typeSystemContext)
+    isSubtypeOfClass(stateSymbol) || isSubtypeOfClass(stateObjectSymbol)
 }

@@ -1,0 +1,16 @@
+object MyState : State<Any> {
+  val value: Any
+    get() {
+      return ""
+    }
+}
+@Composable
+fun MyComposable() {
+  val a = ComposeInvestigator.registerStateObject(MyState, "a")
+  val b = remember {
+    ComposeInvestigator.registerStateObject(MyState, "b")
+  }
+  val c = rememberSaveable {
+    ComposeInvestigator.registerStateObject(MyState, "c")
+  }
+}

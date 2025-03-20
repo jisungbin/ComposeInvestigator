@@ -1,0 +1,19 @@
+object MyStateState : StateObject {
+  val firstStateRecord: StateRecord
+    get() {
+      return TODO()
+    }
+  override fun prependStateRecord(value: StateRecord): Nothing {
+    return TODO()
+  }
+}
+@Composable
+fun MyComposable() {
+  val a = ComposeInvestigator.registerStateObject(MyStateState, "a")
+  val b = remember {
+    ComposeInvestigator.registerStateObject(MyStateState, "b")
+  }
+  val c = rememberSaveable {
+    ComposeInvestigator.registerStateObject(MyStateState, "c")
+  }
+}

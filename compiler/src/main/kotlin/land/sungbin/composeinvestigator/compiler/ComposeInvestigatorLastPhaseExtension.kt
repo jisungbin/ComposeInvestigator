@@ -38,7 +38,7 @@ public class ComposeInvestigatorLastPhaseExtension(
         moduleFragment,
         pluginContext.irBuiltIns,
         "Before ComposeInvestigator Last Phase",
-        ComposeInvestigatorPluginRegistrar.IrValidatorConfig,
+        ComposeInvestigatorPluginRegistrar.IrValidatorConfig.copy(checkAllKotlinFieldsArePrivate = false), // TODO CMP-6932
       )
     }
 
@@ -51,7 +51,7 @@ public class ComposeInvestigatorLastPhaseExtension(
         moduleFragment,
         pluginContext.irBuiltIns,
         "After ComposeInvestigator Last Phase",
-        ComposeInvestigatorPluginRegistrar.IrValidatorConfig,
+        ComposeInvestigatorPluginRegistrar.IrValidatorConfig.copy(checkAllKotlinFieldsArePrivate = false), // TODO CMP-6932
       )
     }
   }

@@ -1,3 +1,5 @@
+// INVESTIGATOR_FEATURES: StateInitializerTracking
+
 import androidx.compose.runtime.saveable.rememberSaveable
 
 @Composable fun MyComposable() {
