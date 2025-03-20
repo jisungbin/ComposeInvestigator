@@ -1,11 +1,13 @@
 **/.idea/*
 !/.idea/icon.png
 !/.idea/vcs.xml
+!/.idea/fileColors.xml
 !/.idea/copyright
 !/.idea/codeStyleSettings.xml
 !/.idea/codeStyles
 !/.idea/dictionaries
 !/.idea/inspectionProfiles
+!/.idea/scopes
 !/.idea/kotlinTestDataPluginTestDataPaths.xml
 *.iml
 .DS_Store
