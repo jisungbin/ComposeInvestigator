@@ -61,7 +61,7 @@ dependencies {
   testImplementation(kotlin("compiler-internal-test-framework", version = kotlinVersion))
   testImplementation(kotlin("test-junit5", version = kotlinVersion))
 
-  // Dependencies required to run the internal test framework.
+  // Dependencies required to run the compiler-internal-test-framework.
   testRuntimeOnly(kotlin("annotations-jvm", version = kotlinVersion))
 }
 
@@ -89,7 +89,7 @@ tasks.withType<Test> {
   workingDir = rootDir
   systemProperty("investigatorRuntime.classpath", investigatorRuntimeClasspath.asPath)
 
-  // Properties required to run the internal test framework.
+  // Properties required to run the compiler-internal-test-framework.
   systemProperty("idea.home.path", rootDir)
   systemProperty("idea.ignore.disabled.plugins", "true")
 }

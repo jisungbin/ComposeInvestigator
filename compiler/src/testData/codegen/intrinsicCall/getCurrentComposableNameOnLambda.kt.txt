@@ -1,0 +1,13 @@
+@Composable
+fun MyComposable() {
+  val lambda = {
+    ComposeInvestigator.getCurrentComposableName(<get-currentComposer>().compoundKeyHash, "<anonymous>")
+  }
+  Test {
+    ComposeInvestigator.getCurrentComposableName(<get-currentComposer>().compoundKeyHash, "MyComposable")
+  }
+}
+@Composable
+private fun Test(valueArgument: @[Composable] Function0<Unit>) {
+  return
+}

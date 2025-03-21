@@ -13,9 +13,6 @@ object MyStateState : StateObject {
 }
 
 @Composable fun MyComposable() {
-  var a: Int by mutableStateOf(1)
-  var b: Int by remember { mutableStateOf(1) }
-  var c: Int by rememberSaveable { mutableStateOf(1) }
   var d: State<Int> = mutableStateOf(1)
   var e: State<Int> = remember { mutableStateOf(1) }
   var f: State<Int> = rememberSaveable { mutableStateOf(1) }

@@ -32,9 +32,21 @@ public class ComposeInvestigatorFirJvmIrTestGenerated extends AbstractComposeInv
     }
 
     @Test
+    @TestMetadata("getCurrentComposableNameOnLambda.kt")
+    public void testGetCurrentComposableNameOnLambda() {
+      runTest("compiler/src/testData/codegen/intrinsicCall/getCurrentComposableNameOnLambda.kt");
+    }
+
+    @Test
     @TestMetadata("getCurrentComposableNameOnRegularFunction.kt")
     public void testGetCurrentComposableNameOnRegularFunction() {
       runTest("compiler/src/testData/codegen/intrinsicCall/getCurrentComposableNameOnRegularFunction.kt");
+    }
+
+    @Test
+    @TestMetadata("getCurrentComposableNameWithLiveLiteral.kt")
+    public void testGetCurrentComposableNameWithLiveLiteral() {
+      runTest("compiler/src/testData/codegen/intrinsicCall/getCurrentComposableNameWithLiveLiteral.kt");
     }
   }
 
@@ -84,9 +96,9 @@ public class ComposeInvestigatorFirJvmIrTestGenerated extends AbstractComposeInv
     }
 
     @Test
-    @TestMetadata("mutableStateOrStateObjectCall.kt")
-    public void testMutableStateOrStateObjectCall() {
-      runTest("compiler/src/testData/codegen/stateInitializer/mutableStateOrStateObjectCall.kt");
+    @TestMetadata("directStateOrStateObjectMutableCall.kt")
+    public void testDirectStateOrStateObjectMutableCall() {
+      runTest("compiler/src/testData/codegen/stateInitializer/directStateOrStateObjectMutableCall.kt");
     }
 
     @Test

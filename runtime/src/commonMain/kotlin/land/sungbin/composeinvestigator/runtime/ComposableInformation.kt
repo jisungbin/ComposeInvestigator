@@ -20,7 +20,14 @@ import androidx.compose.runtime.Stable
   public val packageName: String,
   public val simpleName: String,
   public val compoundKey: Int? = null,
-)
+  public val origin: Origin = Origin.Function,
+) {
+  @Immutable public enum class Origin {
+    Function,
+    ValueArgument,
+    Lambda,
+  }
+}
 
 /** Fully-qualified name of the Composable function. */
 public val ComposableInformation.qualifiedName: String

@@ -10,7 +10,8 @@ object ComposeInvestigatorDirectives : SimpleDirectivesContainer() {
       it.split(',').map(FeatureFlag::valueOf)
     }
 
-  val WITH_COMPOSE by directive("Whether to enable Compose compiler")
+  val WITH_COMPOSE by
+    directive("Whether to enable Compose compiler. If COMPOSE_FEATURES was provided, this is automatically enabled.")
 
   val COMPOSE_FEATURES by
     valueDirective("Feature flags of Compose compiler to enable") { it.split(',').map(ComposeFeatureFlag::valueOf) }

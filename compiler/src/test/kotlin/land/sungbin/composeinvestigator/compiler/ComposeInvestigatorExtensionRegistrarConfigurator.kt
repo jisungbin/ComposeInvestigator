@@ -68,7 +68,7 @@ class InvestigatorExtensionRegistrarConfigurator(services: TestServices) : Envir
         investigatorFeatures,
       ),
     )
-    if (enablesComposeCompiler) {
+    if (enablesComposeCompiler || composeFeatures.isNotEmpty()) {
       IrGenerationExtension.registerExtension(
         ComposeIrGenerationExtension(
           liveLiteralsV2Enabled = ComposeFeatureFlag.LiveLiterals in composeFeatures,
