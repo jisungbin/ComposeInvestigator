@@ -25,6 +25,8 @@ public object InvestigatorClassIds {
   public val InvalidationResult: ClassId = ClassId(ROOT, identifier("InvalidationResult"))
 
   public val ComposableInformation: ClassId = ClassId(ROOT, identifier("ComposableInformation"))
+  public val ComposableInformationOrigin: ClassId = ComposableInformation.createNestedClassId(identifier("Origin"))
+
   public val ValueArgument: ClassId = ClassId(ROOT, identifier("ValueArgument"))
   public val Stability: ClassId = ClassId(ROOT, identifier("Stability"))
 }

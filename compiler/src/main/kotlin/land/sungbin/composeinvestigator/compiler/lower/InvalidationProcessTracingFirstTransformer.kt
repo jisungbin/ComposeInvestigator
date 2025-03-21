@@ -149,9 +149,9 @@ public class InvalidationProcessTracingFirstTransformer(
 
     val composableInformation =
       irComposableInformation(
-        investigator.irGetCurrentComposableName(irString(composable.name.asString()), compoundKey()),
-        irString(composable.file.packageFqName.asString()),
         irString(composable.file.name),
+        irString(composable.file.packageFqName.asString()),
+        investigator.irGetCurrentComposableName(irString(composable.name.asString()), compoundKey()),
         compoundKey(),
       )
     val invalidationResult =

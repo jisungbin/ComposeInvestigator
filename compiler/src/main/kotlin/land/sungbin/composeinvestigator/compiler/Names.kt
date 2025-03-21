@@ -15,6 +15,10 @@ public object InvestigatorNames {
   public val registerStateObject: Name = identifier("registerStateObject")
   public val computeInvalidationReason: Name = identifier("computeInvalidationReason")
 
+  public val Function: Name = identifier("Function")
+  public val ValueArgument: Name = identifier("ValueArgument")
+  public val Lambda: Name = identifier("Lambda")
+
   public val Logger: Name = identifier("Logger")
   public val log: Name = identifier("log")
   public val Skipped: Name = identifier("Skipped")
