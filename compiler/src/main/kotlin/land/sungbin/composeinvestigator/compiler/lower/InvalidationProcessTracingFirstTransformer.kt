@@ -15,6 +15,7 @@ import org.jetbrains.kotlin.ir.declarations.IrSimpleFunction
 import org.jetbrains.kotlin.ir.declarations.createBlockBody
 import org.jetbrains.kotlin.ir.declarations.name
 import org.jetbrains.kotlin.ir.expressions.IrBody
+import org.jetbrains.kotlin.ir.expressions.IrGetEnumValue
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.types.classFqName
@@ -78,7 +79,7 @@ public class InvalidationProcessTracingFirstTransformer(
   messageCollector: MessageCollector,
   private val stabilityInferencer: StabilityInferencer,
 ) : ComposeInvestigatorBaseLower(context, messageCollector) {
-  override fun firstTransformComposableBody(composable: IrSimpleFunction, body: IrBody): IrBody {
+  override fun firstTransformComposableBody(composable: IrSimpleFunction, origin: IrGetEnumValue, body: IrBody): IrBody {
     messageCollector.log(
       "Visit composable body: ${composable.name}",
       body.getCompilerMessageLocation(composable.file),
@@ -153,6 +154,7 @@ public class InvalidationProcessTracingFirstTransformer(
         irString(composable.file.packageFqName.asString()),
         investigator.irGetCurrentComposableName(irString(composable.name.asString()), compoundKey()),
         compoundKey(),
+        origin,
       )
     val invalidationResult =
       irGetValue(invalidationReasonVariable, type = irInvalidationLogger.invalidationResultSymbol.defaultType)

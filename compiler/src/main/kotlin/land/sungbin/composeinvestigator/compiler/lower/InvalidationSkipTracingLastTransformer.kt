@@ -12,6 +12,7 @@ import org.jetbrains.kotlin.ir.declarations.IrFunction
 import org.jetbrains.kotlin.ir.declarations.name
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrExpression
+import org.jetbrains.kotlin.ir.expressions.IrGetEnumValue
 import org.jetbrains.kotlin.ir.expressions.impl.IrBlockImpl
 import org.jetbrains.kotlin.ir.types.classOrNull
 import org.jetbrains.kotlin.ir.types.defaultType
@@ -54,7 +55,7 @@ public class InvalidationSkipTracingLastTransformer(
   context: IrPluginContext,
   messageCollector: MessageCollector,
 ) : ComposeInvestigatorBaseLower(context, messageCollector) {
-  override fun lastTransformSkipToGroupEndCall(composable: IrFunction, expression: IrCall): IrExpression {
+  override fun lastTransformSkipToGroupEndCall(composable: IrFunction, origin: IrGetEnumValue, expression: IrCall): IrExpression {
     messageCollector.log(
       "Visit skipToGroupEnd call: ${composable.name}",
       expression.getCompilerMessageLocation(composable.file),
@@ -74,6 +75,7 @@ public class InvalidationSkipTracingLastTransformer(
         irString(composable.file.packageFqName.asString()),
         investigator.irGetCurrentComposableName(irString(composable.name.asString()), compoundKey()),
         compoundKey(),
+        origin,
       )
     val invalidationResult =
       irInvalidationLogger.irInvalidationResultSkipped()

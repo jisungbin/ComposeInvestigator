@@ -34,6 +34,7 @@ import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrExpression
 import org.jetbrains.kotlin.ir.expressions.IrFunctionExpression
+import org.jetbrains.kotlin.ir.expressions.IrGetEnumValue
 import org.jetbrains.kotlin.ir.expressions.IrGetValue
 import org.jetbrains.kotlin.ir.expressions.IrSyntheticBody
 import org.jetbrains.kotlin.ir.expressions.impl.IrCallImpl
@@ -71,7 +72,7 @@ import org.jetbrains.kotlin.name.Name
  */
 public open class ComposeInvestigatorBaseLower(
   protected val context: IrPluginContext,
-  protected val messageCollector: MessageCollector, // TODO context.createDiagnosticReporter() (Blocked: "This API is not supported for K2")
+  protected val messageCollector: MessageCollector,
 ) : IrElementTransformerVoidWithContext() {
   protected val irRuntimeStability: IrRuntimeStability by lazy { IrRuntimeStability(context) }
   protected val irComposableInformation: IrComposableInformation by lazy { IrComposableInformation(context) }
@@ -80,9 +81,7 @@ public open class ComposeInvestigatorBaseLower(
 
   private val currentComposerSymbol by unsafeLazy { context.referenceProperties(ComposeCallableIds.currentComposer).single() }
   private val composerSymbol by unsafeLazy { context.referenceClass(ComposeClassIds.Composer)!! }
-  private val composerCompoundKeyHashSymbol by unsafeLazy {
-    composerSymbol.getPropertyGetter(ComposeNames.compoundKeyHash.asString())!!
-  }
+  private val composerCompoundKeyHashSymbol by unsafeLazy { composerSymbol.getPropertyGetter(ComposeNames.compoundKeyHash.asString())!! }
 
   private val stateSymbol by unsafeLazy { context.referenceClass(ComposeClassIds.State)!! }
   private val stateObjectSymbol by unsafeLazy { context.referenceClass(ComposeClassIds.StateObject)!! }
@@ -102,12 +101,9 @@ public open class ComposeInvestigatorBaseLower(
     context
       .referenceFunctions(StandardCallableIds.hashCode)
       .first { symbol ->
-        val isNullableAnyExtension = with(symbol.owner.extensionReceiverParameter) {
-          this != null && type.isNullableAny()
-        }
+        val isNullableAnyExtension = symbol.owner.extensionReceiverParameter?.type?.isNullableAny()
         val isIntReturn = symbol.owner.returnType.isInt()
-
-        isNullableAnyExtension && isIntReturn
+        isNullableAnyExtension == true && isIntReturn
       }
   }
 
@@ -138,6 +134,7 @@ public open class ComposeInvestigatorBaseLower(
   }
 
   // Visit composable function expressions
+  //  - Lambdas declared in variables or Anonymous functions supplied as value arguments
   override fun visitFunctionExpression(expression: IrFunctionExpression): IrExpression {
     fun IrStatement.hasComposableCall(): Boolean {
       var result = false
@@ -204,6 +201,7 @@ public open class ComposeInvestigatorBaseLower(
   // (MUST) LoadingOrder.FIRST
   protected open fun firstTransformComposableBody(
     composable: IrSimpleFunction,
+    origin: IrGetEnumValue,
     body: IrBody,
   ): IrBody = body
 
@@ -217,6 +215,7 @@ public open class ComposeInvestigatorBaseLower(
   // (MUST) LoadingOrder.LAST
   protected open fun lastTransformSkipToGroupEndCall(
     composable: IrFunction,
+    origin: IrGetEnumValue,
     expression: IrCall,
   ): IrExpression = expression
 
