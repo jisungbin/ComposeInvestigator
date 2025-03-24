@@ -6,15 +6,14 @@ import land.sungbin.composeinvestigator.compiler.InvestigatorClassIds
 import land.sungbin.composeinvestigator.compiler.InvestigatorNames
 import land.sungbin.composeinvestigator.compiler.lower.unsafeLazy
 import org.jetbrains.kotlin.backend.common.extensions.IrPluginContext
-import org.jetbrains.kotlin.fir.java.enhancement.FirEmptyJavaDeclarationList.declarations
 import org.jetbrains.kotlin.ir.UNDEFINED_OFFSET
 import org.jetbrains.kotlin.ir.declarations.IrEnumEntry
 import org.jetbrains.kotlin.ir.expressions.IrCall
 import org.jetbrains.kotlin.ir.expressions.IrConst
 import org.jetbrains.kotlin.ir.expressions.IrExpression
-import org.jetbrains.kotlin.ir.expressions.impl.IrGetEnumValueImpl
 import org.jetbrains.kotlin.ir.expressions.IrGetEnumValue
 import org.jetbrains.kotlin.ir.expressions.impl.IrConstructorCallImpl
+import org.jetbrains.kotlin.ir.expressions.impl.IrGetEnumValueImpl
 import org.jetbrains.kotlin.ir.expressions.impl.fromSymbolOwner
 import org.jetbrains.kotlin.ir.symbols.IrEnumEntrySymbol
 import org.jetbrains.kotlin.ir.types.defaultType
@@ -34,7 +33,6 @@ public class IrComposableInformation(context: IrPluginContext) {
       .symbol
 
   private val functionOrigin by unsafeLazy { findOriginEntry(InvestigatorNames.Function) }
-  private val valueArgumentOrigin by unsafeLazy { findOriginEntry(InvestigatorNames.ValueArgument) }
   private val lambdaOrigin by unsafeLazy { findOriginEntry(InvestigatorNames.Lambda) }
 
   public operator fun invoke(
@@ -61,14 +59,6 @@ public class IrComposableInformation(context: IrPluginContext) {
       endOffset = UNDEFINED_OFFSET,
       type = originSymbol.defaultType,
       symbol = functionOrigin,
-    )
-
-  public fun irValueArgumentOrigin(): IrGetEnumValue =
-    IrGetEnumValueImpl(
-      startOffset = UNDEFINED_OFFSET,
-      endOffset = UNDEFINED_OFFSET,
-      type = originSymbol.defaultType,
-      symbol = valueArgumentOrigin,
     )
 
   public fun irLambdaOrigin(): IrGetEnumValue =

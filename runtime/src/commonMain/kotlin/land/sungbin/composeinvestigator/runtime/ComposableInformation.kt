@@ -22,9 +22,8 @@ import androidx.compose.runtime.Stable
   public val compoundKey: Int? = null,
   public val origin: Origin = Origin.Function,
 ) {
-  @Immutable public enum class Origin {
+  public enum class Origin {
     Function,
-    ValueArgument,
     Lambda,
   }
 }
