@@ -16,7 +16,7 @@ compose-activity = "1.9.3"
 compose-multiplatform = "1.7.3"
 
 spotless = "7.0.2"
-ktlint = "1.5.0"
+ktlint = "1.7.1"
 
 test-diffutil = "4.15"
 test-assertk = "0.28.1"
